@@ -1,0 +1,34 @@
+# macOS
+.DS_Store
+
+# Node / Vite
+node_modules/
+dist/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# IDE / Editor
+.vscode/
+.idea/
+
+# Tauri / Rust build output
+src-tauri/target/
+
+# ESP-IDF local toolchain/cache
+resources/.espressif/
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
