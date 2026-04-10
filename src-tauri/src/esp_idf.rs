@@ -8,8 +8,66 @@ use std::sync::{Arc, Mutex, OnceLock};
 use std::time::Duration;
 use tauri::{AppHandle, Manager, Emitter};
 
-const DEFAULT_ESP_IDF_VERSION: &str = "v5.2.2";
+static CACHED_ESP_IDF_CONFIG: OnceLock<Mutex<Option<serde_json::Value>>> = OnceLock::new();
+
+const DEFAULT_ESP_IDF_VERSION: &str = "v5.5.1";
 const ESP_IDF_REPO_URL: &str = "https://github.com/espressif/esp-idf.git";
+
+// ── Persistent Config for custom paths ───────────────────────────────
+// Stored in: %APPDATA%/vibeKidbright/config.json
+
+fn esp_idf_config_path() -> std::path::PathBuf {
+    let home = std::env::var("APPDATA")
+        .or_else(|_| std::env::var("HOME"))
+        .unwrap_or_else(|_| ".".to_string());
+    std::path::PathBuf::from(home)
+        .join(".vibekidbright")
+        .join("config.json")
+}
+
+fn read_esp_idf_config() -> serde_json::Value {
+    let mut guard = get_cached_config().lock().unwrap();
+    if let Some(config) = &*guard {
+        return config.clone();
+    }
+
+    let path = esp_idf_config_path();
+    let config = if path.exists() {
+        let data = std::fs::read_to_string(&path).unwrap_or_default();
+        serde_json::from_str(&data).unwrap_or(serde_json::json!({}))
+    } else {
+        serde_json::json!({})
+    };
+
+    *guard = Some(config.clone());
+    config
+}
+
+fn write_esp_idf_config(config: &serde_json::Value) {
+    let path = esp_idf_config_path();
+    if let Some(parent) = path.parent() {
+        let _ = std::fs::create_dir_all(parent);
+    }
+    let _ = std::fs::write(&path, serde_json::to_string_pretty(config).unwrap_or_default());
+    *get_cached_config().lock().unwrap() = None;
+}
+
+/// Check if the user has manually configured custom ESP-IDF paths in config
+fn resolve_custom_config_paths() -> Option<(PathBuf, PathBuf)> {
+    let config = read_esp_idf_config();
+    let idf = config["custom_idf_path"].as_str()?;
+    let tools = config["custom_tools_path"].as_str()?;
+    if idf.is_empty() || tools.is_empty() {
+        return None;
+    }
+    let idf_path = PathBuf::from(idf);
+    let tools_path = PathBuf::from(tools);
+    if idf_path.join("tools/idf.py").exists() && tools_path.exists() {
+        Some((idf_path, tools_path))
+    } else {
+        None
+    }
+}
 
 fn runtime_root_dir(app_handle: &AppHandle) -> Result<PathBuf, String> {
     let app_data_dir = app_handle
@@ -49,6 +107,10 @@ fn maybe_find_runtime_idf(app_handle: &AppHandle) -> Result<Option<PathBuf>, Str
     Ok(idf_dirs.pop())
 }
 
+fn strip_unc_prefix(path: PathBuf) -> PathBuf {
+    dunce::simplified(&path).to_path_buf()
+}
+
 fn canonical_idf_pair(idf_path: &Path, tools_path: &Path) -> Result<(PathBuf, PathBuf), String> {
     if !idf_path.join("tools/idf.py").exists() {
         return Err(format!(
@@ -60,12 +122,12 @@ fn canonical_idf_pair(idf_path: &Path, tools_path: &Path) -> Result<(PathBuf, Pa
         return Err(format!("ESP-IDF tools path missing at {}", tools_path.display()));
     }
 
-    let idf_abs = idf_path
+    let idf_abs = strip_unc_prefix(idf_path
         .canonicalize()
-        .map_err(|e| format!("Failed to canonicalize IDF path: {}", e))?;
-    let tools_abs = tools_path
+        .map_err(|e| format!("Failed to canonicalize IDF path: {}", e))?);
+    let tools_abs = strip_unc_prefix(tools_path
         .canonicalize()
-        .map_err(|e| format!("Failed to canonicalize tools path: {}", e))?;
+        .map_err(|e| format!("Failed to canonicalize tools path: {}", e))?);
     Ok((idf_abs, tools_abs))
 }
 
@@ -106,9 +168,17 @@ fn detect_host_python() -> Result<String, String> {
 }
 
 /// Resolve the ESP-IDF and tools paths (runtime, bundled, or dev fallback).
-/// All paths are canonicalized to absolute paths for consistency.
+/// Priority: env override > user config > runtime > bundled.
 fn resolve_idf_paths(app_handle: &AppHandle) -> Result<(PathBuf, PathBuf), String> {
+    // 1. Environment variable override
     if let Some((idf_path, tools_path)) = resolve_env_override() {
+        if let Ok(paths) = canonical_idf_pair(&idf_path, &tools_path) {
+            return Ok(paths);
+        }
+    }
+
+    // 2. User-configured paths from GUI settings (highest user priority)
+    if let Some((idf_path, tools_path)) = resolve_custom_config_paths() {
         if let Ok(paths) = canonical_idf_pair(&idf_path, &tools_path) {
             return Ok(paths);
         }
@@ -187,35 +257,56 @@ fn read_idf_version(idf_path: &Path) -> String {
         .to_string()
 }
 
-/// Build a PATH string that includes ESP-IDF toolchain directories.
-fn build_idf_path(tools_path: &Path) -> OsString {
-    let mut paths: Vec<PathBuf> = Vec::new();
+fn find_tool_bins(path: &Path, current_depth: u32, max_depth: u32, paths: &mut Vec<PathBuf>) {
+    if current_depth > max_depth {
+        return;
+    }
 
-    // Add all tool bin directories (xtensa-esp-elf, openocd, etc.)
-    let tools_dir = tools_path.join("tools");
-    if let Ok(entries) = std::fs::read_dir(&tools_dir) {
+    if let Ok(entries) = std::fs::read_dir(path) {
         for entry in entries.flatten() {
-            if entry.path().is_dir() {
-                // Each tool may have version subdirs containing a bin/
-                if let Ok(versions) = std::fs::read_dir(entry.path()) {
-                    for ver in versions.flatten() {
-                        let bin = ver.path().join("bin");
-                        if bin.exists() {
-                            paths.push(bin);
-                        }
-                        // Some tools put binaries directly in the version dir
-                        let elf_bin = ver.path().join(entry.file_name().to_string_lossy().to_string());
-                        let tool_bin = elf_bin.join("bin");
-                        if tool_bin.exists() {
-                            paths.push(tool_bin);
-                        }
-                    }
+            let p = entry.path();
+            if p.is_dir() {
+                let name = p.file_name().unwrap_or_default().to_string_lossy();
+                if name == "bin" {
+                    paths.push(p.clone());
                 }
+                // Recursive search ลงไปใน sub-directory
+                find_tool_bins(&p, current_depth + 1, max_depth, paths);
             }
         }
     }
+}
 
-    // Add the venv bin dir
+/// Build a PATH string that includes ESP-IDF toolchain directories.
+/// Also scans the user's D:\Espressif\tools for Ninja, CMake, and compilers.
+fn build_idf_path(tools_path: &Path) -> OsString {
+    let mut paths: Vec<PathBuf> = Vec::new();
+
+    // แก้ไข: เอา mut ออกจากหน้า scan
+    let scan = |tools_dir: &Path, paths: &mut Vec<PathBuf>| {
+        // เรียกใช้ฟังก์ชัน find_tool_bins ที่เราเพิ่มเข้าไปข้างบน
+        find_tool_bins(tools_dir, 0, 4, paths);
+    };
+
+    // 1. Scan the resolved tools_path
+    // หมายเหตุ: เรียกใช้ find_tool_bins โดยตรงหรือผ่าน scan ก็ได้ 
+    // ในที่นี้ผมปรับให้เรียกตามโครงสร้างเดิมที่คุณวางไว้
+    scan(&tools_path.join("tools"), &mut paths);
+    scan(tools_path, &mut paths);
+
+    // 2. Also check config-saved tools dir for Ninja/CMake
+    let config = read_esp_idf_config();
+    if let Some(custom_tools) = config["custom_tools_path"].as_str() {
+        let custom_tools_dir = PathBuf::from(custom_tools);
+        if custom_tools_dir.join("tools") != tools_path.join("tools") {
+            scan(&custom_tools_dir.join("tools"), &mut paths);
+        }
+        if custom_tools_dir != tools_path {
+            scan(&custom_tools_dir, &mut paths);
+        }
+    }
+
+    // 3. Add venv Scripts/bin dirs (โค้ดส่วนเดิมของคุณ...)
     let python_env_dir = tools_path.join("python_env");
     if let Ok(entries) = std::fs::read_dir(&python_env_dir) {
         for entry in entries.flatten() {
@@ -225,8 +316,9 @@ fn build_idf_path(tools_path: &Path) -> OsString {
             }
         }
     }
+    
+    // ... (ส่วนที่เหลือคงเดิม) ...
 
-    // Append the current system PATH
     if let Some(system_path) = std::env::var_os("PATH") {
         paths.extend(std::env::split_paths(&system_path));
     }
@@ -238,6 +330,53 @@ fn build_idf_path(tools_path: &Path) -> OsString {
 pub async fn check_esp_idf(app_handle: AppHandle) -> Result<String, String> {
     let (actual_idf_path, _) = resolve_idf_paths(&app_handle)?;
     Ok(format!("Ready: ESP-IDF found at {}", actual_idf_path.display()))
+}
+
+// ── Custom Path Commands (called from Setup/Repair button) ──────────────────
+
+#[tauri::command]
+pub async fn get_idf_custom_paths() -> Result<serde_json::Value, String> {
+    let config = read_esp_idf_config();
+    Ok(serde_json::json!({
+        "idf_path": config["custom_idf_path"].as_str().unwrap_or(""),
+        "tools_path": config["custom_tools_path"].as_str().unwrap_or("")
+    }))
+}
+
+#[tauri::command]
+pub async fn set_idf_custom_paths(idf_path: String, tools_path: String) -> Result<String, String> {
+    // Validate paths before saving
+    let idf = PathBuf::from(&idf_path);
+    let tools = PathBuf::from(&tools_path);
+
+    if !idf_path.is_empty() && !idf.join("tools/idf.py").exists() {
+        return Err(format!(
+            "Invalid ESP-IDF path: 'tools/idf.py' not found in '{}'",
+            idf_path
+        ));
+    }
+    if !tools_path.is_empty() && !tools.exists() {
+        return Err(format!("Tools path does not exist: '{}'", tools_path));
+    }
+
+    let mut config = read_esp_idf_config();
+    if let serde_json::Value::Object(ref mut map) = config {
+        map.insert("custom_idf_path".to_string(), serde_json::json!(idf_path));
+        map.insert("custom_tools_path".to_string(), serde_json::json!(tools_path));
+    }
+    write_esp_idf_config(&config);
+    Ok(format!("ESP-IDF paths saved: {} | {}", idf_path, tools_path))
+}
+
+#[tauri::command]
+pub async fn clear_idf_custom_paths() -> Result<(), String> {
+    let mut config = read_esp_idf_config();
+    if let serde_json::Value::Object(ref mut map) = config {
+        map.remove("custom_idf_path");
+        map.remove("custom_tools_path");
+    }
+    write_esp_idf_config(&config);
+    Ok(())
 }
 
 #[tauri::command]
@@ -285,16 +424,20 @@ pub async fn setup_esp_idf(
     }
 
     if !idf_path.exists() {
-        let clone_output = Command::new("git")
-            .arg("clone")
-            .arg("--depth")
-            .arg("1")
-            .arg("--branch")
-            .arg(&requested_version)
-            .arg(ESP_IDF_REPO_URL)
-            .arg(&idf_path)
-            .output()
-            .map_err(|e| format!("Failed to run git clone: {}", e))?;
+        let req_ver = requested_version.clone();
+        let idf_p = idf_path.clone();
+        let clone_output = tokio::task::spawn_blocking(move || {
+            Command::new("git")
+                .arg("clone")
+                .arg("--depth")
+                .arg("1")
+                .arg("--branch")
+                .arg(&req_ver)
+                .arg(ESP_IDF_REPO_URL)
+                .arg(&idf_p)
+                .output()
+                .map_err(|e| format!("Failed to run git clone: {}", e))
+        }).await.map_err(|e| format!("Task panicked: {}", e))??;
 
         if !clone_output.status.success() {
             return Err(format!(
@@ -314,26 +457,41 @@ pub async fn setup_esp_idf(
         ));
     }
 
-    let install_status = Command::new(&python_cmd)
-        .arg(&idf_tools_py)
-        .arg("install")
-        .arg("--targets")
-        .arg(&targets_arg)
-        .env("IDF_PATH", &idf_path)
-        .env("IDF_TOOLS_PATH", &tools_path)
-        .status()
-        .map_err(|e| format!("Failed to run idf_tools.py install: {}", e))?;
+    let py_cmd = python_cmd.clone();
+    let tools_py = idf_tools_py.clone();
+    let targets = targets_arg.clone();
+    let idf_p = idf_path.clone();
+    let tools_p = tools_path.clone();
+
+    let install_status = tokio::task::spawn_blocking(move || {
+        Command::new(&py_cmd)
+            .arg(&tools_py)
+            .arg("install")
+            .arg("--targets")
+            .arg(&targets)
+            .env("IDF_PATH", &idf_p)
+            .env("IDF_TOOLS_PATH", &tools_p)
+            .status()
+            .map_err(|e| format!("Failed to run idf_tools.py install: {}", e))
+    }).await.map_err(|e| format!("Task panicked: {}", e))??;
     if !install_status.success() {
         return Err("idf_tools.py install failed. Check network/proxy and rerun setup_esp_idf().".to_string());
     }
 
-    let pyenv_status = Command::new(&python_cmd)
-        .arg(&idf_tools_py)
-        .arg("install-python-env")
-        .env("IDF_PATH", &idf_path)
-        .env("IDF_TOOLS_PATH", &tools_path)
-        .status()
-        .map_err(|e| format!("Failed to run idf_tools.py install-python-env: {}", e))?;
+    let py_cmd = python_cmd.clone();
+    let tools_py = idf_tools_py.clone();
+    let idf_p = idf_path.clone();
+    let tools_p = tools_path.clone();
+
+    let pyenv_status = tokio::task::spawn_blocking(move || {
+        Command::new(&py_cmd)
+            .arg(&tools_py)
+            .arg("install-python-env")
+            .env("IDF_PATH", &idf_p)
+            .env("IDF_TOOLS_PATH", &tools_p)
+            .status()
+            .map_err(|e| format!("Failed to run idf_tools.py install-python-env: {}", e))
+    }).await.map_err(|e| format!("Task panicked: {}", e))??;
     if !pyenv_status.success() {
         return Err("idf_tools.py install-python-env failed. Check Python/pip access and rerun setup_esp_idf().".to_string());
     }
@@ -463,7 +621,10 @@ pub async fn list_project_files(path: String) -> Result<Vec<FileEntry>, String> 
         return Err(format!("Path does not exist: {}", path));
     }
     
-    fn read_dir_recursive(dir: &Path) -> Result<Vec<FileEntry>, String> {
+    fn read_dir_recursive(dir: &Path, depth: usize) -> Result<Vec<FileEntry>, String> {
+        if depth > 8 {
+            return Ok(vec![]);
+        }
         let mut entries = Vec::new();
         if let Ok(read_entries) = std::fs::read_dir(dir) {
             for entry in read_entries.flatten() {
@@ -480,7 +641,7 @@ pub async fn list_project_files(path: String) -> Result<Vec<FileEntry>, String> 
 
                 let is_dir = path.is_dir();
                 let children = if is_dir {
-                    Some(read_dir_recursive(&path)?)
+                    Some(read_dir_recursive(&path, depth + 1)?)
                 } else {
                     None
                 };
@@ -506,7 +667,7 @@ pub async fn list_project_files(path: String) -> Result<Vec<FileEntry>, String> 
         Ok(entries)
     }
 
-    read_dir_recursive(&root)
+    read_dir_recursive(&root, 0)
 }
 
 #[tauri::command]
@@ -519,6 +680,52 @@ pub async fn read_project_file(path: String) -> Result<String, String> {
 pub async fn write_project_file(path: String, content: String) -> Result<(), String> {
     std::fs::write(path, content)
         .map_err(|e| format!("Failed to write file: {}", e))
+}
+
+#[tauri::command]
+pub async fn safe_write_project_file(path: String, content: String) -> Result<(), String> {
+    let path_buf = PathBuf::from(&path);
+    if !path_buf.exists() {
+        return Err(format!("File does not exist: {}", path));
+    }
+    if !path_buf.is_file() {
+        return Err(format!("Path is not a file: {}", path));
+    }
+    
+    std::fs::write(path, content)
+        .map_err(|e| format!("Failed to write file safely: {}", e))
+}
+
+#[tauri::command]
+pub async fn create_directory(path: String) -> Result<(), String> {
+    std::fs::create_dir_all(path)
+        .map_err(|e| format!("Failed to create directory: {}", e))
+}
+
+#[tauri::command]
+pub async fn delete_file(path: String) -> Result<(), String> {
+    let path_buf = PathBuf::from(&path);
+    if path_buf.is_dir() {
+        return Err("Target is a directory, not a file".to_string());
+    }
+    std::fs::remove_file(path)
+        .map_err(|e| format!("Failed to delete file: {}", e))
+}
+
+#[tauri::command]
+pub async fn delete_directory(path: String) -> Result<(), String> {
+    let path_buf = PathBuf::from(&path);
+    if !path_buf.is_dir() {
+        return Err("Target is not a directory".to_string());
+    }
+    std::fs::remove_dir_all(path)
+        .map_err(|e| format!("Failed to delete directory: {}", e))
+}
+
+#[tauri::command]
+pub async fn rename_item(old_path: String, new_path: String) -> Result<(), String> {
+    std::fs::rename(old_path, new_path)
+        .map_err(|e| format!("Failed to rename: {}", e))
 }
 
 #[tauri::command]
@@ -593,6 +800,10 @@ pub async fn run_shell_command(
         }
     });
 
+    std::thread::spawn(move || {
+        let _ = child.wait();
+    });
+
     Ok(())
 }
 
@@ -605,9 +816,106 @@ pub async fn pick_directory() -> Result<String, String> {
     Ok(path.to_string_lossy().to_string())
 }
 
+#[tauri::command]
+pub async fn save_project_as(source_dir: String) -> Result<String, String> {
+    use rfd::FileDialog;
+
+    let source = PathBuf::from(&source_dir);
+    if !source.exists() || !source.is_dir() {
+        return Err(format!("Source project directory does not exist: {}", source_dir));
+    }
+
+    // Open folder picker for the destination parent directory
+    let dest_parent = FileDialog::new()
+        .set_title("Save Project As — Choose Destination Folder")
+        .pick_folder()
+        .ok_or("No destination directory selected")?;
+
+    // Use the same project folder name at the destination
+    let project_name = source
+        .file_name()
+        .map(|n| n.to_string_lossy().to_string())
+        .unwrap_or_else(|| "project_copy".to_string());
+
+    let dest = dest_parent.join(&project_name);
+
+    if dest.exists() {
+        return Err(format!(
+            "A folder named '{}' already exists at '{}'. Please choose a different location or rename it first.",
+            project_name,
+            dest_parent.display()
+        ));
+    }
+
+    // Recursively copy the project directory, skipping build artifacts
+    fn copy_dir_recursive(src: &Path, dst: &Path) -> Result<u64, String> {
+        std::fs::create_dir_all(dst)
+            .map_err(|e| format!("Failed to create directory {}: {}", dst.display(), e))?;
+
+        let mut file_count: u64 = 0;
+
+        let entries = std::fs::read_dir(src)
+            .map_err(|e| format!("Failed to read directory {}: {}", src.display(), e))?;
+
+        for entry in entries {
+            let entry = entry.map_err(|e| format!("Failed to read entry: {}", e))?;
+            let src_path = entry.path();
+            let name = src_path
+                .file_name()
+                .unwrap_or_default()
+                .to_string_lossy()
+                .to_string();
+
+            // Skip build artifacts and hidden directories
+            if name == "build"
+                || name == "target"
+                || name == "node_modules"
+                || name == ".git"
+                || name == "__pycache__"
+            {
+                continue;
+            }
+
+            let dst_path = dst.join(&name);
+
+            if src_path.is_dir() {
+                file_count += copy_dir_recursive(&src_path, &dst_path)?;
+            } else {
+                std::fs::copy(&src_path, &dst_path).map_err(|e| {
+                    format!(
+                        "Failed to copy {} -> {}: {}",
+                        src_path.display(),
+                        dst_path.display(),
+                        e
+                    )
+                })?;
+                file_count += 1;
+            }
+        }
+
+        Ok(file_count)
+    }
+
+    let src = source.clone();
+    let dst = dest.clone();
+    let file_count = tokio::task::spawn_blocking(move || {
+        copy_dir_recursive(&src, &dst)
+    }).await.map_err(|e| format!("Copy task panicked: {}", e))??;
+
+    Ok(format!(
+        "{}|{}",
+        dest.to_string_lossy(),
+        file_count
+    ))
+}
+
 struct SerialMonitorState {
     stop: Arc<AtomicBool>,
     tx: Sender<String>,
+}
+
+fn get_cached_config() -> &'static Mutex<Option<serde_json::Value>> {
+    CACHED_ESP_IDF_CONFIG.get_or_init(|| Mutex::new(None))
 }
 
 fn serial_monitor_store() -> &'static Mutex<Option<SerialMonitorState>> {
