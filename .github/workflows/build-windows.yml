@@ -1,0 +1,36 @@
+name: Build Windows Installer
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch: # อนุญาตให้กดสั่งรันด้วยตัวเองได้บนหน้าเว็บ
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18 # เวอร์ชันตามที่ระบุใน README ของโปรเจกต์
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install Frontend Dependencies
+        run: npm install
+
+      - name: Build and Create Release
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: v__VERSION__ # ดึงเวอร์ชันจาก tauri.conf.json อัตโนมัติ
+          releaseName: 'vibeKidbright v__VERSION__ (Windows)'
+          releaseBody: 'ดาวน์โหลดไฟล์ .msi หรือ .exe ด้านล่างเพื่อติดตั้งบน Windows'
+          releaseDraft: true # สร้างเป็น Draft ไว้ก่อน เผื่อให้คุณเข้าไปตรวจสอบก่อนกด Publish
+          prerelease: false
