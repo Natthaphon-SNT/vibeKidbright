@@ -16,7 +16,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18 # เวอร์ชันตามที่ระบุใน README ของโปรเจกต์
+          node-version: 20 # เวอร์ชันตามที่ระบุใน README ของโปรเจกต์
 
       - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
