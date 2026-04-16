@@ -56,7 +56,7 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
     const [showSettings, setShowSettings] = useState(false);
     const [showHistory, setShowHistory] = useState(false);
     const [activeModelBadge, setActiveModelBadge] = useState<string | null>(null);
-    
+
     // Chat Sessions
     const [sessions, setSessions] = useState<ChatSession[]>([]);
     const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
@@ -144,7 +144,7 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
         invoke("get_google_model").then((m) => {
             const mod = m as string;
             setGoogleModel(mod);
-            setGoogleModelInput(mod);   
+            setGoogleModelInput(mod);
         });
         // Listen for streaming events
         const unlistenActiveModel = listen("ai-active-model", (event) => {
@@ -251,17 +251,17 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
         setSessions(prev => {
             const existing = prev.find(s => s.id === sid);
             const title = existing?.title || (messages.length > 0 ? messages[0].content.substring(0, 30) + "..." : "New Chat");
-            
+
             const updated = prev.filter(s => s.id !== sid);
             if (messages.length === 0 && !existing) return prev; // don't save empty without user action
-            
+
             const newSession = {
                 id: sid,
                 title,
                 messages,
                 updatedAt: Date.now()
             };
-            
+
             const newSessions = [newSession, ...updated];
             localStorage.setItem("vibe_chat_sessions", JSON.stringify(newSessions));
             return newSessions;
@@ -294,7 +294,7 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
         setCurrentSessionId(crypto.randomUUID());
         setMessages([]);
     };
-    
+
     const stopGeneration = () => {
         invoke("stop_ai_generation").catch(e => console.error(e));
     };
@@ -362,7 +362,7 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
         // Convert messages to the format the backend expects
         const apiMessages = newMessages.map((m) => {
             let content = m.content;
-            
+
             // Inject hidden system warning only for the newly sent message
             if (m.id === userMessage.id) {
                 if (projectDir === ".") {
@@ -630,7 +630,7 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
                         </span>
                     ) : (
                         <span className={`text-[8px] px-1.5 py-0.5 rounded font-bold uppercase ${provider === "openai" ? "bg-violet-500/10 text-violet-400" :
-                                provider === "openrouter" ? "bg-orange-500/10 text-orange-400" :
+                            provider === "openrouter" ? "bg-orange-500/10 text-orange-400" :
                                 provider === "google" ? "bg-red-500/10 text-red-400" :
                                     "bg-emerald-500/10 text-emerald-400"
                             }`}>
@@ -698,11 +698,10 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
                                     <button
                                         key={session.id}
                                         onClick={() => loadSession(session.id)}
-                                        className={`w-full text-left p-3 rounded-lg border transition-colors ${
-                                            currentSessionId === session.id
+                                        className={`w-full text-left p-3 rounded-lg border transition-colors ${currentSessionId === session.id
                                                 ? "bg-violet-600/20 border-violet-500/50 text-violet-300"
                                                 : "bg-neutral-900/50 border-neutral-700 text-neutral-400 hover:bg-neutral-700 hover:text-neutral-200"
-                                        }`}
+                                            }`}
                                     >
                                         <div className="font-medium text-sm truncate">{session.title}</div>
                                         <div className="text-[10px] opacity-60 mt-1">
@@ -990,7 +989,7 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
                                             {isIndexing ? 'Indexing...' : 'Re-index'}
                                         </button>
                                         <button
-                                            onClick={() => invoke("add_knowledge_base_files", { projectDir }).then(() => invoke("get_knowledge_base_files", { projectDir }).then(f => setKnowledgeFiles(f as string[])))}
+                                            onClick={() => invoke("add_knowledge_base_files", { projectDir }).then(() => invoke("get_knowledge_base_files", { projectDir }).then(f => setKnowledgeFiles(f as string[]))).catch(err => console.error("Error adding file:", err))}
                                             className="text-[10px] text-red-400 hover:underline flex items-center gap-1"
                                         >
                                             <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1014,14 +1013,41 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
                                         {knowledgeFiles.length === 0 ? (
                                             <span className="text-[10px] text-neutral-600 italic">No custom docs added...</span>
                                         ) : (
-                                            knowledgeFiles.map(file => (
-                                                <div key={file} className="flex items-center gap-1.5 px-2 py-0.5 bg-neutral-800 border border-neutral-600 rounded text-[10px] text-neutral-300">
-                                                    <svg className="w-2.5 h-2.5 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                                    </svg>
-                                                    {file}
-                                                </div>
-                                            ))
+                                            knowledgeFiles.map(file => {
+                                                const isEnabled = !file.endsWith('.disabled');
+                                                const displayFileName = file.replace('.disabled', '');
+                                                return (
+                                                    <div key={file} className={`flex items-center gap-1.5 px-2 py-0.5 border rounded text-[10px] transition-colors ${isEnabled ? 'bg-neutral-800 border-neutral-600 text-neutral-300' : 'bg-neutral-900 border-neutral-800 text-neutral-600'}`}>
+                                                        {isEnabled ? (
+                                                            <svg className="w-2.5 h-2.5 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                            </svg>
+                                                        ) : (
+                                                            <svg className="w-2.5 h-2.5 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                                            </svg>
+                                                        )}
+                                                        <span className={`truncate max-w-[150px] ${!isEnabled ? 'line-through opacity-70' : ''}`} title={file}>{displayFileName}</span>
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                invoke("toggle_knowledge_base_file", { projectDir, fileName: file })
+                                                                    .then(() => invoke("get_knowledge_base_files", { projectDir }))
+                                                                    .then(f => setKnowledgeFiles(f as string[]))
+                                                                    .catch(err => console.error("Failed to toggle file:", err));
+                                                            }}
+                                                            className={`p-0.5 rounded transition-colors ml-1 ${isEnabled ? 'text-amber-400/50 hover:text-amber-400' : 'text-emerald-400/50 hover:text-emerald-400'}`}
+                                                            title={isEnabled ? "ซ่อนไฟล์จากแชท (Disable)" : "เปิดใช้งานในแชท (Enable)"}
+                                                        >
+                                                            {isEnabled ? (
+                                                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /></svg>
+                                                            ) : (
+                                                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                                                            )}
+                                                        </button>
+                                                    </div>
+                                                );
+                                            })
                                         )}
                                     </div>
                                     <p className="text-[10px] text-neutral-500">Add .txt or .md files to `/knowledge_base` to give the AI project-specific context.</p>

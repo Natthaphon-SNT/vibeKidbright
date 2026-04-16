@@ -399,7 +399,7 @@ pub fn get_knowledge_base_files(project_dir: String) -> Vec<String> {
     if let Ok(entries) = std::fs::read_dir(&kb_path) {
         for entry in entries.flatten() {
             if let Ok(name) = entry.file_name().into_string() {
-                if name.ends_with(".txt") || name.ends_with(".md") {
+                if name.ends_with(".txt") || name.ends_with(".md") || name.ends_with(".disabled") {
                     files.push(name);
                 }
             }
@@ -413,6 +413,26 @@ pub fn open_knowledge_base_folder(project_dir: String) {
     let kb_path = resolve_kb_path(&project_dir);
     if !kb_path.exists() { let _ = std::fs::create_dir_all(&kb_path); }
     let _ = tauri_plugin_opener::open_path(kb_path.to_string_lossy().to_string(), None::<String>);
+}
+
+#[tauri::command]
+pub async fn toggle_knowledge_base_file(project_dir: String, file_name: String) -> Result<bool, String> {
+    let kb_path = resolve_kb_path(&project_dir);
+    let target_file = kb_path.join(&file_name);
+    if !target_file.exists() && !target_file.is_file() {
+        return Err("File not found".to_string());
+    }
+    
+    if file_name.ends_with(".disabled") {
+        let new_name = file_name.replace(".disabled", "");
+        let enabled_file = kb_path.join(new_name);
+        std::fs::rename(&target_file, enabled_file).map_err(|e| e.to_string())?;
+    } else {
+        let disabled_file = kb_path.join(format!("{}.disabled", file_name));
+        std::fs::rename(&target_file, disabled_file).map_err(|e| e.to_string())?;
+    }
+    get_kb_query_cache().lock().unwrap().clear(); // Invalidate cache
+    Ok(true)
 }
 
 #[tauri::command]
