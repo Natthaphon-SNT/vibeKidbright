@@ -129,7 +129,20 @@ fn resolve_project_root(project_dir: &str) -> PathBuf {
 }
 
 fn resolve_kb_path(project_dir: &str) -> PathBuf {
-    resolve_project_root(project_dir).join("knowledge_base")
+    let proj_root = resolve_project_root(project_dir);
+    let proj_kb = proj_root.join("knowledge_base");
+    if proj_kb.exists() {
+        return proj_kb;
+    }
+    
+    // Fallback to the global IDE knowledge_base if the project doesn't have its own
+    let fallback_root = resolve_project_root("");
+    let fallback_kb = fallback_root.join("knowledge_base");
+    if fallback_kb.exists() {
+        return fallback_kb;
+    }
+    
+    proj_kb // Default if neither exists
 }
 
 fn resolve_idf_paths_for_ai(app_handle: &AppHandle) -> Option<(PathBuf, PathBuf)> {
@@ -380,8 +393,7 @@ pub async fn refresh_knowledge_base(project_dir: String) -> Result<usize, String
 
 #[tauri::command]
 pub fn get_knowledge_base_files(project_dir: String) -> Vec<String> {
-    let project_path = resolve_project_root(&project_dir);
-    let kb_path = project_path.join("knowledge_base");
+    let kb_path = resolve_kb_path(&project_dir);
     if !kb_path.exists() { return Vec::new(); }
     let mut files = Vec::new();
     if let Ok(entries) = std::fs::read_dir(&kb_path) {

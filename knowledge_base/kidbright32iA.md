@@ -1736,6 +1736,25 @@ Emitter ของ NPN → GND
 
 ---
 
+### 18.7 DS18B20 (1-Wire) Rules
+> **AI INSTRUCTION:** เซ็นเซอร์วัดอุณหภูมิแบบกันน้ำ **DS18B20** ใช้โปรโตคอล 1-Wire ในการอ่านค่าคุณ **MUST** ต่อตัวต้านทาน Pull-up ขนาด **4.7kΩ** คร่อมระหว่างขา DATA และ VCC (3.3V) เสมอ (หากไม่ได้ใช้โมดูลที่มี Pull-up ในตัว)
+
+---
+
+### 18.8 I2C Bus Sharing (BME280 / I2C LCD) Rules
+> **AI INSTRUCTION:** อุปกรณ์ I2C ภายนอกทั้งหมด (เช่น จอ LCD 16x2 I2C, เซ็นเซอร์ BME280) จะต่อผ่านพอร์ต I2C ของ KidBright ซึ่งใช้บัส `I2C_NUM_0` (SDA=GPIO21, SCL=GPIO22) ร่วมกับ LED Matrix และ Accelerometer (KXTJ3) บนบอร์ด
+> ⚠️ **DO NOT reinstall the I2C driver** หากมี `matrix_init()` หรือมีการเรียก `i2c_driver_install` สำหรับ `I2C_NUM_0` ไปแล้ว เพราะจะทำให้เกิด error `ESP_ERR_INVALID_STATE`
+
+---
+
+### 18.9 Buzzer Type Rules
+> **AI INSTRUCTION:** บอร์ด KidBright ตัวแผ่นหลักใช้ **Passive Buzzer** (ต้องใช้ PWM ผ่าน `ledc` ในการกำเนิดเสียง)
+> หากต่อ Buzzer ภายนอก:
+> - **Active Buzzer:** ใช้เพียงสัญญาณ Digital `HIGH` / `LOW` ควบคุม (`gpio_set_level`)
+> - **Passive Buzzer:** ต้องใช้สัญญาณ PWM (`ledc`) เพื่อสร้างความถี่เสียงที่ต้องการ
+
+---
+
 ## 19. PORT CAPABILITY RULES — V1.3 vs V1.6 Comparison
 > **AI INSTRUCTION:** ความสามารถของพอร์ตแตกต่างกันระหว่าง V1.3 และ V1.6 ต้องตรวจสอบบอร์ดเวอร์ชันก่อนใช้งาน Analog Input บนพอร์ต IN1–IN4
 
