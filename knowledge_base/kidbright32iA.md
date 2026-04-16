@@ -329,6 +329,15 @@ ledc_channel_config(&ledc_channel);
 // Play Tone (50% duty)
 ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, 512); // 512 is 50% for 10-bit
 ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
+
+// Stop Tone -- ESP-IDF v5.x: ledc_stop() requires 3 arguments!
+// 3rd arg = idle_level: 0 = GPIO LOW (correct for buzzer), 1 = GPIO HIGH
+ledc_stop(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, 0); // Correct v5.x
+// ledc_stop(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0); // WRONG - compile error in v5.x
+
+// Alternative: mute without stopping the timer (set duty=0)
+ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, 0);
+ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
 ```
 
 ### Common 16x8 Patterns (Row-Major format)
@@ -902,6 +911,10 @@ project(KidBright_Project)
 ### ═══ BUZZER ═══
 - Passive piezo at `GPIO_NUM_13`. Drive with `driver/ledc.h` (PWM).
 - Use `LEDC_TIMER_0`, `LEDC_TIMER_10_BIT`. NEVER use `tone()` — that is Arduino only.
+- **ESP-IDF v5.x BREAKING CHANGE — `ledc_stop()` requires 3 arguments:**
+  - `ledc_stop(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, 0);` ← CORRECT (idle_level=0 → GPIO LOW)
+  - `ledc_stop(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);` ← WRONG — compile error in v5.x!
+  - Error message: `error: too few arguments to function 'ledc_stop'`
 
 ### ═══ BUTTONS ═══
 - **SW1** = `GPIO_NUM_16` (Active LOW, GPIO_PULLUP_ENABLE)
@@ -927,9 +940,11 @@ project(KidBright_Project)
 ### ═══ LDR & ANALOG SENSORS (ADC VACCINE) ═══
 - LDR is strictly on **GPIO36 / ADC1_CHANNEL_0**. Input-only pin — no pull-up/pull-down available.
 - Other external analog sensors (e.g., LM35, Potentiometer) can be connected to IN1 (**GPIO32** / `ADC_CHANNEL_4`) or IN2 (**GPIO33** / `ADC_CHANNEL_5`).
-- **⚠️ CRITICAL ESP-IDF v5.x VACCINE**: 
+- **⚠️ CRITICAL ESP-IDF v5.x VACCINE**:
   - NEVER use legacy API: `adc1_config_width`, `adc1_config_channel_atten`, `adc1_get_raw`, `esp_adc_cal_characterize`. These were **REMOVED** and will cause compilation errors.
   - `#include "driver/adc.h"` and `#include "esp_adc_cal.h"` are **BANNED**.
+  - **`ADC_ATTEN_DB_11` was RENAMED to `ADC_ATTEN_DB_12` in ESP-IDF v5.x** — always use `ADC_ATTEN_DB_12` for the full 0–3.3V input range.
+  - **`#include "esp_rom_delay_us.h"` does NOT EXIST in ESP-IDF v5.x** — this file was never a public header. Use `vTaskDelay(pdMS_TO_TICKS(ms))` for millisecond delays instead. For microsecond delays, use `esp_rom_delay_us(us)` from `#include "rom/ets_sys.h"` (but prefer `vTaskDelay` unless sub-ms precision is critical).
 
 **CORRECT ESP-IDF v5.x ADC TEMPLATE (Oneshot + Calibration):**
 ```c
@@ -1752,6 +1767,30 @@ Emitter ของ NPN → GND
 > หากต่อ Buzzer ภายนอก:
 > - **Active Buzzer:** ใช้เพียงสัญญาณ Digital `HIGH` / `LOW` ควบคุม (`gpio_set_level`)
 > - **Passive Buzzer:** ต้องใช้สัญญาณ PWM (`ledc`) เพื่อสร้างความถี่เสียงที่ต้องการ
+
+> ⚠️ **ESP-IDF v5.x BREAKING CHANGE: `ledc_stop()` signature เปลี่ยนแปลง!**
+>
+> **Function Signature (ESP-IDF v5.x):**
+> ```c
+> esp_err_t ledc_stop(ledc_mode_t speed_mode, ledc_channel_t channel, uint32_t idle_level);
+> ```
+>
+> **ตัวอย่างที่ถูกต้อง:**
+> ```c
+> // ✅ CORRECT — ESP-IDF v5.x
+> // idle_level=0: ขา GPIO กลับเป็น LOW เมื่อหยุด (ถูกต้องสำหรับ Buzzer)
+> ledc_stop(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, 0);
+>
+> // ❌ WRONG — compile error ใน ESP-IDF v5.x ทุกเวอร์ชัน
+> // error: too few arguments to function 'ledc_stop'
+> ledc_stop(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
+> ```
+>
+> **ทางเลือก: ปิดเสียงโดยไม่หยุด Timer (แนะนำสำหรับ melody player)**
+> ```c
+> ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, 0);
+> ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
+> ```
 
 ---
 
