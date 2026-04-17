@@ -867,16 +867,17 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
                                     >
                                         <optgroup label="🆓 Free — Best for Coding">
                                             <option value="qwen/qwen3-coder:free">⭐ Qwen 3 Coder 480B (Best Free Coder)</option>
-                                            <option value="qwen/qwen3.6-plus-04-02:free">Qwen 3.6 Plus (Top Weekly Free)</option>
-                                            <option value="stepfun/step-3.5-flash:free">Step 3.5 Flash (Fast &amp; Free)</option>
-                                            <option value="deepseek/deepseek-chat:free">DeepSeek V3 Chat (Free)</option>
-                                        </optgroup>
-                                        <optgroup label="🆓 Free — General">
-                                            <option value="openrouter/free">Auto Free (Smart Fallback)</option>
-                                            <option value="meta-llama/llama-3.3-70b-instruct:free">Llama 3.3 70B Instruct</option>
-                                            <option value="google/gemma-3-27b-it:free">Gemma 3 27B</option>
+                                            <option value="meta-llama/llama-3.3-70b-instruct:free">Llama 3.3 70B Instruct (Free)</option>
+                                            <option value="nousresearch/hermes-3-llama-3.1-405b:free">Hermes 3 405B Instruct (Free)</option>
+                                            <option value="qwen/qwen3-next-80b-a3b-instruct:free">Qwen 3 Next 80B Instruct (Free)</option>
+                                            <option value="nvidia/nemotron-3-super-120b-a12b:free">Nemotron 3 Super 120B (Free)</option>
                                             <option value="openai/gpt-oss-120b:free">GPT-OSS 120B (Free)</option>
+                                            <option value="google/gemma-3-27b-it:free">Gemma 3 27B (Free)</option>
+                                            <option value="deepseek/deepseek-chat:free">DeepSeek V3 Chat (Free)</option>
                                             <option value="deepseek/deepseek-r1:free">DeepSeek R1 (Free)</option>
+                                        </optgroup>
+                                        <optgroup label="🆓 Free — Auto">
+                                            <option value="openrouter/free">Auto Free (Smart Fallback)</option>
                                         </optgroup>
                                         <optgroup label="✦ Premium — Top Models">
                                             <option value="anthropic/claude-4.6-sonnet-20260217">Claude Sonnet 4.6 (🏆 #1 Week)</option>

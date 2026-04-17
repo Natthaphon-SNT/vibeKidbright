@@ -395,16 +395,21 @@ pub async fn refresh_knowledge_base(project_dir: String) -> Result<usize, String
 pub fn get_knowledge_base_files(project_dir: String) -> Vec<String> {
     let kb_path = resolve_kb_path(&project_dir);
     if !kb_path.exists() { return Vec::new(); }
-    let mut files = Vec::new();
-    if let Ok(entries) = std::fs::read_dir(&kb_path) {
-        for entry in entries.flatten() {
-            if let Ok(name) = entry.file_name().into_string() {
-                if name.ends_with(".txt") || name.ends_with(".md") || name.ends_with(".disabled") {
-                    files.push(name);
-                }
-            }
-        }
-    }
+    // FIX: use recursive collector so sensor_examples/ subfolders are returned,
+    // matching the behaviour of keyword_knowledge_search and reindex_knowledge_base.
+    let all_files = collect_kb_files(&kb_path);
+    let mut files: Vec<String> = all_files
+        .into_iter()
+        .map(|(_, rel_key)| rel_key)
+        .filter(|k| {
+            k.ends_with(".txt")
+                || k.ends_with(".md")
+                || k.ends_with(".c")
+                || k.ends_with(".h")
+                || k.ends_with(".disabled")
+        })
+        .collect();
+    files.sort();
     files
 }
 
@@ -419,7 +424,7 @@ pub fn open_knowledge_base_folder(project_dir: String) {
 pub async fn toggle_knowledge_base_file(project_dir: String, file_name: String) -> Result<bool, String> {
     let kb_path = resolve_kb_path(&project_dir);
     let target_file = kb_path.join(&file_name);
-    if !target_file.exists() && !target_file.is_file() {
+    if !target_file.exists() || !target_file.is_file() {
         return Err("File not found".to_string());
     }
     
@@ -440,7 +445,7 @@ pub async fn add_knowledge_base_files(project_dir: String) -> Result<usize, Stri
     use rfd::FileDialog;
     let paths = FileDialog::new()
         .set_title("Add Document to Knowledge Base")
-        .add_filter("Documentation", &["txt", "md"])
+        .add_filter("Documentation", &["txt", "md", "c", "h"])
         .pick_files();
     if let Some(files) = paths {
         let kb_path = resolve_kb_path(&project_dir);
@@ -597,7 +602,6 @@ pub async fn send_ai_message(
 
     let mut project_path = resolve_project_root(&project_dir);
     let mut no_workspace = project_dir == "." || project_dir.is_empty();
-    let _is_openrouter = provider == "openrouter";
 
     tokio::spawn(async move {
         let mut try_queue: Vec<(String, String, String, String, String)> = vec![];
@@ -826,8 +830,10 @@ YOU HAVE TWO WAYS TO HELP:
 - Even if the Knowledge Base shows Arduino examples, you MUST translate them to pure ESP-IDF API before showing the user.
 
 ### SENSOR RULES (MANDATORY):
-- **Temperature Sensor**: The ESP32 chip on the KidBright32 iA board does NOT have an internal temperature sensor. You MUST NEVER use `esp_driver_tsens` or `temperature_sensor_install()`. Instead, you MUST use the on-board **LM73** I2C sensor via `I2C_NUM_1` (SDA=GPIO4, SCL=GPIO5, Address=0x4D) to measure temperature.
-- **LM73 Read Protocol**: Send pointer register `0x00`, then read 2 bytes. The result is a 13-bit signed value in the upper bits. Shift right by 3, then multiply by 0.0625 to get °C. Handle negative temps with sign extension.
+- **Temperature Sensor**: The ESP32 chip on the KidBright32 iA board does NOT have an internal temperature sensor. You MUST NEVER use `esp_driver_tsens` or `temperature_sensor_install()`. Instead, you MUST use the on-board **LM73** I2C sensor via `I2C_NUM_1` (SDA=GPIO4, SCL=GPIO5, Address=0x4D). Read 2 bytes from register `0x00`, shift right by 5, and divide by 32.0f (or shift by 3 and multiply by 0.0625 if 13-bit).
+- **Light Sensor (LDR)**: Connected to **GPIO36 (ADC1_CH0)**. You MUST use ESP-IDF v5 `adc_oneshot` API. GPIO36 is input-only.
+- **Accelerometer (KXTJ3-1057)**: I2C Address `0x0E`. Uses `I2C_NUM_0` (SDA=GPIO21, SCL=GPIO22) shared with the LED matrix. Write `0x00` to `CTRL_REG1` (0x1B) before configuring. Read 6 bytes from `0x06` (`XOUT_L`). Data is left-justified 12-bit (shift right 4).
+- **Accelerometer (MC3479)**: (Alternative revision) I2C Address `0x6C`. MUST wake up by writing `0x01` to `0x07` before reading.
 
 ### ADC RULES (MANDATORY — ESP-IDF v5.x):
 #### ❌ BANNED Legacy API (deleted in v5):
@@ -998,12 +1004,13 @@ CRITICAL: DO NOT use ESP_ERROR_CHECK() for i2c_master_cmd_begin or any I2C read/
 
 NO STANDARD C RANDOM (CRITICAL): NEVER use random() or srandom(). Use esp_random() or kb_random_range().
 
-VIBE CODER UI INTEGRATION:
-When generating code, if there are multiple files (e.g., main.c and header.h), provide them in separate code blocks, each with its own [FILE: path/to/file] header.
+TOOL USAGE RULE (CRITICAL):
+NEVER just explain code changes in plain text or markdown code blocks. You MUST physically call the `write_file` tool to apply any code changes. If you only output text, the file will NOT be saved.
 
 LANGUAGE & TONE: Thai language preferred. Supportive Technical Partner tone.
 
 FINAL SANITY CHECK & HARDWARE RULES:
+BOARD VERSION INQUIRY (CRITICAL): By default, assume KidBright32 iA. However, if the user's project involves external analog sensors (IN1-IN4), I2C devices, IMU, or features that differ across hardware revisions, you MUST ask the user to confirm their board version (V1.3, V1.4, V1.5, V1.6, or iA) BEFORE generating code, unless they have already specified it.
 DEFAULT BOARD = KidBright32 iA. Single HT16K33 at 0x70, Buzzer at GPIO 13.
 CRITICAL BUTTON PINS: SW1 = GPIO_NUM_16, SW2 = GPIO_NUM_14. Active LOW.
 CRITICAL I2C RULE: Use legacy API (#include "driver/i2c.h") and i2c_master_write_to_device. NEVER use driver/i2c_master.h.
@@ -1024,6 +1031,7 @@ CRITICAL LDR RULE: The on-board LDR (GPIO36 / ADC1_CH0) on KidBright32 iA uses a
 - **MOTORS/RELAYS:** **NEVER** drive Fan/Vibration motors directly from GPIO (max 40mA). ALWAYS use a transistor, driver module, or relay.
 - **ACTIVE LOW OUTPUTS:** OUT1, OUT2, and USB Port outputs are **ACTIVE LOW** (`gpio_set_level(..., 0)` turns the Output/Relay ON).
 - **BUZZERS:** Active Buzzers need Digital HIGH/LOW. Passive Buzzers need PWM (`ledc`).
+- **GPIO INTERRUPTS (ESP-IDF v5.x):** You MUST manually `#define ESP_INTR_FLAG_DEFAULT 0` at the top of the C file before using it in `gpio_install_isr_service(ESP_INTR_FLAG_DEFAULT);`.
 
 ### COMPONENT MANAGER RULE:
 - ถ้าต้องการ library นอก ESP-IDF core (เช่น led_strip, mqtt, cJSON), ให้เรียก tool `install_idf_library` ก่อน write_file EVERY TIME
@@ -1326,6 +1334,10 @@ async fn run_conversation_loop(
                 body_text.chars().take(300).collect::<String>()
             ));
         }
+
+        // A successful response resets the retry counter so a transient 429 earlier
+        // in this conversation doesn't bleed into subsequent tool-call turns.
+        retry_count = 0;
 
         let mut stream = response.bytes_stream();
         let mut accumulated_text = String::new();
@@ -1630,6 +1642,9 @@ async fn run_google_conversation_loop(
             return Err(format!("Google AI error {}: {}", status.as_u16(), body_text.chars().take(300).collect::<String>()));
         }
 
+        // Reset retry counter on a successful response (same logic as OpenAI loop).
+        retry_count = 0;
+
         let mut stream = response.bytes_stream();
         let mut accumulated_text = String::new();
         let mut buffer = String::new();
@@ -1742,7 +1757,7 @@ async fn run_google_conversation_loop(
                     role: "tool".to_string(),
                     content: json!({
                         "__tool_response__": true,
-                        "tool_call_id": tc.name,
+                        "tool_call_id": tc.id,   // FIX: was tc.name — must be the call ID, not the function name
                         "__func_name__": tc.name,
                         "content": result_str
                     }),
@@ -1778,6 +1793,7 @@ fn build_api_messages(system_prompt: &str, messages: &[ChatMessage], model: &str
         if let Some(obj) = m.content.as_object() {
             if obj.contains_key("__tool_calls__") {
                 let mut msg = json!({ "role": "assistant" });
+                // OpenAI rejects `content: null` when tool_calls are present — use "".
                 msg["content"] = obj.get("__text__").and_then(|t| t.as_str())
                     .map(|t| json!(t))
                     .unwrap_or(json!(""));
@@ -1791,12 +1807,21 @@ fn build_api_messages(system_prompt: &str, messages: &[ChatMessage], model: &str
                 }));
             } else {
                 let mut content = m.content.clone();
+                // Inject system prompt into first user message for models that
+                // don't accept a "system" role (e.g. Gemma, o1-*).
+                // Only applies to plain-text content; multimodal content is passed through.
                 if unsupported_system_role && !first_user_found && m.role == "user" {
                     first_user_found = true;
                     if let Some(text) = content.as_str() {
                         content = json!(format!(
                             "[SYSTEM INSTRUCTIONS]\n{}\n\n[USER INPUT]\n{}", system_prompt, text
                         ));
+                    }
+                    // If content is an array (multimodal), prepend a text part.
+                    else if let Some(arr) = content.as_array() {
+                        let mut new_arr = vec![json!({ "type": "text", "text": format!("[SYSTEM INSTRUCTIONS]\n{}\n\n", system_prompt) })];
+                        new_arr.extend(arr.iter().cloned());
+                        content = json!(new_arr);
                     }
                 }
                 api_msgs.push(json!({ "role": m.role.clone(), "content": content }));
@@ -1869,6 +1894,15 @@ async fn execute_tool(
                 let old_content = std::fs::read_to_string(&full_path).unwrap_or_default();
                 if old_content == content {
                     return json!({ "result": format!("File {} is already up to date.", rel_path) });
+                }
+                // FIX: Back up the old content so undo_ai_changes can restore it.
+                // Previously only new files were backed up (with None), leaving existing-file
+                // edits un-undoable.
+                if let Some(state) = app_handle.try_state::<AiBackupState>() {
+                    let mut backups = state.backups.lock().unwrap();
+                    let message_backups = backups.entry(message_id.to_string()).or_insert_with(HashMap::new);
+                    // Only record the *first* backup for this path in this message turn.
+                    message_backups.entry(full_path.clone()).or_insert_with(|| Some(old_content.clone()));
                 }
                 {
                     let mut diffs = get_pending_diffs().lock().unwrap();
@@ -2226,8 +2260,13 @@ fn compute_unified_diff(old: &str, new: &str, path: &str) -> String {
     let new_lines: Vec<&str> = new.lines().collect();
     let mut out = format!("--- {}\n+++ {}\n", path, path);
 
-    // Simple line-by-line diff using longest common subsequence approach.
-    // For production you'd use the `similar` crate, but this keeps zero extra deps.
+    // Simple line-by-line diff.  For production the `similar` crate is preferred,
+    // but this avoids an extra dependency while still producing a readable output.
+    // We emit a single hunk covering the entire file with correct line counters.
+    let old_count = old_lines.len();
+    let new_count = new_lines.len();
+    out.push_str(&format!("@@ -{},{} +{},{} @@\n", 1, old_count, 1, new_count));
+
     let mut i = 0;
     let mut j = 0;
     while i < old_lines.len() || j < new_lines.len() {
@@ -2413,10 +2452,15 @@ fn chunk_text(text: &str, target_size: usize, overlap: usize) -> Vec<String> {
     for sentence in &sentences {
         if current.len() + sentence.len() > target_size && !current.is_empty() {
             chunks.push(current.clone());
-            // Carry overlap: take the tail of current up to `overlap` chars.
+            // Carry overlap: take the tail up to `overlap` chars, but honour UTF-8 boundaries.
             overlap_buf.clear();
-            let tail_start = current.len().saturating_sub(overlap);
-            overlap_buf.push_str(&current[tail_start..]);
+            let byte_len = current.len();
+            let tail_byte_start = byte_len.saturating_sub(overlap);
+            // Walk forward to the next valid char boundary.
+            let safe_start = (tail_byte_start..byte_len)
+                .find(|&i| current.is_char_boundary(i))
+                .unwrap_or(byte_len);
+            overlap_buf.push_str(&current[safe_start..]);
             current = overlap_buf.clone();
             current.push(' ');
         }

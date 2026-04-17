@@ -1,5 +1,6 @@
 # KidBright32 — ESP-IDF Developer Reference
 > ESP32-WROOM-32 · NECTEC / Gravitech · **ESP-IDF v5.x Framework** · 3.3 V logic
+> Covers: **V1.5 Rev 3.1** (NECTEC Standard) · **V1.5 iA** (INEX) · **V1.6** (Gravitech)
 > ⚠️ **CRITICAL RULE FOR AI:** DO NOT use Arduino Framework (`<Wire.h>`, `digitalWrite`, `setup()`, `loop()`). All code must be strictly C/C++ using official ESP-IDF components.
 
 ---
@@ -20,6 +21,58 @@
 - มีจุดต่อพอร์ตที่ใช้คอนเน็กเตอร์ JST 2 มม. 3 ขา (JST : Japan Standard Terminal) รวม 6 ขา:
   - พอร์ตอินพุตดิจิทัล ประกอบด้วย ขา IN1 (GPIO32), IN2 (GPIO33), IN3 (GPIO34) และ IN4 (GPIO35) ตามการกำหนดขาของ KidBright
   - พอร์ตเอาต์พุตดิจิทัล OUT1 (GPIO26) และ OUT2 (GPIO27)
+
+---
+
+## คุณสมบัติทางเทคนิคของบอร์ด KidBright32 V1.5 Rev 3.1 (NECTEC Standard)
+> **บอร์ดมาตรฐาน สวทช.** — เป็น baseline ที่ iA และ iP ต่อยอดมา
+
+- ใช้ไมโครคอนโทรลเลอร์ ESP32 (ESP32-WROOM-32) ที่มีวงจร WiFi และบลูทูธในตัว
+- มีส่วนแสดงผล LED ดอตเมตริกซ์ขนาด 16×8 จุด แบบสีแดง (ไดรเวอร์ HT16K33 @ I2C 0x70)
+- มีเซ็นเซอร์แสง LDR (GPIO36 / ADC1_CH0)
+- มีเซ็นเซอร์อุณหภูมิ LM73 (I2C_NUM_1, SDA=GPIO4, SCL=GPIO5, Address 0x4D)
+- มีลำโพงเปียโซขับเสียง (Passive Buzzer, GPIO13, ต้องใช้ PWM/LEDC)
+- มีวงจรสวิตช์กดติดปล่อยดับขนาดใหญ่ 2 ตัว (SW1=GPIO16, SW2=GPIO17)
+- มีวงจรฐานเวลานาฬิกาจริง (RTC) พร้อมแบตเตอรี่ CR1220 สำรอง
+- มีสวิตช์ RESET การทำงาน
+- เชื่อมต่อกับคอมพิวเตอร์ผ่านพอร์ต **Micro-USB** (ต่างจาก iA/iP ที่ใช้ USB-C)
+- มีช่อง **USB Type-A** (Host) สำหรับต่ออุปกรณ์ภายนอก (Active LOW ผ่าน IO25)
+- มีพอร์ต JST 3 ขา สำหรับ IN1–IN4 (GPIO32–35) และ OUT1–OUT2 (GPIO26–27)
+- มีพอร์ต KB Chain (I2C_NUM_0) สำหรับต่ออุปกรณ์เสริม
+- **ไม่มี** Accelerometer / Gyroscope / Magnetometer (เพิ่มเฉพาะใน iA และ V1.6)
+- **ไม่รองรับ ADC บนพอร์ต IN1–IN4** (ต่างจาก iA และ V1.6 ที่รองรับ)
+
+### Sensor Map — V1.5 Rev 3.1
+
+| Sensor | Protocol | Bus/Pin | Address/Channel |
+|--------|----------|---------|-----------------|
+| LDR (Light) | ADC | GPIO36 / ADC1_CH0 | — |
+| LM73 (Temp) | I2C | I2C_NUM_1, SDA=GPIO4, SCL=GPIO5 | 0x4D |
+| RTC MCP794xx | I2C | I2C_NUM_1, SDA=GPIO4, SCL=GPIO5 | 0x6F |
+| HT16K33 (Matrix) | I2C | I2C_NUM_0, SDA=GPIO21, SCL=GPIO22 | 0x70 |
+| Passive Buzzer | GPIO/PWM | GPIO13 (LEDC) | — |
+| SW1 Button | GPIO | GPIO16 | — |
+| SW2 Button | GPIO | GPIO17 | — |
+| USB Host Control | GPIO | GPIO25 (Active LOW) | — |
+
+> ⚠️ **V1.5 Rev 3.1 ไม่มี KXTJ3 Accelerometer** — I2C_NUM_0 จึงมีเฉพาะ HT16K33 (0x70) เท่านั้น ต่างจาก iA ที่มี KXTJ3 (0x0E) อยู่ด้วย
+
+> 📋 **I2C Scan Result (V1.5 Rev 3.1G — confirmed Apr 17 2026)**
+> - I2C_NUM_0 (SDA=GPIO21, SCL=GPIO22): พบ `0x70` (HT16K33)
+> - I2C_NUM_1 (SDA=GPIO4, SCL=GPIO5): พบ `0x4D` (LM73) และ `0x6F` (RTC MCP794xx)
+> - Address `0x6F` คือ RTC chip ในตระกูล MCP7940N/MCP7941X (Microchip) ซึ่งเป็น RTC ที่มาพร้อมกับ SRAM และ alarm ในตัว ใช้ร่วมกับแบตเตอรี่ CR1220 บนบอร์ด
+
+### GPIO Conflict Table — V1.5 Rev 3.1
+
+| GPIO | ใช้ได้เป็น... |
+|------|--------------|
+| GPIO4 | **BT LED** หรือ **LM73 SDA** — เลือกได้แค่อย่างเดียว |
+| GPIO13 | **Passive Buzzer** — ต้องใช้ LEDC/PWM เสมอ |
+| GPIO16 | **SW1 Button** หรือ **SERVO1** — เลือกได้แค่อย่างเดียว |
+| GPIO17 | **SW2 Button** หรือ **SERVO2** — เลือกได้แค่อย่างเดียว |
+| GPIO25 | **USB Host (Active LOW)** — อย่าใช้งานอื่น |
+| GPIO36 | **LDR ADC** — Input-only, ไม่มี pull resistor |
+| GPIO2 | **Wi-Fi LED** — อย่าใช้งานอื่น |
 
 ---
 
@@ -76,16 +129,13 @@ buffer[16] = column_15_rows (Right Matrix Col 7)
 ```
 
 #### Helper: Convert row-major bitmap to column-major (cols[16])
-> ⚠️ **CRITICAL HARDWARE QUIRK FOR AI:** The KidBright32 matrix hardware is wired upside-down (Y-axis inverted). When converting rows to columns, you **MUST** invert the row bit shifting by using `(7 - row)`. Never use just `row`.
 
 ```c
-// Convert human-readable row-major array to hardware-ready column-major array
-void rows_to_columns_16x8(const uint16_t row_data[8], uint8_t out_cols[16]) {
+static void rows_to_columns_16x8(const uint16_t row_data[8], uint8_t out_cols[16]) {
     memset(out_cols, 0, 16);
     for (int row = 0; row < 8; row++) {
         for (int col = 0; col < 16; col++) {
             if (row_data[row] & (1 << (15 - col))) {
-                // HARDWARE QUIRK: Y-axis inversion required here -> (7 - row)
                 out_cols[col] |= (1 << (7 - row));
             }
         }
@@ -141,6 +191,86 @@ void matrix_draw(const uint8_t cols[16]) {
 }
 ```
 
+#### ⚠️ TWO-DIGIT DISPLAY — เทคนิคบังคับสำหรับตัวเลข 2 หลัก (MANDATORY FOR AI)
+
+> **CRITICAL:** DIGIT patterns (DIGIT_0–DIGIT_9) มาตรฐานจะส่องเฉพาะ **columns 3–7** (ฝั่ง LEFT เท่านั้น)
+> ถ้าแสดง DIGIT_x เดี่ยวๆ ฝั่งขวาจะ **ดับสนิท**
+> ต้องใช้ `display_two_digits()` เสมอเมื่อแสดงตัวเลข 2 หลัก
+
+**❌ WRONG — ฝั่งขวาดับ (common AI mistake):**
+```c
+display_pattern(DIGITS[tens]);   // only cols 3–7 light up, right is dark
+display_pattern(DIGITS[units]);  // same problem
+```
+
+**✅ CORRECT — ทั้งสองฝั่งติดพร้อมกัน:**
+```c
+display_two_digits(tens, units); // tens on LEFT cols 3-7, units on RIGHT cols 11-15
+// Note: DIGITS[units] is shifted right by 8 bits to move it to the right panel.
+```
+
+### ✅ VERIFIED Functions (copy-paste ready):
+
+```c
+// Lookup table — declare globally after DIGIT_0..DIGIT_9 definitions
+static const uint16_t *DIGITS[10] = {
+    DIGIT_0, DIGIT_1, DIGIT_2, DIGIT_3, DIGIT_4,
+    DIGIT_5, DIGIT_6, DIGIT_7, DIGIT_8, DIGIT_9
+};
+
+// Display tens on LEFT panel, units on RIGHT panel — full 16x8 display
+void display_two_digits(int tens, int units) {
+    if (tens  < 0) tens  = 0; if (tens  > 9) tens  = 9;
+    if (units < 0) units = 0; if (units > 9) units = 9;
+    uint16_t combined[8];
+    for (int i = 0; i < 8; i++) {
+        combined[i] = DIGITS[tens][i] | (DIGITS[units][i] >> 8);
+    }
+    uint8_t cols[16];
+    rows_to_columns_16x8(combined, cols);
+    matrix_draw(cols);
+}
+
+// Convenience function: integer 0-99 → 2-digit display
+void display_number(int value) {
+    if (value < 0)  value = 0;
+    if (value > 99) value = 99;
+    display_two_digits((value / 10) % 10, value % 10);
+}
+```
+
+#### Verified Patterns (ห้ามประดิษฐ์ค่า hex เอง!)
+
+> ⚠️ **CRITICAL:** ห้าม invent ค่า `uint16_t` hex สำหรับ digit/icon เองเด็ดขาด
+> ค่าที่ AI คิดเองจะแสดงผล garbled บน hardware เสมอ
+> ใช้เฉพาะ verified patterns ด้านล่างเท่านั้น
+
+```c
+// --- Digits 0–9 (verified hardware-tested, left-panel positioned) ---
+// Each pattern occupies bit positions 12–8 on the left half (cols 3–7).
+// To display on RIGHT panel: shift right by 8 bits → bit positions 4–0 (cols 11–15).
+const uint16_t DIGIT_0[8] = {0x0E00,0x1100,0x1100,0x1100,0x1100,0x1100,0x1100,0x0E00};
+const uint16_t DIGIT_1[8] = {0x0200,0x0600,0x0A00,0x0200,0x0200,0x0200,0x0200,0x1F00};
+const uint16_t DIGIT_2[8] = {0x0E00,0x1100,0x0100,0x0200,0x0400,0x0800,0x1000,0x1F00};
+const uint16_t DIGIT_3[8] = {0x0E00,0x1100,0x0100,0x0600,0x0100,0x0100,0x1100,0x0E00};
+const uint16_t DIGIT_4[8] = {0x0200,0x0600,0x0A00,0x1200,0x1F00,0x0200,0x0200,0x0200};
+const uint16_t DIGIT_5[8] = {0x1F00,0x1000,0x1E00,0x0100,0x0100,0x0100,0x1100,0x0E00};
+const uint16_t DIGIT_6[8] = {0x0E00,0x1100,0x1000,0x1E00,0x1100,0x1100,0x1100,0x0E00};
+const uint16_t DIGIT_7[8] = {0x1F00,0x0100,0x0200,0x0400,0x0400,0x0400,0x0400,0x0400};
+const uint16_t DIGIT_8[8] = {0x0E00,0x1100,0x1100,0x0E00,0x1100,0x1100,0x1100,0x0E00};
+const uint16_t DIGIT_9[8] = {0x0E00,0x1100,0x1100,0x0F00,0x0100,0x0100,0x1100,0x0E00};
+
+// Helper: get digit pattern
+const uint16_t* get_digit_pattern(int digit) {
+    static const uint16_t* digits[10] = {
+        DIGIT_0, DIGIT_1, DIGIT_2, DIGIT_3, DIGIT_4,
+        DIGIT_5, DIGIT_6, DIGIT_7, DIGIT_8, DIGIT_9
+    };
+    if (digit < 0 || digit > 9) return DIGIT_0;
+    return digits[digit];
+}
+```
+
 ### Built-in Indicator LEDs
 | LED | GPIO | Behavior | Notes |
 |---|---|---|---|
@@ -193,7 +323,7 @@ esp_err_t adc_init(void) {
 int adc_read_ldr(void) {
     int raw = 0;
     adc_oneshot_read(adc1_handle, ADC_CHANNEL_0, &raw);
-    return raw; // 0 (dark) to 4095 (bright) — inverted due to LDR circuit
+    return raw; // 0 = bright (สว่างมาก), 4095 = dark (มืดมาก) — LDR voltage-divider is inverted
 }
 
 // --- Cleanup (call if unit is no longer needed) ---
@@ -280,14 +410,16 @@ void adc_deinit(void) {
 
 ## 5. ESP-IDF Quick-Start Snippets (v5.x Syntax)
 
-### Digital Input (Button SW1)
+### Digital Input (Button SW1 & SW2)
 
+> ⚠️ **WARNING:** KidBright SW1 is `GPIO_NUM_16` and SW2 is `GPIO_NUM_14`.
+
+#### Option A: Pulling / Polling (Simple)
 ```c
 #include "driver/gpio.h"
 
-// WARNING: KidBright SW1 is GPIO_NUM_16, NOT GPIO_NUM_0
 gpio_config_t io_conf = {
-    .pin_bit_mask = (1ULL << GPIO_NUM_16),
+    .pin_bit_mask = (1ULL << GPIO_NUM_16) | (1ULL << GPIO_NUM_14),
     .mode = GPIO_MODE_INPUT,
     .pull_up_en = GPIO_PULLUP_ENABLE,
     .pull_down_en = GPIO_PULLDOWN_DISABLE,
@@ -295,8 +427,47 @@ gpio_config_t io_conf = {
 };
 gpio_config(&io_conf);
 
-// Read state
-int sw1_state = gpio_get_level(GPIO_NUM_16); // 0 = Pressed
+// Read state (0 = Pressed, Active LOW)
+int sw1_state = gpio_get_level(GPIO_NUM_16);
+```
+
+#### Option B: Hardware Interrupts (ISR + FreeRTOS Queue) — PREFERRED FOR AI
+> ⚠️ **CRITICAL INSTRUCTION:** Always define `ESP_INTR_FLAG_DEFAULT 0` at the top of your file when using `gpio_install_isr_service()`, otherwise the code will fail to compile.
+
+```c
+#include "freertos/FreeRTOS.h"
+#include "freertos/queue.h"
+#include "driver/gpio.h"
+
+// MANDATORY DECLARATION FOR ESP-IDF ISR
+#define ESP_INTR_FLAG_DEFAULT 0
+
+QueueHandle_t button_evt_queue = NULL;
+
+static void IRAM_ATTR gpio_isr_handler(void* arg) {
+    uint32_t gpio_num = (uint32_t) arg;
+    xQueueSendFromISR(button_evt_queue, &gpio_num, NULL);
+}
+
+void setup_buttons_isr() {
+    gpio_config_t io_conf = {
+        .pin_bit_mask = (1ULL << GPIO_NUM_16) | (1ULL << GPIO_NUM_14),
+        .mode = GPIO_MODE_INPUT,
+        .pull_up_en = GPIO_PULLUP_ENABLE,
+        .pull_down_en = GPIO_PULLDOWN_DISABLE,
+        .intr_type = GPIO_INTR_NEGEDGE  // Interrupt on falling edge (pressed)
+    };
+    gpio_config(&io_conf);
+
+    button_evt_queue = xQueueCreate(10, sizeof(uint32_t));
+    
+    // Install ISR service with default flag MUST be explicitly 0
+    gpio_install_isr_service(ESP_INTR_FLAG_DEFAULT);
+    
+    // Hook ISR handlers
+    gpio_isr_handler_add(GPIO_NUM_16, gpio_isr_handler, (void*) GPIO_NUM_16);
+    gpio_isr_handler_add(GPIO_NUM_14, gpio_isr_handler, (void*) GPIO_NUM_14);
+}
 ```
 
 ### Buzzer (LEDC PWM)
@@ -436,6 +607,37 @@ snprintf(str, sizeof(str), "%03d", raw_value);
 
 #define ESP_INTR_FLAG_DEFAULT 0
 ```
+
+### ⛔ BANNED HEADERS — AI MUST NEVER USE (These cause fatal compile errors)
+> ⚠️ **CRITICAL AI VACCINE RULE:** The following headers do NOT exist in ESP-IDF v5.x. Using them causes `fatal error: No such file or directory`. NEVER generate code with these includes under ANY circumstances.
+
+| BANNED Header | Why Banned | Correct Replacement |
+|---|---|---|
+| `esp_rom_delay_us.h` | **Does not exist** — AI hallucination | Use `vTaskDelay(pdMS_TO_TICKS(ms))` in tasks |
+| `rom/ets_sys.h` | Deprecated / unreliable in v5.x | Use `vTaskDelay()` instead |
+| `esp_rom_gpio.h` | Private ROM header, not public API | Use `driver/gpio.h` |
+| `adc1_config_width` / `adc1_get_raw` | **REMOVED** in v5.x | Use `esp_adc/adc_oneshot.h` |
+| `Arduino.h` / `Wire.h` | Arduino framework only | Use ESP-IDF driver/i2c.h |
+
+### ✅ CORRECT Delay Patterns in ESP-IDF v5.x
+
+```c
+// ✅ CORRECT — inside any FreeRTOS task (most common, preferred)
+vTaskDelay(pdMS_TO_TICKS(100));   // delay 100 ms
+
+// ✅ CORRECT — if you need microsecond busy-wait (use sparingly, blocks CPU)
+// Header: #include "esp_rom_sys.h"   ← this is the correct header (NOT esp_rom_delay_us.h)
+#include "esp_rom_sys.h"
+esp_rom_delay_us(50);             // busy-wait 50 µs — use ONLY outside tasks / in ISR context
+
+// ❌ WRONG — these will NOT compile:
+// #include "esp_rom_delay_us.h"   ← DOES NOT EXIST
+// ets_delay_us(50);               ← deprecated, avoid
+// delay(100);                     ← Arduino only
+// usleep(100000);                 ← POSIX, not available in FreeRTOS
+```
+
+> **AI RULE:** In **99% of cases** you should use `vTaskDelay(pdMS_TO_TICKS(...))`. Only use `esp_rom_delay_us()` with `#include "esp_rom_sys.h"` for sub-millisecond hardware timing where blocking is acceptable.
 
 ### Proper Function Ordering Template
 > **AI INSTRUCTION:** You MUST define functions in this exact order to prevent "implicit declaration" errors in C. Defining `app_main` before a function it calls is a fatal compile error.
@@ -945,6 +1147,7 @@ project(KidBright_Project)
   - `#include "driver/adc.h"` and `#include "esp_adc_cal.h"` are **BANNED**.
   - **`ADC_ATTEN_DB_11` was RENAMED to `ADC_ATTEN_DB_12` in ESP-IDF v5.x** — always use `ADC_ATTEN_DB_12` for the full 0–3.3V input range.
   - **`#include "esp_rom_delay_us.h"` does NOT EXIST in ESP-IDF v5.x** — this file was never a public header. Use `vTaskDelay(pdMS_TO_TICKS(ms))` for millisecond delays instead. For microsecond delays, use `esp_rom_delay_us(us)` from `#include "rom/ets_sys.h"` (but prefer `vTaskDelay` unless sub-ms precision is critical).
+  - **`ESP_INTR_FLAG_DEFAULT` is UNDECLARED by default** — you MUST manually `#define ESP_INTR_FLAG_DEFAULT 0` at the top of your C files before calling `gpio_install_isr_service(ESP_INTR_FLAG_DEFAULT);`.
 
 **CORRECT ESP-IDF v5.x ADC TEMPLATE (Oneshot + Calibration):**
 ```c
@@ -1237,7 +1440,7 @@ const char* ldr_classify(int raw) {
 
 **กฎการแก้ปัญหา ADC Noise แกว่ง (Jumping Digits)**
 > ⚠️ **CRITICAL ADC NOISE RULE FOR AI:** ESP32 ADC มีสัญญาณรบกวนสูงมากและไวต่อความถี่แสงไฟบ้าน 50Hz เพื่อป้องกันไม่ให้ตัวเลขบนจอภาพกระโดดไปมา (Tens/Units fluctuation) 
-> 1. **Time-Spaced Sampling:** ห้ามอ่าน Multisampling รัวๆ ในลูปเดียวโดยไม่มีการหน่วงเวลา ต้องใส่ `esp_rom_delay_us(500);` ระหว่างแต่ละ Sample เสมอ
+> 1. **Time-Spaced Sampling:** ห้ามอ่าน Multisampling รัวๆ ในลูปเดียวโดยไม่มีการหน่วงเวลา ต้องใส่ `esp_rom_delay_us(500);` (ต้อง `#include "esp_rom_sys.h"` — **ไม่ใช่** `esp_rom_delay_us.h` ซึ่งไม่มีจริง) ระหว่างแต่ละ Sample เสมอ
 > 2. **EMA Filter:** ต้องจัดทำ Exponential Moving Average (EMA) เพื่อกรองความสมูทของค่าก่อนนำไปแสดงผลเสมอ เช่น `filtered = (filtered * 9 + current) / 10;`
 
 ### 15.4 KXTJ3-1057 Accelerometer — Additional Rules
@@ -1794,37 +1997,45 @@ Emitter ของ NPN → GND
 
 ---
 
-## 19. PORT CAPABILITY RULES — V1.3 vs V1.6 Comparison
-> **AI INSTRUCTION:** ความสามารถของพอร์ตแตกต่างกันระหว่าง V1.3 และ V1.6 ต้องตรวจสอบบอร์ดเวอร์ชันก่อนใช้งาน Analog Input บนพอร์ต IN1–IN4
+## 19. PORT CAPABILITY RULES — V1.5 Rev 3.1 / V1.3 / V1.6 Comparison
+> **AI INSTRUCTION:** ความสามารถของพอร์ตแตกต่างกันระหว่างแต่ละเวอร์ชัน ต้องตรวจสอบบอร์ดเวอร์ชันก่อนใช้งาน Analog Input บนพอร์ต IN1–IN4
 
 ### 19.1 Port Capability Comparison Table
 
 | KidBright Pin | GPIO | Digital Input | Digital Output | Analog Input (ADC) | Analog Output |
 |---|---|---|---|---|---|
-| **IN1** | GPIO32 | ✅ V1.3 & V1.6 | ❌ | ✅ **V1.6 เท่านั้น** (ADC1_CH4) | ❌ |
-| **IN2** | GPIO33 | ✅ V1.3 & V1.6 | ❌ | ✅ **V1.6 เท่านั้น** (ADC1_CH5) | ❌ |
-| **IN3** | GPIO34 | ✅ V1.3 & V1.6 | ❌ | ✅ **V1.6 เท่านั้น** (ADC1_CH6) | ❌ |
-| **IN4** | GPIO35 | ✅ V1.3 & V1.6 | ❌ | ✅ **V1.6 เท่านั้น** (ADC1_CH7) | ❌ |
-| **Out1** | GPIO26 | ❌ | ✅ V1.3 & V1.6 | ❌ | ✅ V1.3 & V1.6 (DAC2) |
-| **Out2** | GPIO27 | ❌ | ✅ V1.3 & V1.6 | ❌ | ❌ |
-| **IO18** | GPIO18 | ✅ V1.3 & V1.6 | ✅ V1.3 & V1.6 | ❌ | ✅ V1.3 & V1.6 |
-| **IO19** | GPIO19 | ✅ V1.3 & V1.6 | ✅ V1.3 & V1.6 | ❌ | ✅ V1.3 & V1.6 |
-| **IO23** | GPIO23 | ✅ V1.3 & V1.6 | ✅ V1.3 & V1.6 | ❌ | ✅ V1.3 & V1.6 |
+| **IN1** | GPIO32 | ✅ All versions | ❌ | ✅ **iA / V1.6 เท่านั้น** (ADC1_CH4) | ❌ |
+| **IN2** | GPIO33 | ✅ All versions | ❌ | ✅ **iA / V1.6 เท่านั้น** (ADC1_CH5) | ❌ |
+| **IN3** | GPIO34 | ✅ All versions | ❌ | ✅ **iA / V1.6 เท่านั้น** (ADC1_CH6) | ❌ |
+| **IN4** | GPIO35 | ✅ All versions | ❌ | ✅ **iA / V1.6 เท่านั้น** (ADC1_CH7) | ❌ |
+| **Out1** | GPIO26 | ❌ | ✅ All versions | ❌ | ✅ All versions (DAC2) |
+| **Out2** | GPIO27 | ❌ | ✅ All versions | ❌ | ❌ |
+| **IO18** | GPIO18 | ✅ All versions | ✅ All versions | ❌ | ✅ All versions |
+| **IO19** | GPIO19 | ✅ All versions | ✅ All versions | ❌ | ✅ All versions |
+| **IO23** | GPIO23 | ✅ All versions | ✅ All versions | ❌ | ✅ All versions |
 
 > ✅ = รองรับ | ❌ = ไม่รองรับ
 
 ---
 
-### 19.2 Critical Differences V1.3 vs V1.6
+### 19.2 Critical Differences — V1.5 Rev 3.1 vs iA vs V1.6
 
-| Feature | V1.3 | V1.6 |
-|---|---|---|
-| Analog Input บน IN1–IN4 | ❌ ไม่รองรับ | ✅ รองรับ (ADC1_CH4–CH7) |
-| Servo Connector | ❌ ไม่มี | ✅ มี (SERVO1=GPIO15/IO15, SERVO2=GPIO17/IO17) |
-| 3-pin JST Connector (Input/Output) | ❌ ไม่มี | ✅ มี (I1–I4, O1–O2) |
-| Power Output | 5V (USB) | 3.3V + GND |
-| USB Connector | Micro-USB | USB-C (iA revision) |
-| Light Sensor Module (Analog) | ❌ | ✅ |
+| Feature | V1.5 Rev 3.1 (NECTEC) | V1.5 iA (INEX) | V1.6 (Gravitech) |
+|---|---|---|---|
+| Analog Input บน IN1–IN4 | ❌ ไม่รองรับ | ✅ รองรับ (ADC1_CH4–CH7) | ✅ รองรับ (ADC1_CH4–CH7) |
+| Accelerometer | ❌ ไม่มี | ✅ KXTJ3-1057 (I2C_NUM_0, 0x0E) | ✅ มี |
+| Gyroscope | ❌ ไม่มี | ❌ ไม่มี | ✅ มี |
+| Magnetometer | ❌ ไม่มี | ❌ ไม่มี | ✅ มี |
+| RGB LED on-board | ❌ ไม่มี | ❌ ไม่มี | ✅ มี (6 ดวง) |
+| Servo Connector | ❌ ไม่มี | ❌ ไม่มี | ✅ มี (SERVO1=GPIO15, SERVO2=GPIO17) |
+| USB Connector | **Micro-USB** | **USB-C** | USB-C |
+| USB Host (Type-A) | ✅ มี (GPIO25, Active LOW) | ✅ มี | ✅ มี |
+| LDR Sensor | ✅ GPIO36 / ADC1_CH0 | ✅ GPIO36 / ADC1_CH0 | ✅ |
+| Temperature Sensor | ✅ LM73 (I2C1, 0x4D) | ✅ LM73 (I2C1, 0x4D) | ✅ LM73 |
+| I2C_NUM_0 devices | HT16K33 (0x70) only | HT16K33 (0x70) + KXTJ3 (0x0E) | HT16K33 + Accel/Gyro/Mag |
+| I2C_NUM_1 devices | LM73 (0x4D) + RTC (0x6F) | LM73 (0x4D) | LM73 (0x4D) |
+
+> ⚠️ **AI CRITICAL:** V1.5 Rev 3.1 ใช้ **Micro-USB** ไม่ใช่ USB-C และ **ไม่มี KXTJ3** — ห้ามเขียนโค้ดที่ init KXTJ3 สำหรับบอร์ดนี้
 
 ---
 
