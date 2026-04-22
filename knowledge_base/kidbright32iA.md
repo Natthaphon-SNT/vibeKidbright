@@ -332,8 +332,12 @@ const uint16_t* get_digit_pattern(int digit) {
 
 ```c
 #include "esp_adc/adc_oneshot.h"
-#include "esp_adc/adc_cali.h"
-#include "esp_adc/adc_cali_scheme.h"
+// ⚠️ Do NOT include adc_cali.h or adc_cali_scheme.h when only reading LDR raw values
+
+// --- Hardware-calibrated LDR bounds (KidBright32 iA on-board LDR) ---
+// The voltage-divider limits the range — it does NOT reach 0 or 4095!
+#define LDR_ADC_MIN_VAL  100   // Brightest (most light)
+#define LDR_ADC_MAX_VAL  900   // Darkest  (covered)
 
 // --- ADC Initialization (call once in app_main) ---
 adc_oneshot_unit_handle_t adc1_handle;
@@ -352,11 +356,18 @@ esp_err_t adc_init(void) {
     return adc_oneshot_config_channel(adc1_handle, ADC_CHANNEL_0, &chan_config);
 }
 
-// --- Read a single ADC sample ---
-int adc_read_ldr(void) {
+// --- Read LDR and return light percentage (0=dark, 99=bright) ---
+// ⚠️ HARDWARE NOTE: On KidBright32 iA the voltage-divider limits range to ~100–900.
+// NEVER use 0 or 4095 as bounds. ALWAYS use LDR_ADC_MIN_VAL/LDR_ADC_MAX_VAL.
+int adc_read_ldr_percent(void) {
     int raw = 0;
     adc_oneshot_read(adc1_handle, ADC_CHANNEL_0, &raw);
-    return raw; // 0 = bright (สว่างมาก), 4095 = dark (มืดมาก) — LDR voltage-divider is inverted
+
+    // Inverted: lower raw = more light
+    int pct = (int)(((float)(LDR_ADC_MAX_VAL - raw) / (LDR_ADC_MAX_VAL - LDR_ADC_MIN_VAL)) * 100.0f);
+    if (pct < 0)  pct = 0;
+    if (pct > 99) pct = 99;  // Cap at 99 for 2-digit display
+    return pct;
 }
 
 // --- Cleanup (call if unit is no longer needed) ---
@@ -364,6 +375,8 @@ void adc_deinit(void) {
     adc_oneshot_del_unit(adc1_handle);
 }
 ```
+
+> **Hardware Calibration Note:** The on-board LDR uses an INVERTED voltage-divider — MORE light = LOWER raw ADC value. The circuit physically limits the range to ~100 (bright) to ~900 (dark). The formula `(MAX - raw) / (MAX - MIN)` corrects for both inversion and clamped range.
 
 > **Note for AI:** `ADC_ATTEN_DB_12` (formerly `ADC_ATTEN_DB_11`) is the correct constant for full 3.3 V range in ESP-IDF v5.x. Never use `ADC_ATTEN_DB_11` — it is deprecated and may be removed.
 

@@ -831,7 +831,9 @@ YOU HAVE TWO WAYS TO HELP:
 
 ### SENSOR RULES (MANDATORY):
 - **Temperature Sensor**: The ESP32 chip on the KidBright32 iA board does NOT have an internal temperature sensor. You MUST NEVER use `esp_driver_tsens` or `temperature_sensor_install()`. Instead, you MUST use the on-board **LM73** I2C sensor via `I2C_NUM_1` (SDA=GPIO4, SCL=GPIO5, Address=0x4D) to measure temperature.
-- **LM73 Read Protocol**: Send pointer register `0x00`, then read 2 bytes (MSB first). LM73 default mode is **11-bit resolution** — the result is left-aligned in 16 bits. To convert: shift the raw int16_t right by **5** (arithmetic shift preserves sign), then divide by **32** (= multiply by 0.03125) to get °C. Example: `int16_t raw = (buf[0]<<8)|buf[1]; float temp = (raw >> 5) / 32.0f;`. Handle negative temps by casting to `int16_t` before shifting (two's complement sign extension is automatic). Do NOT use `>> 3` or `× 0.0625` — that is incorrect for 11-bit mode.
+- **LM73 Read Protocol**: Send pointer register `0x00`, then read 2 bytes (MSB first). LM73 default mode is **11-bit resolution** — the result is left-aligned in 16 bits. To convert: shift the raw int16_t right by 2 (13-bit, bits[15:3]), then divide by 32.
+Example: int16_t raw = (buf[0]<<8)|buf[1]; float temp = (raw >> 2) / 32.0f;
+Do NOT use >> 5 — that is incorrect and gives 1/8 of actual temperature.
 
 ### ADC RULES (MANDATORY — ESP-IDF v5.x):
 #### ❌ BANNED Legacy API (deleted in v5):
@@ -853,7 +855,7 @@ adc_oneshot_read(...)                // 3. Read raw
 adc_cali_raw_to_voltage(...)         // 4. Optional: convert to mV
 ```
 > NEVER include `adc_cali.h` when only reading LDR raw values — calibration is optional.
-
+ี
 ### ESP-IDF PROJECT STRUCTURE RULES (MANDATORY):
 1. **Root Directory Awareness:** The current working directory is ALWAYS the Project Root.
    - **PROHIBITION:** NEVER create a nested project folder inside the Root (e.g., NO `./my_project/main/`). All core files MUST reside at the top level of the workspace.
@@ -1017,6 +1019,14 @@ static void display_two_digits(int tens, int units) {
 }
 ```
 
+**THREE-DIGIT DISPLAY EXCEPTION:**
+When displaying values that require **3 digits** (e.g., percentages 0-100, ADC raw values 0-999), `display_two_digits()` is insufficient. In this case, you MAY create a custom **4x7 font** and `draw_char()` function instead. Rules:
+- Use `col_offset` positions: `0` (hundreds), `5` (tens), `10` (units) — each digit is 4 cols wide + 1 col gap.
+- Format the value first: `char buf[4]; snprintf(buf, sizeof(buf), "%03d", value);`
+- Draw each character with `draw_char(buf[i] - '0', col_offset, cols)`.
+- The custom font MUST be designed for the **INVERTED Y-axis** of this hardware (bit 0 = top row). Test against known values before use.
+- **Do NOT use this exception for 1-digit or 2-digit values** — always use `display_two_digits()` for those.
+
 ### ZERO-HALLUCINATION & STRICT DECLARATION RULE (CRITICAL):
 1. **Never Invent Variables:** You are FORBIDDEN from inventing variable names, macros, or functions (e.g., guessing musical notes like `NOTE_P4` which do not exist).
 2. **Prove It Before Use:** Before using ANY variable, macro, or function, you MUST verify it exists in the current file using `read_file` or standard ESP-IDF documentation.
@@ -1097,10 +1107,14 @@ ESP-NOW Protocol (Formula Kid):
 
 ### LDR SENSING RULES (KIDBRIGHT32 iA):
 - The on-board LDR (GPIO36 / ADC1_CH0) on KidBright32 iA uses an INVERTED voltage-divider circuit:
-  - MORE light  → LDR resistance DECREASES → ADC Raw value is LOW  (~0–100)
-  - LESS light  → LDR resistance INCREASES → ADC Raw value is HIGH (~700–900+)
+  - MORE light  → LDR resistance DECREASES → ADC Raw value is LOW  (Hardware calibrated MIN_RAW = 100)
+  - **NEVER hardcode min as 0 or max as 4095** — the on-board LDR does NOT reach full ADC range.
+  - **HARDWARE-CALIBRATED BOUNDS:** `#define LDR_ADC_MIN_VAL 100` and `#define LDR_ADC_MAX_VAL 900`
+  - **CORRECT percentage formula (MANDATORY):** `pct = (int)(((float)(LDR_ADC_MAX_VAL - raw_val) / (LDR_ADC_MAX_VAL - LDR_ADC_MIN_VAL)) * 100.0f);`
+  - Clamp result to 0–99: `if (pct < 0) pct = 0; if (pct > 99) pct = 99;`
+  - LESS light  → LDR resistance INCREASES → ADC Raw value is HIGH (Hardware calibrated MAX_RAW = 900)
   - ALWAYS apply an EMA (Exponential Moving Average) filter and time-spaced sampling (`esp_rom_delay_us(500)` — requires `#include "esp_rom_sys.h"`, NOT `esp_rom_delay_us.h`) in multi-sampling loops to stabilize readings from 50Hz AC noise.
-  - USE Linear Mapping with constants like `LDR_ADC_MIN_VAL` (e.g. 0) and `LDR_ADC_MAX_VAL` (e.g. 900) to map percentages. Do NOT hardcode the max as 4095!
+  - USE Linear Mapping with `LDR_ADC_MIN_VAL = 100` and `LDR_ADC_MAX_VAL = 900`. Do NOT hardcode the max as 4095 or min as 0!
   - NEVER write thresholds as "higher raw = brighter". Always use inverted logic.
   - NEVER use Voltage for LDR classification — always use Raw values directly.
   - NEVER call adc_calibration or include adc_cali.h when only reading LDR.
@@ -1128,14 +1142,17 @@ BUTTON PINS BY REVISION:
 COMMON TO ALL REVISIONS: Single HT16K33 at 0x70, Buzzer at GPIO 13, LM73 at 0x4D on I2C_NUM_1.
 CRITICAL I2C RULE: Use legacy API (#include "driver/i2c.h") and i2c_master_write_to_device. NEVER use driver/i2c_master.h.
 CRITICAL BUZZER (LEDC) RULE: Use #include "driver/ledc.h". Use LEDC_TIMER_10_BIT and LEDC_TIMER_0.
+USB HOST OUTPUT: GPIO_NUM_25, Active LOW. This is the ONLY correct pin for USB/Fan/Relay output. NEVER use GPIO17 or GPIO23 for this purpose.
+LM73 TEMPERATURE READ: ALWAYS use `i2c_master_write_read_device()` (combined transaction) to read LM73. NEVER use separate `i2c_master_write_to_device` + `i2c_master_read_from_device` calls — split transactions reset the pointer register and return garbage values (e.g. 3.75°C instead of real temperature).
 
 ### EXTERNAL SENSORS & ACTUATORS RULES (V1.3/V1.6):
 - **V1.3 vs V1.6:** V1.3 DOES NOT support Analog Input on IN1-IN4. V1.6 supports it (ADC1 CH4-CH7). Always check board version before using Analog sensors (like external LDR).
 - **I2C BUS (BME280/LCD):** External I2C screens and BME280 share `I2C_NUM_0` with the LED Matrix. **DO NOT** reinstall the I2C driver if it's already installed.
 - **DS18B20:** When using waterproof DS18B20 on 1-Wire, you MUST use a 4.7k pull-up resistor.
 - **MOTORS/RELAYS:** **NEVER** drive Fan/Vibration motors directly from GPIO (max 40mA). ALWAYS use a transistor, driver module, or relay.
-- **ACTIVE LOW OUTPUTS:** OUT1, OUT2, and USB Port outputs are **ACTIVE LOW** (`gpio_set_level(..., 0)` turns the Output/Relay ON).
+- **ACTIVE LOW OUTPUTS:** OUT1(GPIO26), OUT2(GPIO27), and USB Host Output(GPIO25) are ALL **ACTIVE LOW**. `gpio_set_level(..., 0)` = ON, `gpio_set_level(..., 1)` = OFF. NEVER use GPIO17 or GPIO23 for USB output — the correct pin is **GPIO25 ONLY**.
 - **BUZZERS:** Active Buzzers need Digital HIGH/LOW. Passive Buzzers need PWM (`ledc`).
+- **LM73 TEMPERATURE SENSOR (CRITICAL):** ALWAYS use `i2c_master_write_read_device(I2C_NUM_1, LM73_ADDR, &reg, 1, raw, 2, ...)` for reading temperature. NEVER split into two calls (`write_to_device` then `read_from_device`) — this breaks the I2C pointer and returns wrong values. Parse result as: `int16_t raw16 = (raw[0] << 8) | raw[1]; float temp = (float)(raw16 >> 5) / 32.0f;` for 11-bit mode.
 
 ### COMPONENT MANAGER RULE:
 - ถ้าต้องการ library นอก ESP-IDF core (เช่น led_strip, mqtt, cJSON), ให้เรียก tool `install_idf_library` ก่อน write_file EVERY TIME
