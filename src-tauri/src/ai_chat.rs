@@ -1574,7 +1574,10 @@ async fn run_conversation_loop(
                     content: json!(accumulated_text),
                 });
             }
-            let _ = app_handle.emit("ai-chat-done", json!({ "text": &accumulated_text }).to_string());
+            let _ = app_handle.emit("ai-chat-done", json!({
+                "text": &accumulated_text,
+                "history": &messages
+            }).to_string());
             break;
         }
     }
@@ -1862,7 +1865,10 @@ async fn run_google_conversation_loop(
                     content: json!(accumulated_text),
                 });
             }
-            let _ = app_handle.emit("ai-chat-done", json!({ "text": &accumulated_text }).to_string());
+            let _ = app_handle.emit("ai-chat-done", json!({
+                "text": &accumulated_text,
+                "history": &messages
+            }).to_string());
             break;
         }
     }

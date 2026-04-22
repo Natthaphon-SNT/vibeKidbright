@@ -56,6 +56,9 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
     const [showSettings, setShowSettings] = useState(false);
     const [showHistory, setShowHistory] = useState(false);
     const [activeModelBadge, setActiveModelBadge] = useState<string | null>(null);
+    // Stores the full API-level conversation (including tool_calls + tool responses)
+    // so that follow-up messages preserve the complete tool-call history.
+    const [conversationHistory, setConversationHistory] = useState<any[]>([]);
 
     // Chat Sessions
     const [sessions, setSessions] = useState<ChatSession[]>([]);
@@ -182,23 +185,26 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
             });
         });
 
-        const unlistenDone = listen("ai-chat-done", () => {
+        const unlistenDone = listen("ai-chat-done", (event) => {
+            const data = (() => { try { return JSON.parse(event.payload as string); } catch { return {}; } })();
+            // Capture the full API-level history (including tool_calls sequences) returned
+            // by the backend so follow-up messages keep the complete context.
+            if (data.history && Array.isArray(data.history)) {
+                setConversationHistory(data.history);
+            }
             setStreamingText((prev) => {
                 setMessages((msgs) => {
                     const last = msgs[msgs.length - 1];
                     if (last && last.role === "assistant") {
-                        // อัปเดตข้อความสุดท้ายให้สมบูรณ์
                         return [
                             ...msgs.slice(0, -1),
                             { ...last, content: prev },
                         ];
                     }
-                    // ถ้าไม่มีข้อความ assistant รองรับ ให้สร้างใหม่
                     return [...msgs, { id: crypto.randomUUID(), role: "assistant", content: prev }];
                 });
-                return ""; // เคลียร์ streaming text
+                return "";
             });
-            // บังคับปิดสถานะ Loading และ Tool เสมอ
             setIsLoading(false);
             setActiveTools([]);
         });
@@ -271,6 +277,7 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
     const createNewChat = () => {
         setCurrentSessionId(crypto.randomUUID());
         setMessages([]);
+        setConversationHistory([]);
         setShowHistory(false);
     };
 
@@ -279,6 +286,9 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
         if (session) {
             setCurrentSessionId(id);
             setMessages(session.messages);
+            // Tool call history is not persisted — reset so the next message
+            // starts a fresh API context (the UI messages still show prior content).
+            setConversationHistory([]);
             setShowHistory(false);
         }
     };
@@ -293,6 +303,7 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
         }
         setCurrentSessionId(crypto.randomUUID());
         setMessages([]);
+        setConversationHistory([]);
     };
 
     const stopGeneration = () => {
@@ -359,28 +370,20 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
         // Add empty assistant message placeholder
         setMessages((prev) => [...prev, { id: messageId, role: "assistant", content: "" }]);
 
-        // Convert messages to the format the backend expects
-        const apiMessages = newMessages.map((m) => {
-            let content = m.content;
-
-            // Inject hidden system warning only for the newly sent message
-            if (m.id === userMessage.id) {
-                if (projectDir === ".") {
-                    content = `[CRITICAL SYSTEM ENFORCEMENT: NO WORKSPACE IS CURRENTLY OPEN! If the user asks to create a project from scratch and there is no active workspace, you MUST call 'create_project_workspace' FIRST. You are FORBIDDEN from using 'run_command' (e.g., mkdir) or 'write_file' to create initial folders. Wait for the tool to return the selected path before writing files.]\n\n${content}`;
-                } else {
-                    // แอบแนบสถานะโปรเจกต์ไปกับคำถามเสมอ
-                    let systemContext = `[CURRENT PROJECT STATE: You are working in '${projectDir}'. `;
-                    systemContext += `Always rely on explicitly declared variables. DO NOT invent macros.]\n\n`;
-
-                    // 🛠 [เพิ่มส่วนนี้] กระตุ้น AI บังคับให้ใช้ Tool ทุกครั้งที่มีโปรเจกต์อยู่แล้ว
-                    content = `${systemContext}${content}\n\n[CRITICAL REMINDER: If the user asks you to fix, check, or write code, you MUST use the \`read_file\` or \`write_file\` tool IMMEDIATELY. DO NOT just apologize or explain what you will do. Execute the tool NOW.]`;
-                }
-            }
-            return {
-                role: m.role,
-                content: content,
-            };
-        });
+        // Build API message list:
+        // Use conversationHistory (which retains tool_call sequences from previous turns)
+        // and append only the new user message on top. This ensures follow-up requests
+        // carry the full tool context that the backend needs to continue correctly.
+        let userContent = textToSend;
+        if (projectDir === ".") {
+            userContent = `[CRITICAL SYSTEM ENFORCEMENT: NO WORKSPACE IS CURRENTLY OPEN! If the user asks to create a project from scratch and there is no active workspace, you MUST call 'create_project_workspace' FIRST. You are FORBIDDEN from using 'run_command' (e.g., mkdir) or 'write_file' to create initial folders. Wait for the tool to return the selected path before writing files.]\n\n${userContent}`;
+        } else {
+            let systemContext = `[CURRENT PROJECT STATE: You are working in '${projectDir}'. `;
+            systemContext += `Always rely on explicitly declared variables. DO NOT invent macros.]\n\n`;
+            userContent = `${systemContext}${userContent}\n\n[CRITICAL REMINDER: If the user asks you to fix, check, or write code, you MUST use the \`read_file\` or \`write_file\` tool IMMEDIATELY. DO NOT just apologize or explain what you will do. Execute the tool NOW.]`;
+        }
+        const newUserApiMsg = { role: "user", content: userContent };
+        const apiMessages = [...conversationHistory, newUserApiMsg];
 
         try {
             await invoke("send_ai_message", {
