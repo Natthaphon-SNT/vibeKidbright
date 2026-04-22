@@ -128,7 +128,10 @@ static void i2c_and_matrix_init(void) {
 }
 ```
 
-### 6.2 — Convert Row-Major → Column-Major
+### 6.2 — Convert Row-Major → Column-Major (Y-axis inversion)
+
+> ⚠️ **CRITICAL HARDWARE QUIRK:** Matrix บอร์ดต่อสายกลับด้าน (Y-axis inverted)
+> ต้องใช้ `(7 - row)` เสมอ — ห้ามใช้แค่ `row`
 
 ```c
 static void rows_to_columns_16x8(const uint16_t row_data[8], uint8_t out_cols[16]) {
@@ -136,6 +139,7 @@ static void rows_to_columns_16x8(const uint16_t row_data[8], uint8_t out_cols[16
     for (int row = 0; row < 8; row++) {
         for (int col = 0; col < 16; col++) {
             if (row_data[row] & (1 << (15 - col))) {
+                // HARDWARE QUIRK: Y-axis inversion required -> (7 - row)
                 out_cols[col] |= (1 << (7 - row));
             }
         }
@@ -377,13 +381,10 @@ static void i2c_and_matrix_init(void) {
 // --- Convert & Draw ---
 static void rows_to_columns_16x8(const uint16_t row_data[8], uint8_t out_cols[16]) {
     memset(out_cols, 0, 16);
-    for (int row = 0; row < 8; row++) {
-        for (int col = 0; col < 16; col++) {
-            if (row_data[row] & (1 << (15 - col))) {
+    for (int row = 0; row < 8; row++)
+        for (int col = 0; col < 16; col++)
+            if (row_data[row] & (1 << (15 - col)))
                 out_cols[col] |= (1 << (7 - row));
-            }
-        }
-    }
 }
 
 static void matrix_draw(const uint8_t cols[16]) {
@@ -449,7 +450,8 @@ void app_main(void) {
 | # | Anti-Pattern | ผลที่เกิด |
 |---|---|---|
 | 1 | ส่ง init commands รวมใน write เดียว | Display ดับสนิท |
-| 2 | ข้าม `rows_to_columns_16x8` | Pixel แสดงผลผิดตำแหน่ง |
+| 2 | ข้าม `rows_to_columns_16x8` | Pixel แสดงผลกลับหัว/ผิดตำแหน่ง |
+| 3 | ใช้ `(row)` แทน `(7 - row)` | ภาพกลับหัว |
 | 4 | `display_pattern(DIGIT_x)` เดี่ยวๆ | ฝั่งขวาดับ |
 | 5 | ประดิษฐ์ค่า hex pattern เอง | Pixel garbled |
 | 6 | `ESP_ERROR_CHECK` บน data transfer | Board รีบูทถ้า I2C glitch |

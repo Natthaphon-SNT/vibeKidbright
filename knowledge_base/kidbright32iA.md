@@ -1,6 +1,6 @@
 # KidBright32 — ESP-IDF Developer Reference
 > ESP32-WROOM-32 · NECTEC / Gravitech · **ESP-IDF v5.x Framework** · 3.3 V logic
-> Covers: **V1.5 Rev 3.1** (NECTEC Standard) · **V1.5 iA** (INEX) · **V1.6** (Gravitech)
+> Covers: **V1.5 Rev 3.1** (NECTEC Standard) · **V1.5 Rev 3.1G** (Gravitech OEM) · **V1.5 iA** (INEX) · **V1.6** (Gravitech)
 > ⚠️ **CRITICAL RULE FOR AI:** DO NOT use Arduino Framework (`<Wire.h>`, `digitalWrite`, `setup()`, `loop()`). All code must be strictly C/C++ using official ESP-IDF components.
 
 ---
@@ -32,7 +32,7 @@
 - มีเซ็นเซอร์แสง LDR (GPIO36 / ADC1_CH0)
 - มีเซ็นเซอร์อุณหภูมิ LM73 (I2C_NUM_1, SDA=GPIO4, SCL=GPIO5, Address 0x4D)
 - มีลำโพงเปียโซขับเสียง (Passive Buzzer, GPIO13, ต้องใช้ PWM/LEDC)
-- มีวงจรสวิตช์กดติดปล่อยดับขนาดใหญ่ 2 ตัว (SW1=GPIO16, SW2=GPIO17)
+- มีวงจรสวิตช์กดติดปล่อยดับขนาดใหญ่ 2 ตัว (SW1=GPIO16, **SW2=GPIO14**)
 - มีวงจรฐานเวลานาฬิกาจริง (RTC) พร้อมแบตเตอรี่ CR1220 สำรอง
 - มีสวิตช์ RESET การทำงาน
 - เชื่อมต่อกับคอมพิวเตอร์ผ่านพอร์ต **Micro-USB** (ต่างจาก iA/iP ที่ใช้ USB-C)
@@ -42,7 +42,8 @@
 - **ไม่มี** Accelerometer / Gyroscope / Magnetometer (เพิ่มเฉพาะใน iA และ V1.6)
 - **ไม่รองรับ ADC บนพอร์ต IN1–IN4** (ต่างจาก iA และ V1.6 ที่รองรับ)
 
-### Sensor Map — V1.5 Rev 3.1
+### Sensor Map — V1.5 Rev 3.1 (NECTEC Standard)
+> ⚠️ **SW2 = GPIO14** — ต่างจาก Rev 3.1G ที่ใช้ GPIO17
 
 | Sensor | Protocol | Bus/Pin | Address/Channel |
 |--------|----------|---------|-----------------|
@@ -52,24 +53,53 @@
 | HT16K33 (Matrix) | I2C | I2C_NUM_0, SDA=GPIO21, SCL=GPIO22 | 0x70 |
 | Passive Buzzer | GPIO/PWM | GPIO13 (LEDC) | — |
 | SW1 Button | GPIO | GPIO16 | — |
-| SW2 Button | GPIO | GPIO17 | — |
+| **SW2 Button** | GPIO | **GPIO14** | — |
 | USB Host Control | GPIO | GPIO25 (Active LOW) | — |
 
-> ⚠️ **V1.5 Rev 3.1 ไม่มี KXTJ3 Accelerometer** — I2C_NUM_0 จึงมีเฉพาะ HT16K33 (0x70) เท่านั้น ต่างจาก iA ที่มี KXTJ3 (0x0E) อยู่ด้วย
+> ⚠️ **V1.5 Rev 3.1 ไม่มี KXTJ3 Accelerometer** — I2C_NUM_0 จึงมีเฉพาะ HT16K33 (0x70) เท่านั้น
+
+---
+
+### Sensor Map — V1.5 Rev 3.1G (Gravitech OEM)
+> ⚠️ **SW2 = GPIO17** — ต่างจาก Rev 3.1 ที่ใช้ GPIO14
+> ฮาร์ดแวร์อื่นทุกอย่างเหมือน Rev 3.1 (ไม่มี KXTJ3, ไม่รองรับ ADC บน IN1–IN4)
+
+| Sensor | Protocol | Bus/Pin | Address/Channel |
+|--------|----------|---------|-----------------|
+| LDR (Light) | ADC | GPIO36 / ADC1_CH0 | — |
+| LM73 (Temp) | I2C | I2C_NUM_1, SDA=GPIO4, SCL=GPIO5 | 0x4D |
+| RTC MCP794xx | I2C | I2C_NUM_1, SDA=GPIO4, SCL=GPIO5 | 0x6F |
+| HT16K33 (Matrix) | I2C | I2C_NUM_0, SDA=GPIO21, SCL=GPIO22 | 0x70 |
+| Passive Buzzer | GPIO/PWM | GPIO13 (LEDC) | — |
+| SW1 Button | GPIO | GPIO16 | — |
+| **SW2 Button** | GPIO | **GPIO17** | — |
+| USB Host Control | GPIO | GPIO25 (Active LOW) | — |
 
 > 📋 **I2C Scan Result (V1.5 Rev 3.1G — confirmed Apr 17 2026)**
 > - I2C_NUM_0 (SDA=GPIO21, SCL=GPIO22): พบ `0x70` (HT16K33)
 > - I2C_NUM_1 (SDA=GPIO4, SCL=GPIO5): พบ `0x4D` (LM73) และ `0x6F` (RTC MCP794xx)
 > - Address `0x6F` คือ RTC chip ในตระกูล MCP7940N/MCP7941X (Microchip) ซึ่งเป็น RTC ที่มาพร้อมกับ SRAM และ alarm ในตัว ใช้ร่วมกับแบตเตอรี่ CR1220 บนบอร์ด
 
-### GPIO Conflict Table — V1.5 Rev 3.1
+### GPIO Conflict Table — V1.5 Rev 3.1 (NECTEC Standard)
 
 | GPIO | ใช้ได้เป็น... |
 |------|--------------|
 | GPIO4 | **BT LED** หรือ **LM73 SDA** — เลือกได้แค่อย่างเดียว |
 | GPIO13 | **Passive Buzzer** — ต้องใช้ LEDC/PWM เสมอ |
-| GPIO16 | **SW1 Button** หรือ **SERVO1** — เลือกได้แค่อย่างเดียว |
-| GPIO17 | **SW2 Button** หรือ **SERVO2** — เลือกได้แค่อย่างเดียว |
+| GPIO14 | **SW2 Button** — ห้ามใช้งานอื่น บน V1.5 Rev 3.1 |
+| GPIO16 | **SW1 Button** — ห้ามใช้งานอื่น บน V1.5 Rev 3.1 |
+| GPIO25 | **USB Host (Active LOW)** — อย่าใช้งานอื่น |
+| GPIO36 | **LDR ADC** — Input-only, ไม่มี pull resistor |
+| GPIO2 | **Wi-Fi LED** — อย่าใช้งานอื่น |
+
+### GPIO Conflict Table — V1.5 Rev 3.1G (Gravitech OEM)
+
+| GPIO | ใช้ได้เป็น... |
+|------|--------------|
+| GPIO4 | **BT LED** หรือ **LM73 SDA** — เลือกได้แค่อย่างเดียว |
+| GPIO13 | **Passive Buzzer** — ต้องใช้ LEDC/PWM เสมอ |
+| GPIO16 | **SW1 Button** — ห้ามใช้งานอื่น บน V1.5 Rev 3.1G |
+| GPIO17 | **SW2 Button** — ห้ามใช้งานอื่น บน V1.5 Rev 3.1G |
 | GPIO25 | **USB Host (Active LOW)** — อย่าใช้งานอื่น |
 | GPIO36 | **LDR ADC** — Input-only, ไม่มี pull resistor |
 | GPIO2 | **Wi-Fi LED** — อย่าใช้งานอื่น |
@@ -129,13 +159,16 @@ buffer[16] = column_15_rows (Right Matrix Col 7)
 ```
 
 #### Helper: Convert row-major bitmap to column-major (cols[16])
+> ⚠️ **CRITICAL HARDWARE QUIRK FOR AI:** The KidBright32 matrix hardware is wired upside-down (Y-axis inverted). When converting rows to columns, you **MUST** invert the row bit shifting by using `(7 - row)`. Never use just `row`.
 
 ```c
-static void rows_to_columns_16x8(const uint16_t row_data[8], uint8_t out_cols[16]) {
+// Convert human-readable row-major array to hardware-ready column-major array
+void rows_to_columns_16x8(const uint16_t row_data[8], uint8_t out_cols[16]) {
     memset(out_cols, 0, 16);
     for (int row = 0; row < 8; row++) {
         for (int col = 0; col < 16; col++) {
             if (row_data[row] & (1 << (15 - col))) {
+                // HARDWARE QUIRK: Y-axis inversion required here -> (7 - row)
                 out_cols[col] |= (1 << (7 - row));
             }
         }
@@ -335,7 +368,9 @@ void adc_deinit(void) {
 > **Note for AI:** `ADC_ATTEN_DB_12` (formerly `ADC_ATTEN_DB_11`) is the correct constant for full 3.3 V range in ESP-IDF v5.x. Never use `ADC_ATTEN_DB_11` — it is deprecated and may be removed.
 
 ### Push Buttons (CRITICAL PINOUT FOR AI)
-> ⚠️ **AI INSTRUCTION:** The buttons on KidBright32 iA use **GPIO16** and **GPIO14**. Do NOT use standard ESP32 button pins like GPIO0, GPIO2, or GPIO35.
+> ⚠️ **AI INSTRUCTION:** The button pins depend on the board revision! Do NOT use standard ESP32 button pins like GPIO0, GPIO2, or GPIO35.
+> - For **Standard / iA / V1.5 Rev 3.1 / V1.6**: SW1 = **GPIO16**, SW2 = **GPIO14**
+> - For **V1.5 Rev 3.1G (Gravitech OEM)**: SW1 = **GPIO16**, SW2 = **GPIO14**
 
 | Button | GPIO | Notes |
 |---|---|---|
@@ -1147,7 +1182,6 @@ project(KidBright_Project)
   - `#include "driver/adc.h"` and `#include "esp_adc_cal.h"` are **BANNED**.
   - **`ADC_ATTEN_DB_11` was RENAMED to `ADC_ATTEN_DB_12` in ESP-IDF v5.x** — always use `ADC_ATTEN_DB_12` for the full 0–3.3V input range.
   - **`#include "esp_rom_delay_us.h"` does NOT EXIST in ESP-IDF v5.x** — this file was never a public header. Use `vTaskDelay(pdMS_TO_TICKS(ms))` for millisecond delays instead. For microsecond delays, use `esp_rom_delay_us(us)` from `#include "rom/ets_sys.h"` (but prefer `vTaskDelay` unless sub-ms precision is critical).
-  - **`ESP_INTR_FLAG_DEFAULT` is UNDECLARED by default** — you MUST manually `#define ESP_INTR_FLAG_DEFAULT 0` at the top of your C files before calling `gpio_install_isr_service(ESP_INTR_FLAG_DEFAULT);`.
 
 **CORRECT ESP-IDF v5.x ADC TEMPLATE (Oneshot + Calibration):**
 ```c
@@ -2018,24 +2052,30 @@ Emitter ของ NPN → GND
 
 ---
 
-### 19.2 Critical Differences — V1.5 Rev 3.1 vs iA vs V1.6
+### 19.2 Critical Differences — V1.5 Rev 3.1 vs Rev 3.1G vs iA vs V1.6
 
-| Feature | V1.5 Rev 3.1 (NECTEC) | V1.5 iA (INEX) | V1.6 (Gravitech) |
-|---|---|---|---|
-| Analog Input บน IN1–IN4 | ❌ ไม่รองรับ | ✅ รองรับ (ADC1_CH4–CH7) | ✅ รองรับ (ADC1_CH4–CH7) |
-| Accelerometer | ❌ ไม่มี | ✅ KXTJ3-1057 (I2C_NUM_0, 0x0E) | ✅ มี |
-| Gyroscope | ❌ ไม่มี | ❌ ไม่มี | ✅ มี |
-| Magnetometer | ❌ ไม่มี | ❌ ไม่มี | ✅ มี |
-| RGB LED on-board | ❌ ไม่มี | ❌ ไม่มี | ✅ มี (6 ดวง) |
-| Servo Connector | ❌ ไม่มี | ❌ ไม่มี | ✅ มี (SERVO1=GPIO15, SERVO2=GPIO17) |
-| USB Connector | **Micro-USB** | **USB-C** | USB-C |
-| USB Host (Type-A) | ✅ มี (GPIO25, Active LOW) | ✅ มี | ✅ มี |
-| LDR Sensor | ✅ GPIO36 / ADC1_CH0 | ✅ GPIO36 / ADC1_CH0 | ✅ |
-| Temperature Sensor | ✅ LM73 (I2C1, 0x4D) | ✅ LM73 (I2C1, 0x4D) | ✅ LM73 |
-| I2C_NUM_0 devices | HT16K33 (0x70) only | HT16K33 (0x70) + KXTJ3 (0x0E) | HT16K33 + Accel/Gyro/Mag |
-| I2C_NUM_1 devices | LM73 (0x4D) + RTC (0x6F) | LM73 (0x4D) | LM73 (0x4D) |
+| Feature | V1.5 Rev 3.1 (NECTEC) | V1.5 Rev 3.1**G** (Gravitech OEM) | V1.5 iA (INEX) | V1.6 (Gravitech) |
+|---|---|---|---|---|
+| **SW2 GPIO** | **GPIO14** | **GPIO17** | GPIO17 | GPIO17 |
+| Analog Input บน IN1–IN4 | ❌ ไม่รองรับ | ❌ ไม่รองรับ | ✅ รองรับ (ADC1_CH4–CH7) | ✅ รองรับ (ADC1_CH4–CH7) |
+| Accelerometer | ❌ ไม่มี | ❌ ไม่มี | ✅ KXTJ3-1057 (I2C_NUM_0, 0x0E) | ✅ มี |
+| Gyroscope | ❌ ไม่มี | ❌ ไม่มี | ❌ ไม่มี | ✅ มี |
+| Magnetometer | ❌ ไม่มี | ❌ ไม่มี | ❌ ไม่มี | ✅ มี |
+| RGB LED on-board | ❌ ไม่มี | ❌ ไม่มี | ❌ ไม่มี | ✅ มี (6 ดวง) |
+| Servo Connector | ❌ ไม่มี | ❌ ไม่มี | ❌ ไม่มี | ✅ มี (SERVO1=GPIO15, SERVO2=GPIO17) |
+| USB Connector | **Micro-USB** | **Micro-USB** | **USB-C** | USB-C |
+| USB Host (Type-A) | ✅ มี (GPIO25, Active LOW) | ✅ มี (GPIO25, Active LOW) | ✅ มี | ✅ มี |
+| LDR Sensor | ✅ GPIO36 / ADC1_CH0 | ✅ GPIO36 / ADC1_CH0 | ✅ GPIO36 / ADC1_CH0 | ✅ |
+| Temperature Sensor | ✅ LM73 (I2C1, 0x4D) | ✅ LM73 (I2C1, 0x4D) | ✅ LM73 (I2C1, 0x4D) | ✅ LM73 |
+| I2C_NUM_0 devices | HT16K33 (0x70) only | HT16K33 (0x70) only | HT16K33 (0x70) + KXTJ3 (0x0E) | HT16K33 + Accel/Gyro/Mag |
+| I2C_NUM_1 devices | LM73 (0x4D) + RTC (0x6F) | LM73 (0x4D) + RTC (0x6F) | LM73 (0x4D) | LM73 (0x4D) |
 
-> ⚠️ **AI CRITICAL:** V1.5 Rev 3.1 ใช้ **Micro-USB** ไม่ใช่ USB-C และ **ไม่มี KXTJ3** — ห้ามเขียนโค้ดที่ init KXTJ3 สำหรับบอร์ดนี้
+> ⚠️ **AI CRITICAL — SW2 PIN DIFFERENCE:**
+> - V1.5 Rev 3.1 (NECTEC): SW2 = **GPIO14**
+> - V1.5 Rev 3.1G (Gravitech OEM): SW2 = **GPIO17**
+> ตรวจสอบ PCB silkscreen หรือ I2C scan result ก่อนเขียนโค้ดเสมอ
+>
+> ⚠️ **AI CRITICAL:** V1.5 Rev 3.1 และ Rev 3.1G ใช้ **Micro-USB** ไม่ใช่ USB-C และ **ไม่มี KXTJ3** — ห้ามเขียนโค้ดที่ init KXTJ3 สำหรับบอร์ดทั้งสอง
 
 ---
 
