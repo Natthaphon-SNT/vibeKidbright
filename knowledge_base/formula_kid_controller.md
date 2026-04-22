@@ -142,13 +142,17 @@ pos = clamp(pos, -100, 100);
 
 ### กฎการรับค่า ESP-NOW และสั่งมอเตอร์
 
-| ค่า ESPNOW_VALUE | การกระทำ | รายละเอียด |
+| ค่า ESPNOW_VALUE (`int32_t`) | การกระทำ | รายละเอียด & LED |
 |-----------------|---------|-----------|
-| `999` | **หยุด** | `drv8833.stop()` |
-| `10` ถึง `100` | **เดินหน้า** (direction=0) | speed = ค่า |
-| `-100` ถึง `-10` | **ถอยหลัง** (direction=1) | speed = \|ค่า\| |
-| `300` ถึง `399` | **เลี้ยวซ้าย** (direction=2) | แปลง: ค่า - 400 → -100 ถึง 0 |
-| `400` ถึง `500` | **เลี้ยวขวา** (direction=3) | แปลง: ค่า - 400 → 0 ถึง 100 |
+| `999` | **หยุด** | `drv8833.stop()`, แสดง "--" |
+| `10` ถึง `199` | **เดินหน้า** (direction=0) | speed = ค่า, แสดง "U" |
+| `-10` ถึง `-199` | **ถอยหลัง** (direction=1) | speed = \|ค่า\|, แสดง "D" |
+| `300` ถึง `390` | **เลี้ยวซ้าย** (direction=2) | speed = ค่า - 400, แสดง "L" |
+| `410` ขึ้นไป | **เลี้ยวขวา** (direction=3) | speed = ค่า - 400, แสดง "R" |
+
+> ⚠️ **CRITICAL FIX:** ค่าที่ส่งจากฝั่ง Controller (KBIDE block) มีขนาด 4-byte Integer (`int32_t`)
+> ฝั่ง Receiver **ต้องใช้** `int32_t esp_value;` ใน Struct
+> **ห้ามใช้ `float` เด็ดขาด** เพราะจะทำให้การแปลงค่าลบกลายเป็น `-nan` และ 999 กลายเป็น `0.00`
 
 ---
 
@@ -185,7 +189,7 @@ pos = clamp(pos, -100, 100);
 |------------|-----|---------|
 | โปรโตคอล | ESP-NOW | ไม่ต้องใช้ Router |
 | โหมด | Unicast | ส่งไปยัง MAC Address เฉพาะของบอร์ดรถ |
-| ชนิดข้อมูล | Integer (int) | ส่งตัวเลขจำนวนเต็มหนึ่งตัวต่อครั้ง |
+| ชนิดข้อมูล | `int32_t` (Integer 4-byte) | ส่งตัวเลขจำนวนเต็มหนึ่งตัวต่อครั้ง (ห้ามใช้ float) |
 | อัตราการส่ง | ทุก 500ms | `vTaskDelay(pdMS_TO_TICKS(500))` |
 
 ### กฎสำคัญ ESP-NOW (MANDATORY)
@@ -214,44 +218,83 @@ static void espnow_send_cb(const wifi_tx_info_t *tx_info, esp_now_send_status_t 
     // ถ้าต้องการ MAC address ของ peer → tx_info->peer_addr
 }
 
+// ⚠️ ESP-IDF v5.5+ RECEIVE CALLBACK SIGNATURE
+static void espnow_recv_cb(const esp_now_recv_info_t *recv_info, const uint8_t *data, int len) {
+    // recv_info->src_addr, recv_info->des_addr
+}
+
 // Registration ยังเหมือนเดิม:
 ESP_ERROR_CHECK(esp_now_register_send_cb(espnow_send_cb));
 ```
 
-### ตัวอย่าง Pseudocode สำหรับ Controller Loop (ESP-IDF v5.x)
+### ตัวอย่าง Verified Controller Loop & LED Matrix (ESP-IDF v5.x)
+
+> **CRITICAL LED MATRIX 180° ROTATION**: The 16x8 LED Matrix on Formula Kid is physically rotated 180 degrees.
+> `cols[0]` is physical Left, `cols[15]` is physical Right.
+> `Bit 7` is physical Top, `Bit 0` is physical Bottom.
 
 ```c
-// Main loop (polling every 500ms — matches block Delay 0.5)
+// LED Matrix — Letter characters (Corrected mapping for 180° rotated display)
+static const uint8_t img_up[16]    = {0x00, 0x00, 0xFF, 0xFF, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0xFF, 0xFF, 0x00, 0x00}; // U
+static const uint8_t img_down[16]  = {0x00, 0x00, 0x00, 0xFF, 0xFF, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x7E, 0x3C, 0x00, 0x00, 0x00}; // D
+static const uint8_t img_left[16]  = {0x00, 0x00, 0x00, 0xFF, 0xFF, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x00, 0x00, 0x00}; // L
+static const uint8_t img_right[16] = {0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0x90, 0x90, 0x98, 0x94, 0x62, 0x01, 0x00, 0x00, 0x00, 0x00}; // R
+static const uint8_t img_stop[16]  = {0x00, 0x00, 0x18, 0x18, 0x18, 0x18, 0x00, 0x00, 0x00, 0x00, 0x18, 0x18, 0x18, 0x18, 0x00, 0x00}; // --
+
+// DO NOT swap panels in matrix_draw. Keep it like this:
+static void matrix_draw(const uint8_t cols[16]) {
+    uint8_t buf[17] = {0};
+    buf[0] = 0x00;
+    for (int c = 0; c < 8; c++) {
+        buf[1 + (c * 2)] = cols[c];         // Left screen col
+        buf[2 + (c * 2)] = cols[c + 8];     // Right screen col
+    }
+    i2c_master_write_to_device(I2C_NUM_0, HT16K33_ADDR, buf, sizeof(buf), pdMS_TO_TICKS(100));
+}
+
+// Main loop (polling every 300ms)
 while (1) {
-    int js1 = read_joystick1();  // range -100 to 100 (Joystick 1 Position)
-    int js2 = read_joystick2();  // range -100 to 100 (Joystick 2 Position)
+    rc_timing_event_t event;
+    int64_t current_time = esp_timer_get_time();
 
-    int espnow_value;
-
-    if (js1 >= 10 || js1 <= -10) {
-        // JS1 outside dead zone → send JS1 directly (no invert)
-        if (js1 >= 10) {
-            led_display("U");          // forward
-        } else {
-            led_display("D");          // backward
-        }
-        espnow_value = js1;            // +10~+100 = forward, -10~-100 = backward
-    } else if (js2 >= 10 || js2 <= -10) {
-        // JS2 outside dead zone → send JS2 + 400
-        if (js2 >= 10) {
-            led_display("R");          // turn right
-        } else {
-            led_display("L");          // turn left
-        }
-        espnow_value = js2 + 400;      // 410~500 = right, 300~399 = left
-    } else {
-        // Both in dead zone → stop
-        led_display("--");
-        espnow_value = 999;
+    // Trigger JS1
+    read_rc_timing(JS1_TRIG_GPIO, JS1_CAP_GPIO, &js1_start_time);
+    vTaskDelay(pdMS_TO_TICKS(1)); // Allow ISR to trigger
+    if (xQueueReceive(s_rc_timing_queue, &event, pdMS_TO_TICKS(CAP_TIMEOUT_US / 1000)) == pdTRUE && event.gpio_num == JS1_CAP_GPIO) {
+        js1_pos = calculate_joystick_position(event.duration - js1_start_time, -3, -100, 89);
     }
 
-    esp_now_send(peer_mac, (uint8_t*)&espnow_value, sizeof(int));
-    vTaskDelay(pdMS_TO_TICKS(500));
+    // Trigger JS2
+    read_rc_timing(JS2_TRIG_GPIO, JS2_CAP_GPIO, &js2_start_time);
+    vTaskDelay(pdMS_TO_TICKS(1));
+    if (xQueueReceive(s_rc_timing_queue, &event, pdMS_TO_TICKS(CAP_TIMEOUT_US / 1000)) == pdTRUE && event.gpio_num == JS2_CAP_GPIO) {
+        js2_pos = calculate_joystick_position(event.duration - js2_start_time, -3, -100, 90);
+    }
+
+    int32_t espnow_value = 999;
+    const uint8_t *current_matrix_pattern = img_stop;
+
+    if (js1_pos >= JS_DEAD_ZONE) {
+        espnow_value = js1_pos;
+        current_matrix_pattern = img_up;
+    } else if (js1_pos <= -JS_DEAD_ZONE) {
+        espnow_value = js1_pos;
+        current_matrix_pattern = img_down;
+    } else if (js2_pos >= JS_DEAD_ZONE) {
+        espnow_value = js2_pos + 400;
+        current_matrix_pattern = img_right;
+    } else if (js2_pos <= -JS_DEAD_ZONE) {
+        espnow_value = js2_pos + 400;
+        current_matrix_pattern = img_left;
+    } else {
+        espnow_value = 999;
+        current_matrix_pattern = img_stop;
+    }
+
+    // Update Display and Send ESP-NOW if changed...
+    // ...
+    
+    vTaskDelay(pdMS_TO_TICKS(300));
 }
 ```
 

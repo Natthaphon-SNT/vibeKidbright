@@ -1027,6 +1027,10 @@ static void display_two_digits(int tens, int units) {
    - **ISR CRITICAL RULE:** NEVER put `ESP_LOGI`, `printf`, or complex blocking logic inside an `IRAM_ATTR` ISR! This causes an immediate panic/crash on ESP32. You MUST use `xQueueSendFromISR` and handle the logic inside a FreeRTOS task.
    - **FreeRTOS Types v5.x:** NEVER use legacy types like `xQueueHandle` or `xTaskHandle` (they are removed). You MUST use `QueueHandle_t` and `TaskHandle_t`.
    - **Mandatory Includes:** Always `#include "freertos/queue.h"` if your code uses queues.
+   - **IRAM_ATTR Forward Declaration Rule (CRITICAL):** NEVER put `IRAM_ATTR` on a forward declaration (prototype). Only put `IRAM_ATTR` on the actual function **definition**. Putting it on both causes a linker section conflict warning: `ignoring attribute 'section (".iram1.X")' because it conflicts with previous 'section (".iram1.Y")'`. Correct pattern: `static void my_isr(void *arg);` (prototype, no IRAM_ATTR) then `static void IRAM_ATTR my_isr(void *arg) { ... }` (definition only).
+   - **Declare Before Use (CRITICAL):** NEVER use a local variable without declaring it first in the same scope. Example of the bug: calling `memset(&peer_info, ...)` without first writing `esp_now_peer_info_t peer_info;` — this causes `error: 'peer_info' undeclared`. Always declare struct/variable at the top of the function or immediately before first use.
+   - **No Unused Static Const (CRITICAL):** ESP-IDF v5.x compiles with `-Werror=unused-const-variable=`, which turns unused `static const` arrays/variables into **hard errors** that stop the build. NEVER declare a `static const` array or variable that is not actually referenced somewhere in the code. If you define alternative or draft patterns (e.g., `img_stop`, `img_dash`, `img_two_dashes`) that are superseded by a final version, you MUST delete the unused ones before writing the file. Only the arrays that are passed to a function call should exist in the final code.
+   - **No Missing Includes/Defines (CRITICAL):** You MUST NOT forget to declare `#include` for all ESP-IDF APIs (e.g. `<string.h>`, `"esp_now.h"`, `"esp_mac.h"`, `"esp_wifi.h"`, `"nvs_flash.h"`) and `#define` all hardware pins/constants at the top of the file before using them. Omitting these causes fatal `implicit declaration of function` and `undeclared` build errors.
 SMART ERROR RECOVERY:
 - **Read -> Fix Loop**: Before fixing any bug, ALWAYS call `read_file` on the affected file first. Never assume the current state from memory. Order: `read_file` -> analyze -> `write_file`.
 - **Build Error Taxonomy**:
@@ -1036,6 +1040,8 @@ SMART ERROR RECOVERY:
   * Compilation/build failure -> use `read_file` to inspect `CMakeLists.txt` and `sdkconfig` before suggesting a fix.
   * `ESP_ERR_INVALID_STATE` during I2C init -> `i2c_driver_install()` was called twice on the same port. Remove the duplicate call.
   * `I2C Timeout` or `ESP_FAIL` during I2C -> check physical pull-up resistors, power supply, and verify correct I2C pins (bus0: SDA=21/SCL=22, bus1: SDA=4/SCL=5).
+  * `error: 'wifi_tx_info_t' has no member named 'dst_mac'` -> The `wifi_tx_info_t` struct does NOT contain a `dst_mac` field. Remove all `tx_info->dst_mac` references and use `(void)tx_info;` instead.
+  * `error: defined but not used [-Werror=unused-const-variable=]` -> Delete the unused `static const` array/variable. ESP-IDF treats unused static consts as hard errors.
 
 CODE QUALITY & FORMATTING:
 ALWAYS #include <string.h> and #include "driver/gpio.h" at the top of your files.
@@ -1068,17 +1074,24 @@ Use gpio_install_isr_service(0) ONCE at startup. Use IRAM_ATTR on ISR handlers.
 CAP_TIMEOUT_US=500000 (return last known position on timeout).
 
 ESP-NOW Protocol (Formula Kid):
-- Send ONE integer value (ESPNOW_VALUE) via Unicast to target MAC, every **500ms** (matches block Delay 0.5)
+- Send ONE integer value (`int32_t`) via Unicast to target MAC, every **300ms** (matches block logic). CRITICAL: The receiver MUST decode data as `int32_t`, NOT `float`. Using `float` causes `-nan` and `0.00` decoding errors!
 - **CRITICAL: Do NOT use IoT WiFi (SSID/Password) together with ESP-NOW**
 - **CRITICAL ESP-IDF v5.5+ BREAKING CHANGE — esp_now_register_send_cb:** ALWAYS use: `static void espnow_send_cb(const wifi_tx_info_t *tx_info, esp_now_send_status_t status)`. Never use old `uint8_t*` signature.
+- **CRITICAL: `wifi_tx_info_t` has NO `dst_mac` field.** NEVER access `tx_info->dst_mac` — it does not exist and will cause a compile error. In the send callback, use `status` only. Cast `(void)tx_info;` to suppress unused-parameter warnings. Correct pattern: `static void espnow_send_cb(const wifi_tx_info_t *tx_info, esp_now_send_status_t status) { (void)tx_info; if (status != ESP_NOW_SEND_SUCCESS) { ESP_LOGW(TAG, "ESP-NOW send failed"); } }`
+- **CRITICAL ESP-IDF v5.5+ BREAKING CHANGE — esp_now_register_recv_cb:** ALWAYS use: `static void espnow_recv_cb(const esp_now_recv_info_t *recv_info, const uint8_t *data, int len)`.
 - Encoding rules (Priority: JS1 > JS2 > stop):
   * JS1 >= 10 → forward, LED="U", send JS1 value (10 to 100)
   * JS1 <= -10 → backward, LED="D", send JS1 value (-100 to -10)
   * JS2 >= 10 → right, LED="R", send JS2+400 (410 to 500)
   * JS2 <= -10 → left, LED="L", send JS2+400 (300 to 399)
   * Both in dead zone (-10 to 10) → stop, LED="--", send 999
-- Motor receiver decoding:
-  * 999 → stop | 10 to 100 → forward(dir=0,speed=val) | -100 to -10 → backward(dir=1,speed=|val|) | 300–399 → left(dir=2,val-400) | 410–500 → right(dir=3,val-400)
+- **LED MATRIX 180° ROTATION (CRITICAL)**: The 16x8 LED Matrix on Formula Kid is physically rotated 180 degrees. The correct mapping for bitmaps is: `cols[0]` is the physical LEFT column, `cols[15]` is the physical RIGHT column. `Bit 7` (0x80) is the physical TOP bit, `Bit 0` (0x01) is the physical BOTTOM bit. Do NOT swap left/right panels in `matrix_draw()`. Use the exact same physical bitmap mapping on both Sender and Receiver.
+- Motor Receiver Decoding & Display (KidBright32 iA):
+  * 999 → Neutral (Stop), LED="--"
+  * 10 to 199 → Forward (dir=0, speed=val), LED="U"
+  * -10 to -199 → Backward (dir=1, speed=|val|), LED="D"
+  * 410+ → Right (dir=3, speed=val-400), LED="R"
+  * 300 to 390 → Left (dir=2, speed=val-400), LED="L"
 - DRV8833 GPIO: nSLEEP=GPIO23, MotorA1=GPIO18, MotorA2=GPIO26(OUT1), MotorB1=GPIO19, MotorB2=GPIO27(OUT2)
 
 

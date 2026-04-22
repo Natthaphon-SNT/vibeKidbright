@@ -61,7 +61,7 @@
 ---
 
 ### Sensor Map — V1.5 Rev 3.1G (Gravitech OEM)
-> ⚠️ **SW2 = GPIO17** — ต่างจาก Rev 3.1 ที่ใช้ GPIO14
+> ⚠️ **SW2 = GPIO 14** — ต่างจาก Rev 3.1 ที่ใช้ GPIO17
 > ฮาร์ดแวร์อื่นทุกอย่างเหมือน Rev 3.1 (ไม่มี KXTJ3, ไม่รองรับ ADC บน IN1–IN4)
 
 | Sensor | Protocol | Bus/Pin | Address/Channel |
@@ -72,7 +72,7 @@
 | HT16K33 (Matrix) | I2C | I2C_NUM_0, SDA=GPIO21, SCL=GPIO22 | 0x70 |
 | Passive Buzzer | GPIO/PWM | GPIO13 (LEDC) | — |
 | SW1 Button | GPIO | GPIO16 | — |
-| **SW2 Button** | GPIO | **GPIO17** | — |
+| **SW2 Button** | GPIO | **GPIO14** | — |
 | USB Host Control | GPIO | GPIO25 (Active LOW) | — |
 
 > 📋 **I2C Scan Result (V1.5 Rev 3.1G — confirmed Apr 17 2026)**
@@ -99,7 +99,7 @@
 | GPIO4 | **BT LED** หรือ **LM73 SDA** — เลือกได้แค่อย่างเดียว |
 | GPIO13 | **Passive Buzzer** — ต้องใช้ LEDC/PWM เสมอ |
 | GPIO16 | **SW1 Button** — ห้ามใช้งานอื่น บน V1.5 Rev 3.1G |
-| GPIO17 | **SW2 Button** — ห้ามใช้งานอื่น บน V1.5 Rev 3.1G |
+| GPIO14 | **SW2 Button** — ห้ามใช้งานอื่น บน V1.5 Rev 3.1G |
 | GPIO25 | **USB Host (Active LOW)** — อย่าใช้งานอื่น |
 | GPIO36 | **LDR ADC** — Input-only, ไม่มี pull resistor |
 | GPIO2 | **Wi-Fi LED** — อย่าใช้งานอื่น |

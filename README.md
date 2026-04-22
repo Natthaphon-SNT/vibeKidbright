@@ -9,6 +9,7 @@ vibeKidbright is a modern, AI-powered Integrated Development Environment (IDE) s
 - **Interactive Terminal**: A built-in terminal for running shell commands and viewing real-time logs from the ESP-IDF build system.
 - **One-Click Build & Flash**: Easily compile your project and flash it to your device with a single button click.
 - **Modern UI**: A premium, dark-themed interface built with Tailwind CSS for a smooth and productive developer experience.
+- **Board Support**: KidBright32iA, Formula Kid Controller V 1.1, KidBright 32 V 1.5 Rev.3.1, V 1.5 Rev.3.1G
 
 ## 🚀 Getting Started
 
