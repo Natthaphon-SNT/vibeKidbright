@@ -1168,7 +1168,89 @@ ENVIRONMENT:
 Framework: ESP-IDF. Build Tools: idf.py, cmake, ninja.
 Board: KidBright32 (revision to be confirmed per session — see BOARD DETECTION rule). Common hardware: HT16K33 LED Matrix (I2C addr 0x70), Buzzer GPIO_NUM_13, I2C bus0 SDA=21/SCL=22, bus1 SDA=4/SCL=5. SW2 pin: GPIO14 for Rev3.1/iA/V1.6/Rev3.1G. Formula Kid S1/S2: GPIO36/GPIO39 (separate from on-board buttons).
 When you need ESP-IDF, use run_command with commands like idf.py build, idf.py flash, idf.py set-target esp32.
-Do NOT ask the user to install ESP-IDF again unless the tool result explicitly says ESP-IDF is missing."#;
+Do NOT ask the user to install ESP-IDF again unless the tool result explicitly says ESP-IDF is missing.
+
+### L298N MOTOR DRIVER RULES (SKATE Rev 1.3 / KidBright):
+
+#### ภาพรวม
+L298N เป็น IC ขับมอเตอร์ Dual H-Bridge ขับ DC Motor 2 ตัวพร้อมกัน (หรือ Stepper 1 ตัว), สูงสุด 2A/Channel, VCC motor 5–35V, Logic 3.3–5V.
+
+#### Truth Table ทิศทาง (Motor A — Motor B ใช้ ENB/IN3/IN4 เหมือนกัน)
+| ENA | IN1 | IN2 | ผลลัพธ์ |
+|-----|-----|-----|--------|
+| HIGH | HIGH | LOW | เดินหน้า |
+| HIGH | LOW | HIGH | ถอยหลัง |
+| HIGH | HIGH | HIGH | เบรก |
+| HIGH | LOW | LOW | เบรก |
+| LOW | X | X | Coast (หยุด) |
+
+#### SKATE Rev 1.3 — GPIO Mapping (อ้างอิง Skate_rev1_3.kicad_sch)
+- IN1 → GPIO (Motor A dir 1), IN2 → GPIO (Motor A dir 2)
+- IN3 → GPIO (Motor B dir 1), IN4 → GPIO (Motor B dir 2)
+- ENA → GPIO PWM (speed Motor A), ENB → GPIO PWM (speed Motor B)
+- VCC Motor ← VBAT (ผ่าน StepDown XL4005 → 5V Logic)
+- **MANDATORY: GND ของแบตเตอรี่, L298N, และ MCU ต้องต่อร่วมกันเสมอ**
+
+#### กฎการเขียนโปรแกรม (CRITICAL)
+1. **ห้ามให้ IN1 และ IN2 HIGH พร้อมกันนาน** — H-Bridge Short → IC ร้อนเสียหาย
+2. **ตั้งทิศทาง (IN1/IN2) ก่อนเปิด ENA/PWM เสมอ**
+3. **ถอด Jumper ENA/ENB ออกก่อนใช้ PWM** — ถ้าจั๊มไว้จะ lock HIGH ปรับความเร็วไม่ได้
+4. **ใช้ PWM (LEDC) ปรับความเร็ว ห้ามปรับ VCC โดยตรง**
+5. **Ramp Up/Down เสมอ** — ห้าม Full Speed ทันที เพื่อยืดอายุ Motor และ L298N
+6. **ESP32 ใช้ 3.3V Logic** — L298N รองรับได้ แต่ให้ตรวจสอบ Logic Threshold ของโมดูลที่ใช้
+
+#### ตัวอย่างโค้ด ESP-IDF (LEDC สำหรับ SKATE/KidBright)
+```c
+// L298N + ESP-IDF LEDC — SKATE Rev 1.3
+// ปรับ PIN ตาม schematic จริงของบอร์ด
+#define MOTOR_IN1  GPIO_NUM_25
+#define MOTOR_IN2  GPIO_NUM_26
+#define MOTOR_IN3  GPIO_NUM_27
+#define MOTOR_IN4  GPIO_NUM_14
+#define MOTOR_ENA  GPIO_NUM_32
+#define MOTOR_ENB  GPIO_NUM_33
+
+#define PWM_FREQ_HZ   5000
+#define PWM_RESOLUTION LEDC_TIMER_8_BIT  // 0–255
+
+// Init direction pins
+gpio_config_t dir_conf = {
+    .pin_bit_mask = (1ULL<<MOTOR_IN1)|(1ULL<<MOTOR_IN2)|(1ULL<<MOTOR_IN3)|(1ULL<<MOTOR_IN4),
+    .mode = GPIO_MODE_OUTPUT, .pull_up_en = GPIO_PULLUP_DISABLE,
+    .pull_down_en = GPIO_PULLDOWN_DISABLE, .intr_type = GPIO_INTR_DISABLE
+};
+gpio_config(&dir_conf);
+
+// Init LEDC PWM for ENA
+ledc_timer_config_t tmr = {
+    .speed_mode = LEDC_LOW_SPEED_MODE, .timer_num = LEDC_TIMER_0,
+    .duty_resolution = PWM_RESOLUTION, .freq_hz = PWM_FREQ_HZ, .clk_cfg = LEDC_AUTO_CLK
+};
+ledc_timer_config(&tmr);
+ledc_channel_config_t ch_a = {
+    .speed_mode = LEDC_LOW_SPEED_MODE, .channel = LEDC_CHANNEL_0,
+    .timer_sel = LEDC_TIMER_0, .intr_type = LEDC_INTR_DISABLE,
+    .gpio_num = MOTOR_ENA, .duty = 0, .hpoint = 0
+};
+ledc_channel_config(&ch_a);
+// ทำซ้ำสำหรับ ENB ด้วย LEDC_CHANNEL_1
+
+// เดินหน้า (ตั้งทิศก่อน แล้วค่อยให้ PWM)
+gpio_set_level(MOTOR_IN1, 1); gpio_set_level(MOTOR_IN2, 0);
+gpio_set_level(MOTOR_IN3, 1); gpio_set_level(MOTOR_IN4, 0);
+ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, 200);
+ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
+
+// หยุด (coast)
+ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, 0);
+ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
+gpio_set_level(MOTOR_IN1, 0); gpio_set_level(MOTOR_IN2, 0);
+```
+
+#### KidBright + L298N ผ่าน KB CHAIN
+- ต่อ L298N ตรงกับขา OUT1(GPIO26)/OUT2(GPIO27) หรือ IN1-IN4 ของ KidBright ได้
+- **KidBright IDE (Block) ไม่มี PWM ตรงๆ สำหรับ L298N** → ต้องใช้ ESP-IDF หรือ MicroPython
+- ถ้าใช้ SKATE Board ผ่าน KB CHAIN → ESP32 บน SKATE เป็นตัวควบคุม L298N โดยตรง"#;
 
 fn get_tools() -> Value {
     json!([
