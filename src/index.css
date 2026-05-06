@@ -1,61 +1,314 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+/* ── PMS 293 Palette ────────────────────────────────────────────────────────── */
+/* PMS 293 C = #254796 (PANTONE official)                                        */
 
 :root {
-  --background: #0a0a0a;
-  --foreground: #f5f5f5;
-  --primary: #ef4444;
-  --secondary: #171717;
-  --accent: #e11d48;
+  /* === LIGHT MODE (Default) === */
+  --pms-293:       #254796;
+  --pms-293-dark:  #1a3570;
+  --pms-293-light: #3a5db3;
+  --pms-293-pale:  #dde6f7;
+  --pms-293-ultra: #eef2fb;
+
+  --bg-app:        #f5f7fc;
+  --bg-sidebar:    #ffffff;
+  --bg-main:       #f0f4fa;
+  --bg-editor:     #ffffff;
+  --bg-panel:      #ffffff;
+  --bg-terminal:   #f8f9fc;
+  --bg-input:      #ffffff;
+  --bg-hover:      #eef2fb;
+  --bg-active:     #dde6f7;
+  --bg-modal:      #ffffff;
+  --bg-tooltip:    #1a3570;
+  --bg-tag:        #eef2fb;
+  --bg-select:     #f5f7fc;
+
+  --border-color:  #d0daf0;
+  --border-focus:  #254796;
+
+  --text-primary:  #0d1a3a;
+  --text-secondary:#3d5080;
+  --text-muted:    #7a8fb8;
+  --text-disabled: #b0bcdb;
+  --text-on-primary: #ffffff;
+  --text-link:     #254796;
+
+  --accent:        #254796;
+  --accent-hover:  #1a3570;
+  --accent-active: #3a5db3;
+  --accent-glow:   rgba(37, 71, 150, 0.18);
+
+  --success:       #0d7f45;
+  --warning:       #b45309;
+  --danger:        #b91c1c;
+  --info:          #0e6eb8;
+
+  --scrollbar-thumb: #c0ceea;
+  --scrollbar-hover: #a0b4d8;
+  --shadow-sm:     0 1px 4px rgba(37,71,150,0.08);
+  --shadow-md:     0 4px 16px rgba(37,71,150,0.12);
+  --shadow-lg:     0 8px 32px rgba(37,71,150,0.16);
+
+  /* Tailwind color overrides via CSS vars */
+  --background: var(--bg-app);
+  --foreground: var(--text-primary);
+  --primary: var(--pms-293);
+  --secondary: #eef2fb;
+  --accent-color: var(--pms-293);
+}
+
+[data-theme="dark"] {
+  /* === DARK MODE === */
+  --pms-293:       #4a72c8;
+  --pms-293-dark:  #254796;
+  --pms-293-light: #6a8ed4;
+  --pms-293-pale:  #1a2a4a;
+  --pms-293-ultra: #111e36;
+
+  --bg-app:        #0d1220;
+  --bg-sidebar:    #0a0f1a;
+  --bg-main:       #0f1628;
+  --bg-editor:     #090d18;
+  --bg-panel:      #111827;
+  --bg-terminal:   #070c16;
+  --bg-input:      #111827;
+  --bg-hover:      #1a2540;
+  --bg-active:     #1e2d52;
+  --bg-modal:      #131d32;
+  --bg-tooltip:    #1e2d52;
+  --bg-tag:        #1a2a4a;
+  --bg-select:     #111827;
+
+  --border-color:  #1e2d52;
+  --border-focus:  #4a72c8;
+
+  --text-primary:  #dde6f7;
+  --text-secondary:#8aabda;
+  --text-muted:    #4a6090;
+  --text-disabled: #2a3a5a;
+  --text-on-primary: #ffffff;
+  --text-link:     #7aa0e0;
+
+  --accent:        #4a72c8;
+  --accent-hover:  #6a8ed4;
+  --accent-active: #254796;
+  --accent-glow:   rgba(74, 114, 200, 0.25);
+
+  --success:       #10b981;
+  --warning:       #f59e0b;
+  --danger:        #ef4444;
+  --info:          #38bdf8;
+
+  --scrollbar-thumb: #1e2d52;
+  --scrollbar-hover: #2a3f6a;
+  --shadow-sm:     0 1px 4px rgba(0,0,0,0.3);
+  --shadow-md:     0 4px 16px rgba(0,0,0,0.4);
+  --shadow-lg:     0 8px 32px rgba(0,0,0,0.5);
+
+  --background: var(--bg-app);
+  --foreground: var(--text-primary);
+  --primary: var(--pms-293);
+  --secondary: #1a2540;
+  --accent-color: var(--pms-293);
+}
+
+/* ── Base ───────────────────────────────────────────────────────────────────── */
+
+*, *::before, *::after {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.15s ease;
 }
 
 body {
   margin: 0;
   padding: 0;
-  font-family: 'Inter', sans-serif;
-  background-color: var(--background);
-  color: var(--foreground);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--bg-app);
+  color: var(--text-primary);
   overflow: hidden;
-  /* Prevent body scroll, IDE handles layout */
 }
 
-.glass {
-  background: rgba(30, 41, 59, 0.7);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+/* ── Theme-aware Tailwind overrides ─────────────────────────────────────────── */
+
+/* Sidebar & panels */
+.theme-sidebar {
+  background-color: var(--bg-sidebar);
+  border-color: var(--border-color);
+}
+.theme-main {
+  background-color: var(--bg-main);
+  border-color: var(--border-color);
+}
+.theme-panel {
+  background-color: var(--bg-panel);
+  border-color: var(--border-color);
+}
+.theme-terminal {
+  background-color: var(--bg-terminal);
+  border-color: var(--border-color);
+}
+.theme-modal {
+  background-color: var(--bg-modal);
+  border-color: var(--border-color);
+  box-shadow: var(--shadow-lg);
 }
 
+/* Text */
+.theme-text-primary   { color: var(--text-primary); }
+.theme-text-secondary { color: var(--text-secondary); }
+.theme-text-muted     { color: var(--text-muted); }
+
+/* Active file tab indicator */
+.theme-tab-active {
+  background-color: var(--bg-active);
+  color: var(--accent);
+  border-bottom-color: var(--accent) !important;
+}
+.theme-tab-inactive:hover {
+  background-color: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+/* Accent / Primary button */
 .btn-primary {
-  @apply px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-md transition-all duration-200 font-medium flex items-center gap-2;
+  background-color: var(--accent);
+  color: var(--text-on-primary);
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: none;
+  cursor: pointer;
+}
+.btn-primary:hover {
+  background-color: var(--accent-hover);
+  box-shadow: 0 0 0 4px var(--accent-glow);
 }
 
 .btn-secondary {
-  @apply px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-md transition-all duration-200 font-medium flex items-center gap-2;
+  background-color: var(--bg-hover);
+  color: var(--text-secondary);
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+}
+.btn-secondary:hover {
+  background-color: var(--bg-active);
+  color: var(--accent);
 }
 
-/* Scrollbar styles */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+/* Glass panel */
+.glass {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(37, 71, 150, 0.15);
+}
+[data-theme="dark"] .glass {
+  background: rgba(17, 24, 39, 0.75);
+  border: 1px solid rgba(74, 114, 200, 0.2);
 }
 
-::-webkit-scrollbar-track {
-  background: transparent;
+/* Inputs */
+.theme-input {
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: 0.5rem;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.theme-input:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px var(--accent-glow);
 }
 
-::-webkit-scrollbar-thumb {
-  background: #334155;
+/* ── Scrollbar ──────────────────────────────────────────────────────────────── */
+
+::-webkit-scrollbar        { width: 7px; height: 7px; }
+::-webkit-scrollbar-track  { background: transparent; }
+::-webkit-scrollbar-thumb  {
+  background: var(--scrollbar-thumb);
   border-radius: 4px;
 }
+::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-hover); }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ── Theme Toggle Button ────────────────────────────────────────────────────── */
+
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-color);
+  background: var(--bg-hover);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+}
+.theme-toggle:hover {
+  background: var(--bg-active);
+  color: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
 }
 
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
+/* ── Brand gradient (light) ─────────────────────────────────────────────────── */
+
+.brand-gradient {
+  background: linear-gradient(135deg, var(--pms-293) 0%, var(--pms-293-light) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+/* ── Accent highlight bar ───────────────────────────────────────────────────── */
+
+.accent-bar {
+  background-color: var(--accent);
 }
+
+/* ── Status dot ─────────────────────────────────────────────────────────────── */
+
+.status-ok   { background-color: var(--success); box-shadow: 0 0 8px rgba(16,185,129,0.5); }
+.status-warn { background-color: var(--warning); box-shadow: 0 0 8px rgba(245,158,11,0.5); }
+
+/* ── Code / Mono font ───────────────────────────────────────────────────────── */
+
+code, pre, .font-mono {
+  font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+}
+
+/* ── Micro-animations ───────────────────────────────────────────────────────── */
+
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fadein { animation: fadeSlideIn 0.18s ease both; }
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 0 0 var(--accent-glow); }
+  50%       { box-shadow: 0 0 0 6px transparent; }
+}
+.animate-glow { animation: pulseGlow 2s ease-in-out infinite; }

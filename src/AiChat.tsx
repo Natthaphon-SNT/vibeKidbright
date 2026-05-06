@@ -39,7 +39,8 @@ function ApplyButton({ onApply, targetFile }: { onApply: () => void, targetFile?
     return (
         <button
             onClick={handleClick}
-            className="opacity-0 group-hover/code:opacity-100 bg-violet-600 hover:bg-violet-500 text-white px-2 py-0.5 rounded text-[8px] transition-all font-bold"
+            className="opacity-0 group-hover/code:opacity-100 text-white px-2 py-0.5 rounded text-[8px] transition-all font-bold"
+            style={{ backgroundColor: 'var(--accent)' }}
         >
             {targetFile ? `APPLY TO ${targetFile}` : "APPLY"}
         </button>
@@ -489,9 +490,9 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
                     const currentCodeContent = [...codeContent];
 
                     elements.push(
-                        <div key={key++} className="my-2 rounded-lg border border-neutral-700/50 overflow-hidden relative group/code">
-                            <div className="bg-neutral-800 px-3 py-1.5 text-[10px] text-neutral-400 font-mono flex justify-between items-center border-b border-neutral-700/50">
-                                <span>{currentTargetFile ? <><span className="text-red-400 font-bold">{currentTargetFile}</span> <span className="uppercase opacity-50 ml-2">{langMatch}</span></> : <span className="uppercase">{langMatch || "code"}</span>}</span>
+                        <div key={key++} className="my-2 rounded-lg overflow-hidden relative group/code" style={{ border: '1px solid var(--border-color)' }}>
+                            <div className="px-3 py-1.5 text-[10px] font-mono flex justify-between items-center" style={{ backgroundColor: 'var(--bg-hover)', color: 'var(--text-muted)', borderBottom: '1px solid var(--border-color)' }}>
+                                <span>{currentTargetFile ? <><span className="font-bold" style={{ color: 'var(--accent)' }}>{currentTargetFile}</span> <span className="uppercase opacity-50 ml-2">{langMatch}</span></> : <span className="uppercase">{langMatch || 'code'}</span>}</span>
                                 <ApplyButton
                                     targetFile={currentTargetFile ? currentTargetFile.split('/').pop() : null}
                                     onApply={() => {
@@ -503,7 +504,7 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
                                     }}
                                 />
                             </div>
-                            <pre className="bg-neutral-900/80 p-3 overflow-x-auto text-xs">
+                            <pre className="p-3 overflow-x-auto text-xs" style={{ backgroundColor: 'var(--bg-terminal)' }}>
                                 <code>{currentCodeContent.join("\n")}</code>
                             </pre>
                         </div>
@@ -522,21 +523,21 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
             } else if (line.startsWith("### ")) {
                 prevLine = line;
                 elements.push(
-                    <h4 key={key++} className="font-bold text-sm mt-3 mb-1 text-red-300">
+                    <h4 key={key++} className="font-bold text-sm mt-3 mb-1" style={{ color: 'var(--accent)' }}>
                         {line.slice(4)}
                     </h4>
                 );
             } else if (line.startsWith("## ")) {
                 prevLine = line;
                 elements.push(
-                    <h3 key={key++} className="font-bold text-base mt-3 mb-1 text-red-300">
+                    <h3 key={key++} className="font-bold text-base mt-3 mb-1" style={{ color: 'var(--accent)' }}>
                         {line.slice(3)}
                     </h3>
                 );
             } else if (line.startsWith("# ")) {
                 prevLine = line;
                 elements.push(
-                    <h2 key={key++} className="font-bold text-lg mt-3 mb-1 text-red-300">
+                    <h2 key={key++} className="font-bold text-lg mt-3 mb-1" style={{ color: 'var(--accent)' }}>
                         {line.slice(2)}
                     </h2>
                 );
@@ -544,7 +545,7 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
                 prevLine = line;
                 elements.push(
                     <div key={key++} className="flex gap-2 ml-2">
-                        <span className="text-red-500">•</span>
+                        <span style={{ color: 'var(--accent)' }}>•</span>
                         <span>{renderInlineCode(line.slice(2))}</span>
                     </div>
                 );
@@ -600,7 +601,7 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
         return parts.map((part, i) => {
             if (part.startsWith("`") && part.endsWith("`")) {
                 return (
-                    <code key={i} className="bg-neutral-700 px-1.5 py-0.5 rounded text-red-300 text-xs font-mono">
+                    <code key={i} className="px-1.5 py-0.5 rounded text-xs font-mono" style={{ backgroundColor: 'var(--bg-hover)', color: 'var(--accent)' }}>
                         {part.slice(1, -1)}
                     </code>
                 );
@@ -617,18 +618,18 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
     };
 
     return (
-        <div className="flex flex-col h-full bg-neutral-950">
+        <div className="flex flex-col h-full" style={{ backgroundColor: 'var(--bg-panel)', color: 'var(--text-primary)' }}>
             {/* Header */}
-            <div className="h-10 border-b border-neutral-800 flex items-center justify-between px-4 bg-neutral-900/80 backdrop-blur-sm shrink-0">
+            <div className="h-10 flex items-center justify-between px-4 backdrop-blur-sm shrink-0" style={{ borderBottom: '1px solid var(--border-color)', backgroundColor: 'var(--bg-sidebar)' }}>
                 <div className="flex items-center gap-2">
-                    <div className="w-5 h-5 rounded bg-gradient-to-br from-violet-500 to-rose-600 flex items-center justify-center text-[10px] font-bold text-white shadow-lg shadow-violet-500/20">
+                    <div className="w-5 h-5 rounded flex items-center justify-center text-[10px] font-bold text-white shadow-lg" style={{ background: 'linear-gradient(135deg, var(--pms-293) 0%, var(--pms-293-light) 100%)' }}>
                         AI
                     </div>
-                    <span className="text-xs font-bold text-neutral-300 tracking-wide">
+                    <span className="text-xs font-bold tracking-wide" style={{ color: 'var(--text-primary)' }}>
                         Vibe Coder
                     </span>
                     {activeModelBadge ? (
-                        <span className="text-[9px] px-1.5 py-0.5 rounded font-bold uppercase bg-red-500/10 text-red-400 border border-red-500/20">
+                        <span className="text-[9px] px-1.5 py-0.5 rounded font-bold uppercase" style={{ background: 'var(--pms-293-pale)', color: 'var(--accent)', border: '1px solid var(--accent)' }}>
                             {activeModelBadge}
                         </span>
                     ) : (
@@ -685,10 +686,10 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
 
             {/* History Modal */}
             {showHistory && (
-                <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50" onClick={(e) => { if (e.target === e.currentTarget) setShowHistory(false) }}>
-                    <div className="bg-neutral-800 border border-neutral-700 rounded-xl p-6 w-96 shadow-2xl overflow-y-auto max-h-[90vh]">
+                <div className="absolute inset-0 backdrop-blur-sm flex items-center justify-center z-50" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }} onClick={(e) => { if (e.target === e.currentTarget) setShowHistory(false) }}>
+                    <div className="rounded-xl p-6 w-96 overflow-y-auto max-h-[90vh] animate-fadein" style={{ backgroundColor: 'var(--bg-modal)', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-lg)' }}>
                         <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-sm font-bold text-neutral-200">ประวัติแชท (Chat History)</h3>
+                            <h3 className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>ประวัติแชท (Chat History)</h3>
                             <button onClick={() => setShowHistory(false)} className="text-neutral-500 hover:text-neutral-300">
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                             </button>
@@ -701,10 +702,11 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
                                     <button
                                         key={session.id}
                                         onClick={() => loadSession(session.id)}
-                                        className={`w-full text-left p-3 rounded-lg border transition-colors ${currentSessionId === session.id
-                                                ? "bg-violet-600/20 border-violet-500/50 text-violet-300"
-                                                : "bg-neutral-900/50 border-neutral-700 text-neutral-400 hover:bg-neutral-700 hover:text-neutral-200"
-                                            }`}
+                                        className="w-full text-left p-3 rounded-lg border transition-colors"
+                                        style={currentSessionId === session.id
+                                            ? { backgroundColor: 'var(--bg-active)', borderColor: 'var(--accent)', color: 'var(--accent)' }
+                                            : { backgroundColor: 'var(--bg-hover)', borderColor: 'var(--border-color)', color: 'var(--text-secondary)' }
+                                        }
                                     >
                                         <div className="font-medium text-sm truncate">{session.title}</div>
                                         <div className="text-[10px] opacity-60 mt-1">
@@ -720,17 +722,18 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
 
             {/* Settings Modal */}
             {showSettings && (
-                <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
-                    <div className="bg-neutral-800 border border-neutral-700 rounded-xl p-6 w-96 shadow-2xl overflow-y-auto max-h-[90vh]">
-                        <h3 className="text-sm font-bold text-neutral-200 mb-4">
+                <div className="absolute inset-0 backdrop-blur-sm flex items-center justify-center z-50" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+                    <div className="rounded-xl p-6 w-96 overflow-y-auto max-h-[90vh] animate-fadein" style={{ backgroundColor: 'var(--bg-modal)', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-lg)' }}>
+                        <h3 className="text-sm font-bold mb-4" style={{ color: 'var(--text-primary)' }}>
                             AI Provider Settings
                         </h3>
 
                         {/* Provider Switcher Tabs */}
-                        <div className="flex bg-neutral-900 p-1 rounded-lg mb-6 border border-neutral-700 gap-1">
+                        <div className="flex p-1 rounded-lg mb-6 gap-1" style={{ backgroundColor: 'var(--bg-terminal)', border: '1px solid var(--border-color)' }}>
                             <button
                                 onClick={() => handleProviderChange("openai")}
-                                className={`flex-1 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded transition-all ${providerInput === "openai" ? "bg-violet-600 text-white shadow-lg" : "text-neutral-500 hover:text-neutral-300"}`}
+                                className="flex-1 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded transition-all"
+                                style={providerInput === 'openai' ? { backgroundColor: 'var(--accent)', color: '#fff', boxShadow: 'var(--shadow-sm)' } : { color: 'var(--text-muted)' }}
                             >
                                 Cloud (OpenAI)
                             </button>
@@ -742,7 +745,8 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
                             </button>
                             <button
                                 onClick={() => handleProviderChange("local")}
-                                className={`flex-1 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded transition-all ${providerInput === "local" ? "bg-emerald-600 text-white shadow-lg" : "text-neutral-500 hover:text-neutral-300"}`}
+                                className="flex-1 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded transition-all"
+                                style={providerInput === 'local' ? { backgroundColor: 'var(--success)', color: '#fff' } : { color: 'var(--text-muted)' }}
                             >
                                 Local
                             </button>
@@ -1062,13 +1066,15 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
                         <div className="flex gap-2">
                             <button
                                 onClick={() => setShowSettings(false)}
-                                className="flex-1 py-2 bg-neutral-700 hover:bg-neutral-600 text-sm text-neutral-300 rounded-lg transition-colors"
+                                className="flex-1 py-2 text-sm rounded-lg transition-colors"
+                                style={{ backgroundColor: 'var(--bg-hover)', color: 'var(--text-secondary)', border: '1px solid var(--border-color)' }}
                             >
                                 Cancel
                             </button>
                             <button
                                 onClick={saveSettings}
-                                className="flex-1 py-2 bg-violet-600 hover:bg-violet-500 text-sm text-white rounded-lg transition-colors font-medium"
+                                className="flex-1 py-2 text-sm text-white rounded-lg transition-colors font-medium"
+                                style={{ backgroundColor: 'var(--accent)' }}
                             >
                                 Save
                             </button>
@@ -1080,11 +1086,11 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
             {/* Messages */}
             <div
                 ref={scrollRef}
-                className="flex-1 overflow-y-auto p-4 space-y-4"
+                className="flex-1 overflow-y-auto p-4 space-y-4" style={{ backgroundColor: 'var(--bg-main)' }}
             >
                 {messages.length === 0 && !isLoading && (
                     <div className="flex flex-col items-center justify-center h-full text-center opacity-50">
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500/20 to-rose-600/20 border border-violet-500/20 flex items-center justify-center mb-3">
+                        <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-3" style={{ background: 'var(--pms-293-pale)', border: '1px solid var(--accent)' }}>
                             <span className="text-lg">✨</span>
                         </div>
                         <p className="text-sm text-neutral-500 font-medium">
@@ -1102,10 +1108,11 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
                         className={`flex flex-col mb-2 group/msg ${msg.role === "user" ? "items-end" : "items-start"}`}
                     >
                         <div
-                            className={`max-w-[90%] rounded-xl px-4 py-3 text-sm leading-relaxed ${msg.role === "user"
-                                ? "bg-violet-600/80 text-white rounded-br-sm"
-                                : "bg-neutral-800/80 text-neutral-200 rounded-bl-sm border border-neutral-700/50"
-                                }`}
+                            className={`max-w-[90%] rounded-xl px-4 py-3 text-sm leading-relaxed ${msg.role === 'user' ? 'rounded-br-sm' : 'rounded-bl-sm'}`}
+                            style={msg.role === 'user'
+                                ? { backgroundColor: 'var(--accent)', color: '#fff' }
+                                : { backgroundColor: 'var(--bg-panel)', color: 'var(--text-primary)', border: '1px solid var(--border-color)' }
+                            }
                         >
                             {msg.role === "assistant" ? (
                                 <>
@@ -1113,7 +1120,7 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
                                     {msg.toolCalls?.map((tc, j) => (
                                         <div
                                             key={j}
-                                            className="flex items-center gap-2 text-xs text-neutral-400 mb-2 bg-neutral-700/50 rounded-lg px-2 py-1.5"
+                                            className="flex items-center gap-2 text-xs mb-2 rounded-lg px-2 py-1.5" style={{ backgroundColor: 'var(--bg-hover)', color: 'var(--text-muted)' }}
                                         >
                                             <span className="text-emerald-400">⚡</span>
                                             <span className="font-mono">{tc.name}</span>
@@ -1157,9 +1164,9 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
                 {/* Streaming text */}
                 {isLoading && streamingText && (
                     <div className="flex justify-start">
-                        <div className="max-w-[90%] rounded-xl rounded-bl-sm px-4 py-3 bg-neutral-800/80 text-neutral-200 text-sm leading-relaxed border border-neutral-700/50">
+                        <div className="max-w-[90%] rounded-xl rounded-bl-sm px-4 py-3 text-sm leading-relaxed" style={{ backgroundColor: 'var(--bg-panel)', color: 'var(--text-primary)', border: '1px solid var(--border-color)' }}>
                             <div className="prose-sm">{renderMarkdown(streamingText)}</div>
-                            <span className="inline-block w-1.5 h-4 bg-violet-400 animate-pulse ml-0.5 align-middle" />
+                            <span className="inline-block w-1.5 h-4 animate-pulse ml-0.5 align-middle" style={{ backgroundColor: 'var(--accent)' }} />
                         </div>
                     </div>
                 )}
@@ -1167,8 +1174,8 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
                 {/* Active tool indicators */}
                 {activeTools.length > 0 && (
                     <div className="flex justify-start">
-                        <div className="rounded-xl px-4 py-2 bg-neutral-800/50 border border-neutral-700/50 text-xs text-neutral-400 flex items-center gap-2">
-                            <svg className="w-3 h-3 animate-spin text-violet-400" fill="none" viewBox="0 0 24 24">
+                        <div className="rounded-xl px-4 py-2 text-xs flex items-center gap-2" style={{ backgroundColor: 'var(--bg-hover)', border: '1px solid var(--border-color)', color: 'var(--text-muted)' }}>
+                            <svg className="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24" style={{ color: 'var(--accent)' }}>
                                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                             </svg>
@@ -1180,11 +1187,11 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
                 {/* Loading indicator when no text yet */}
                 {isLoading && !streamingText && activeTools.length === 0 && (
                     <div className="flex justify-start">
-                        <div className="rounded-xl px-4 py-3 bg-neutral-800/50 border border-neutral-700/50">
+                        <div className="rounded-xl px-4 py-3" style={{ backgroundColor: 'var(--bg-hover)', border: '1px solid var(--border-color)' }}>
                             <div className="flex gap-1">
-                                <div className="w-2 h-2 bg-violet-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-                                <div className="w-2 h-2 bg-violet-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-                                <div className="w-2 h-2 bg-violet-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                                <div className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: 'var(--accent)', animationDelay: '0ms' }} />
+                                <div className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: 'var(--accent)', animationDelay: '150ms' }} />
+                                <div className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: 'var(--accent)', animationDelay: '300ms' }} />
                             </div>
                         </div>
                     </div>
@@ -1192,7 +1199,7 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
             </div>
 
             {/* Input */}
-            <div className="p-3 border-t border-neutral-800 bg-neutral-900/60 shrink-0">
+            <div className="p-3 shrink-0" style={{ borderTop: '1px solid var(--border-color)', backgroundColor: 'var(--bg-sidebar)' }}>
                 <div className="flex gap-2 items-end">
                     <textarea
                         ref={inputRef}
@@ -1201,8 +1208,8 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
                         onKeyDown={handleKeyDown}
                         placeholder="Ask about your code..."
                         rows={1}
-                        className="flex-1 bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-sm text-neutral-200 resize-none focus:outline-none focus:border-violet-500 transition-colors placeholder:text-neutral-600 max-h-32 overflow-y-auto"
-                        style={{ minHeight: "36px" }}
+                        className="flex-1 rounded-lg px-3 py-2 text-sm resize-none focus:outline-none transition-colors max-h-32 overflow-y-auto"
+                        style={{ minHeight: "36px", backgroundColor: 'var(--bg-input)', border: '1px solid var(--border-color)', color: 'var(--text-primary)' }}
                     />
                     {isLoading ? (
                         <button
@@ -1218,10 +1225,11 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
                         <button
                             onClick={() => sendMessage()}
                             disabled={!input.trim()}
-                            className={`p-2 rounded-lg transition-all duration-200 ${!input.trim()
-                                ? "bg-neutral-700 text-neutral-500 cursor-not-allowed"
-                                : "bg-violet-600 hover:bg-violet-500 text-white shadow-lg shadow-violet-500/20 active:scale-95"
-                                }`}
+                            className="p-2 rounded-lg transition-all duration-200 active:scale-95"
+                            style={!input.trim()
+                                ? { backgroundColor: 'var(--bg-hover)', color: 'var(--text-muted)', cursor: 'not-allowed' }
+                                : { backgroundColor: 'var(--accent)', color: '#fff', boxShadow: '0 4px 12px var(--accent-glow)' }
+                            }
                         >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
