@@ -1152,7 +1152,7 @@ LM73 TEMPERATURE READ: ALWAYS use `i2c_master_write_read_device()` (combined tra
 - **MOTORS/RELAYS:** **NEVER** drive Fan/Vibration motors directly from GPIO (max 40mA). ALWAYS use a transistor, driver module, or relay.
 - **ACTIVE LOW OUTPUTS:** OUT1(GPIO26), OUT2(GPIO27), and USB Host Output(GPIO25) are ALL **ACTIVE LOW**. `gpio_set_level(..., 0)` = ON, `gpio_set_level(..., 1)` = OFF. NEVER use GPIO17 or GPIO23 for USB output — the correct pin is **GPIO25 ONLY**.
 - **BUZZERS:** Active Buzzers need Digital HIGH/LOW. Passive Buzzers need PWM (`ledc`).
-- **LM73 TEMPERATURE SENSOR (CRITICAL):** ALWAYS use `i2c_master_write_read_device(I2C_NUM_1, LM73_ADDR, &reg, 1, raw, 2, ...)` for reading temperature. NEVER split into two calls (`write_to_device` then `read_from_device`) — this breaks the I2C pointer and returns wrong values. Parse result as: `int16_t raw16 = (raw[0] << 8) | raw[1]; float temp = (float)(raw16 >> 5) / 32.0f;` for 11-bit mode.
+- **LM73 TEMPERATURE SENSOR (CRITICAL):** ALWAYS use `i2c_master_write_read_device(I2C_NUM_1, LM73_ADDR, &reg, 1, raw, 2, ...)` for reading temperature. NEVER split into two calls (`write_to_device` then `read_from_device`) — this breaks the I2C pointer and returns wrong values. Parse result as: `int16_t raw16 = (raw[0] << 8) | raw[1]; float temp = (float)(raw16 >> 2) / 32.0f;` for 11-bit mode. (LM73 default: 11-bit left-aligned → shift RIGHT 2 bits, then divide by 32. NEVER use >> 5 — that gives 1/8 of actual temperature.)
 
 ### COMPONENT MANAGER RULE:
 - ถ้าต้องการ library นอก ESP-IDF core (เช่น led_strip, mqtt, cJSON), ให้เรียก tool `install_idf_library` ก่อน write_file EVERY TIME
@@ -1184,14 +1184,17 @@ L298N เป็น IC ขับมอเตอร์ Dual H-Bridge ขับ DC 
 | HIGH | LOW | LOW | เบรก |
 | LOW | X | X | Coast (หยุด) |
 
-#### SKATE Rev 1.3 — GPIO Mapping (อ้างอิง Skate_rev1_3.kicad_sch)
-- IN1 → GPIO (Motor A dir 1), IN2 → GPIO (Motor A dir 2)
-- IN3 → GPIO (Motor B dir 1), IN4 → GPIO (Motor B dir 2)
-- ENA → GPIO PWM (speed Motor A), ENB → GPIO PWM (speed Motor B)
-- VCC Motor ← VBAT (ผ่าน StepDown XL4005 → 5V Logic)
-- **MANDATORY: GND ของแบตเตอรี่, L298N, และ MCU ต้องต่อร่วมกันเสมอ**
+#### SKATE Rev 1.3 — GPIO จริงจากโค้ด Self-Balancing (อ้างอิง balanced_robot.c)
+- LT (Left Top) = GPIO 18 — มอเตอร์ซ้าย เดินหน้า
+- LB (Left Bottom) = GPIO 19 — มอเตอร์ซ้าย ถอยหลัง
+- RT (Right Top) = GPIO 26 — มอเตอร์ขวา เดินหน้า
+- RB (Right Bottom) = GPIO 27 — มอเตอร์ขวา ถอยหลัง
+- ENCA = GPIO 32 (Interrupt นับ Pulse), ENCB = GPIO 33 (ทิศทาง)
+- SDA (MPU6050) = GPIO 4, SCL (MPU6050) = GPIO 5
+- **GPIO 18/19 เป็นขา VSPI — ระวัง conflict ถ้าใช้ SPI peripherals อื่น**
+- **โค้ดเดิมใช้ `analogWrite()` (Arduino Core เก่า) — ถ้า Core ≥ 3.x ต้องเปลี่ยนเป็น `ledcWrite`**
 
-#### กฎการเขียนโปรแกรม (CRITICAL)
+#### กฎการเขียนโปรแกรม (CRITICAL — กฎ 1–12)
 1. **ห้ามให้ IN1 และ IN2 HIGH พร้อมกันนาน** — H-Bridge Short → IC ร้อนเสียหาย
 2. **ตั้งทิศทาง (IN1/IN2) ก่อนเปิด ENA/PWM เสมอ**
 3. **ถอด Jumper ENA/ENB ออกก่อนใช้ PWM** — ถ้าจั๊มไว้จะ lock HIGH ปรับความเร็วไม่ได้
