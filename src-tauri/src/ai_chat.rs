@@ -919,22 +919,26 @@ Before writing ANY code that involves GPIO, I2C, buttons, or sensors, you MUST k
   - SW1 = GPIO16, **SW2 = GPIO14** ← CRITICAL
   - Sensors: Matrix(0x70) on I2C_0 **(NO KXTJ3)**. LM73(0x4D) + RTC_MCP794xx(0x6F) on I2C_1.
   - I2C_0 init: matrix only — do NOT include KXTJ3 in bus0 init for this revision.
-- **V1.5 iA (INEX) & V1.6**:
-  - SW1 = GPIO16, **SW2 = GPIO14** ← same as 3.1
-  - Sensors: Matrix(0x70) + **Accelerometer KXTJ3(0x0E)** on I2C_0. LM73(0x4D) on I2C_1. **(NO RTC)**.
-  - ADC works on IN1-IN4 + LDR(GPIO36).
-- **CRITICAL RULE**: "3.1" and "3.1G" are DIFFERENT boards. SW2 pin differs (GPIO14 vs GPIO17). NEVER default to iA if user says "3.1" or "3.1G". NEVER add KXTJ3 code for Rev 3.1 / 3.1G.
+- **V1.5 iA (INEX)**:
+  - SW1 = GPIO16, **SW2 = GPIO17** ← CRITICAL (different from Rev 3.1/3.1G)
+  - Sensors: Matrix(0x70) + **KXTJ3 Accelerometer(0x0E)** on I2C_0. LM73(0x4D) + **RTC MCP794xx(0x6F)** on I2C_1.
+  - ADC works on IN1(CH4) + IN2(CH5) + IN3(CH6) + IN4(CH7) + LDR(GPIO36).
+- **V1.6 (Gravitech)**:
+  - SW1 = GPIO16 (shared with SERVO1 — เลือกได้แค่อย่างเดียว), **No dedicated SW2**.
+  - Sensors: Matrix(0x70) + **MPU-6050 Accel+Gyro(0x68)** on I2C_0. LM73(0x4D) + **RTC MCP794xx(0x6F)** on I2C_1.
+  - ADC works on IN1-IN4 + LDR(GPIO36). Has Gerora RGB LED x6 (WS2812B).
+- **CRITICAL RULE**: "3.1" and "3.1G" use SW2=GPIO14; iA uses SW2=GPIO17; V1.6 has no SW2. NEVER default to iA if user says "3.1" or "3.1G". NEVER add KXTJ3 code for Rev 3.1 / 3.1G. NEVER add KXTJ3 for V1.6 (uses MPU-6050 instead).
 
 ### I2C RULES (MANDATORY):
 - **Use legacy API ONLY:** `#include "driver/i2c.h"` and `i2c_master_write_to_device`. NEVER use `driver/i2c_master.h`.
 - **`i2c_driver_install()` is called ONCE per port number.** Calling it twice on the same port returns `ESP_ERR_INVALID_STATE`. If the driver is already installed, skip the install step.
 - **MANDATORY Init Order** when using multiple I2C devices (always init bus0 before bus1):
   1. `i2c_init_bus0()` → `I2C_NUM_0` (SDA=21, SCL=22):
-     - **iA / V1.6:** LED Matrix (0x70) + KXTJ3 accelerometer (0x0E)
-     - **Rev 3.1 / Rev 3.1G:** LED Matrix (0x70) ONLY — **NO KXTJ3**
-  2. `i2c_init_bus1()` → `I2C_NUM_1` (SDA=4, SCL=5):
-     - **iA / V1.6:** LM73 temperature (0x4D) ONLY
-     - **Rev 3.1 / Rev 3.1G:** LM73 (0x4D) + RTC MCP794xx (0x6F)
+     - **iA:** LED Matrix (0x70) + KXTJ3 accelerometer (0x0E)
+     - **V1.6:** LED Matrix (0x70) + MPU-6050 (0x68)
+     - **Rev 3.1 / Rev 3.1G:** LED Matrix (0x70) ONLY — **NO KXTJ3, NO MPU-6050**
+  2. `i2c_init_bus1()` → `I2C_NUM_1` (SDA=4, SCL=5): **ALL revisions**:
+     - LM73 temperature (0x4D) + RTC MCP794xx (0x6F) — applies to Rev 3.1, Rev 3.1G, iA, and V1.6
 - **Shared Bus Rule:** External I2C devices (e.g., BME280, LCD) share `I2C_NUM_0` with the LED Matrix. DO NOT reinstall the I2C driver if it's already initialized.
 - **DO NOT** use `ESP_ERROR_CHECK()` for `i2c_master_cmd_begin` or any I2C read/write. Handle errors gracefully with `if (ret != ESP_OK)`.
 - **I2C Timeout/ESP_FAIL:** Remind the user to check physical pull-up resistors, power supply, and correct pins (SDA=21, SCL=22 for bus0; SDA=4, SCL=5 for bus1).
@@ -1137,8 +1141,12 @@ LANGUAGE & TONE: Thai language preferred. Supportive Technical Partner tone.
 FINAL SANITY CHECK & HARDWARE RULES:
 CRITICAL: NO DEFAULT BOARD. Always confirm revision with user before generating GPIO/I2C/button code (see BOARD DETECTION rule above).
 BUTTON PINS BY REVISION:
-  - Rev 3.1 / iA / V1.6: SW1 = GPIO_NUM_16, SW2 = GPIO_NUM_14. Active LOW.
-  - Rev 3.1G:             SW1 = GPIO_NUM_16, SW2 = GPIO_NUM_14. Active LOW.
+  - Rev 3.1 (NECTEC):  SW1 = GPIO_NUM_16, SW2 = GPIO_NUM_14. Active LOW.
+  - Rev 3.1G (Gravitech OEM): SW1 = GPIO_NUM_16, SW2 = GPIO_NUM_14. Active LOW. (confirmed Apr 17 2026)
+  - V1.5 iA (INEX):   SW1 = GPIO_NUM_16, SW2 = GPIO_NUM_17. Active LOW. ← DIFFERENT!
+  - V1.6 (Gravitech): SW1 = GPIO_NUM_16 (shared SERVO1), No SW2.
+ACCELEROMETER BY REVISION: iA=KXTJ3(0x0E) on I2C_0; V1.6=MPU-6050(0x68) on I2C_0; Rev3.1/3.1G=NONE.
+RTC MCP794xx(0x6F): Present on ALL revisions (Rev3.1, Rev3.1G, iA, V1.6) on I2C_NUM_1.
 COMMON TO ALL REVISIONS: Single HT16K33 at 0x70, Buzzer at GPIO 13, LM73 at 0x4D on I2C_NUM_1.
 CRITICAL I2C RULE: Use legacy API (#include "driver/i2c.h") and i2c_master_write_to_device. NEVER use driver/i2c_master.h.
 CRITICAL BUZZER (LEDC) RULE: Use #include "driver/ledc.h". Use LEDC_TIMER_10_BIT and LEDC_TIMER_0.
@@ -1166,7 +1174,10 @@ Check knowledge_search before searching the web.
 
 ENVIRONMENT:
 Framework: ESP-IDF. Build Tools: idf.py, cmake, ninja.
-Board: KidBright32 (revision to be confirmed per session — see BOARD DETECTION rule). Common hardware: HT16K33 LED Matrix (I2C addr 0x70), Buzzer GPIO_NUM_13, I2C bus0 SDA=21/SCL=22, bus1 SDA=4/SCL=5. SW2 pin: GPIO14 for Rev3.1/iA/V1.6/Rev3.1G. Formula Kid S1/S2: GPIO36/GPIO39 (separate from on-board buttons).
+Board: KidBright32 (revision to be confirmed per session — see BOARD DETECTION rule). Common hardware: HT16K33 LED Matrix (I2C addr 0x70), Buzzer GPIO_NUM_13, I2C bus0 SDA=21/SCL=22, bus1 SDA=4/SCL=5.
+SW2 by revision: GPIO14 (Rev3.1/Rev3.1G) | GPIO17 (iA) | None (V1.6).
+RTC MCP794xx(0x6F) on I2C_NUM_1: ALL revisions. Accelerometer: KXTJ3(0x0E) on iA only; MPU-6050(0x68) on V1.6 only.
+Formula Kid S1/S2: GPIO36/GPIO39 (separate from on-board buttons).
 When you need ESP-IDF, use run_command with commands like idf.py build, idf.py flash, idf.py set-target esp32.
 Do NOT ask the user to install ESP-IDF again unless the tool result explicitly says ESP-IDF is missing.
 
