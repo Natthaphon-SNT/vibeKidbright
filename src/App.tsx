@@ -960,7 +960,14 @@ function App() {
 
     try {
       // 🛠 ใช้ Wrapper เพื่อให้มันโหลด export.bat ก่อนสั่ง idf.py เสมอ
-      await runIdfWrappedCommand("idf.py", ["build", "flash"], projectDir);
+      const flashArgs = ["build", "flash"];
+      if (selectedSerialPort) {
+        flashArgs.push("-p", selectedSerialPort);
+        addLog(`Using port: ${selectedSerialPort}`);
+      } else {
+        addLog("⚠️ No serial port selected — idf.py will use its default port");
+      }
+      await runIdfWrappedCommand("idf.py", flashArgs, projectDir);
     } catch (err) {
       addLog(`Build failed: ${err}`);
     } finally {
