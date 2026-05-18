@@ -762,8 +762,9 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
                             {providerInput === "openai" && (
                                 <div className="space-y-4 animate-in fade-in slide-in-from-top-1 duration-200">
                                     <div>
-                                        <label className="text-xs text-neutral-400 mb-1 block">
-                                            OpenAI API Key
+                                        <label className="text-xs text-neutral-400 mb-1 flex justify-between items-center">
+                                            <span>OpenAI API Key</span>
+                                            <a href="https://platform.openai.com/api-keys" target="_blank" rel="noreferrer" className="text-[10px] text-violet-400 hover:underline">Get Free Key ↗</a>
                                         </label>
                                         <input
                                             type="password"
@@ -774,8 +775,9 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
                                         />
                                     </div>
                                     <div>
-                                        <label className="text-xs text-neutral-400 mb-2 block font-bold uppercase tracking-wider">
-                                            Cloud Model
+                                        <label className="text-xs text-neutral-400 mb-2 flex justify-between items-center font-bold uppercase tracking-wider">
+                                            <span>Cloud Model</span>
+                                            <a href="https://platform.openai.com/docs/models" target="_blank" rel="noreferrer" className="text-[10px] text-violet-400 hover:underline normal-case tracking-normal font-normal">Browse all models ↗</a>
                                         </label>
                                         <select
                                             value={modelInput}
@@ -789,9 +791,13 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
                                             <option value="o3">o3 (Advanced Reasoning)</option>
                                             <option value="o4-mini">o4-mini (Reasoning Fast)</option>
                                         </select>
-                                        <p className="text-[10px] text-neutral-500 mt-1.5 font-mono truncate">
-                                            ID: {modelInput}
-                                        </p>
+                                        <input
+                                            type="text"
+                                            value={modelInput}
+                                            onChange={(e) => setModelInput(e.target.value)}
+                                            placeholder="หรือพิมพ์ Model ID เอง เช่น gpt-4.1"
+                                            className="w-full mt-1.5 bg-neutral-900 border border-neutral-700 rounded-lg px-3 py-1.5 text-xs text-neutral-300 focus:outline-none focus:border-violet-500 transition-colors font-mono"
+                                        />
                                     </div>
                                 </div>
                             )}
@@ -849,8 +855,9 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
                                     </p>
                                 </div>
                                 <div>
-                                    <label className="text-xs text-neutral-400 mb-1 block">
-                                        OpenRouter API Key
+                                    <label className="text-xs text-neutral-400 mb-1 flex justify-between items-center">
+                                        <span>OpenRouter API Key</span>
+                                        <a href="https://openrouter.ai/keys" target="_blank" rel="noreferrer" className="text-[10px] text-orange-400 hover:underline">Get Free Key ↗</a>
                                     </label>
                                     <input
                                         type="password"
@@ -859,13 +866,11 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
                                         placeholder="sk-or-..."
                                         className="w-full bg-neutral-900 border border-neutral-600 rounded-lg px-3 py-2 text-sm text-neutral-200 focus:outline-none focus:border-orange-500 transition-colors"
                                     />
-                                    <p className="text-[10px] text-neutral-500 mt-1">
-                                        Get your key at <span className="text-orange-400">openrouter.ai/keys</span>
-                                    </p>
                                 </div>
                                 <div>
-                                    <label className="text-xs text-neutral-400 mb-1.5 block font-bold uppercase tracking-wider">
-                                        OpenRouter Model
+                                    <label className="text-xs text-neutral-400 mb-1.5 flex justify-between items-center font-bold uppercase tracking-wider">
+                                        <span>OpenRouter Model</span>
+                                        <a href="https://openrouter.ai/models" target="_blank" rel="noreferrer" className="text-[10px] text-orange-400 hover:underline normal-case tracking-normal font-normal">Browse all models ↗</a>
                                     </label>
                                     <select
                                         value={openrouterModelInput}
@@ -874,6 +879,7 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
                                         style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center" }}
                                     >
                                         <optgroup label="🆓 Free — Best for Coding">
+                                            <option value="=== เลือก Preset เอง หรือกรอก ID Models ===">=== เลือก Preset เอง หรือกรอก ID Models ===</option>
                                             <option value="qwen/qwen3-coder:free">⭐ Qwen3 Coder 480B (Best Free Coder)</option>
                                             <option value="meta-llama/llama-4-maverick:free">Llama 4 Maverick 17B (Free)</option>
                                             <option value="meta-llama/llama-4-scout:free">Llama 4 Scout 17B (Free)</option>
@@ -897,9 +903,13 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
                                             <option value="deepseek/deepseek-r1">DeepSeek R1 Full (Reasoning)</option>
                                         </optgroup>
                                     </select>
-                                    <p className="text-[10px] text-neutral-500 mt-1.5 font-mono truncate">
-                                        ID: {openrouterModelInput}
-                                    </p>
+                                    <input
+                                        type="text"
+                                        value={openrouterModelInput}
+                                        onChange={(e) => setOpenrouterModelInput(e.target.value)}
+                                        placeholder="หรือพิมพ์ Model ID เอง เช่น anthropic/claude-opus-4-5"
+                                        className="w-full mt-1.5 bg-neutral-900 border border-neutral-700 rounded-lg px-3 py-1.5 text-xs text-neutral-300 focus:outline-none focus:border-orange-500 transition-colors font-mono"
+                                    />
                                 </div>
                             </div>
                         )}
@@ -929,8 +939,9 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-xs text-neutral-400 mb-1.5 block font-bold uppercase tracking-wider">
-                                        Gemini Model
+                                    <label className="text-xs text-neutral-400 mb-1.5 flex justify-between items-center font-bold uppercase tracking-wider">
+                                        <span>Gemini Model</span>
+                                        <a href="https://ai.google.dev/gemini-api/docs/models/gemini" target="_blank" rel="noreferrer" className="text-[10px] text-red-400 hover:underline normal-case tracking-normal font-normal">Browse all models ↗</a>
                                     </label>
                                     <select
                                         value={googleModelInput}
@@ -952,13 +963,14 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
                                             <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash-Lite (Budget — Free)</option>
                                             <option value="gemini-2.5-pro">Gemini 2.5 Pro (Best Coding — Paid)</option>
                                         </optgroup>
-                                        <optgroup label="⚠️ Deprecated (shutdown Jun 1 2026)">
-                                            <option value="gemini-2.0-flash">Gemini 2.0 Flash ❌ Deprecated</option>
-                                        </optgroup>
                                     </select>
-                                    <p className="text-[10px] text-neutral-500 mt-1.5 font-mono truncate">
-                                        ID: {googleModelInput}
-                                    </p>
+                                    <input
+                                        type="text"
+                                        value={googleModelInput}
+                                        onChange={(e) => setGoogleModelInput(e.target.value)}
+                                        placeholder="หรือพิมพ์ Model ID เอง เช่น gemini-2.5-pro"
+                                        className="w-full mt-1.5 bg-neutral-900 border border-neutral-700 rounded-lg px-3 py-1.5 text-xs text-neutral-300 focus:outline-none focus:border-red-500 transition-colors font-mono"
+                                    />
                                 </div>
                             </div>
                         )}

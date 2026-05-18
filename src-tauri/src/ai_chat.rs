@@ -1764,7 +1764,11 @@ async fn run_conversation_loop(
     no_workspace: &mut bool,
     system_prompt: &str,
 ) -> Result<(), String> {
-    let client = Client::new();
+    let client = Client::builder()
+        .connect_timeout(std::time::Duration::from_secs(15))
+        .timeout(std::time::Duration::from_secs(300))
+        .build()
+        .unwrap_or_else(|_| Client::new());
     let tools = get_tools();
 
     let model_supports_tools = if model.ends_with(":free") {
@@ -1866,13 +1870,20 @@ async fn run_conversation_loop(
         let mut pending_tool_calls: Vec<PendingToolCall> = Vec::new();
         let mut buffer = String::new();
 
-        while let Some(chunk) = stream.next().await {
+        while let Some(chunk_result) = {
+            match tokio::time::timeout(std::time::Duration::from_secs(90), stream.next()).await {
+                Ok(item) => item,
+                Err(_) => {
+                    return Err("⏱️ Stream timeout: The AI server stopped responding for 90 seconds. Please retry.".to_string());
+                }
+            }
+        } {
             if let Some(state) = app_handle.try_state::<AiAbortState>() {
                 if state.0.load(Ordering::SeqCst) {
                     return Err("Generation stopped by user.".to_string());
                 }
             }
-            let chunk = chunk.map_err(|e| format!("Stream error: {}", e))?;
+            let chunk = chunk_result.map_err(|e| format!("Stream error: {}", e))?;
             let chunk_str = String::from_utf8_lossy(&chunk);
             buffer.push_str(&chunk_str);
 
@@ -2112,7 +2123,11 @@ async fn run_google_conversation_loop(
     no_workspace: &mut bool,
     system_prompt: &str,
 ) -> Result<(), String> {
-    let client = Client::new();
+    let client = Client::builder()
+        .connect_timeout(std::time::Duration::from_secs(15))
+        .timeout(std::time::Duration::from_secs(300))
+        .build()
+        .unwrap_or_else(|_| Client::new());
     let google_tools = get_google_tools();
 
     const MAX_RETRIES: u32 = 3;
@@ -2177,13 +2192,20 @@ async fn run_google_conversation_loop(
         let mut buffer = String::new();
         let mut pending_tool_calls: Vec<PendingToolCall> = Vec::new();
 
-        while let Some(chunk) = stream.next().await {
+        while let Some(chunk_result) = {
+            match tokio::time::timeout(std::time::Duration::from_secs(90), stream.next()).await {
+                Ok(item) => item,
+                Err(_) => {
+                    return Err("⏱️ Stream timeout: The AI server stopped responding for 90 seconds. Please retry.".to_string());
+                }
+            }
+        } {
             if let Some(state) = app_handle.try_state::<AiAbortState>() {
                 if state.0.load(Ordering::SeqCst) {
                     return Err("Generation stopped by user.".to_string());
                 }
             }
-            let chunk = chunk.map_err(|e| format!("Stream error: {}", e))?;
+            let chunk = chunk_result.map_err(|e| format!("Stream error: {}", e))?;
             let chunk_str = String::from_utf8_lossy(&chunk);
             buffer.push_str(&chunk_str);
 

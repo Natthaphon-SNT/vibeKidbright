@@ -1,5 +1,6 @@
 mod esp_idf;
 mod ai_chat;
+mod toolchain;
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
@@ -70,7 +71,13 @@ pub fn run() {
             ai_chat::undo_ai_changes,
             ai_chat::check_pending_diff,
             ai_chat::accept_diff,
-            ai_chat::reject_diff
+            ai_chat::reject_diff,
+            toolchain::check_toolchain,
+            toolchain::download_toolchain,
+            toolchain::cancel_toolchain_download,
+            toolchain::remove_toolchain,
+            toolchain::get_toolchain_paths,
+            toolchain::build_firmware_with_toolchain
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
