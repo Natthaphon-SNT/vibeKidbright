@@ -1,398 +1,410 @@
-# KidBright32 — All Models Reference
-
-> **Framework:** ESP-IDF v5.x เท่านั้น · ห้ามใช้ Arduino Framework
-> **MCU:** ESP32-WROOM-32 · Dual-core Xtensa LX6 240MHz · 4MB Flash · 520KB SRAM · 3.3V logic
-
----
-
-## สรุปรุ่นทั้งหมด
-
-| รุ่น | ผู้ผลิต | Accel | ADC on IN | SW2 GPIO | สถานะ |
-|------|---------|-------|-----------|----------|-------|
-| **V1.5 Rev 3.1** | NECTEC Standard | ไม่มี | ❌ | GPIO14 | Official |
-| **V1.5 Rev 3.1G** | Gravitech OEM | ไม่มี | ❌ | GPIO14 | Official |
-| **V1.5 iA** | INEX | KXTJ3-1057 | ✅ | GPIO17 | Official |
-| **V1.6** | Gravitech | MPU-6050 | ✅ | — | Official (ล่าสุด) |
-
-> ⚠️ **V1.5 Rev 3.1 และ Rev 3.1G**: SW2 = GPIO14 ทั้งคู่ — ยืนยันจาก hardware scan Apr 17 2026
+# 📋 KidBright — ประวัติรุ่น, GPIO Pinout & Sensor ทุกรุ่น (ตั้งแต่ V2016 ถึงรุ่นล่าสุด)
+> **จัดทำโดย:** รวบรวมจากเอกสารทางการ NECTEC/NSTDA · อัปเดต 2026
+> ครอบคลุมทุกรุ่น: **KidBright V2016 (ESP8266)** · **V1.0 (ESP8266)** · **V1.1–V1.6 (ESP32)** · **KidBright μAI (AllWinner V831/ESP32-S3)**
 
 ---
 
-## Core MCU — ESP32-WROOM-32
+## 🏛️ ประวัติรุ่น KidBright ทุกรุ่น (Timeline)
 
-| Parameter | Value |
-|-----------|-------|
-| CPU | Dual-core Xtensa LX6, up to 240 MHz |
-| Flash | 4 MB |
-| RAM | 520 KB SRAM |
-| Logic voltage | **3.3 V** (GPIO ไม่ทน 5V) |
-| ADC | ADC1: CH0–CH7 (ADC2 ห้ามใช้เมื่อเปิด WiFi) |
-| I2C | 2 buses (I2C_NUM_0 และ I2C_NUM_1) |
-
----
-
-## On-Board Sensor Map — V1.5 Rev 3.1 (NECTEC Standard)
-
-> ⚠️ ไม่มี Accelerometer · ไม่รองรับ ADC บน IN1–IN4 · SW2 = GPIO14
-
-| Sensor | Protocol | Bus / Pin | Address |
-|--------|----------|-----------|---------|
-| LDR | ADC | GPIO36 / ADC1_CH0 | — |
-| LM73 (Temp) | I2C | I2C_NUM_1 · SDA=GPIO4 · SCL=GPIO5 | 0x4D |
-| RTC MCP794xx | I2C | I2C_NUM_1 · SDA=GPIO4 · SCL=GPIO5 | 0x6F |
-| HT16K33 (Matrix) | I2C | I2C_NUM_0 · SDA=GPIO21 · SCL=GPIO22 | 0x70 |
-| Passive Buzzer | GPIO/PWM | GPIO13 (LEDC) | — |
-| SW1 | GPIO | GPIO16 | — |
-| **SW2** | GPIO | **GPIO14** | — |
-| USB Host | GPIO | GPIO25 (Active LOW) | — |
-
-```
-I2C Init Order:
-1. I2C_NUM_0 (GPIO21/22): HT16K33 (0x70)
-2. I2C_NUM_1 (GPIO4/5):   LM73 (0x4D) + RTC (0x6F)
-3. ADC1: LDR GPIO36 เท่านั้น
-SW1=GPIO16, SW2=GPIO14
-```
+| รุ่น | ปี | MCU | USB | หมายเหตุสำคัญ |
+|------|-----|-----|-----|---------------|
+| **KidBright V2016** | 2016 | ESP8266 | Micro-USB | Prototype ทดสอบในคลองหลวง — ใช้ Android App บน WiFi ไม่มี USB-Serial programming |
+| **KidBright V1.0** | 2017 | ESP8266 | Micro-USB | รุ่นแรกที่แจกจ่ายจริง รูปร่างบอร์ดต่างจาก V1.1+ ควบคุมผ่าน KidBright IDE/Android App |
+| **V1.1** | 2018 | ESP32-WROOM-32 | Micro-USB (Cypress CY7C65213) | รุ่นแรกที่ใช้ ESP32, มี LED status 4 ดวง |
+| **V1.2** | 2018 | ESP32-WROOM-32 | Micro-USB (Cypress CY7C65213) | เหมือน V1.1 แก้ไข PCB เล็กน้อย |
+| **V1.3** | 2019 | ESP32-WROOM-32 | Micro-USB (FTDI FT232RL) | เปลี่ยน USB bridge เป็น FTDI |
+| **V1.4** | 2019–2020 | ESP32-WROOM-32 | Micro-USB (FTDI) | LED status ลดเหลือ 2 ดวง (WiFi+BT) |
+| **V1.5 Rev 3.1** | 2020 | ESP32-WROOM-32 | Micro-USB (CP2102) | NECTEC Standard, SW2=GPIO14 |
+| **V1.5 Rev 3.1G** | 2020 | ESP32-WROOM-32 | Micro-USB (CP2102) | Gravitech OEM, SW2=GPIO14 |
+| **V1.5 iA** | 2021–2022 | ESP32-WROOM-32 | **USB-C** (CP2102) | INEX, เพิ่ม KXTJ3-1057 Accelerometer, SW2=GPIO17 |
+| **KidBright32i** | 2021–2022 | ESP32-WROOM-32 | **USB-C** (CP2102) | INEX บอร์ดสีเขียว, ต้นแบบ i-series — Phototransistor แทน LDR, ADC บน IN1–IN4, **SW2=GPIO14** |
+| **KidBright32iA** | 2022 | ESP32-WROOM-32 | **USB-C** (CP2102) | INEX — เพิ่ม KXTJ3-1057 Accelerometer บน I2C0, **SW2=GPIO14**, ฐานเดียวกับ 32i |
+| **V1.6** | 2022+ | ESP32-WROOM-32 | **USB-C** (CP2102) | Gravitech, เพิ่ม MPU-6050 + RGB LED ×6, SW2=GPIO17 |
+| **KidBright32iP** | 2023–2024 | ESP32-WROOM-32 | **USB-C** (CP2102) | INEX บอร์ดสีชมพู — ปรับปรุงจาก 32i, Phototransistor ดีขึ้น, LED สถานะไฟเลี้ยง, รองรับ Servo, **SW2=GPIO14** |
+| **KidBright μAI** | 2024 | AllWinner V831 + ESP32-S3 | USB-C (OTG+UART) | รุ่นล่าสุด — Edge AI, มีกล้อง 2MP, ไมโครโฟน, จอ IPS 1.3 นิ้ว, Tina Linux |
 
 ---
 
-## On-Board Sensor Map — V1.5 Rev 3.1G (Gravitech OEM)
+## 📌 GPIO Pinout สรุปทุกรุ่น (ESP32 Series)
 
-> ⚠️ ไม่มี Accelerometer · ไม่รองรับ ADC บน IN1–IN4 · SW2 = GPIO14 (เหมือน Rev 3.1)
+### Generation 1 — ESP8266 (V2016 / V1.0) ⛔ ไม่รองรับ ESP-IDF
 
-| Sensor | Protocol | Bus / Pin | Address |
-|--------|----------|-----------|---------|
-| LDR | ADC | GPIO36 / ADC1_CH0 | — |
-| LM73 (Temp) | I2C | I2C_NUM_1 · SDA=GPIO4 · SCL=GPIO5 | 0x4D |
-| RTC MCP794xx | I2C | I2C_NUM_1 · SDA=GPIO4 · SCL=GPIO5 | 0x6F |
-| HT16K33 (Matrix) | I2C | I2C_NUM_0 · SDA=GPIO21 · SCL=GPIO22 | 0x70 |
-| Passive Buzzer | GPIO/PWM | GPIO13 (LEDC) | — |
-| SW1 | GPIO | GPIO16 | — |
-| **SW2** | GPIO | **GPIO14** | — |
-| USB Host | GPIO | GPIO25 (Active LOW) | — |
+> ใช้ได้เฉพาะ **KidBright IDE** หรือ **Arduino IDE** เท่านั้น ไม่มี native GPIO header เหมือน ESP32
 
-> 📋 I2C Scan (confirmed Apr 17 2026): NUM_0=`0x70` · NUM_1=`0x4D`+`0x6F`
-
-```
-I2C Init Order:
-1. I2C_NUM_0 (GPIO21/22): HT16K33 (0x70)
-2. I2C_NUM_1 (GPIO4/5):   LM73 (0x4D) + RTC (0x6F)
-3. ADC1: LDR GPIO36 เท่านั้น
-SW1=GPIO16, SW2=GPIO14 ← ยืนยัน Apr 17 2026
-```
+| ฟังก์ชัน | หมายเหตุ |
+|----------|----------|
+| MCU | ESP8266 (ESP-12F module) |
+| WiFi | 802.11 b/g/n 2.4 GHz (built-in) |
+| ADC | 1× 10-bit (A0) เท่านั้น |
+| I2C | SW I2C (GPIO4=SDA, GPIO5=SCL) |
+| LED Matrix | 16×8 Red LED (HT16K33 via I2C) |
+| Sensor | LDR (A0), LM73 Temperature (I2C), RTC (I2C) |
+| Buzzer | Passive Piezo (GPIO) |
+| Button | SW1, SW2 |
+| Input Port | IN1–IN4 (Digital เท่านั้น) |
+| Output Port | OUT1–OUT2 (Digital) |
+| USB | Micro-USB (สำหรับ power + programming) |
+| Control | Android App ผ่าน WiFi / KidBright IDE |
 
 ---
 
-## On-Board Sensor Map — V1.5 iA (INEX)
+### Generation 2 — ESP32 V1.1 / V1.2 (Cypress USB, LED 4 ดวง)
 
-> ✅ มี KXTJ3 Accelerometer · รองรับ ADC บน IN1–IN4 · SW2 = GPIO17
+| GPIO | ฟังก์ชัน | หมายเหตุ |
+|------|----------|----------|
+| GPIO2 | LED WiFi (Active HIGH) | ⚠️ Boot strapping pin |
+| GPIO4 | I2C_NUM_1 SDA (LM73/RTC) | — |
+| GPIO5 | I2C_NUM_1 SCL + LED NTP | ⚠️ แชร์กับ VSPI CLK |
+| GPIO12 | LED IoT (Active HIGH) | ⚠️ Boot strapping — ห้าม pull-up ไปยัง 3.3V |
+| GPIO13 | Passive Buzzer (LEDC/PWM) | — |
+| GPIO14 | SW2 Button (Active LOW) | — |
+| GPIO16 | SW1 Button (Active LOW) | — |
+| GPIO21 | I2C_NUM_0 SDA (HT16K33 Matrix) | — |
+| GPIO22 | I2C_NUM_0 SCL (HT16K33 Matrix) | — |
+| GPIO23 | LED BT (Active HIGH) | ⚠️ บางล็อตแชร์กับ I2C_NUM_0 SCL |
+| GPIO25 | USB Host Type-A Control (Active LOW) | — |
+| GPIO26 | OUT1 (Active LOW) | — |
+| GPIO27 | OUT2 (Active LOW) | — |
+| GPIO32 | IN1 (Digital Input) | — |
+| GPIO33 | IN2 (Digital Input) | — |
+| GPIO34 | IN3 (Digital Input-only) | ไม่มี internal pull |
+| GPIO35 | IN4 (Digital Input-only) | ไม่มี internal pull |
+| GPIO36 | LDR Light Sensor (ADC1_CH0) | Input-only |
 
-| Sensor | Protocol | Bus / Pin | Address |
-|--------|----------|-----------|---------|
-| LDR | ADC | GPIO36 / ADC1_CH0 | — |
-| LM73 (Temp) | I2C | I2C_NUM_1 · SDA=GPIO4 · SCL=GPIO5 | 0x4D |
-| RTC MCP794xx | I2C | I2C_NUM_1 · SDA=GPIO4 · SCL=GPIO5 | 0x6F |
-| **KXTJ3-1057** | I2C | I2C_NUM_0 · SDA=GPIO21 · SCL=GPIO22 | **0x0E** |
-| HT16K33 (Matrix) | I2C | I2C_NUM_0 · SDA=GPIO21 · SCL=GPIO22 | 0x70 |
-| Passive Buzzer | GPIO/PWM | GPIO13 (LEDC) | — |
-| SW1 | GPIO | GPIO16 | — |
-| **SW2** | GPIO | **GPIO17** | — |
-
-```
-I2C Init Order:
-1. I2C_NUM_0 (GPIO21/22): HT16K33 (0x70) + KXTJ3 (0x0E)
-2. I2C_NUM_1 (GPIO4/5):   LM73 (0x4D) + RTC (0x6F)
-3. ADC1: LDR (GPIO36) + IN1(CH4) + IN2(CH5) + IN3(CH6) + IN4(CH7)
-SW1=GPIO16, SW2=GPIO17
-```
-
----
-
-## On-Board Sensor Map — V1.6 (Gravitech)
-
-> ✅ มี MPU-6050 (Accel+Gyro) · Gerora RGB LED 6 ดวง · รองรับ ADC บน IN1–IN4
-
-| Sensor | Protocol | Bus / Pin | Address |
-|--------|----------|-----------|---------|
-| LDR | ADC | GPIO36 / ADC1_CH0 | — |
-| LM73 (Temp) | I2C | I2C_NUM_1 · SDA=GPIO4 · SCL=GPIO5 | 0x4D |
-| RTC MCP794xx | I2C | I2C_NUM_1 · SDA=GPIO4 · SCL=GPIO5 | 0x6F |
-| **MPU-6050** | I2C | I2C_NUM_0 · SDA=GPIO21 · SCL=GPIO22 | **0x68** |
-| HT16K33 (Matrix) | I2C | I2C_NUM_0 · SDA=GPIO21 · SCL=GPIO22 | 0x70 |
-| Gerora RGB LED × 6 | WS2812B | GPIO (addressable) | — |
-| Passive Buzzer | GPIO/PWM | GPIO13 (LEDC) | — |
-| SW1 | GPIO | GPIO16 (shared with SERVO1) | — |
-
-```
-I2C Init Order:
-1. I2C_NUM_0 (GPIO21/22): HT16K33 (0x70) + MPU-6050 (0x68)
-2. I2C_NUM_1 (GPIO4/5):   LM73 (0x4D) + RTC (0x6F)
-3. ADC1: LDR (GPIO36) + IN1(CH4) + IN2(CH5) + IN3(CH6) + IN4(CH7)
-SW1=GPIO16 (shared SERVO1 — เลือกอย่างใดอย่างหนึ่ง)
-```
+**เซนเซอร์ on-board:** LDR (GPIO36), LM73 Temp (I2C 0x4D), RTC MCP794xx (I2C 0x6F), HT16K33 LED Matrix (I2C 0x70)
 
 ---
 
-## External JST Ports (ทุกรุ่น V1.5+)
+### Generation 2 — ESP32 V1.3 (FTDI USB)
 
-| Port | GPIO | ADC Channel | หมายเหตุ |
-|------|------|-------------|---------|
-| IN1 | GPIO32 | ADC1_CH4 | ADC รองรับเฉพาะ iA และ V1.6 |
-| IN2 | GPIO33 | ADC1_CH5 | ADC รองรับเฉพาะ iA และ V1.6 |
-| IN3 | GPIO34 | ADC1_CH6 | Input-only · ไม่มี pull |
-| IN4 | GPIO35 | ADC1_CH7 | Input-only · ไม่มี pull |
-| OUT1 | GPIO26 | DAC2 | — |
-| OUT2 | GPIO27 | — | — |
+> GPIO เหมือน V1.1/V1.2 ทุกอย่าง เปลี่ยนเพียง USB bridge chip เป็น FTDI FT232RL
 
 ---
 
-## GPIO Conflict Table
+### Generation 2 — ESP32 V1.4 (LED Status ลดเหลือ 2 ดวง)
 
-### V1.5 Rev 3.1 / Rev 3.1G
+| GPIO | ฟังก์ชัน | หมายเหตุ |
+|------|----------|----------|
+| GPIO2 | LED WiFi (Active HIGH) | ⚠️ Boot strapping |
+| GPIO4 | LED BT (Active HIGH) + I2C_NUM_1 SDA | ⚠️ แชร์ — เลือกได้แค่อย่างเดียว |
+| GPIO5 | I2C_NUM_1 SCL | ว่างจาก NTP LED แล้ว |
+| GPIO12 | GPIO ทั่วไป | ว่างจาก IoT LED แล้ว (แต่ยังเป็น boot pin) |
+| GPIO13 | Passive Buzzer (LEDC/PWM) | — |
+| GPIO14 | SW2 Button (Active LOW) | — |
+| GPIO16 | SW1 Button (Active LOW) | — |
+| GPIO21 | I2C_NUM_0 SDA (HT16K33) | — |
+| GPIO22 | I2C_NUM_0 SCL (HT16K33) | — |
+| GPIO25 | USB Host Control (Active LOW) | — |
+| GPIO26 | OUT1 (Active LOW) | — |
+| GPIO27 | OUT2 (Active LOW) | — |
+| GPIO32 | IN1 (Digital Input) | — |
+| GPIO33 | IN2 (Digital Input) | — |
+| GPIO34 | IN3 (Digital Input-only) | — |
+| GPIO35 | IN4 (Digital Input-only) | — |
+| GPIO36 | LDR ADC (ADC1_CH0) | Input-only |
 
-| GPIO | Conflict |
-|------|---------|
-| GPIO2 | Wi-Fi LED — อย่าใช้งานอื่น |
-| GPIO4 | BT LED หรือ LM73 SDA — เลือกได้แค่อย่างเดียว |
-| GPIO13 | Passive Buzzer — ต้องใช้ LEDC/PWM เสมอ |
-| GPIO14 | SW2 — ห้ามใช้งานอื่น |
-| GPIO16 | SW1 — ห้ามใช้งานอื่น |
-| GPIO25 | USB Host (Active LOW) — อย่าใช้งานอื่น |
-| GPIO36 | LDR ADC — Input-only, ไม่มี pull |
-
-### V1.5 iA
-
-| GPIO | Conflict |
-|------|---------|
-| GPIO2 | Wi-Fi LED |
-| GPIO4 | BT LED หรือ LM73 SDA |
-| GPIO13 | Passive Buzzer — LEDC/PWM เท่านั้น |
-| GPIO16 | SW1 |
-| GPIO17 | SW2 |
-| GPIO36 | LDR ADC — Input-only |
-
-### V1.6
-
-| GPIO | Conflict |
-|------|---------|
-| GPIO2 | Wi-Fi LED |
-| GPIO4 | BT LED หรือ LM73 SDA |
-| GPIO13 | Passive Buzzer — LEDC/PWM เท่านั้น |
-| GPIO16 | SW1 หรือ SERVO1 — เลือกได้แค่อย่างเดียว |
-| GPIO36 | LDR ADC — Input-only |
+**เซนเซอร์ on-board:** LDR, LM73 Temp, RTC, HT16K33 Matrix — **ไม่มี ADC บน IN1–IN4**
 
 ---
 
-## HT16K33 — LED Matrix Driver (ทุกรุ่น)
+### Generation 2 — ESP32 V1.5 Rev 3.1 (NECTEC Standard)
 
-| Property | Detail |
-|----------|--------|
-| I2C Address | `0x70` |
-| I2C Bus | I2C_NUM_0 (SDA=GPIO21, SCL=GPIO22) |
-| Display | 16 columns × 8 rows |
-| Oscillator ON | `0x21` |
-| Display ON | `0x81` |
-| Brightness MAX | `0xEF` |
+| GPIO | ฟังก์ชัน | หมายเหตุ |
+|------|----------|----------|
+| GPIO2 | LED WiFi (Active HIGH) | — |
+| GPIO4 | LED BT (Active HIGH) + I2C_NUM_1 SDA | ⚠️ แชร์ |
+| GPIO5 | I2C_NUM_1 SCL (LM73/RTC) | — |
+| GPIO13 | Passive Buzzer (LEDC/PWM) | — |
+| **GPIO14** | **SW2 Button (Active LOW)** | ⚠️ ต่างจาก Rev 3.1G/iA/V1.6 |
+| GPIO16 | SW1 Button (Active LOW) | — |
+| GPIO21 | I2C_NUM_0 SDA (HT16K33) | — |
+| GPIO22 | I2C_NUM_0 SCL (HT16K33) | — |
+| GPIO25 | USB Host Control (Active LOW) | — |
+| GPIO26 | OUT1 (Active LOW) | — |
+| GPIO27 | OUT2 (Active LOW) | — |
+| GPIO32 | IN1 (Digital เท่านั้น) | ไม่รองรับ ADC |
+| GPIO33 | IN2 (Digital เท่านั้น) | ไม่รองรับ ADC |
+| GPIO34 | IN3 (Digital Input-only) | ไม่รองรับ ADC |
+| GPIO35 | IN4 (Digital Input-only) | ไม่รองรับ ADC |
+| GPIO36 | LDR (ADC1_CH0) | — |
 
-### ⚠️ Y-axis Inversion (CRITICAL)
-
-```c
-// ❌ ผิด
-out_cols[col] |= (1 << row);
-
-// ✅ ถูก — hardware wired upside-down
-out_cols[col] |= (1 << (7 - row));
-```
-
----
-
-## ADC Rules
-
-### ❌ Legacy API (ถูกลบใน v5)
-
-```c
-#include "driver/adc.h"        // ❌ BANNED
-#include "esp_adc_cal.h"       // ❌ BANNED
-ADC_ATTEN_DB_11                // ❌ → ใช้ ADC_ATTEN_DB_12
-```
-
-### ✅ Oneshot API (v5.x)
-
-```c
-#include "esp_adc/adc_oneshot.h"
-#include "esp_adc/adc_cali.h"
-#include "esp_adc/adc_cali_scheme.h"
-
-adc_oneshot_new_unit(...)           // 1. Create unit
-adc_oneshot_config_channel(...)     // 2. Config (ADC_ATTEN_DB_12)
-adc_oneshot_read(...)               // 3. Read raw
-adc_cali_raw_to_voltage(...)        // 4. Convert to mV
-```
+**เซนเซอร์ on-board:** LDR, LM73 (I2C 0x4D), RTC MCP794xx (I2C 0x6F), HT16K33 (I2C 0x70) — **ไม่มี Accelerometer**
 
 ---
 
-## Code Examples
+### Generation 2 — ESP32 V1.5 Rev 3.1G (Gravitech OEM)
 
-### LDR (GPIO36) — ทุกรุ่น
-
-```c
-#include "esp_adc/adc_oneshot.h"
-#include "esp_adc/adc_cali.h"
-#include "esp_adc/adc_cali_scheme.h"
-
-adc_oneshot_unit_handle_t adc1_handle;
-adc_cali_handle_t cali_handle;
-
-void ldr_init(void) {
-    adc_oneshot_unit_init_cfg_t unit_cfg = { .unit_id = ADC_UNIT_1 };
-    adc_oneshot_new_unit(&unit_cfg, &adc1_handle);
-    adc_oneshot_chan_cfg_t chan_cfg = {
-        .atten = ADC_ATTEN_DB_12,
-        .bitwidth = ADC_BITWIDTH_DEFAULT,
-    };
-    adc_oneshot_config_channel(adc1_handle, ADC_CHANNEL_0, &chan_cfg);
-    adc_cali_curve_fitting_config_t cali_cfg = {
-        .unit_id = ADC_UNIT_1,
-        .atten = ADC_ATTEN_DB_12,
-        .bitwidth = ADC_BITWIDTH_DEFAULT,
-    };
-    adc_cali_create_scheme_curve_fitting(&cali_cfg, &cali_handle);
-}
-
-int ldr_read_mv(void) {
-    int raw = 0, mv = 0;
-    adc_oneshot_read(adc1_handle, ADC_CHANNEL_0, &raw);
-    adc_cali_raw_to_voltage(cali_handle, raw, &mv);
-    return mv;
-}
-```
-
-### LM73 Temperature (I2C_NUM_1) — ทุกรุ่น
-
-```c
-#include "driver/i2c.h"
-#define I2C1_SDA GPIO_NUM_4
-#define I2C1_SCL GPIO_NUM_5
-#define LM73_ADDR 0x4D
-
-void i2c1_init(void) {
-    i2c_config_t conf = {
-        .mode = I2C_MODE_MASTER,
-        .sda_io_num = I2C1_SDA,
-        .scl_io_num = I2C1_SCL,
-        .sda_pullup_en = GPIO_PULLUP_ENABLE,
-        .scl_pullup_en = GPIO_PULLUP_ENABLE,
-        .master.clk_speed = 100000,
-    };
-    i2c_param_config(I2C_NUM_1, &conf);
-    i2c_driver_install(I2C_NUM_1, I2C_MODE_MASTER, 0, 0, 0); // เรียกครั้งเดียวเท่านั้น
-}
-
-float lm73_read_celsius(void) {
-    uint8_t buf[2] = {0};
-    i2c_master_read_from_device(I2C_NUM_1, LM73_ADDR, buf, 2, pdMS_TO_TICKS(100));
-    int16_t raw = ((int16_t)buf[0] << 8) | buf[1];
-    return (raw >> 5) * 0.25f;
-}
-```
-
-### KXTJ3 Accelerometer — V1.5 iA เท่านั้น
-
-```c
-#include "driver/i2c.h"
-#define KXTJ3_ADDR 0x0E
-#define KXTJ3_CTRL 0x1B
-#define KXTJ3_XOUT 0x06
-
-void kxtj3_init(void) {
-    uint8_t cmd[2] = { KXTJ3_CTRL, 0xC0 };
-    i2c_master_write_to_device(I2C_NUM_0, KXTJ3_ADDR, cmd, 2, pdMS_TO_TICKS(100));
-}
-
-void kxtj3_read(float *ax, float *ay, float *az) {
-    uint8_t reg = KXTJ3_XOUT, buf[6];
-    i2c_master_write_read_device(I2C_NUM_0, KXTJ3_ADDR, &reg, 1, buf, 6, pdMS_TO_TICKS(100));
-    int16_t rx = (int16_t)((buf[1] << 8) | buf[0]) >> 4;
-    int16_t ry = (int16_t)((buf[3] << 8) | buf[2]) >> 4;
-    int16_t rz = (int16_t)((buf[5] << 8) | buf[4]) >> 4;
-    const float scale = 2.0f / 2048.0f;
-    *ax = rx * scale; *ay = ry * scale; *az = rz * scale;
-}
-```
-
-### MPU-6050 — V1.6 เท่านั้น
-
-```c
-#include "driver/i2c.h"
-#define MPU6050_ADDR  0x68
-#define MPU6050_PWR   0x6B
-#define MPU6050_ACCEL 0x3B
-
-void mpu6050_init(void) {
-    uint8_t cmd[2] = { MPU6050_PWR, 0x00 };
-    i2c_master_write_to_device(I2C_NUM_0, MPU6050_ADDR, cmd, 2, pdMS_TO_TICKS(100));
-}
-
-void mpu6050_read_accel(float *ax, float *ay, float *az) {
-    uint8_t reg = MPU6050_ACCEL, buf[6];
-    i2c_master_write_read_device(I2C_NUM_0, MPU6050_ADDR, &reg, 1, buf, 6, pdMS_TO_TICKS(100));
-    int16_t rx = (int16_t)((buf[0] << 8) | buf[1]);
-    int16_t ry = (int16_t)((buf[2] << 8) | buf[3]);
-    int16_t rz = (int16_t)((buf[4] << 8) | buf[5]);
-    const float scale = 2.0f / 32768.0f;
-    *ax = rx * scale; *ay = ry * scale; *az = rz * scale;
-}
-```
+> GPIO เหมือน V1.5 Rev 3.1 ทุกอย่าง **SW2 = GPIO14** เหมือนกัน
+> ฮาร์ดแวร์และเซนเซอร์เหมือนกันทุกประการ
 
 ---
 
-## KB Chain — ระบบต่อเสริม (I2C_NUM_0)
+### Generation 2 — ESP32 V1.5 iA (INEX) — เพิ่ม Accelerometer
 
-### เซ็นเซอร์
+| GPIO | ฟังก์ชัน | หมายเหตุ |
+|------|----------|----------|
+| GPIO2 | LED WiFi (Active HIGH) | — |
+| GPIO4 | LED BT (Active HIGH) + I2C_NUM_1 SDA | ⚠️ แชร์ |
+| GPIO5 | I2C_NUM_1 SCL | — |
+| GPIO13 | Passive Buzzer (LEDC/PWM) | — |
+| GPIO16 | SW1 Button (Active LOW) | — |
+| **GPIO17** | **SW2 Button (Active LOW)** | ⚠️ ต่างจาก Rev 3.1 ที่ใช้ GPIO14 |
+| GPIO18 | I/O Port ขา 18 (Active HIGH) | — |
+| GPIO19 | I/O Port ขา 19 (Active HIGH) | — |
+| GPIO21 | I2C_NUM_0 SDA (HT16K33 + KXTJ3) | — |
+| GPIO22 | I2C_NUM_0 SCL (HT16K33 + KXTJ3) | — |
+| GPIO23 | I/O Port ขา 23 (Active HIGH) | — |
+| GPIO25 | USB Host Control (Active LOW) | — |
+| GPIO26 | OUT1 (Active LOW) | — |
+| GPIO27 | OUT2 (Active LOW) | — |
+| GPIO32 | IN1 (Digital + **ADC** รองรับ) | ✅ รองรับ ADC |
+| GPIO33 | IN2 (Digital + **ADC** รองรับ) | ✅ รองรับ ADC |
+| GPIO34 | IN3 (Digital Input-only + ADC) | ✅ รองรับ ADC, ไม่มี pull |
+| GPIO35 | IN4 (Digital Input-only + ADC) | ✅ รองรับ ADC, ไม่มี pull |
+| GPIO36 | LDR (ADC1_CH0) | — |
 
-| บอร์ด | Sensor | หมายเหตุ |
-|-------|--------|---------|
-| KB Chain VOC | Temp + Humidity + Pressure + Gas | BME680 |
-| KB Chain UVA/UVB | UV-A (365nm) + UV-B (330nm) | — |
-| BH1750 | ความเข้มแสง (lux) | — |
-| ZX-DHT11 | อุณหภูมิ + ความชื้น | ต่อที่พอร์ต IN |
-| KidUltra | Ultrasonic วัดระยะ | — |
-| เซ็นเซอร์ฝุ่น SPS30 | PM1.0/2.5/4/10 | — |
-
-### I/O Expansion
-
-| บอร์ด | รายละเอียด |
-|-------|-----------|
-| KB Chain 4-CH ADC | ADC 12-bit 4 ช่อง (ADS1015, 0–5V) |
-| KB Chain 5-CH Hub | ต่อบอร์ด KB Chain หลายตัว |
-| iKB-1 / MotorKB | DIO 8ch · Servo 6ch · Motor 4ch |
-| KB Chain OLED | จอ OLED (0x3C / 0x3D) |
-
----
-
-## Golden Rules
-
-1. **ESP-IDF v5.x ONLY** — ห้ามใช้ Arduino (`Wire.h`, `setup()`, `loop()`)
-2. **ADC Oneshot API ONLY** — ห้ามใช้ `driver/adc.h` / `esp_adc_cal.h`
-3. **ADC_ATTEN_DB_12** — ห้ามใช้ `ADC_ATTEN_DB_11`
-4. **`i2c_driver_install()` ครั้งเดียวต่อ port** — เรียก 2 ครั้ง → `ESP_ERR_INVALID_STATE`
-5. **Y-axis inversion** — ใช้ `(7 - row)` บน LED Matrix เสมอ
-6. **3.3V logic** — GPIO ไม่ทน 5V
-7. **ADC2 ห้ามใช้เมื่อเปิด WiFi**
-8. **IN3/IN4 = Input-only** — ไม่มี pull-up/down
-9. **Buzzer ต้องใช้ PWM/LEDC** — ไม่ใช้ `gpio_set_level()`
-10. **ตรวจสอบ PCB silkscreen** — SW2: GPIO14 (Rev3.1/3.1G) vs GPIO17 (iA)
+**เซนเซอร์ on-board:**
+| เซนเซอร์ | Protocol | I2C Address | หมายเหตุ |
+|----------|----------|-------------|----------|
+| LDR (แสง) | ADC | GPIO36 | — |
+| LM73 (อุณหภูมิ) | I2C_NUM_1 | 0x4D | SDA=GPIO4, SCL=GPIO5 |
+| RTC MCP794xx | I2C_NUM_1 | 0x6F | + CR1220 battery |
+| HT16K33 (LED Matrix 16×8) | I2C_NUM_0 | 0x70 | SDA=GPIO21, SCL=GPIO22 |
+| **KXTJ3-1057 (Accelerometer 3-axis)** | I2C_NUM_0 | **0x0E** | เพิ่มใหม่ใน iA |
+| Passive Buzzer | PWM/LEDC | GPIO13 | — |
 
 ---
 
-## อ้างอิงไฟล์
+### Generation 2 — ESP32 KidBright32i (INEX บอร์ดสีเขียว) — i-series ต้นฉบับ
 
-| ไฟล์ | เนื้อหา |
-|------|--------|
-| `README.md` | Quick start · sensor map สรุป · I2C init order |
-| `all_models.md` | **ไฟล์นี้** — Reference ครบทุกรุ่น |
-| `kidbright32iA.md` | Full developer reference |
-| `adc_ldr_external.c` | ADC oneshot + calibration |
-| `temp_lm73.c` | LM73 temperature |
-| `accel_kxtj3.c` | KXTJ3 accelerometer (V1.5 iA) |
-| `all_sensors_demo.c` | Demo รวมทุกเซ็นเซอร์ |
+> **ผลิตโดย INEX** ใช้เป็น base ของ i-series ทั้งหมด GPIO layout เหมือน V1.5 iA แต่ **ไม่มี KXTJ3 Accelerometer**
+
+| GPIO | ฟังก์ชัน | หมายเหตุ |
+|------|----------|----------|
+| GPIO2 | LED WiFi (Active HIGH) | — |
+| GPIO4 | LED BT (Active HIGH) + I2C_NUM_1 SDA | ⚠️ แชร์ |
+| GPIO5 | I2C_NUM_1 SCL | — |
+| GPIO13 | Passive Buzzer (LEDC/PWM) | — |
+| GPIO16 | SW1 Button (Active LOW) | — |
+| **GPIO17** | **SW2 Button (Active LOW)** | ⚠️ ต่างจาก Rev 3.1 (GPIO14) |
+| GPIO18 | I/O Port ขา 18 | จุดบัดกรีอิสระ |
+| GPIO19 | I/O Port ขา 19 | จุดบัดกรีอิสระ |
+| GPIO21 | I2C_NUM_0 SDA (HT16K33) | — |
+| GPIO22 | I2C_NUM_0 SCL (HT16K33) | — |
+| GPIO23 | I/O Port ขา 23 | จุดบัดกรีอิสระ |
+| GPIO25 | USB Host Control (Active LOW) | — |
+| GPIO26 | OUT1 (Active LOW) | — |
+| GPIO27 | OUT2 (Active LOW) | — |
+| GPIO32 | IN1 (Digital + ADC) | ✅ รองรับ ADC |
+| GPIO33 | IN2 (Digital + ADC) | ✅ รองรับ ADC |
+| GPIO34 | IN3 (Digital Input-only + ADC) | ✅ ไม่มี pull |
+| GPIO35 | IN4 (Digital Input-only + ADC) | ✅ ไม่มี pull |
+| GPIO36 | **Phototransistor** (ADC1_CH0) | ⚡ เปลี่ยนจาก LDR เป็น Phototransistor |
+| VN (GPIO39) | จุดบัดกรีอิสระ (ADC Input-only) | — |
+
+**เซนเซอร์ on-board:**
+| เซนเซอร์ | Protocol | I2C Address | หมายเหตุ |
+|----------|----------|-------------|----------|
+| **Phototransistor (แสง)** | ADC | GPIO36 | ⚡ Phototransistor ไม่ใช่ LDR |
+| LM73 (อุณหภูมิ -40~150°C) | I2C_NUM_1 | 0x4D | — |
+| RTC | I2C_NUM_1 | 0x6F | EEPROM ใหญ่ขึ้น |
+| HT16K33 (LED Matrix 16×8) | I2C_NUM_0 | 0x70 | — |
+| Passive Buzzer | PWM/LEDC | GPIO13 | — |
+
+**จุดต่างจาก V1.5 Rev 3.1 หลักๆ:** USB-C, Phototransistor แทน LDR, ADC บน IN1–IN4, 3.3V Regulator จาก USB, GPIO18/19/23/VN breakout, LED USB status (สีฟ้า), **SW2=GPIO14** (เหมือน Rev 3.1)
+
+---
+
+### Generation 2 — ESP32 KidBright32iA (INEX) — เพิ่ม Accelerometer บน 32i
+
+> ฐานเดียวกับ KidBright32i (บอร์ดสีเขียว) แต่เพิ่ม **KXTJ3-1057** บน I2C_NUM_0
+> GPIO layout เหมือน KidBright32i ทุกอย่าง ยกเว้น I2C_NUM_0 มี KXTJ3 ด้วย
+
+| GPIO | ฟังก์ชัน | หมายเหตุ |
+|------|----------|----------|
+| GPIO21 | I2C_NUM_0 SDA (HT16K33 + **KXTJ3**) | เพิ่ม KXTJ3 |
+| GPIO22 | I2C_NUM_0 SCL (HT16K33 + **KXTJ3**) | เพิ่ม KXTJ3 |
+| **GPIO17** | **SW2 Button (Active LOW)** | เหมือน 32i |
+| GPIO36 | **Phototransistor** (ADC1_CH0) | ⚡ Phototransistor |
+| (ที่เหลือ) | เหมือน KidBright32i ทุกอย่าง | — |
+
+**เซนเซอร์ on-board:**
+| เซนเซอร์ | Protocol | I2C Address | หมายเหตุ |
+|----------|----------|-------------|----------|
+| Phototransistor (แสง) | ADC | GPIO36 | Phototransistor แทน LDR |
+| LM73 (อุณหภูมิ) | I2C_NUM_1 | 0x4D | — |
+| RTC | I2C_NUM_1 | 0x6F | EEPROM ใหญ่ขึ้น |
+| HT16K33 (LED Matrix 16×8) | I2C_NUM_0 | 0x70 | — |
+| **KXTJ3-1057 (Accelerometer 3-axis)** | I2C_NUM_0 | **0x0E** | เพิ่มจาก 32i |
+| Passive Buzzer | PWM/LEDC | GPIO13 | — |
+
+---
+
+### Generation 2 — ESP32 KidBright32iP (INEX บอร์ดสีชมพู) — ปรับปรุงจาก 32i
+
+> **ผลิตโดย INEX** เข้ากันได้กับ V1.5 มาตรฐาน สวทช. รับคุณสมบัติของ 32i มาทั้งหมด + ปรับปรุงเพิ่มเติม
+
+| GPIO | ฟังก์ชัน | หมายเหตุ |
+|------|----------|----------|
+| GPIO2 | LED WiFi (Active HIGH) | — |
+| GPIO4 | LED BT (Active HIGH) + I2C_NUM_1 SDA | ⚠️ แชร์ |
+| GPIO5 | I2C_NUM_1 SCL | — |
+| GPIO13 | Passive Buzzer (LEDC/PWM) | — |
+| **GPIO15** | **SERVO1** (PWM/LEDC) | — |
+| GPIO16 | SW1 Button (Active LOW) | — |
+| **GPIO17** | **SW2 Button (Active LOW) / SERVO2** | ⚠️ แชร์กัน |
+| GPIO18 | I/O Port ขา 18 | จุดบัดกรีอิสระ |
+| GPIO19 | I/O Port ขา 19 | จุดบัดกรีอิสระ |
+| GPIO21 | I2C_NUM_0 SDA (HT16K33) | — |
+| GPIO22 | I2C_NUM_0 SCL (HT16K33) | — |
+| GPIO23 | I/O Port ขา 23 | จุดบัดกรีอิสระ |
+| GPIO25 | USB Host Control (Active LOW) | — |
+| GPIO26 | OUT1 (Active LOW) | — |
+| GPIO27 | OUT2 (Active LOW) | — |
+| GPIO32 | IN1 (Digital + ADC) | ✅ |
+| GPIO33 | IN2 (Digital + ADC) | ✅ |
+| GPIO34 | IN3 (Digital Input-only + ADC) | ✅ |
+| GPIO35 | IN4 (Digital Input-only + ADC) | ✅ |
+| GPIO36 | **Phototransistor** ปรับปรุง (ADC1_CH0) | ⚡ ตอบสนองแสงขาวดีกว่า 32i |
+| VN (GPIO39) | จุดบัดกรีอิสระ (ADC Input-only) | — |
+
+**เซนเซอร์ on-board:**
+| เซนเซอร์ | Protocol | I2C Address | หมายเหตุ |
+|----------|----------|-------------|----------|
+| **Phototransistor ปรับปรุง (แสง)** | ADC | GPIO36 | ดีกว่า 32i — เชิงเส้นมากขึ้น |
+| LM73 (อุณหภูมิ -40~150°C) | I2C_NUM_1 | 0x4D | — |
+| RTC | I2C_NUM_1 | 0x6F | EEPROM ใหญ่ขึ้น |
+| HT16K33 (LED Matrix 16×8) | I2C_NUM_0 | 0x70 | — |
+| Passive Buzzer | PWM/LEDC | GPIO13 | — |
+| SERVO1 | PWM/LEDC | GPIO15 | — |
+| SERVO2 | PWM/LEDC | GPIO17 | แชร์กับ SW2 |
+
+**จุดเพิ่มจาก 32i:** LED สถานะไฟเลี้ยงบอร์ด, LED สถานะไฟเลี้ยง Servo, Phototransistor ปรับปรุง, SERVO connector (GPIO15/17)
+
+---
+
+### Generation 2 — ESP32 V1.6 (Gravitech) — เพิ่ม MPU-6050 + RGB LED
+
+| GPIO | ฟังก์ชัน | หมายเหตุ |
+|------|----------|----------|
+| GPIO2 | LED WiFi (Active HIGH) | — |
+| GPIO4 | LED BT (Active HIGH) + LM73 SDA | ⚠️ แชร์ |
+| GPIO5 | I2C_NUM_1 SCL | — |
+| GPIO13 | Passive Buzzer (LEDC/PWM) | — |
+| **GPIO15** | **SERVO1** (LEDC/PWM) | ห้ามใช้งานอื่น |
+| GPIO16 | SW1 Button (Active LOW) | — |
+| **GPIO17** | **SW2 Button (Active LOW) / SERVO2** | ⚠️ แชร์กัน เลือกได้อย่างเดียว |
+| GPIO21 | I2C_NUM_0 SDA (HT16K33 + MPU-6050) | — |
+| GPIO22 | I2C_NUM_0 SCL (HT16K33 + MPU-6050) | — |
+| GPIO25 | USB Host Control (Active LOW) | — |
+| GPIO26 | OUT1 / 3-pin O1 (Active LOW) | — |
+| GPIO27 | OUT2 / 3-pin O2 (Active LOW) | — |
+| GPIO32 | IN1 (Digital + ADC) | ✅ รองรับ ADC |
+| GPIO33 | IN2 (Digital + ADC) | ✅ รองรับ ADC |
+| GPIO34 | IN3 (Digital Input-only + ADC) | ✅ ไม่มี pull |
+| GPIO35 | IN4 (Digital Input-only + ADC) | ✅ ไม่มี pull |
+| GPIO36 | LDR (ADC1_CH0) | — |
+| **RGB_GPIO** | **RGB LED ×6 (WS2812B/RMT)** | ⚠️ ดู silkscreen บอร์ด |
+
+**เซนเซอร์ on-board:**
+| เซนเซอร์ | Protocol | I2C Address | หมายเหตุ |
+|----------|----------|-------------|----------|
+| LDR (แสง) | ADC | GPIO36 | — |
+| LM73 (อุณหภูมิ) | I2C_NUM_1 | 0x4D | — |
+| HT16K33 (LED Matrix 16×8) | I2C_NUM_0 | 0x70 | — |
+| **MPU-6050 (Accel + Gyro 6-axis)** | I2C_NUM_0 | **0x68** | ⚠️ 6-axis เท่านั้น ไม่มี magnetometer |
+| **RGB LED ×6 (WS2812B)** | RMT/1-wire | — | ต้องใช้ RMT peripheral |
+| Passive Buzzer | PWM/LEDC | GPIO13 | — |
+| SERVO1 | PWM/LEDC | GPIO15 | — |
+| SERVO2 | PWM/LEDC | GPIO17 | แชร์กับ SW2 |
+
+---
+
+### Generation 3 — KidBright μAI (รุ่นล่าสุด 2024) — Edge AI Platform
+
+> **⚠️ ไม่ใช่ ESP32 ธรรมดา** — ใช้ SoC AllWinner V831 (ARM Cortex-A7) สำหรับ AI + ESP32-S3 สำหรับ IoT/WiFi
+> ทำงานบน **Tina Linux** (fork จาก OpenWrt, Kernel 4.9) — ไม่ใช่ ESP-IDF Framework
+> พัฒนาด้วย **KidBright μAI IDE** (online Blockly + Python) หรือ cross-compile C/C++ บน Ubuntu 16.04
+
+| คุณสมบัติ | รายละเอียด |
+|-----------|-----------|
+| AI Processor | AllWinner V831 (ARM Cortex-A7 @ ~800 MHz) |
+| IoT Module | ESP32-S3 (WiFi + BLE) |
+| Display | จอ IPS สี 1.3 นิ้ว (TFT) |
+| Camera | กล้อง 2 ล้านพิกเซล (built-in) |
+| Microphone | ไมโครโฟน built-in |
+| WiFi | 802.11 b/g/n 2.4 GHz (via ESP32-S3) |
+| USB | USB-C (OTG + UART) |
+| Input/Output | รองรับ Digital I/O + ต่ออุปกรณ์ภายนอก |
+| Storage | SD Card (Tina Linux boot) |
+| OS | Tina Linux (OpenWrt-based) |
+| IDE | KidBright μAI IDE (online Blockly/Python) |
+| AI Features | Image Classification, Object Detection, Sound Classification |
+| Released | 2024 (เปิดตัว KDC24 KidBright Developer Conference) |
+
+**เซนเซอร์ / อินพุตที่รองรับ:**
+- กล้อง 2MP (ภาพ AI)
+- ไมโครโฟน (เสียง AI)
+- จอ IPS 1.3 นิ้ว (แสดงผล)
+- WiFi (IoT, Cloud)
+- ต่อเซนเซอร์ภายนอกผ่าน I/O ports
+
+---
+
+## 🔍 เปรียบเทียบเซนเซอร์ on-board ทุกรุ่น
+
+| เซนเซอร์ | V1.1–V1.3 | V1.4 | V1.5 Rev3.1 | V1.5 Rev3.1G | V1.5 iA | **32i** | **32iA** | V1.6 | **32iP** | μAI |
+|----------|-----------|------|-------------|--------------|---------|---------|----------|------|----------|-----|
+| LDR (แสง) | ✅ GPIO36 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | — |
+| Phototransistor | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ GPIO36 | ✅ GPIO36 | ❌ | ✅ GPIO36 | — |
+| LM73 (อุณหภูมิ) | ✅ I2C 0x4D | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — |
+| RTC MCP794xx | ✅ I2C 0x6F | ✅ | ✅ | ✅ | ✅ | ✅ (EEPROM ใหญ่) | ✅ | ❓ | ✅ (EEPROM ใหญ่) | — |
+| HT16K33 LED Matrix | ✅ I2C 0x70 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — |
+| KXTJ3-1057 Accel 3-axis | ❌ | ❌ | ❌ | ❌ | ✅ I2C 0x0E | ❌ | ✅ I2C 0x0E | ❌ | ❌ | — |
+| MPU-6050 Accel+Gyro 6-axis | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ I2C 0x68 | ❌ | — |
+| RGB LED WS2812B | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ ×6 (RMT) | ❌ | — |
+| ADC บน IN1–IN4 | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | — |
+| SERVO connector | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ ×2 | ✅ ×2 | — |
+| 3.3V Regulator จาก USB | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ | ❌ | ✅ | — |
+| LED USB status (สีฟ้า) | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ | ❌ | ✅ | — |
+| LED ไฟเลี้ยงบอร์ด | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | — |
+| GPIO18/19/23 breakout | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ | ❌ | ✅ | — |
+| กล้อง (Camera) | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ 2MP |
+| ไมโครโฟน | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
+| จอสี IPS | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ 1.3" |
+| Edge AI | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
+
+---
+
+## ⚡ เซนเซอร์ภายนอก (External) ที่รองรับผ่าน JST Port ทุกรุ่น ESP32
+
+เชื่อมต่อผ่านพอร์ต IN1–IN4 (JST 3-pin), I2C KB Chain, หรือ OUT1–OUT2:
+
+| เซนเซอร์ | ประเภท | พอร์ตที่ใช้ |
+|----------|---------|------------|
+| PIR Motion Sensor | Digital | IN1–IN4 |
+| Reed Switch (Magnetic) | Digital | IN1–IN4 |
+| Soil Moisture | Digital / Analog (iA/V1.6/32i/32iA/32iP) | IN1–IN4 |
+| DHT11/DHT22 (Temp+Humidity) | Digital 1-wire | IN1–IN4 |
+| Ultrasonic HC-SR04 | Digital | IN1–IN4 |
+| IR Sensor | Digital | IN1–IN4 |
+| เซนเซอร์ I2C อื่นๆ | I2C | KB Chain port |
+| พัดลม / หลอดไฟ (5V) | Digital | OUT1–OUT2 / USB Host |
+
+---
+
+## 🔑 สรุปความแตกต่างหลัก INEX i-series vs V1.5 มาตรฐาน
+
+| คุณสมบัติ | V1.5 Rev 3.1 (NECTEC) | V1.5 iA (INEX) | **32i** (INEX สีเขียว) | **32iA** (INEX) | **32iP** (INEX สีชมพู) |
+|-----------|----------------------|----------------|----------------------|----------------|----------------------|
+| SW2 GPIO | GPIO14 | GPIO17 | GPIO17 | GPIO17 | GPIO17 |
+| USB | Micro-USB | USB-C | USB-C | USB-C | USB-C |
+| เซนเซอร์แสง | LDR | LDR | **Phototransistor** | **Phototransistor** | **Phototransistor ปรับปรุง** |
+| ADC บน IN1-IN4 | ❌ | ✅ | ✅ | ✅ | ✅ |
+| Accelerometer | ❌ | KXTJ3 0x0E (I2C0) | ❌ | KXTJ3 0x0E (I2C0) | ❌ |
+| 3.3V Regulator USB | ❌ | ❌ | ✅ | ✅ | ✅ |
+| GPIO18/19/23 breakout | ❌ | ✅ | ✅ | ✅ | ✅ |
+| LED USB status | ❌ | ❌ | ✅ | ✅ | ✅ |
+| LED ไฟเลี้ยงบอร์ด | ❌ | ❌ | ❌ | ❌ | ✅ |
+| SERVO connector | ❌ | ❌ | ❌ | ❌ | ✅ (GPIO15/17) |
+| RTC EEPROM | มาตรฐาน | มาตรฐาน | **ใหญ่ขึ้น** | **ใหญ่ขึ้น** | **ใหญ่ขึ้น** |

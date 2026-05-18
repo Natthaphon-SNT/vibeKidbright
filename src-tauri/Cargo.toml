@@ -31,4 +31,5 @@ urlencoding = "2.1"
 serialport = "4.8"
 regex = "1"
 dunce = "1"
-
+zip = "2"                    # สำหรับแตกไฟล์ toolchain .zip
+directories = "5.0"          # สำหรับหาโฟลเดอร์ AppData ของผู้ใช้

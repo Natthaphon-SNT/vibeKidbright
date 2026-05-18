@@ -622,10 +622,14 @@ function App() {
     try {
       const ports = await invoke("list_serial_ports");
       const list = ports as string[];
+      
+      setSelectedSerialPort(prev => {
+        if (list.length === 0) return "";
+        if (prev && list.includes(prev)) return prev;
+        return list[0];
+      });
+      
       setSerialPorts(list);
-      if (list.length > 0 && !selectedSerialPort) {
-        setSelectedSerialPort(list[0]);
-      }
     } catch (err) {
       addLog(`❌ Failed to list serial ports: ${err}`);
     }

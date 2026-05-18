@@ -177,13 +177,13 @@ static void motor_backward(int speed_pct) {
     motor_set(255, 255, 255, 255);
 }
 
-// เลี้ยวซ้าย: ขวาเดินหน้า ซ้ายถอยหลัง
+// เลี้ยวซ้าย: ขับเฉพาะล้อขวาไปข้างหน้า (R_FWD=d)
 static void motor_turn_left(int speed_pct) {
     uint32_t d = pct_to_duty(speed_pct);
     motor_set(0, 0, d, 0);
 }
 
-// เลี้ยวขวา: ซ้ายเดินหน้า ขวาถอยหลัง
+// เลี้ยวขวา: ขับเฉพาะล้อซ้ายไปข้างหน้า (L_FWD=d)
 static void motor_turn_right(int speed_pct) {
     uint32_t d = pct_to_duty(speed_pct);
     motor_set(d, 0, 0, 0);

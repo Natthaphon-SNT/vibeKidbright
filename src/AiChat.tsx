@@ -783,10 +783,11 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
                                             className="w-full bg-neutral-900 border border-neutral-600 rounded-lg px-3 py-2 text-sm text-neutral-200 focus:outline-none focus:border-violet-500 transition-colors appearance-none cursor-pointer"
                                             style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center" }}
                                         >
-                                            <option value="gpt-4o">GPT-4o (Standard)</option>
-                                            <option value="gpt-4o-mini">GPT-4o Mini (Fast)</option>
-                                            <option value="o1-preview">o1-preview (Reasoning)</option>
-                                            <option value="o3-mini">o3-mini (Advanced Reasoning Fast)</option>
+                                            <option value="gpt-4.1">GPT-4.1 (Latest — Best Coding)</option>
+                                            <option value="gpt-4.1-mini">GPT-4.1 Mini (Fast & Cheap)</option>
+                                            <option value="gpt-4o">GPT-4o (Vision)</option>
+                                            <option value="o3">o3 (Advanced Reasoning)</option>
+                                            <option value="o4-mini">o4-mini (Reasoning Fast)</option>
                                         </select>
                                         <p className="text-[10px] text-neutral-500 mt-1.5 font-mono truncate">
                                             ID: {modelInput}
@@ -873,28 +874,27 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
                                         style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center" }}
                                     >
                                         <optgroup label="🆓 Free — Best for Coding">
-                                            <option value="qwen/qwen3-coder:free">⭐ Qwen 3 Coder 480B (Best Free Coder)</option>
-                                            <option value="meta-llama/llama-3.3-70b-instruct:free">Llama 3.3 70B Instruct (Free)</option>
-                                            <option value="nousresearch/hermes-3-llama-3.1-405b:free">Hermes 3 405B Instruct (Free)</option>
-                                            <option value="qwen/qwen3-next-80b-a3b-instruct:free">Qwen 3 Next 80B Instruct (Free)</option>
-                                            <option value="nvidia/nemotron-3-super-120b-a12b:free">Nemotron 3 Super 120B (Free)</option>
-                                            <option value="openai/gpt-oss-120b:free">GPT-OSS 120B (Free)</option>
+                                            <option value="qwen/qwen3-coder:free">⭐ Qwen3 Coder 480B (Best Free Coder)</option>
+                                            <option value="meta-llama/llama-4-maverick:free">Llama 4 Maverick 17B (Free)</option>
+                                            <option value="meta-llama/llama-4-scout:free">Llama 4 Scout 17B (Free)</option>
                                             <option value="google/gemma-3-27b-it:free">Gemma 3 27B (Free)</option>
-                                            <option value="deepseek/deepseek-chat:free">DeepSeek V3 Chat (Free)</option>
-                                            <option value="deepseek/deepseek-r1:free">DeepSeek R1 (Free)</option>
+                                            <option value="deepseek/deepseek-chat-v3-0324:free">DeepSeek V3 0324 (Free)</option>
+                                            <option value="deepseek/deepseek-r1:free">DeepSeek R1 (Free Reasoning)</option>
+                                            <option value="microsoft/phi-4-reasoning:free">Phi-4 Reasoning (Free)</option>
                                         </optgroup>
                                         <optgroup label="🆓 Free — Auto">
                                             <option value="openrouter/free">Auto Free (Smart Fallback)</option>
                                         </optgroup>
-                                        <optgroup label="✦ Premium — Top Models">
-                                            <option value="anthropic/claude-4.6-sonnet-20260217">Claude Sonnet 4.6 (🏆 #1 Week)</option>
-                                            <option value="anthropic/claude-4.6-opus-20260205">Claude Opus 4.6 (Most Powerful)</option>
-                                            <option value="deepseek/deepseek-v3.2-20251201">DeepSeek V3.2 (Fast &amp; Cheap)</option>
-                                            <option value="google/gemini-3-flash-preview-20251217">Gemini 3 Flash Preview</option>
-                                            <option value="moonshotai/kimi-k2.5-0127">Kimi K2.5 (Long Context)</option>
-                                            <option value="openai/gpt-4o">GPT-4o</option>
-                                            <option value="openai/gpt-4o-mini">GPT-4o Mini</option>
-                                            <option value="deepseek/deepseek-r1">DeepSeek R1 (Full)</option>
+                                        <optgroup label="✶ Premium — Top Models">
+                                            <option value="anthropic/claude-sonnet-4-5">Claude Sonnet 4.5 (🏆 Best Coder)</option>
+                                            <option value="anthropic/claude-opus-4-5">Claude Opus 4.5 (Most Powerful)</option>
+                                            <option value="google/gemini-2.5-pro">Gemini 2.5 Pro (Best Reasoning)</option>
+                                            <option value="google/gemini-2.5-flash">Gemini 2.5 Flash (Fast & Smart)</option>
+                                            <option value="deepseek/deepseek-chat-v3-0324">DeepSeek V3 0324 (Fast & Cheap)</option>
+                                            <option value="openai/gpt-4.1">GPT-4.1 (Latest OpenAI)</option>
+                                            <option value="openai/o3">o3 (Advanced Reasoning)</option>
+                                            <option value="openai/o4-mini">o4-mini (Reasoning Fast)</option>
+                                            <option value="deepseek/deepseek-r1">DeepSeek R1 Full (Reasoning)</option>
                                         </optgroup>
                                     </select>
                                     <p className="text-[10px] text-neutral-500 mt-1.5 font-mono truncate">
@@ -938,21 +938,22 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
                                         className="w-full bg-neutral-900 border border-neutral-600 rounded-lg px-3 py-2 text-sm text-neutral-200 focus:outline-none focus:border-red-500 transition-colors appearance-none cursor-pointer"
                                         style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center" }}
                                     >
-                                        <optgroup label="🔥 Gemini 3.1 Series (Latest Preview)">
-                                            <option value="gemini-3.1-pro-preview">Gemini 3.1 Pro (Best Reasoning &amp; Coding)</option>
-                                            <option value="gemini-3.1-flash-lite-preview">Gemini 3.1 Flash-Lite (Fastest &amp; Cheapest)</option>
+                                        <optgroup label="🔥 Gemini 3.1 Series (Latest)">
+                                            <option value="gemini-3.1-flash-lite">Gemini 3.1 Flash-Lite (Stable — Free tier)</option>
+                                            <option value="gemini-3.1-flash-lite-preview">Gemini 3.1 Flash-Lite Preview</option>
+                                            <option value="gemini-3.1-pro-preview">Gemini 3.1 Pro Preview (Paid only)</option>
                                             <option value="gemini-3.1-flash-live-preview">Gemini 3.1 Flash Live (Real-time A2A)</option>
                                         </optgroup>
-                                        <optgroup label="⚡ Gemini 3 Flash (Preview)">
-                                            <option value="gemini-3-flash-preview-20251217">Gemini 3 Flash Preview (Frontier-class)</option>
+                                        <optgroup label="⚡ Gemini 3 Flash">
+                                            <option value="gemini-3-flash-preview">Gemini 3 Flash Preview (Frontier-class)</option>
                                         </optgroup>
-                                        <optgroup label="✦ Gemini 2.5 Series (Stable — Recommended)">
-                                            <option value="gemini-2.5-pro">Gemini 2.5 Pro (Best Stable)</option>
-                                            <option value="gemini-2.5-flash">⭐ Gemini 2.5 Flash (Best Price/Perf)</option>
-                                            <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash-Lite (Budget)</option>
+                                        <optgroup label="✨ Gemini 2.5 Series (Stable — Recommended)">
+                                            <option value="gemini-2.5-flash">⭐ Gemini 2.5 Flash (Best Free — Default)</option>
+                                            <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash-Lite (Budget — Free)</option>
+                                            <option value="gemini-2.5-pro">Gemini 2.5 Pro (Best Coding — Paid)</option>
                                         </optgroup>
-                                        <optgroup label="⚠️ Gemini 2.0 (Deprecated)">
-                                            <option value="gemini-2.0-flash">Gemini 2.0 Flash (Deprecated)</option>
+                                        <optgroup label="⚠️ Deprecated (shutdown Jun 1 2026)">
+                                            <option value="gemini-2.0-flash">Gemini 2.0 Flash ❌ Deprecated</option>
                                         </optgroup>
                                     </select>
                                     <p className="text-[10px] text-neutral-500 mt-1.5 font-mono truncate">
