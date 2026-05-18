@@ -33,16 +33,11 @@ use tauri::{AppHandle, Emitter, Manager};
 ///   https://huggingface.co/{username}/{repo}/resolve/main/kb_compiler_v1.zip
 ///
 /// Hugging Face ส่ง direct download ตรงๆ reqwest จัดการได้เลย
+/// Google Drive share URL → แปลงเป็น direct download URL อัตโนมัติ
+/// รองรับทั้ง: drive.google.com/file/d/{id}/... และ drive.google.com/open?id={id}
 const TOOLCHAIN_PARTS: &[&str] = &[
-    // --- เปลี่ยนให้ตรงกับ URL จริงๆ ของคุณ Kao ---
-
-    // GitHub Releases (split) — ตัวอย่าง:
-    "https://github.com/KaoRMUTT/vibeKidbright/releases/download/toolchain-v1.0.0/kb_compiler_v1.zip.001",
-    "https://github.com/KaoRMUTT/vibeKidbright/releases/download/toolchain-v1.0.0/kb_compiler_v1.zip.002",
-    // "https://github.com/.../kb_compiler_v1.zip.003",  // เพิ่มถ้ามีพาร์ตที่ 3
-
-    // --- หรือถ้าใช้ Hugging Face (ไฟล์เดียว ไม่ต้อง split): ---
-    // "https://huggingface.co/KaoRMUTT/vibekidbright-toolchain/resolve/main/kb_compiler_v1.zip",
+    // Google Drive — ใส่ sharing URL ตรงๆ ได้เลย ระบบจะแปลงให้อัตโนมัติ
+    "https://drive.google.com/file/d/1uWHX5w_BD_EmoViaoBbjDqTicJP5CJIT/view?usp=sharing",
 ];
 
 /// ชื่อ "sentinel file" — ถ้าไฟล์นี้มีอยู่ แปลว่า toolchain สมบูรณ์แล้ว
@@ -241,14 +236,51 @@ pub async fn get_toolchain_paths(
 
 // ── Core Logic: Download + Extract ───────────────────────────────────────────
 
-/// สร้าง HTTP client สำหรับ GitHub Releases + Hugging Face
+/// สร้าง HTTP client พร้อม cookie store (จำเป็นสำหรับ Google Drive)
 fn make_http_client() -> Result<reqwest::blocking::Client, String> {
     reqwest::blocking::Client::builder()
         .timeout(std::time::Duration::from_secs(600))
-        .user_agent("vibeKidbright/1.0")
-        .redirect(reqwest::redirect::Policy::limited(10))
+        .user_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+        .redirect(reqwest::redirect::Policy::limited(15))
+        .cookie_store(true) // จำเป็นสำหรับ Google Drive confirmation cookie
         .build()
         .map_err(|e| format!("Failed to create HTTP client: {}", e))
+}
+
+/// แปลง URL ให้เป็น direct download URL
+/// - Google Drive share URL → drive.usercontent.google.com/download?id=...&confirm=t
+/// - URL อื่นๆ → คืนค่าเดิม
+fn resolve_download_url(url: &str) -> String {
+    // ตรวจว่าเป็น Google Drive URL หรือไม่
+    if !url.contains("drive.google.com") && !url.contains("docs.google.com") {
+        return url.to_string();
+    }
+
+    // แยก file ID จาก URL หลายรูปแบบ
+    // รูปแบบ: /file/d/{id}/
+    let file_id = if let Some(part) = url.split("/file/d/").nth(1) {
+        part.split('/').next().unwrap_or("").split('?').next().unwrap_or("")
+    }
+    // รูปแบบ: ?id={id}
+    else if let Some(part) = url.split("?id=").nth(1).or_else(|| url.split("&id=").nth(1)) {
+        part.split('&').next().unwrap_or("")
+    }
+    // รูปแบบ: /open?id={id}
+    else if let Some(part) = url.split("open?id=").nth(1) {
+        part.split('&').next().unwrap_or("")
+    } else {
+        ""
+    };
+
+    if file_id.is_empty() {
+        return url.to_string();
+    }
+
+    // ใช้ drive.usercontent.google.com พร้อม confirm=t เพื่อข้าม virus-scan page
+    format!(
+        "https://drive.usercontent.google.com/download?id={}&export=download&confirm=t&uuid=1",
+        file_id
+    )
 }
 
 /// ดาวน์โหลด 1 URL และ append bytes ลงไปใน `dest_file` ที่เปิดค้างอยู่
@@ -264,16 +296,24 @@ fn download_part_into(
     dest_file: &mut std::fs::File,
     cancel: &Arc<AtomicBool>,
 ) -> Result<(), String> {
+    // แปลง Google Drive share URL → direct download URL
+    let resolved_url = resolve_download_url(url);
+    let url_display = if resolved_url != url {
+        format!("[GDrive] {}", &resolved_url[..resolved_url.len().min(60)])
+    } else {
+        url[..url.len().min(60)].to_string()
+    };
+
     emit_progress(
         app,
         "downloading",
         1,
-        &format!("[{}/{}] Connecting: {}...", part_idx + 1, part_total, url),
+        &format!("[{}/{}] Connecting: {}...", part_idx + 1, part_total, url_display),
     );
 
     let mut response = client
-        .get(url)
-        .header("Accept", "application/octet-stream")
+        .get(&resolved_url)
+        .header("Accept", "application/octet-stream,*/*")
         .send()
         .map_err(|e| {
             format!(
@@ -284,6 +324,46 @@ fn download_part_into(
                 url
             )
         })?;
+
+    // Google Drive ส่ง HTML หน้า confirm สำหรับไฟล์ใหญ่บางครั้ง
+    // ถ้า Content-Type เป็น HTML ให้ลอง fallback URL อีกครั้ง
+    let content_type = response
+        .headers()
+        .get("content-type")
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("")
+        .to_string();
+
+    if content_type.contains("text/html") && url.contains("drive.google.com") {
+        // อ่าน HTML และหา download token
+        let html = response.text().map_err(|e| e.to_string())?;
+        let token = extract_gdrive_token(&html);
+
+        let file_id = resolved_url
+            .split("id=").nth(1)
+            .and_then(|s| s.split('&').next())
+            .unwrap_or("");
+
+        let retry_url = if let Some(t) = token {
+            format!(
+                "https://drive.usercontent.google.com/download?id={}&export=download&confirm={}",
+                file_id, t
+            )
+        } else {
+            format!(
+                "https://drive.google.com/uc?export=download&id={}&confirm=t",
+                file_id
+            )
+        };
+
+        emit_progress(app, "downloading", 2, "Following Google Drive confirmation...");
+
+        response = client
+            .get(&retry_url)
+            .header("Accept", "application/octet-stream,*/*")
+            .send()
+            .map_err(|e| format!("GDrive retry failed: {}", e))?;
+    }
 
     if !response.status().is_success() {
         return Err(format!(
@@ -677,4 +757,24 @@ fn scan_bin_dirs(dir: &Path, depth: u32, max_depth: u32, out: &mut Vec<PathBuf>)
             }
         }
     }
+}
+
+// ── Google Drive Token Extractor ──────────────────────────────────────────────
+
+/// หา download confirmation token จาก HTML ที่ Google Drive ส่งมา
+/// Google Drive ใช้ form action หรือ query param หลายรูปแบบ
+fn extract_gdrive_token(html: &str) -> Option<String> {
+    for pattern in &["confirm=", "&amp;confirm="] {
+        if let Some(pos) = html.find(pattern) {
+            let rest = &html[pos + pattern.len()..];
+            let token: String = rest
+                .chars()
+                .take_while(|c| c.is_alphanumeric() || *c == '_' || *c == '-')
+                .collect();
+            if !token.is_empty() && token != "t" {
+                return Some(token);
+            }
+        }
+    }
+    None
 }

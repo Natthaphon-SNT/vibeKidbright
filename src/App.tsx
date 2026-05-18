@@ -3,7 +3,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import AiChat from "./AiChat";
 import CodeEditor from "./CodeEditor";
-//import ToolchainSetup from "./ToolchainSetup";
+import ToolchainSetup from "./ToolchainSetup";
 
 interface FileEntry {
   name: string;
@@ -257,16 +257,16 @@ interface FileTab {
   savedContent: string;
 }
 
-// // ── AppShell: Toolchain gate wrapper ─────────────────────────────────
-// function AppShell() {
-//   const [toolchainReady, setToolchainReady] = React.useState(false);
+// ── AppShell: Toolchain gate wrapper ─────────────────────────────────
+function AppShell() {
+  const [toolchainReady, setToolchainReady] = React.useState(false);
 
-//   if (!toolchainReady) {
-//     return <ToolchainSetup onReady={() => setToolchainReady(true)} />;
-//   }
+  if (!toolchainReady) {
+    return <ToolchainSetup onReady={() => setToolchainReady(true)} />;
+  }
 
-//   return <App />;
-// }
+  return <App />;
+}
 
 function App() {
   const [darkMode, setDarkMode] = React.useState(() => {
@@ -1566,4 +1566,4 @@ function App() {
   );
 }
 
-export default App;
+export default AppShell;

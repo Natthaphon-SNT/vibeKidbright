@@ -353,7 +353,12 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
                 ? !openrouterApiKey
                 : provider === "google"
                     ? !googleApiKey
-                    : !api_key && !baseUrl.includes("localhost") && !baseUrl.includes("127.0.0.1");
+                    : !api_key &&
+                      !baseUrl.includes("localhost") &&
+                      !baseUrl.includes("127.0.0.1") &&
+                      !baseUrl.match(/\d+\.\d+\.\d+\.\d+/) &&
+                      !baseUrl.includes("192.168.") &&
+                      !baseUrl.includes("10.");
 
         if (missingKey) {
             setShowSettings(true);
@@ -806,16 +811,19 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
                                 <div className="space-y-4 animate-in fade-in slide-in-from-top-1 duration-200">
                                     <div>
                                         <label className="text-xs text-neutral-400 mb-1 block">
-                                            LM Studio Server URL
+                                            Local / LAN Server URL
                                         </label>
                                         <input
                                             type="text"
                                             value={baseUrlInput}
                                             onChange={(e) => setBaseUrlInput(e.target.value)}
-                                            placeholder="http://localhost:1234/v1"
+                                            placeholder="http://localhost:1234  หรือ  http://192.168.x.x:1234"
                                             className="w-full bg-neutral-900 border border-neutral-600 rounded-lg px-3 py-2 text-sm text-neutral-200 focus:outline-none focus:border-emerald-500 transition-colors"
                                         />
-                                        <p className="text-[10px] text-neutral-500 mt-1">Note: /v1 is required in LM Studio</p>
+                                        <div className="mt-1.5 space-y-0.5">
+                                            <p className="text-[10px] text-neutral-500">✅ /v1 จะถูกเติมให้อัตโนมัติถ้ายังไม่มี</p>
+                                            <p className="text-[10px] text-neutral-600">เช่น: localhost:1234 · 192.168.1.x:1234 · 10.x.x.x:1234 · Ollama: :11434</p>
+                                        </div>
                                     </div>
                                     <div>
                                         <label className="text-xs text-neutral-400 mb-1 block">

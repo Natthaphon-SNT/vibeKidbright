@@ -570,10 +570,8 @@ pub async fn send_ai_message(
     if !base_url.starts_with("http") && !base_url.is_empty() {
         base_url = format!("http://{}", base_url);
     }
-    if (base_url.contains("localhost") || base_url.contains("127.0.0.1"))
-        && !base_url.contains("/v1")
-        && !base_url.ends_with("/v1")
-    {
+
+    if !base_url.contains("/v1") {
         base_url = format!("{}/v1", base_url.trim_end_matches('/'));
     }
 
@@ -589,11 +587,18 @@ pub async fn send_ai_message(
     if api_key.is_empty() && provider == "google" {
         return Err("Google AI API key not set. Please configure it in AI Provider Settings.".to_string());
     }
-    if api_key.is_empty() && provider == "openai"
-        && !base_url.contains("localhost")
-        && !base_url.contains("127.0.0.1")
-    {
-        return Err("API key not set. Please configure your OpenAI API key.".to_string());
+    if api_key.is_empty() && provider == "openai" {
+        let is_local = base_url.contains("localhost")
+            || base_url.contains("127.0.0.1")
+            || base_url.starts_with("http://10.")
+            || base_url.starts_with("http://192.168.")
+            || base_url.split('/').nth(2)
+                .map(|host| host.split(':').next().unwrap_or(""))
+                .map(|host| host.split('.').count() == 4 && host.chars().all(|c| c.is_ascii_digit() || c == '.'))
+                .unwrap_or(false);
+        if !is_local {
+            return Err("API key not set. Please configure your OpenAI API key.".to_string());
+        }
     }
 
     // FIX: Convert message_id to Arc<str> before moving into spawn.
@@ -2945,7 +2950,8 @@ async fn get_embeddings_internal(api_key: &str, mut base_url: String, text: &str
     if !base_url.starts_with("http") && !base_url.is_empty() {
         base_url = format!("http://{}", base_url);
     }
-    if (base_url.contains("localhost") || base_url.contains("127.0.0.1")) && !base_url.contains("/v1") {
+
+    if !base_url.contains("/v1") {
         base_url = format!("{}/v1", base_url.trim_end_matches('/'));
     }
     let client = Client::new();
