@@ -45,6 +45,9 @@ export default function ToolchainSetup({ onReady, toolchainUrl }: Props) {
   const [showUrlInput, setShowUrlInput] = useState(false);
   const [logs, setLogs] = useState<string[]>([]);
   const logsRef = useRef<HTMLDivElement>(null);
+  // Auto-start countdown
+  const [countdown, setCountdown] = useState<number | null>(null);
+  const [autoStartCancelled, setAutoStartCancelled] = useState(false);
 
   // ── Scroll logs to bottom ────────────────────────────────────────────────
   useEffect(() => {
@@ -85,16 +88,26 @@ export default function ToolchainSetup({ onReady, toolchainUrl }: Props) {
       setCheckDone(true);
 
       if (status.status === "ready") {
-        // Toolchain มีอยู่แล้ว → ผ่านไปเลย
+        // Toolchain มีอยู่แล้ว → ผ่านไฟเลย
         setProgress({ stage: "done", percent: 100, message: `Toolchain v${status.version} ready.` });
         setTimeout(() => onReady(), 500);
+      } else {
+        // not_installed → เริ่ม auto-countdown 5 วินาที
+        setCountdown(5);
       }
-      // ถ้า not_installed → รอให้ผู้ใช้กดปุ่ม
     } catch (err) {
       setCheckDone(true);
       setErrorMsg(String(err));
     }
   };
+
+  // ── Auto-start countdown ───────────────────────────────────────────────
+  useEffect(() => {
+    if (countdown === null || autoStartCancelled || isDownloading) return;
+    if (countdown === 0) { startDownload(); return; }
+    const t = setTimeout(() => setCountdown((c) => (c !== null ? c - 1 : null)), 1000);
+    return () => clearTimeout(t);
+  }, [countdown, autoStartCancelled, isDownloading]);
 
   const startDownload = async () => {
     if (isDownloading) return;
@@ -185,6 +198,10 @@ export default function ToolchainSetup({ onReady, toolchainUrl }: Props) {
           0% { background-position: 200% center; }
           100% { background-position: -200% center; }
         }
+        @keyframes countdown-ring {
+          from { stroke-dashoffset: 0; }
+          to   { stroke-dashoffset: 88; }
+        }
         .progress-bar-inner {
           background-size: 200% auto;
           animation: progress-shimmer 2s linear infinite;
@@ -192,6 +209,7 @@ export default function ToolchainSetup({ onReady, toolchainUrl }: Props) {
         .log-entry { animation: fadeIn 0.2s ease forwards; }
         .setup-card { animation: fadeIn 0.4s ease forwards; }
         .spinner { animation: spin 1s linear infinite; }
+        .countdown-arc { animation: countdown-ring 5s linear forwards; stroke-dasharray: 88; }
       `}</style>
 
       {/* Main card */}
@@ -447,30 +465,76 @@ export default function ToolchainSetup({ onReady, toolchainUrl }: Props) {
                   ⛔ Cancel Download
                 </button>
               ) : (
-                <button
-                  id="btn-start-download"
-                  onClick={startDownload}
-                  disabled={!checkDone}
-                  style={{
-                    flex: 1,
-                    padding: "14px",
-                    borderRadius: "12px",
-                    border: "none",
-                    background:
-                      !checkDone
+                <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "8px" }}>
+                  {/* Install / countdown button */}
+                  <button
+                    id="btn-start-download"
+                    onClick={() => { setCountdown(null); startDownload(); }}
+                    disabled={!checkDone}
+                    style={{
+                      width: "100%",
+                      padding: "14px",
+                      borderRadius: "12px",
+                      border: "none",
+                      background: !checkDone
                         ? "rgba(30,40,60,0.5)"
                         : "linear-gradient(135deg, #1d4ed8, #3b82f6, #6366f1)",
-                    color: !checkDone ? "#64748b" : "white",
-                    fontSize: "14px",
-                    fontWeight: 700,
-                    cursor: !checkDone ? "not-allowed" : "pointer",
-                    boxShadow: checkDone ? "0 4px 24px rgba(59,130,246,0.4)" : "none",
-                    transition: "all 0.2s",
-                    letterSpacing: "0.2px",
-                  }}
-                >
-                  {isError || isCancelled ? "🔄 Try Again" : "⬇️ Install Toolchain (1-time)"}
-                </button>
+                      color: !checkDone ? "#64748b" : "white",
+                      fontSize: "14px",
+                      fontWeight: 700,
+                      cursor: !checkDone ? "not-allowed" : "pointer",
+                      boxShadow: checkDone ? "0 4px 24px rgba(59,130,246,0.4)" : "none",
+                      transition: "all 0.2s",
+                      letterSpacing: "0.2px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "10px",
+                    }}
+                  >
+                    {/* Countdown ring */}
+                    {countdown !== null && !autoStartCancelled && (
+                      <svg width="22" height="22" viewBox="0 0 30 30" style={{ flexShrink: 0 }}>
+                        <circle cx="15" cy="15" r="14" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="2.5" />
+                        <circle
+                          cx="15" cy="15" r="14"
+                          fill="none" stroke="#fff" strokeWidth="2.5"
+                          strokeLinecap="round"
+                          className="countdown-arc"
+                          style={{ transformOrigin: "center", transform: "rotate(-90deg)" }}
+                        />
+                        <text x="15" y="19" textAnchor="middle" fill="white" fontSize="11" fontWeight="700" fontFamily="monospace">
+                          {countdown}
+                        </text>
+                      </svg>
+                    )}
+                    {isError || isCancelled
+                      ? "🔄 Try Again"
+                      : countdown !== null && !autoStartCancelled
+                      ? `Auto-installing in ${countdown}s...`
+                      : "⬇️ Install Toolchain (1-time)"}
+                  </button>
+
+                  {/* Cancel auto-start (only shown during countdown) */}
+                  {countdown !== null && !autoStartCancelled && !isDownloading && (
+                    <button
+                      onClick={() => { setAutoStartCancelled(true); setCountdown(null); }}
+                      style={{
+                        width: "100%",
+                        padding: "8px",
+                        borderRadius: "10px",
+                        border: "1px solid rgba(148,163,184,0.15)",
+                        background: "transparent",
+                        color: "rgba(148,163,184,0.6)",
+                        fontSize: "12px",
+                        cursor: "pointer",
+                        transition: "all 0.2s",
+                      }}
+                    >
+                      Cancel auto-start
+                    </button>
+                  )}
+                </div>
               )}
             </>
           )}

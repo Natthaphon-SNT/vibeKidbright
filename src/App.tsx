@@ -291,7 +291,10 @@ function App() {
   const [terminalInput, setTerminalInput] = useState("");
   const [openFiles, setOpenFiles] = useState<FileTab[]>([]);
   const [activeFilePath, setActiveFilePath] = useState<string>("");
-  const [showAiPanel, setShowAiPanel] = useState(true);
+  const [showAiPanel, setShowAiPanel] = useState(() => {
+    const saved = localStorage.getItem("vibe-ai-panel");
+    return saved === null ? true : saved === "true"; // default: เปิดอยู่เสมอ
+  });
   const [projectDir, setProjectDir] = useState(".");
   const [isBuilding, setIsBuilding] = useState(false);
   const [serialPorts, setSerialPorts] = useState<string[]>([]);
@@ -400,10 +403,13 @@ function App() {
     }
   };
 
+  // Mount-once: ตรวจสภาพและโหลด serial ports ครั้งเดียวเท่านั้น
   useEffect(() => {
     checkEnvironment();
     loadSerialPorts();
+  }, []);
 
+  useEffect(() => {
     const unlistenTerminal = listen("terminal-output", (event) => {
       setLogs((prev) => [...prev, event.payload as string]);
     });
@@ -793,28 +799,49 @@ function App() {
   };
 
   const runEspIdfSetup = async () => {
+    // Legacy — replaced by handleAutoInstallGithub
+    await handleAutoInstallGithub();
+  };
+
+  /** ดาวน์โหลด toolchain จาก GitHub Release (v1.0.1) */
+  const handleAutoInstallGithub = async () => {
     if (isSettingUpEspIdf) return;
 
     setIsSettingUpEspIdf(true);
-    setEspIdfSetupNote("Installing ESP-IDF toolchain for this OS...");
-    setStatus("Setting up ESP-IDF...");
-    addLog("Starting first-run ESP-IDF setup...");
+    setEspIdfSetupNote("⬇️ Connecting to GitHub Release...");
+    setStatus("Downloading toolchain from GitHub...");
+    addLog("🚀 Starting GitHub toolchain download (frameworks + tools)...");
+
+    // Subscribe to toolchain-progress events แสดงใน terminal
+    const unlisten = await listen<{ stage: string; percent: number; message: string }>(
+      "toolchain-progress",
+      (event) => {
+        const { stage, percent, message } = event.payload;
+        addLog(`[${stage.toUpperCase()}] ${percent}% — ${message}`);
+        setEspIdfSetupNote(`${percent}% — ${message}`);
+
+        if (stage === "done") {
+          setStatus("✅ Toolchain Ready");
+          setEspIdfSetupNote("Toolchain installed successfully!");
+          setIsSettingUpEspIdf(false);
+        } else if (stage === "error" || stage === "cancelled") {
+          setStatus("❌ Installation Failed");
+          setIsSettingUpEspIdf(false);
+        }
+      }
+    );
 
     try {
-      const result = await invoke("setup_esp_idf", {
-        version: "v5.2.2",
-        targets: ["esp32", "esp32s2", "esp32s3", "esp32c3", "esp32c6"]
-      });
-      addLog(`${result}`);
-      setEspIdfSetupNote("ESP-IDF installed successfully.");
+      const result = await invoke("download_toolchain", { url: null });
+      addLog(`✅ ${result}`);
       await checkEnvironment();
     } catch (err) {
-      const message = `ESP-IDF setup failed: ${err}`;
-      setStatus("ESP-IDF setup failed");
-      setEspIdfSetupNote("Setup failed. Check logs and retry.");
-      addLog(`❌ ${message}`);
-    } finally {
+      addLog(`❌ GitHub toolchain download failed: ${err}`);
+      setStatus("❌ Installation Failed");
+      setEspIdfSetupNote(`Failed: ${err}`);
       setIsSettingUpEspIdf(false);
+    } finally {
+      unlisten();
     }
   };
 
@@ -823,12 +850,20 @@ function App() {
       const result = await invoke("check_esp_idf");
       setStatus(result as string);
       setEspIdfSetupNote("");
-    } catch (err) {
+    } catch (_err) {
+      // check_esp_idf ล้มเหลว — ตรวจว่า Happy Meal toolchain มีอยู่แล้วหรือเปล่า
+      try {
+        const tc = await invoke("check_toolchain") as { status: string; version: string | null };
+        if (tc.status === "ready") {
+          setStatus(`✅ Toolchain v${tc.version || ""} Ready`);
+          setEspIdfSetupNote("");
+          return; // มี toolchain แล้ว — ไม่ต้องติดตั้งอีก
+        }
+      } catch (_tc) { /* ignore */ }
+      // ไม่มีทั้ง check_esp_idf และ toolchain — แจ้งเฟย ไม่ auto-run
       setStatus("ESP-IDF not found");
-      setEspIdfSetupNote("ESP-IDF is required. Starting bootstrap installer...");
-      addLog("ESP-IDF not found. Running bootstrap installer...");
-      await runEspIdfSetup();
-      console.error(err);
+      setEspIdfSetupNote("⚠️ ESP-IDF not found. Use Setup / Repair ESP-IDF to install.");
+      addLog("⚠️ ESP-IDF not found. Click \"Setup / Repair ESP-IDF\" to install.");
     }
   };
 
@@ -1112,7 +1147,7 @@ function App() {
             {isSettingUpEspIdf ? "Installing ESP-IDF..." : "Setup / Repair ESP-IDF"}
           </button>
           <button
-            onClick={() => setShowAiPanel(!showAiPanel)}
+            onClick={() => { const next = !showAiPanel; setShowAiPanel(next); localStorage.setItem("vibe-ai-panel", String(next)); }}
             className="w-full text-left p-2 rounded flex items-center gap-2 text-sm transition-colors group"
             style={showAiPanel
               ? { backgroundColor: 'var(--pms-293-pale)', color: 'var(--accent)' }
@@ -1498,17 +1533,17 @@ function App() {
             <div className="bg-neutral-900/60 border border-neutral-700 rounded-lg p-4 mb-5">
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-red-400 text-sm font-bold">⬇ Auto Install</span>
-                <span className="text-[10px] text-neutral-500 bg-neutral-700 px-1.5 py-0.5 rounded">Downloads & installs ESP-IDF v5.2.2</span>
+                <span className="text-[10px] text-neutral-500 bg-neutral-700 px-1.5 py-0.5 rounded">GitHub Release v1.0.1 (~2.1 GB)</span>
               </div>
               <p className="text-[11px] text-neutral-500 mb-3">
-                Let the app download and configure ESP-IDF automatically. This may take 10–20 minutes depending on your connection speed.
+                ดาวน์โหลด <code className="text-neutral-400">frameworks.zip</code> + <code className="text-neutral-400">tools.zip</code> จาก GitHub Release แล้วแตกไฟล์ลง AppData โดยอัตโนมัติ (ครั้งเดียว)
               </p>
               <button
-                onClick={() => { setShowSetupModal(false); runEspIdfSetup(); }}
+                onClick={() => { setShowSetupModal(false); handleAutoInstallGithub(); }}
                 disabled={isSettingUpEspIdf}
                 className="w-full py-2 bg-red-600 hover:bg-red-500 text-sm font-bold text-white rounded-lg transition-all active:scale-95 shadow-lg shadow-red-500/20"
               >
-                Start Auto Install
+                {isSettingUpEspIdf ? "⏳ Downloading from GitHub..." : "⬇️ Start Auto Install (GitHub)"}
               </button>
             </div>
 
