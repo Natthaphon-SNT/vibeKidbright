@@ -798,11 +798,6 @@ function App() {
     });
   };
 
-  const runEspIdfSetup = async () => {
-    // Legacy — replaced by handleAutoInstallGithub
-    await handleAutoInstallGithub();
-  };
-
   /** ดาวน์โหลด toolchain จาก GitHub Release (v1.0.1) */
   const handleAutoInstallGithub = async () => {
     if (isSettingUpEspIdf) return;
