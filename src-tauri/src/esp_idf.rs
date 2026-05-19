@@ -168,7 +168,7 @@ fn detect_host_python() -> Result<String, String> {
 }
 
 /// Resolve the ESP-IDF and tools paths (runtime, bundled, or dev fallback).
-/// Priority: env override > user config > runtime > bundled.
+/// Priority: env override > user config > Happy Meal toolchain > runtime > bundled.
 fn resolve_idf_paths(app_handle: &AppHandle) -> Result<(PathBuf, PathBuf), String> {
     // 1. Environment variable override
     if let Some((idf_path, tools_path)) = resolve_env_override() {
@@ -184,6 +184,18 @@ fn resolve_idf_paths(app_handle: &AppHandle) -> Result<(PathBuf, PathBuf), Strin
         }
     }
 
+    // 3. Happy Meal toolchain (ดาวน์โหลดจาก GitHub Release)
+    //    โครงสร้าง: AppData/.../toolchain/esp-idf + toolchain/.espressif
+    if let Ok(app_data) = app_handle.path().app_data_dir() {
+        let toolchain_dir = app_data.join("toolchain");
+        let hm_idf   = toolchain_dir.join("esp-idf");
+        let hm_tools = toolchain_dir.join(".espressif");
+        if let Ok(paths) = canonical_idf_pair(&hm_idf, &hm_tools) {
+            return Ok(paths);
+        }
+    }
+
+    // 4. Runtime ESP-IDF (ติดตั้งผ่าน setup_esp_idf command)
     if let Some(runtime_idf) = maybe_find_runtime_idf(app_handle)? {
         let tools = runtime_root_dir(app_handle)?.join(".espressif");
         if let Ok(paths) = canonical_idf_pair(&runtime_idf, &tools) {

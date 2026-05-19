@@ -394,6 +394,9 @@ fn download_and_extract(
                     // Throttle: emit progress ทุก 3 วินาที ลด UI lag
                     let mut last_emit = std::time::Instant::now();
                     let emit_interval = std::time::Duration::from_secs(3);
+                    // Speed tracking
+                    let download_start = std::time::Instant::now();
+                    let mut bytes_since_last_emit: u64 = 0;
 
                     loop {
                         if cancel.load(Ordering::SeqCst) {
@@ -409,11 +412,31 @@ fn download_and_extract(
                             .map_err(|e| format!("Write error ({}): {}", label, e))?;
 
                         local_done += n as u64;
+                        bytes_since_last_emit += n as u64;
                         let combined = gd.fetch_add(n as u64, Ordering::Relaxed) + n as u64;
 
                         // Emit ทุก 3 วินาที (ไม่ใช่ทุก chunk) เพื่อลด UI lag
                         if last_emit.elapsed() >= emit_interval {
+                            let elapsed_secs = last_emit.elapsed().as_secs_f64();
                             last_emit = std::time::Instant::now();
+
+                            // คำนวณ speed จาก bytes ที่โหลดในช่วง interval นี้
+                            let speed_mbps = (bytes_since_last_emit as f64 / 1_048_576.0) / elapsed_secs;
+                            bytes_since_last_emit = 0;
+
+                            // คำนวณ ETA จาก average speed ตลอดการโหลด
+                            let total_elapsed = download_start.elapsed().as_secs_f64();
+                            let avg_speed = if total_elapsed > 0.0 { local_done as f64 / total_elapsed } else { 1.0 };
+                            let remaining_bytes = if part_size > local_done { part_size - local_done } else { 0 };
+                            let eta_secs = if avg_speed > 0.0 { remaining_bytes as f64 / avg_speed } else { 0.0 };
+
+                            let eta_str = if eta_secs > 3600.0 {
+                                format!("{:.0}h {:.0}m", eta_secs / 3600.0, (eta_secs % 3600.0) / 60.0)
+                            } else if eta_secs > 60.0 {
+                                format!("{:.0}m {:.0}s", eta_secs / 60.0, eta_secs % 60.0)
+                            } else {
+                                format!("{:.0}s", eta_secs)
+                            };
 
                             let percent = if global_total > 0 {
                                 ((combined as f64 / global_total as f64) * 49.0) as u8
@@ -427,10 +450,13 @@ fn download_and_extract(
                             let mb_part  = part_size as f64  / 1_048_576.0;
 
                             emit_progress(&app, "downloading", percent,
-                                &format!("[{}/{}] {} — {:.1}/{:.1} MB  |  รวม {:.1}/{:.1} MB",
+                                &format!("[{}/{}] {} — {:.1}/{:.1} MB  ⚡ {:.1} MB/s  ⏱ ETA {}",
                                     idx + 1, total_parts, label,
                                     mb_local, mb_part,
-                                    mb_done_total, mb_total));
+                                    speed_mbps,
+                                    if remaining_bytes == 0 { "done".to_string() } else { eta_str }));
+
+                            let _ = mb_done_total + mb_total; // suppress unused warning
                         }
                     }
 
