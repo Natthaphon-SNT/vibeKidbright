@@ -185,13 +185,32 @@ fn resolve_idf_paths(app_handle: &AppHandle) -> Result<(PathBuf, PathBuf), Strin
     }
 
     // 3. Happy Meal toolchain (ดาวน์โหลดจาก GitHub Release)
-    //    โครงสร้าง: AppData/.../toolchain/esp-idf + toolchain/.espressif
+    //    โครงสร้างจริง: toolchain/frameworks/esp-idf-vX.X.X/  +  toolchain/tools/
     if let Ok(app_data) = app_handle.path().app_data_dir() {
         let toolchain_dir = app_data.join("toolchain");
-        let hm_idf   = toolchain_dir.join("esp-idf");
-        let hm_tools = toolchain_dir.join(".espressif");
-        if let Ok(paths) = canonical_idf_pair(&hm_idf, &hm_tools) {
-            return Ok(paths);
+        let frameworks_dir = toolchain_dir.join("frameworks");
+        let tools_dir = toolchain_dir.join("tools");
+
+        if frameworks_dir.exists() && tools_dir.exists() {
+            if let Ok(entries) = std::fs::read_dir(&frameworks_dir) {
+                let mut idf_dirs: Vec<PathBuf> = entries
+                    .flatten()
+                    .map(|e| e.path())
+                    .filter(|p| {
+                        p.is_dir()
+                            && p.file_name()
+                                .map(|n| n.to_string_lossy().starts_with("esp-idf"))
+                                .unwrap_or(false)
+                            && p.join("tools/idf.py").exists()
+                    })
+                    .collect();
+                idf_dirs.sort();
+                if let Some(idf_dir) = idf_dirs.pop() {
+                    if let Ok(paths) = canonical_idf_pair(&idf_dir, &tools_dir) {
+                        return Ok(paths);
+                    }
+                }
+            }
         }
     }
 
