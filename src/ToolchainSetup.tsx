@@ -5,7 +5,7 @@
 // หน้าจอจะหายไปอัตโนมัติเมื่อ download + extract เสร็จสมบูรณ์
 // ─────────────────────────────────────────────────────────────────────────────
 
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 
