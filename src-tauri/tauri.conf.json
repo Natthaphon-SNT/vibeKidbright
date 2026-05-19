@@ -25,7 +25,8 @@
   "bundle": {
     "active": true,
     "resources": [
-      "../resources/**/*"
+      "../resources/**/*",
+      "../knowledge_base/**/*"
     ],
     "targets": "all",
     "icon": [

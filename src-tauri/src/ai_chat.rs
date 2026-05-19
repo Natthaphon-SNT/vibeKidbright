@@ -135,14 +135,59 @@ fn resolve_kb_path(project_dir: &str) -> PathBuf {
         return proj_kb;
     }
     
-    // Fallback to the global IDE knowledge_base if the project doesn't have its own
+    // Fallback 1: global IDE knowledge_base (dev mode — CWD-based)
     let fallback_root = resolve_project_root("");
     let fallback_kb = fallback_root.join("knowledge_base");
     if fallback_kb.exists() {
         return fallback_kb;
     }
+
+    // Fallback 2: AppData/knowledge_base (installed version — seeded by seed_knowledge_base)
+    if let Ok(app_data) = std::env::var("APPDATA").or_else(|_| std::env::var("HOME")) {
+        let appdata_kb = std::path::PathBuf::from(app_data)
+            .join("com.cake.tauri-app")
+            .join("knowledge_base");
+        if appdata_kb.exists() {
+            return appdata_kb;
+        }
+    }
     
     proj_kb // Default if neither exists
+}
+
+/// Seed bundled knowledge_base files into AppData/knowledge_base (installed version).
+/// Called once on startup — skips files that already exist (ไม่ overwrite ไฟล์ที่ผู้ใช้แก้ไข).
+pub fn seed_knowledge_base(app_handle: &AppHandle) {
+    let Ok(resource_dir) = app_handle.path().resource_dir() else { return };
+    let Ok(app_data_dir) = app_handle.path().app_data_dir() else { return };
+
+    let src = resource_dir.join("knowledge_base");
+    let dst = app_data_dir.join("knowledge_base");
+
+    if !src.exists() { return; }
+    let _ = std::fs::create_dir_all(&dst);
+
+    copy_dir_recursive(&src, &dst);
+}
+
+fn copy_dir_recursive(src: &std::path::Path, dst: &std::path::Path) {
+    let Ok(entries) = std::fs::read_dir(src) else { return };
+    for entry in entries.flatten() {
+        let src_path = entry.path();
+        let dst_path = dst.join(entry.file_name());
+        if src_path.is_dir() {
+            let _ = std::fs::create_dir_all(&dst_path);
+            copy_dir_recursive(&src_path, &dst_path);
+        } else {
+            // ข้าม .embeddings.json และ .backup (ไม่ต้อง bundle)
+            let name = entry.file_name().to_string_lossy().to_string();
+            if name.ends_with(".backup") || name == ".embeddings.json" { continue; }
+            // ไม่ overwrite ไฟล์ที่มีอยู่แล้ว (ผู้ใช้อาจแก้ไขไว้)
+            if !dst_path.exists() {
+                let _ = std::fs::copy(&src_path, &dst_path);
+            }
+        }
+    }
 }
 
 fn resolve_idf_paths_for_ai(app_handle: &AppHandle) -> Option<(PathBuf, PathBuf)> {
