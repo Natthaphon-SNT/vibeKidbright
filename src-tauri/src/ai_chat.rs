@@ -161,12 +161,23 @@ pub fn seed_knowledge_base(app_handle: &AppHandle) {
     let Ok(resource_dir) = app_handle.path().resource_dir() else { return };
     let Ok(app_data_dir) = app_handle.path().app_data_dir() else { return };
 
+    // KB ถูก copy ไปไว้ใน resources/knowledge_base/ แล้ว
     let src = resource_dir.join("knowledge_base");
     let dst = app_data_dir.join("knowledge_base");
 
-    if !src.exists() { return; }
-    let _ = std::fs::create_dir_all(&dst);
+    if !src.exists() {
+        // fallback: ลอง parent ของ resource_dir (กรณี Tauri เก็บ path แบบ relative)
+        let alt_src = resource_dir.parent()
+            .map(|p| p.join("knowledge_base"))
+            .unwrap_or_default();
+        if alt_src.exists() {
+            let _ = std::fs::create_dir_all(&dst);
+            copy_dir_recursive(&alt_src, &dst);
+        }
+        return;
+    }
 
+    let _ = std::fs::create_dir_all(&dst);
     copy_dir_recursive(&src, &dst);
 }
 
