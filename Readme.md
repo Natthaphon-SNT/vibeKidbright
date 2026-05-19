@@ -363,7 +363,7 @@ void app_main(void)
 
 ## 📄 License
 
-MIT License — ใช้ฟรี แก้ไขได้ แจกจ่ายได้
+This project is under MIT License
 
 ---
 
