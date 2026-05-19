@@ -11,7 +11,7 @@
 //   3. get_toolchain_dir()  → คืนค่า path ของ toolchain ให้ build_firmware() ใช้
 // ─────────────────────────────────────────────────────────────────────────────
 
-use std::io::{BufReader, Read, Write};
+use std::io::{BufReader, BufWriter, Read, Write};
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, OnceLock};
@@ -19,32 +19,35 @@ use tauri::{AppHandle, Emitter, Manager};
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-/// ── วิธีที่ 1: Split ZIP หลายพาร์ต (GitHub Releases) ────────────────────────
+/// GitHub Release v1.0.1 — มี 2 ไฟล์แยกกัน:
+///   frameworks.zip  (~286 MB)  → แตกลง toolchain/
+///   tools.zip       (~1.85 GB) → แตกลง toolchain/
 ///
-/// ตัดไฟล์ด้วย 7-Zip:
-///   7z a -v1800m kb_compiler_v1.zip.001 kb_compiler_v1.zip
+/// โครงสร้างหลังแตกไฟล์:
+///   toolchain/
+///     esp-idf/          ← มาจาก frameworks.zip
+///     .espressif/       ← มาจาก tools.zip
+///     .toolchain_ready  ← sentinel file
 ///
-/// อัปโหลดทุกพาร์ตเข้า GitHub Release เดียวกัน แล้วใส่ URL ด้านล่าง
-/// (ถ้ามีแค่พาร์ตเดียวก็ใส่ 1 entry ก็พอ)
-///
-/// ── วิธีที่ 2: Hugging Face Hub (ไฟล์ใหญ่ถึง 50 GB) ──────────────────────────
-///
-/// อัปโหลดไฟล์เดียวไปที่ https://huggingface.co แล้วใช้ URL แบบนี้:
-///   https://huggingface.co/{username}/{repo}/resolve/main/kb_compiler_v1.zip
-///
-/// Hugging Face ส่ง direct download ตรงๆ reqwest จัดการได้เลย
-/// Google Drive share URL → แปลงเป็น direct download URL อัตโนมัติ
-/// รองรับทั้ง: drive.google.com/file/d/{id}/... และ drive.google.com/open?id={id}
-const TOOLCHAIN_PARTS: &[&str] = &[
-    // Google Drive — ใส่ sharing URL ตรงๆ ได้เลย ระบบจะแปลงให้อัตโนมัติ
-    "https://drive.google.com/file/d/1uWHX5w_BD_EmoViaoBbjDqTicJP5CJIT/view?usp=sharing",
+/// รองรับ Google Drive URL ด้วย (แปลงอัตโนมัติ)
+const TOOLCHAIN_PARTS: &[(&str, &str)] = &[
+    // (URL, label)
+    (
+        "https://github.com/Natthaphon-SNT/vibeKidbright/releases/download/v1.0.1/frameworks.zip",
+        "frameworks (~286 MB)",
+    ),
+    (
+        "https://github.com/Natthaphon-SNT/vibeKidbright/releases/download/v1.0.1/tools.zip",
+        "tools (~1.85 GB)",
+    ),
 ];
 
 /// ชื่อ "sentinel file" — ถ้าไฟล์นี้มีอยู่ แปลว่า toolchain สมบูรณ์แล้ว
 const SENTINEL_FILE: &str = ".toolchain_ready";
 
-/// เวอร์ชัน toolchain — เปลี่ยนเมื่ออัปเดต ZIP บน Cloud
-const TOOLCHAIN_VERSION: &str = "1.0.0";
+/// เวอร์ชัน toolchain
+const TOOLCHAIN_VERSION: &str = "1.0.1";
+
 
 // ── Global cancel flag ────────────────────────────────────────────────────────
 
@@ -132,10 +135,16 @@ pub async fn download_toolchain(
     app_handle: AppHandle,
     url: Option<String>,
 ) -> Result<String, String> {
-    let custom_parts: Vec<String> = url
+    // ถ้ามี custom URL ให้ใช้เป็น single-entry มิฉะนั้นใช้ค่าเริ่มต้น (GitHub Release)
+    let parts: Vec<(String, String)> = url
         .filter(|u| !u.trim().is_empty())
-        .map(|u| vec![u])
-        .unwrap_or_else(|| TOOLCHAIN_PARTS.iter().map(|s| s.to_string()).collect());
+        .map(|u| vec![(u, "custom".to_string())])
+        .unwrap_or_else(|| {
+            TOOLCHAIN_PARTS
+                .iter()
+                .map(|(u, l)| (u.to_string(), l.to_string()))
+                .collect()
+        });
 
     let toolchain_dir = get_toolchain_dir(&app_handle)?;
 
@@ -154,21 +163,23 @@ pub async fn download_toolchain(
     std::fs::create_dir_all(&toolchain_dir)
         .map_err(|e| format!("Failed to create toolchain directory: {}", e))?;
 
-    let part_count = custom_parts.len();
     emit_progress(
         &app_handle,
         "downloading",
         0,
-        &format!("Starting download ({} part(s))...", part_count),
+        &format!("Starting download ({} file(s)): {}",
+            parts.len(),
+            parts.iter().map(|(_, l)| l.as_str()).collect::<Vec<_>>().join(" + ")
+        ),
     );
 
     let app_clone = app_handle.clone();
     let dir_clone = toolchain_dir.clone();
     let cancel = cancel_flag();
 
-    // รันใน blocking thread เพราะ reqwest blocking + zip extraction ใช้ CPU หนัก
+    // รันใน blocking thread
     let result = tokio::task::spawn_blocking(move || {
-        download_and_extract(&app_clone, &custom_parts, &dir_clone, cancel)
+        download_and_extract(&app_clone, &parts, &dir_clone, cancel)
     })
     .await
     .map_err(|e| format!("Task panicked: {}", e))??;
@@ -239,10 +250,12 @@ pub async fn get_toolchain_paths(
 /// สร้าง HTTP client พร้อม cookie store (จำเป็นสำหรับ Google Drive)
 fn make_http_client() -> Result<reqwest::blocking::Client, String> {
     reqwest::blocking::Client::builder()
-        .timeout(std::time::Duration::from_secs(600))
+        .connect_timeout(std::time::Duration::from_secs(30))  // ค้าง connect ได้สูงสุด 30s
+        .timeout(std::time::Duration::from_secs(600))         // total timeout 10 นาที
         .user_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
         .redirect(reqwest::redirect::Policy::limited(15))
         .cookie_store(true) // จำเป็นสำหรับ Google Drive confirmation cookie
+        .tcp_keepalive(std::time::Duration::from_secs(30))    // keepalive ป้องกัน connection drop
         .build()
         .map_err(|e| format!("Failed to create HTTP client: {}", e))
 }
@@ -283,207 +296,186 @@ fn resolve_download_url(url: &str) -> String {
     )
 }
 
-/// ดาวน์โหลด 1 URL และ append bytes ลงไปใน `dest_file` ที่เปิดค้างอยู่
-/// คืน (bytes_downloaded, content_length) เพื่อใช้คำนวณ progress
-fn download_part_into(
-    app: &AppHandle,
-    client: &reqwest::blocking::Client,
-    url: &str,
-    part_idx: usize,
-    part_total: usize,
-    global_downloaded: &mut u64,
-    global_total: u64,
-    dest_file: &mut std::fs::File,
-    cancel: &Arc<AtomicBool>,
-) -> Result<(), String> {
-    // แปลง Google Drive share URL → direct download URL
-    let resolved_url = resolve_download_url(url);
-    let url_display = if resolved_url != url {
-        format!("[GDrive] {}", &resolved_url[..resolved_url.len().min(60)])
-    } else {
-        url[..url.len().min(60)].to_string()
-    };
-
-    emit_progress(
-        app,
-        "downloading",
-        1,
-        &format!("[{}/{}] Connecting: {}...", part_idx + 1, part_total, url_display),
-    );
-
-    let mut response = client
-        .get(&resolved_url)
-        .header("Accept", "application/octet-stream,*/*")
-        .send()
-        .map_err(|e| {
-            format!(
-                "Download failed (part {}/{}): {}\nURL: {}",
-                part_idx + 1,
-                part_total,
-                e,
-                url
-            )
-        })?;
-
-    // Google Drive ส่ง HTML หน้า confirm สำหรับไฟล์ใหญ่บางครั้ง
-    // ถ้า Content-Type เป็น HTML ให้ลอง fallback URL อีกครั้ง
-    let content_type = response
-        .headers()
-        .get("content-type")
-        .and_then(|v| v.to_str().ok())
-        .unwrap_or("")
-        .to_string();
-
-    if content_type.contains("text/html") && url.contains("drive.google.com") {
-        // อ่าน HTML และหา download token
-        let html = response.text().map_err(|e| e.to_string())?;
-        let token = extract_gdrive_token(&html);
-
-        let file_id = resolved_url
-            .split("id=").nth(1)
-            .and_then(|s| s.split('&').next())
-            .unwrap_or("");
-
-        let retry_url = if let Some(t) = token {
-            format!(
-                "https://drive.usercontent.google.com/download?id={}&export=download&confirm={}",
-                file_id, t
-            )
-        } else {
-            format!(
-                "https://drive.google.com/uc?export=download&id={}&confirm=t",
-                file_id
-            )
-        };
-
-        emit_progress(app, "downloading", 2, "Following Google Drive confirmation...");
-
-        response = client
-            .get(&retry_url)
-            .header("Accept", "application/octet-stream,*/*")
-            .send()
-            .map_err(|e| format!("GDrive retry failed: {}", e))?;
-    }
-
-    if !response.status().is_success() {
-        return Err(format!(
-            "Server error {} for part {}/{}: {}",
-            response.status(),
-            part_idx + 1,
-            part_total,
-            url
-        ));
-    }
-
-    let part_len = response.content_length().unwrap_or(0);
-    let mut buf = vec![0u8; 65536]; // 64 KB chunks
-
-    loop {
-        if cancel.load(Ordering::SeqCst) {
-            return Err("Download cancelled by user.".to_string());
-        }
-
-        let n = response
-            .read(&mut buf)
-            .map_err(|e| format!("Read error (part {}): {}", part_idx + 1, e))?;
-
-        if n == 0 {
-            break;
-        }
-
-        dest_file
-            .write_all(&buf[..n])
-            .map_err(|e| format!("Write error: {}", e))?;
-
-        *global_downloaded += n as u64;
-
-        // Download phase = 0–49%
-        let percent = if global_total > 0 {
-            ((*global_downloaded as f64 / global_total as f64) * 49.0) as u8
-        } else {
-            ((*global_downloaded / 1_048_576) % 48 + 1) as u8
-        };
-
-        let mb_done = *global_downloaded as f64 / 1_048_576.0;
-        let mb_total = global_total as f64 / 1_048_576.0;
-        let part_mb = part_len as f64 / 1_048_576.0;
-
-        let msg = if part_total > 1 {
-            format!(
-                "[{}/{}] Downloading... {:.1} / {:.1} MB (part size {:.1} MB)",
-                part_idx + 1,
-                part_total,
-                mb_done,
-                mb_total,
-                part_mb
-            )
-        } else {
-            format!("Downloading... {:.1} / {:.1} MB", mb_done, mb_total)
-        };
-
-        emit_progress(app, "downloading", percent, &msg);
-    }
-
-    Ok(())
-}
 
 fn download_and_extract(
     app: &AppHandle,
-    parts: &[String],
+    parts: &[(String, String)], // (url, label)
     dest_dir: &Path,
     cancel: Arc<AtomicBool>,
 ) -> Result<String, String> {
     let client = make_http_client()?;
-    let zip_path = dest_dir.join("_toolchain_download.zip");
+    let total_parts = parts.len();
 
-    // ─── Phase 1: HEAD requests เพื่อรวม total size (best-effort) ────────────
-    let mut global_total: u64 = 0;
-    for url in parts {
-        if let Ok(resp) = client.head(url.as_str()).send() {
-            global_total += resp.content_length().unwrap_or(0);
+    // ─── Phase 1: HEAD เพื่อรวม total size (best-effort) ───────────────────
+    let global_total: u64 = {
+        let mut total = 0u64;
+        for (url, _) in parts {
+            let resolved = resolve_download_url(url);
+            if let Ok(resp) = client.head(&resolved)
+                .header("Accept", "application/octet-stream,*/*")
+                .send() {
+                total += resp.content_length().unwrap_or(0);
+            }
+        }
+        total
+    };
+
+    // ─── Phase 2: ดาวน์โหลด ทุกไฟล์พร้อมกัน (parallel) ──────────────────
+    // Shared atomic counter สำหรับ progress รวมจากทุก thread
+    let global_downloaded = Arc::new(std::sync::atomic::AtomicU64::new(0));
+
+    let zip_paths: Vec<PathBuf> = (0..total_parts)
+        .map(|i| dest_dir.join(format!("_download_{}.zip", i)))
+        .collect();
+
+    // ใช้ thread::scope ดาวน์โหลดทุกไฟล์พร้อมกัน
+    emit_progress(app, "downloading", 1,
+        &format!("เริ่มดาวน์โหลด {} ไฟล์พร้อมกัน...", total_parts)
+    );
+
+    let download_errors: Vec<Result<(), String>> = std::thread::scope(|scope| {
+        let handles: Vec<_> = parts
+            .iter()
+            .zip(zip_paths.iter())
+            .enumerate()
+            .map(|(idx, ((url, label), zip_path))| {
+                let client = client.clone();
+                let app = app.clone();
+                let cancel = cancel.clone();
+                let gd = global_downloaded.clone();
+                let url = url.clone();
+                let label = label.clone();
+                let zip_path = zip_path.clone();
+
+                scope.spawn(move || -> Result<(), String> {
+                    let resolved = resolve_download_url(&url);
+                    emit_progress(&app, "downloading", 1,
+                        &format!("[{}/{}] Connecting {}...", idx + 1, total_parts, label));
+
+                    // Connect
+                    let mut resp = client.get(&resolved)
+                        .header("Accept", "application/octet-stream,*/*")
+                        .send()
+                        .map_err(|e| format!("Connect failed ({}): {}", label, e))?;
+
+                    // จัดการ GDrive HTML confirm page
+                    let ct = resp.headers()
+                        .get("content-type")
+                        .and_then(|v| v.to_str().ok())
+                        .unwrap_or("").to_string();
+                    if ct.contains("text/html") && url.contains("drive.google.com") {
+                        let html = resp.text().map_err(|e| e.to_string())?;
+                        let token = extract_gdrive_token(&html);
+                        let file_id = resolved.split("id=").nth(1)
+                            .and_then(|s| s.split('&').next()).unwrap_or("");
+                        let retry = if let Some(t) = token {
+                            format!("https://drive.usercontent.google.com/download?id={}&export=download&confirm={}", file_id, t)
+                        } else {
+                            format!("https://drive.google.com/uc?export=download&id={}&confirm=t", file_id)
+                        };
+                        resp = client.get(&retry)
+                            .header("Accept", "application/octet-stream,*/*")
+                            .send().map_err(|e| format!("GDrive retry failed: {}", e))?;
+                    }
+
+                    if !resp.status().is_success() {
+                        return Err(format!("Server {} for {}", resp.status(), label));
+                    }
+
+                    let part_size = resp.content_length().unwrap_or(0);
+
+                    // Stream ลงไฟล์ด้วย BufWriter (8 MB read buffer + 4 MB write buffer)
+                    let raw_file = std::fs::File::create(&zip_path)
+                        .map_err(|e| format!("Cannot create temp ({}): {}", label, e))?;
+                    let mut file = BufWriter::with_capacity(4 * 1024 * 1024, raw_file);
+                    let mut buf = vec![0u8; 8 * 1024 * 1024]; // 8 MB read buffer
+                    let mut local_done: u64 = 0;
+
+                    // Throttle: emit progress ทุก 3 วินาที ลด UI lag
+                    let mut last_emit = std::time::Instant::now();
+                    let emit_interval = std::time::Duration::from_secs(3);
+
+                    loop {
+                        if cancel.load(Ordering::SeqCst) {
+                            let _ = std::fs::remove_file(&zip_path);
+                            return Err("Cancelled.".to_string());
+                        }
+
+                        let n = resp.read(&mut buf)
+                            .map_err(|e| format!("Read error ({}): {}", label, e))?;
+                        if n == 0 { break; }
+
+                        file.write_all(&buf[..n])
+                            .map_err(|e| format!("Write error ({}): {}", label, e))?;
+
+                        local_done += n as u64;
+                        let combined = gd.fetch_add(n as u64, Ordering::Relaxed) + n as u64;
+
+                        // Emit ทุก 3 วินาที (ไม่ใช่ทุก chunk) เพื่อลด UI lag
+                        if last_emit.elapsed() >= emit_interval {
+                            last_emit = std::time::Instant::now();
+
+                            let percent = if global_total > 0 {
+                                ((combined as f64 / global_total as f64) * 49.0) as u8
+                            } else {
+                                (combined / 1_048_576 % 48 + 1) as u8
+                            };
+
+                            let mb_done_total = combined as f64 / 1_048_576.0;
+                            let mb_total = global_total as f64 / 1_048_576.0;
+                            let mb_local = local_done as f64 / 1_048_576.0;
+                            let mb_part  = part_size as f64  / 1_048_576.0;
+
+                            emit_progress(&app, "downloading", percent,
+                                &format!("[{}/{}] {} — {:.1}/{:.1} MB  |  รวม {:.1}/{:.1} MB",
+                                    idx + 1, total_parts, label,
+                                    mb_local, mb_part,
+                                    mb_done_total, mb_total));
+                        }
+                    }
+
+                    // Flush BufWriter ก่อนปิด
+                    file.flush()
+                        .map_err(|e| format!("Flush error ({}): {}", label, e))?;
+
+                    Ok(())
+                })
+            })
+            .collect();
+
+        handles.into_iter()
+            .map(|h| h.join().unwrap_or_else(|_| Err("Thread panicked".to_string())))
+            .collect()
+    });
+
+    // ตรวจสอบ error จาก download threads
+    for (i, res) in download_errors.into_iter().enumerate() {
+        if let Err(e) = res {
+            // ลบ temp ที่สำเร็จแล้ว
+            for zip_path in &zip_paths {
+                let _ = std::fs::remove_file(zip_path);
+            }
+            return Err(format!("ดาวน์โหลดไฟล์ที่ {} ล้มเหลว: {}", i + 1, e));
         }
     }
 
-    // ─── Phase 2: Download ทุกพาร์ต → เขียนลงไฟล์เดียว ──────────────────────
-    {
-        let mut combined_file = std::fs::File::create(&zip_path)
-            .map_err(|e| format!("Cannot create temp file: {}", e))?;
-
-        let mut global_downloaded: u64 = 0;
-
-        for (i, url) in parts.iter().enumerate() {
-            if cancel.load(Ordering::SeqCst) {
-                drop(combined_file);
-                let _ = std::fs::remove_file(&zip_path);
-                return Err("Download cancelled by user.".to_string());
-            }
-
-            let result = download_part_into(
-                app,
-                &client,
-                url.as_str(),
-                i,
-                parts.len(),
-                &mut global_downloaded,
-                global_total,
-                &mut combined_file,
-                &cancel,
-            );
-
-            if let Err(e) = result {
-                drop(combined_file);
-                let _ = std::fs::remove_file(&zip_path);
-                return Err(e);
-            }
+    // ─── Phase 3: Extract ทีละไฟล์ (sequential) ───────────────────────────────
+    for (file_idx, ((_, label), zip_path)) in parts.iter().zip(zip_paths.iter()).enumerate() {
+        if cancel.load(Ordering::SeqCst) {
+            for zp in &zip_paths { let _ = std::fs::remove_file(zp); }
+            return Err("Cancelled before extraction.".to_string());
         }
-    } // combined_file ถูก flush+close ที่นี่
 
-    emit_progress(app, "extracting", 50, "All parts downloaded. Extracting...");
+        let extract_base = 50u8 + (file_idx as u8 * (49 / total_parts as u8));
+        let extract_range = 49u8 / total_parts as u8;
 
-    // ─── Phase 3: Extract ZIP ──────────────────────────────────────────────
-    let extract_result = extract_zip_with_progress(app, &zip_path, dest_dir, &cancel);
-    let _ = std::fs::remove_file(&zip_path); // ลบ temp เสมอ
-    extract_result?;
+        emit_progress(app, "extracting", extract_base,
+            &format!("[{}/{}] Extracting {}...", file_idx + 1, total_parts, label));
+
+        let res = extract_zip_ranged(app, zip_path, dest_dir, &cancel, extract_base, extract_range);
+        let _ = std::fs::remove_file(zip_path);
+        res?;
+    }
 
     if cancel.load(Ordering::SeqCst) {
         return Err("Extraction cancelled.".to_string());
@@ -493,24 +485,20 @@ fn download_and_extract(
     std::fs::write(dest_dir.join(SENTINEL_FILE), TOOLCHAIN_VERSION)
         .map_err(|e| format!("Failed to write sentinel: {}", e))?;
 
-    emit_progress(
-        app,
-        "done",
-        100,
-        &format!("Toolchain ready at {}", dest_dir.display()),
-    );
+    emit_progress(app, "done", 100,
+        &format!("Toolchain v{} ready!", TOOLCHAIN_VERSION));
 
-    Ok(format!(
-        "Toolchain installed successfully at {}",
-        dest_dir.display()
-    ))
+    Ok(format!("Toolchain installed at {}", dest_dir.display()))
 }
 
-fn extract_zip_with_progress(
+/// `base_percent` = \u0e40\u0e23\u0e34\u0e48\u0e21\u0e15\u0e49\u0e19\u0e17\u0e35\u0e48 (0–99), `range` = \u0e08\u0e33\u0e19\u0e27\u0e19 percent \u0e17\u0e35\u0e48\u0e43\u0e0a\u0e49\u0e2a\u0e33\u0e2b\u0e23\u0e31\u0e1a\u0e44\u0e1f\u0e25\u0e4c\u0e19\u0e35\u0e49
+fn extract_zip_ranged(
     app: &AppHandle,
     zip_path: &Path,
     dest_dir: &Path,
     cancel: &Arc<AtomicBool>,
+    base_percent: u8,
+    range: u8,
 ) -> Result<(), String> {
     let file = std::fs::File::open(zip_path)
         .map_err(|e| format!("Cannot open ZIP file: {}", e))?;
@@ -529,14 +517,12 @@ fn extract_zip_with_progress(
             .by_index(i)
             .map_err(|e| format!("ZIP read error at index {}: {}", i, e))?;
 
-        // แปลง path ใน ZIP ให้ปลอดภัย (ป้องกัน path traversal)
         let out_path = match zip_file.enclosed_name() {
             Some(p) => dest_dir.join(p),
             None => continue,
         };
 
-        // คำนวณ percent (50–99 = extract phase)
-        let percent = 50 + ((i as f64 / total as f64) * 49.0) as u8;
+        let percent = base_percent + ((i as f64 / total as f64) * range as f64) as u8;
 
         if i % 500 == 0 || i == total - 1 {
             emit_progress(
@@ -551,19 +537,18 @@ fn extract_zip_with_progress(
             std::fs::create_dir_all(&out_path)
                 .map_err(|e| format!("Cannot create dir {}: {}", out_path.display(), e))?;
         } else {
-            // สร้าง parent directory ถ้ายังไม่มี
             if let Some(parent) = out_path.parent() {
                 std::fs::create_dir_all(parent)
                     .map_err(|e| format!("Cannot create parent dir: {}", e))?;
             }
 
-            let mut out_file = std::fs::File::create(&out_path)
+            let raw_out = std::fs::File::create(&out_path)
                 .map_err(|e| format!("Cannot create file {}: {}", out_path.display(), e))?;
+            let mut out_file = BufWriter::with_capacity(512 * 1024, raw_out); // 512 KB write buffer
 
             std::io::copy(&mut zip_file, &mut out_file)
                 .map_err(|e| format!("Cannot extract {}: {}", zip_file.name(), e))?;
 
-            // บน Unix ต้องตั้ง permission bits (executable)
             #[cfg(unix)]
             {
                 use std::os::unix::fs::PermissionsExt;
@@ -579,6 +564,7 @@ fn extract_zip_with_progress(
 
     Ok(())
 }
+
 
 // ── Build Firmware using bundled toolchain ────────────────────────────────────
 
