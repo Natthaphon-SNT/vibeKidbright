@@ -7,6 +7,16 @@ use std::sync::mpsc::{self, Sender, TryRecvError};
 use std::sync::{Arc, Mutex, OnceLock};
 use std::time::Duration;
 use tauri::{AppHandle, Manager, Emitter};
+#[cfg(target_os = "windows")]
+use std::os::windows::process::CommandExt;
+
+/// Windows: ซ่อน console window ที่โผล่ขึ้นมาระหว่าง idf.py/cmake/ninja
+const CREATE_NO_WINDOW: u32 = 0x0800_0000;
+
+fn apply_no_window(cmd: &mut Command) {
+    #[cfg(target_os = "windows")]
+    cmd.creation_flags(CREATE_NO_WINDOW);
+}
 
 static CACHED_ESP_IDF_CONFIG: OnceLock<Mutex<Option<serde_json::Value>>> = OnceLock::new();
 
@@ -807,6 +817,7 @@ pub async fn run_shell_command(
         .stdout(Stdio::piped())
         .stderr(Stdio::piped());
 
+    apply_no_window(&mut command);
     let mut child = command.spawn().map_err(|e| e.to_string())?;
     let stdout = child.stdout.take().ok_or("Failed to open stdout")?;
     let stderr = child.stderr.take().ok_or("Failed to open stderr")?;
