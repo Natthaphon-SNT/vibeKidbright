@@ -158,27 +158,40 @@ fn resolve_kb_path(project_dir: &str) -> PathBuf {
 /// Seed bundled knowledge_base files into AppData/knowledge_base (installed version).
 /// Called once on startup — skips files that already exist (ไม่ overwrite ไฟล์ที่ผู้ใช้แก้ไข).
 pub fn seed_knowledge_base(app_handle: &AppHandle) {
-    let Ok(resource_dir) = app_handle.path().resource_dir() else { return };
     let Ok(app_data_dir) = app_handle.path().app_data_dir() else { return };
-
-    // KB ถูก copy ไปไว้ใน resources/knowledge_base/ แล้ว
-    let src = resource_dir.join("knowledge_base");
     let dst = app_data_dir.join("knowledge_base");
 
-    if !src.exists() {
-        // fallback: ลอง parent ของ resource_dir (กรณี Tauri เก็บ path แบบ relative)
-        let alt_src = resource_dir.parent()
-            .map(|p| p.join("knowledge_base"))
-            .unwrap_or_default();
-        if alt_src.exists() {
-            let _ = std::fs::create_dir_all(&dst);
-            copy_dir_recursive(&alt_src, &dst);
+    // ลองหา source ของ KB ทีละ path จนกว่าจะเจอ
+    let mut candidates: Vec<PathBuf> = Vec::new();
+
+    // 1. resource_dir/knowledge_base (Tauri v2 bundled resources)
+    if let Ok(resource_dir) = app_handle.path().resource_dir() {
+        candidates.push(resource_dir.join("knowledge_base"));
+        // 2. resource_dir/../knowledge_base (กรณี path relative)
+        if let Some(parent) = resource_dir.parent() {
+            candidates.push(parent.join("knowledge_base"));
         }
-        return;
     }
 
-    let _ = std::fs::create_dir_all(&dst);
-    copy_dir_recursive(&src, &dst);
+    // 3. exe_dir/knowledge_base (Windows MSI วาง resources ติดกับ .exe)
+    if let Ok(exe_path) = std::env::current_exe() {
+        if let Some(exe_dir) = exe_path.parent() {
+            candidates.push(exe_dir.join("knowledge_base"));
+            // 4. exe_dir/../knowledge_base
+            if let Some(parent) = exe_dir.parent() {
+                candidates.push(parent.join("knowledge_base"));
+            }
+        }
+    }
+
+    for src in &candidates {
+        if src.exists() && src.join("formula_kid_controller.md").exists() {
+            let _ = std::fs::create_dir_all(&dst);
+            copy_dir_recursive(src, &dst);
+            return;
+        }
+    }
+    // ไม่เจอ KB ใน resource — ข้ามได้ (dev mode จัดการเองผ่าน resolve_kb_path)
 }
 
 fn copy_dir_recursive(src: &std::path::Path, dst: &std::path::Path) {
