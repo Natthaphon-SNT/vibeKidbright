@@ -16,7 +16,7 @@
 | **V1.4** | 2019–2020 | ESP32-WROOM-32 | Micro-USB (FTDI) | LED status ลดเหลือ 2 ดวง (WiFi+BT) |
 | **V1.5 Rev 3.1** | 2020 | ESP32-WROOM-32 | Micro-USB (CP2102) | NECTEC Standard, SW2=GPIO14 |
 | **V1.5 Rev 3.1G** | 2020 | ESP32-WROOM-32 | Micro-USB (CP2102) | Gravitech OEM, SW2=GPIO14 |
-| **V1.5 iA** | 2021–2022 | ESP32-WROOM-32 | **USB-C** (CP2102) | INEX, เพิ่ม KXTJ3-1057 Accelerometer, SW2=GPIO17 |
+| **V1.5 iA** | 2021–2022 | ESP32-WROOM-32 | **USB-C** (CP2102) | INEX, เพิ่ม KXTJ3-1057 Accelerometer, SW2=GPIO14 |
 | **KidBright32i** | 2021–2022 | ESP32-WROOM-32 | **USB-C** (CP2102) | INEX บอร์ดสีเขียว, ต้นแบบ i-series — Phototransistor แทน LDR, ADC บน IN1–IN4, **SW2=GPIO14** |
 | **KidBright32iA** | 2022 | ESP32-WROOM-32 | **USB-C** (CP2102) | INEX — เพิ่ม KXTJ3-1057 Accelerometer บน I2C0, **SW2=GPIO14**, ฐานเดียวกับ 32i |
 | **V1.6** | 2022+ | ESP32-WROOM-32 | **USB-C** (CP2102) | Gravitech, เพิ่ม MPU-6050 + RGB LED ×6, SW2=GPIO17 |
@@ -148,7 +148,7 @@
 | GPIO5 | I2C_NUM_1 SCL | — |
 | GPIO13 | Passive Buzzer (LEDC/PWM) | — |
 | GPIO16 | SW1 Button (Active LOW) | — |
-| **GPIO17** | **SW2 Button (Active LOW)** | ⚠️ ต่างจาก Rev 3.1 ที่ใช้ GPIO14 |
+| **GPIO14** | **SW2 Button (Active LOW)** | ✅ เหมือน Rev 3.1/3.1G |
 | GPIO18 | I/O Port ขา 18 (Active HIGH) | — |
 | GPIO19 | I/O Port ขา 19 (Active HIGH) | — |
 | GPIO21 | I2C_NUM_0 SDA (HT16K33 + KXTJ3) | — |
@@ -186,7 +186,7 @@
 | GPIO5 | I2C_NUM_1 SCL | — |
 | GPIO13 | Passive Buzzer (LEDC/PWM) | — |
 | GPIO16 | SW1 Button (Active LOW) | — |
-| **GPIO17** | **SW2 Button (Active LOW)** | ⚠️ ต่างจาก Rev 3.1 (GPIO14) |
+| **GPIO14** | **SW2 Button (Active LOW)** | ✅ เหมือน Rev 3.1/3.1G/iA |
 | GPIO18 | I/O Port ขา 18 | จุดบัดกรีอิสระ |
 | GPIO19 | I/O Port ขา 19 | จุดบัดกรีอิสระ |
 | GPIO21 | I2C_NUM_0 SDA (HT16K33) | — |
@@ -211,7 +211,7 @@
 | HT16K33 (LED Matrix 16×8) | I2C_NUM_0 | 0x70 | — |
 | Passive Buzzer | PWM/LEDC | GPIO13 | — |
 
-**จุดต่างจาก V1.5 Rev 3.1 หลักๆ:** USB-C, Phototransistor แทน LDR, ADC บน IN1–IN4, 3.3V Regulator จาก USB, GPIO18/19/23/VN breakout, LED USB status (สีฟ้า), **SW2=GPIO14** (เหมือน Rev 3.1)
+**จุดต่างจาก V1.5 Rev 3.1 หลักๆ:** USB-C, Phototransistor แทน LDR, ADC บน IN1–IN4, 3.3V Regulator จาก USB, GPIO18/19/23/VN breakout, LED USB status (สีฟ้า), **SW2=GPIO14** (เหมือน Rev 3.1/3.1G/iA)
 
 ---
 
@@ -224,7 +224,7 @@
 |------|----------|----------|
 | GPIO21 | I2C_NUM_0 SDA (HT16K33 + **KXTJ3**) | เพิ่ม KXTJ3 |
 | GPIO22 | I2C_NUM_0 SCL (HT16K33 + **KXTJ3**) | เพิ่ม KXTJ3 |
-| **GPIO17** | **SW2 Button (Active LOW)** | เหมือน 32i |
+| **GPIO14** | **SW2 Button (Active LOW)** | ✅ เหมือน Rev 3.1/3.1G/iA/32i |
 | GPIO36 | **Phototransistor** (ADC1_CH0) | ⚡ Phototransistor |
 | (ที่เหลือ) | เหมือน KidBright32i ทุกอย่าง | — |
 
@@ -397,7 +397,7 @@
 
 | คุณสมบัติ | V1.5 Rev 3.1 (NECTEC) | V1.5 iA (INEX) | **32i** (INEX สีเขียว) | **32iA** (INEX) | **32iP** (INEX สีชมพู) |
 |-----------|----------------------|----------------|----------------------|----------------|----------------------|
-| SW2 GPIO | GPIO14 | GPIO17 | GPIO17 | GPIO17 | GPIO17 |
+| SW2 GPIO | GPIO14 | **GPIO14** | **GPIO14** | **GPIO14** | GPIO17 (SERVO2 shared) |
 | USB | Micro-USB | USB-C | USB-C | USB-C | USB-C |
 | เซนเซอร์แสง | LDR | LDR | **Phototransistor** | **Phototransistor** | **Phototransistor ปรับปรุง** |
 | ADC บน IN1-IN4 | ❌ | ✅ | ✅ | ✅ | ✅ |

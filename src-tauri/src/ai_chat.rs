@@ -656,6 +656,7 @@ pub async fn send_ai_message(
     if api_key.is_empty() && provider == "google" {
         return Err("Google AI API key not set. Please configure it in AI Provider Settings.".to_string());
     }
+    // "local" provider never requires an API key.
     if api_key.is_empty() && provider == "openai" {
         let is_local = base_url.contains("localhost")
             || base_url.contains("127.0.0.1")
@@ -675,7 +676,15 @@ pub async fn send_ai_message(
     let message_id: Arc<str> = Arc::from(message_id.as_str());
 
     let mut project_path = resolve_project_root(&project_dir);
-    let mut no_workspace = project_dir == "." || project_dir.is_empty();
+    // A workspace is "real" only if the path is non-trivial AND the directory exists
+    // with at least one file in it. This prevents the model from calling
+    // create_project_workspace when the user already has a project open.
+    let mut no_workspace = project_dir == "." || project_dir.is_empty() || {
+        // Also treat as no-workspace if the directory doesn't exist or is empty
+        !project_path.exists() || std::fs::read_dir(&project_path)
+            .map(|mut d| d.next().is_none())  // true if empty dir
+            .unwrap_or(true)                   // true if can't read
+    };
 
     tokio::spawn(async move {
         let mut try_queue: Vec<(String, String, String, String, String)> = vec![];
@@ -693,10 +702,11 @@ pub async fn send_ai_message(
         };
 
         let is_free_tier = [
-            "gemini-1.5", "gemini-2.0", "gemini-2.5",
+            "gemini-1.5", "gemini-2.0", "gemini-2.5", "gemini-3",
             "meta-llama", "qwen", "deepseek",
             "nvidia/nemotron", "arcee-ai", "minimax",
             "z-ai/glm", "openai/gpt-oss", "google/gemma",
+            "mistralai/mistral-7b", "microsoft/phi-4",
             ":free",
         ]
         .iter()
@@ -704,21 +714,27 @@ pub async fn send_ai_message(
 
         if model == "free" || model == "openrouter/free" || model == "auto-free" {
             let best_free_models = vec![
-                // ── Top tier (coding + tool support + large context) ──────────
+                // ── Tier 1: Best reasoning + coding free models ───────────────
                 "qwen/qwen3-coder:free",                    // 480B, best free coder
+                "deepseek/deepseek-r1-0528:free",           // Latest DeepSeek R1 reasoning
+                "deepseek/deepseek-r1:free",                // Strong reasoning
+                "deepseek/deepseek-chat-v3-0324:free",      // V3 fast coding
+                "microsoft/phi-4-reasoning:free",           // Phi-4 reasoning
+                // ── Tier 2: Large capable free models ────────────────────────
                 "openai/gpt-oss-120b:free",                 // GPT-class 120B
-                "stepfun/step-3.5-flash:free",              // fast & free
                 "nvidia/nemotron-3-super-120b-a12b:free",   // top weekly
-                "deepseek/deepseek-r1:free",                // strong reasoning
-                "deepseek/deepseek-chat:free",
-                // ── Mid tier ─────────────────────────────────────────────────
-                "qwen/qwen3.6-plus-04-02:free",
-                "arcee-ai/trinity-large-preview:free",
-                "minimax/minimax-m2.5:free",
+                "meta-llama/llama-4-maverick:free",         // Llama 4 Maverick 17Bx128E
+                "meta-llama/llama-4-scout:free",            // Llama 4 Scout
+                "meta-llama/llama-3.3-70b-instruct:free",   // Reliable fallback
+                // ── Tier 3: Mid-size free models ──────────────────────────────
+                "stepfun/step-3.5-flash:free",
                 "google/gemma-4-31b-it:free",
                 "google/gemma-3-27b-it:free",
-                "meta-llama/llama-3.3-70b-instruct:free",
-                // ── Smaller / lighter fallbacks ───────────────────────────────
+                "arcee-ai/trinity-large-preview:free",
+                "minimax/minimax-m2.5:free",
+                "qwen/qwen3.6-plus-04-02:free",
+                // ── Tier 4: Lightweight fallbacks ─────────────────────────────
+                "mistralai/mistral-7b-instruct:free",
                 "nvidia/nemotron-3-nano-30b-a3b:free",
                 "openai/gpt-oss-20b:free",
                 "arcee-ai/trinity-mini:free",
@@ -747,7 +763,9 @@ pub async fn send_ai_message(
                     format!("{} [AUTO-FREE Google Fallback]", config_google_model),
                 ));
             }
-        } else if is_free_tier {
+        } else if is_free_tier && provider != "local" {
+            // Free-tier cloud models: try primary model first, then fallback to Google/OpenRouter.
+            // NOTE: "local" provider is excluded — local models go straight to direct call below.
             try_queue.push((
                 provider.clone(), model.clone(), base_url.clone(), api_key.clone(),
                 format!("{} [FREE]", model),
@@ -774,10 +792,14 @@ pub async fn send_ai_message(
                 
                 // Add guaranteed working fallbacks just in case the user's config_or_model is deprecated/removed.
                 let guaranteed_fallbacks = vec![
+                    "qwen/qwen3-coder:free",
+                    "deepseek/deepseek-r1-0528:free",
+                    "deepseek/deepseek-r1:free",
+                    "meta-llama/llama-4-maverick:free",
                     "nvidia/nemotron-3-super-120b-a12b:free",
                     "meta-llama/llama-3.3-70b-instruct:free",
                     "google/gemma-4-31b-it:free",
-                    "qwen/qwen3-coder:free",
+                    "mistralai/mistral-7b-instruct:free",
                 ];
                 for gf in guaranteed_fallbacks {
                     if gf != config_or_model && gf != model {
@@ -791,9 +813,14 @@ pub async fn send_ai_message(
                 }
             }
         } else {
+            // Paid models OR local provider: single direct call, no fallback.
             try_queue.push((
                 provider.clone(), model.clone(), base_url.clone(), api_key.clone(),
-                format!("{} [PAID]", model),
+                if provider == "local" {
+                    format!("{} [LOCAL]", model)
+                } else {
+                    format!("{} [PAID]", model)
+                },
             ));
         }
 
@@ -929,15 +956,22 @@ When the user provides an existing file as reference or says "copy this" / "make
 - Changing `motor_set()` to `motor_set_duty()` = VIOLATION.
 - Changing turn range logic = VIOLATION.
 
-### KNOWLEDGE BASE WORKFLOW (CRITICAL & NON-NEGOTIABLE):
-YOU ARE STRICTLY FORBIDDEN from generating code, writing files, or calling `create_project_workspace` before consulting the Knowledge Base!
-When asked to write or explain hardware-specific code (GPIO, motors, ESP-NOW, board config, etc.):
+### KNOWLEDGE BASE WORKFLOW (CRITICAL):
+When asked to write hardware-specific code (GPIO, motors, ESP-NOW, board config, sensors):
 
-1. YOUR VERY FIRST ACTION MUST BE TO CALL `knowledge_search` or `read_knowledge_file`.
-2. DO NOT call `create_project_workspace` or `write_file` in the same turn without reading the KB first.
-3. If the search result is empty, truncated, or uncertain → call `read_knowledge_file` with the exact filename from the active files list.
-4. Only AFTER reading the KB content are you allowed to generate code or create projects.
-5. If the KB has no relevant info → say so explicitly, then ask the user before proceeding with general knowledge.
+**Call `knowledge_search` or `read_knowledge_file` ONLY IF:**
+- The exact GPIO pins, I2C address, or hardware spec for this board is NOT already confirmed in this conversation.
+- The task involves a complex component (OLED, LED matrix, ESP-NOW protocol, motor driver, accelerometer).
+- You are uncertain or the user hasn't specified the board revision yet.
+
+**You MAY skip `knowledge_search` and write directly IF:**
+- The board revision AND relevant GPIO pins were already established earlier in this conversation.
+- The task is simple (e.g., GPIO button + buzzer where the user just confirmed the board is iA).
+- You already called `knowledge_search` or `read_knowledge_file` for this board in this session.
+
+2. DO NOT call `create_project_workspace` before reading the KB if the task involves hardware code.
+3. If the search result is empty or truncated → call `read_knowledge_file` with the exact filename.
+4. If the KB has no relevant info → say so explicitly, then ask the user before proceeding with general knowledge.
 
 HARD RULE: "KB not loaded" or empty search result is NOT permission to generate from memory. It is a signal to call `read_knowledge_file` instead.
 
@@ -1105,7 +1139,7 @@ Before writing ANY code that involves GPIO, I2C, buttons, or sensors, you MUST k
   - Sensors: Matrix(0x70) on I2C_0 **(NO KXTJ3)**. LM73(0x4D) + RTC_MCP794xx(0x6F) on I2C_1.
   - ADC on IN1–IN4: ❌ NOT supported (digital only)
 - **V1.5 iA (INEX)**:
-  - SW1 = GPIO16, **SW2 = GPIO17** ← CRITICAL (different from V1.1–3.1G)
+  - SW1 = GPIO16, **SW2 = GPIO14** ← CRITICAL (same as Rev 3.1/3.1G)
   - Sensors: Matrix(0x70) + **KXTJ3 Accelerometer(0x0E)** on I2C_0. LM73(0x4D) + **RTC MCP794xx(0x6F)** on I2C_1.
   - ADC works on IN1(GPIO32) + IN2(GPIO33) + IN3(GPIO34) + IN4(GPIO35) + LDR(GPIO36). **LDR (not Phototransistor).**
 - **KidBright32i (INEX บอร์ดสีเขียว)**:
@@ -1131,9 +1165,9 @@ Before writing ANY code that involves GPIO, I2C, buttons, or sensors, you MUST k
 - **CRITICAL RULE**:
   - "V1.1", "V1.2", "V1.3", "V1.4" all use SW2=GPIO14.
   - "3.1" and "3.1G" use SW2=GPIO14.
+  - **V1.5 iA** uses **SW2=GPIO14** (corrected — same as Rev 3.1/3.1G).
   - **KidBright32i, KidBright32iA, KidBright32iP** all use **SW2=GPIO14**.
-  - **V1.5 iA** uses SW2=GPIO17.
-  - **V1.6** uses SW2=GPIO17 (shared SERVO2).
+  - **V1.6** uses SW2=GPIO17 (shared SERVO2 only — this is the exception).
   - NEVER reject a board revision the user claims. ALWAYS look it up in the knowledge base.
 
 ### I2C RULES (MANDATORY):
@@ -1357,7 +1391,7 @@ CRITICAL: NO DEFAULT BOARD. Always confirm revision with user before generating 
 BUTTON PINS BY REVISION:
   - Rev 3.1 (NECTEC):  SW1 = GPIO_NUM_16, SW2 = GPIO_NUM_14. Active LOW.
   - Rev 3.1G (Gravitech OEM): SW1 = GPIO_NUM_16, SW2 = GPIO_NUM_14. Active LOW. (confirmed Apr 17 2026)
-  - V1.5 iA (INEX):   SW1 = GPIO_NUM_16, SW2 = GPIO_NUM_17. Active LOW. ← DIFFERENT!
+  - V1.5 iA (INEX):   SW1 = GPIO_NUM_16, SW2 = GPIO_NUM_14. Active LOW. (corrected — same as Rev 3.1/3.1G)
   - V1.6 (Gravitech): SW1 = GPIO_NUM_16 (shared SERVO1), No SW2.
 ACCELEROMETER BY REVISION: iA=KXTJ3(0x0E) on I2C_0; V1.6=MPU-6050(0x68) on I2C_0; Rev3.1/3.1G=NONE.
 RTC MCP794xx(0x6F): Present on ALL revisions (Rev3.1, Rev3.1G, iA, V1.6) on I2C_NUM_1.
@@ -1390,7 +1424,7 @@ Check knowledge_search before searching the web.
 ENVIRONMENT:
 Framework: ESP-IDF. Build Tools: idf.py, cmake, ninja.
 Board: KidBright32 (revision to be confirmed per session — see BOARD DETECTION rule). Common hardware: HT16K33 LED Matrix (I2C addr 0x70), Buzzer GPIO_NUM_13, I2C bus0 SDA=21/SCL=22, bus1 SDA=4/SCL=5.
-SW2 by revision: GPIO14 (Rev3.1/Rev3.1G) | GPIO17 (iA) | None (V1.6).
+SW2 by revision: GPIO14 (Rev3.1/Rev3.1G/iA/32i/32iA/32iP) | GPIO17 (V1.6 shared SERVO2 only) | None (V1.6 as standalone SW2).
 RTC MCP794xx(0x6F) on I2C_NUM_1: ALL revisions. Accelerometer: KXTJ3(0x0E) on iA only; MPU-6050(0x68) on V1.6 only.
 Formula Kid S1/S2: GPIO36/GPIO39 (separate from on-board buttons).
 When you need ESP-IDF, use run_command with commands like idf.py build, idf.py flash, idf.py set-target esp32.
@@ -1838,11 +1872,61 @@ async fn run_conversation_loop(
     no_workspace: &mut bool,
     system_prompt: &str,
 ) -> Result<(), String> {
-    let client = Client::builder()
-        .connect_timeout(std::time::Duration::from_secs(15))
-        .timeout(std::time::Duration::from_secs(300))
-        .build()
-        .unwrap_or_else(|_| Client::new());
+    // Detect local/LAN server early — affects client config, timeout, and encoding headers.
+    // Covers: localhost, 127.x.x.x, 10.x.x.x, 172.16-31.x.x, 192.168.x.x, bare IP URLs.
+    let is_local_url = {
+        let host = base_url
+            .trim_start_matches("https://")
+            .trim_start_matches("http://")
+            .split('/')
+            .next()
+            .unwrap_or("")
+            .split(':')
+            .next()
+            .unwrap_or("");
+        host == "localhost"
+            || host.starts_with("127.")
+            || host.starts_with("10.")
+            || host.starts_with("192.168.")
+            || {
+                // 172.16.0.0/12 → 172.16.x.x … 172.31.x.x
+                if let Some(second_octet_str) = host.strip_prefix("172.") {
+                    second_octet_str
+                        .split('.')
+                        .next()
+                        .and_then(|s| s.parse::<u8>().ok())
+                        .map(|n| (16..=31).contains(&n))
+                        .unwrap_or(false)
+                } else {
+                    false
+                }
+            }
+            || !is_openrouter && {
+                // Treat any bare IPv4 address (no letters in hostname) as local/LAN.
+                host.chars().all(|c| c.is_ascii_digit() || c == '.')
+                    && host.split('.').count() == 4
+            }
+    };
+
+    // Local LLM servers (LM Studio, Ollama) send SSE as plain text.
+    // reqwest's auto-decompression treats it as gzip/brotli and fails with
+    // "error decoding response body". Disable decompression for local servers.
+    let client = if is_local_url {
+        Client::builder()
+            .connect_timeout(std::time::Duration::from_secs(15))
+            .timeout(std::time::Duration::from_secs(600))
+            .no_gzip()
+            .no_brotli()
+            .no_deflate()
+            .build()
+            .unwrap_or_else(|_| Client::new())
+    } else {
+        Client::builder()
+            .connect_timeout(std::time::Duration::from_secs(15))
+            .timeout(std::time::Duration::from_secs(300))
+            .build()
+            .unwrap_or_else(|_| Client::new())
+    };
     let tools = get_tools();
 
     let model_supports_tools = if model.ends_with(":free") {
@@ -1876,10 +1960,22 @@ async fn run_conversation_loop(
             body["tools"] = tools.clone();
         }
 
+        // Qwen3 models default to thinking mode — all output goes into <think> blocks
+        // and delta.content is empty, making the response appear blank in the UI.
+        // Disable thinking for Qwen3 on local servers so output goes directly to delta.content.
+        if is_local_url && model.to_lowercase().contains("qwen3") {
+            body["chat_template_kwargs"] = json!({ "enable_thinking": false });
+        }
+
         let url = format!("{}/chat/completions", base_url.trim_end_matches('/'));
         let mut request = client.post(&url).header("Content-Type", "application/json");
         if !api_key.is_empty() {
             request = request.header("Authorization", format!("Bearer {}", api_key));
+        }
+        // For local servers: explicitly request no compression so the SSE plain-text
+        // stream is never gzip/brotli-encoded — prevents "error decoding response body".
+        if is_local_url {
+            request = request.header("Accept-Encoding", "identity");
         }
         if is_openrouter {
             request = request
@@ -1940,15 +2036,23 @@ async fn run_conversation_loop(
         retry_count = 0;
 
         let mut stream = response.bytes_stream();
-        let mut accumulated_text = String::new();
+        let mut accumulated_text = String::new(); // Final answer (outside <think>)
+        let mut think_text = String::new();       // Thinking content (inside <think>)
+        let mut in_think_block = false;            // Track if we're inside <think>...</think>
         let mut pending_tool_calls: Vec<PendingToolCall> = Vec::new();
         let mut buffer = String::new();
 
+
         while let Some(chunk_result) = {
-            match tokio::time::timeout(std::time::Duration::from_secs(90), stream.next()).await {
-                Ok(item) => item,
-                Err(_) => {
-                    return Err("⏱️ Stream timeout: The AI server stopped responding for 90 seconds. Please retry.".to_string());
+            if is_local_url {
+                // No timeout for local servers — large models can be slow
+                stream.next().await
+            } else {
+                match tokio::time::timeout(std::time::Duration::from_secs(90), stream.next()).await {
+                    Ok(item) => item,
+                    Err(_) => {
+                        return Err("⏱️ Stream timeout: The AI server stopped responding for 90 seconds. Please retry.".to_string());
+                    }
                 }
             }
         } {
@@ -1957,7 +2061,23 @@ async fn run_conversation_loop(
                     return Err("Generation stopped by user.".to_string());
                 }
             }
-            let chunk = chunk_result.map_err(|e| format!("Stream error: {}", e))?;
+            let chunk = match chunk_result {
+                Ok(c) => c,
+                Err(e) => {
+                    // Local servers sometimes send a malformed final chunk or
+                    // close the connection abruptly. If we already received text,
+                    // treat this as a natural end-of-stream instead of an error.
+                    let err_str = e.to_string();
+                    if is_local_url && !accumulated_text.is_empty() {
+                        let _ = app_handle.emit(
+                            "terminal-output",
+                            format!("[AI] Local stream ended early (ignored): {}", err_str),
+                        );
+                        break;
+                    }
+                    return Err(format!("Stream error: {}", err_str));
+                }
+            };
             let chunk_str = String::from_utf8_lossy(&chunk);
             buffer.push_str(&chunk_str);
 
@@ -1973,9 +2093,51 @@ async fn run_conversation_loop(
                 };
                 let choice = &event["choices"][0];
                 let delta = &choice["delta"];
-                if let Some(content) = delta["content"].as_str() {
-                    accumulated_text.push_str(content);
-                    let _ = app_handle.emit("ai-chat-delta", content.to_string());
+                if let Some(raw_content) = delta["content"].as_str() {
+                    if !raw_content.is_empty() {
+                        // Filter <think>...</think> blocks in real-time.
+                        // Qwen3/DeepSeek send reasoning inside these tags;
+                        // only the content OUTSIDE them is the actual answer.
+                        let mut remaining = raw_content;
+                        while !remaining.is_empty() {
+                            if in_think_block {
+                                if let Some(end_pos) = remaining.find("</think>") {
+                                    // Found end of think block
+                                    think_text.push_str(&remaining[..end_pos]);
+                                    remaining = &remaining[end_pos + 8..]; // skip </think>
+                                    in_think_block = false;
+                                } else {
+                                    // Still inside think block, buffer it
+                                    think_text.push_str(remaining);
+                                    remaining = "";
+                                }
+                            } else {
+                                if let Some(start_pos) = remaining.find("<think>") {
+                                    // Emit content before <think>
+                                    let before = &remaining[..start_pos];
+                                    if !before.is_empty() {
+                                        accumulated_text.push_str(before);
+                                        let _ = app_handle.emit("ai-chat-delta", before.to_string());
+                                    }
+                                    remaining = &remaining[start_pos + 7..]; // skip <think>
+                                    in_think_block = true;
+                                } else {
+                                    // No think tags — emit as normal
+                                    accumulated_text.push_str(remaining);
+                                    let _ = app_handle.emit("ai-chat-delta", remaining.to_string());
+                                    remaining = "";
+                                }
+                            }
+                        }
+                    }
+                }
+                // Qwen3 / DeepSeek-R1 via some servers: reasoning in separate field
+                if delta["content"].as_str().map(|s| s.is_empty()).unwrap_or(true) {
+                    if let Some(reasoning) = delta["reasoning_content"].as_str() {
+                        if !reasoning.is_empty() {
+                            think_text.push_str(reasoning);
+                        }
+                    }
                 }
                 if let Some(tool_calls) = delta["tool_calls"].as_array() {
                     for tc in tool_calls {
@@ -2084,6 +2246,12 @@ async fn run_conversation_loop(
             }
             pending_tool_calls.clear();
         } else {
+            // Fallback: if the model ONLY output thinking (no final answer after </think>),
+            // show the thinking content so the UI isn't blank.
+            if accumulated_text.is_empty() && !think_text.is_empty() {
+                let _ = app_handle.emit("ai-chat-delta", think_text.clone());
+                accumulated_text = think_text.clone();
+            }
             if !accumulated_text.is_empty() {
                 messages.push(ChatMessage {
                     role: "assistant".to_string(),
@@ -2127,13 +2295,17 @@ fn build_google_contents(messages: &[ChatMessage]) -> Vec<Value> {
                             eprintln!("[AI] Could not parse Google tool args for '{}'", func_name);
                             json!({})
                         });
-                    // Echo back thought_signature required by Gemini thinking models.
-                    // Without this, the API returns a 400 error on subsequent turns.
-                    let mut fc_obj = json!({ "name": func_name, "args": args });
+                    // Echo back thought_signature at the PART level — NOT inside functionCall.
+                    // Google docs: "return this signature in the exact part where it was received"
+                    // Gemini 3.x places it at: part["thoughtSignature"]  (part level)
+                    // Gemini 2.5 places it at: part["functionCall"]["thoughtSignature"]  (inside fc)
+                    // Sending it inside functionCall causes: "Unknown name thoughtSignature at function_call"
+                    let fc_obj = json!({ "name": func_name, "args": args });
+                    let mut part = json!({ "functionCall": fc_obj });
                     if let Some(sig) = tc["function"]["thought_signature"].as_str() {
-                        fc_obj["thoughtSignature"] = json!(sig);
+                        part["thoughtSignature"] = json!(sig);  // ← part level (correct)
                     }
-                    parts.push(json!({ "functionCall": fc_obj }));
+                    parts.push(part);
                 }
                 if !parts.is_empty() {
                     contents.push(json!({ "role": "model", "parts": parts }));
@@ -2186,6 +2358,51 @@ fn get_google_tools() -> Value {
     }])
 }
 
+/// Strip large embedded C code blocks from the system prompt for Gemini 3.x thinking models.
+/// Rules, GPIO tables, and short examples (<= MAX_CODE_LINES) are preserved.
+/// Long code templates are replaced with a one-line hint so the model calls knowledge_search.
+/// Result: ~50% fewer system-prompt tokens while maintaining all behavioral constraints.
+fn compact_prompt_for_thinking_model(prompt: &str) -> String {
+    const MAX_CODE_LINES: usize = 8; // keep examples this short or shorter
+    let mut result = String::with_capacity(prompt.len() / 2);
+    let mut in_code = false;
+    let mut fence_marker = String::new();
+    let mut code_buf: Vec<&str> = Vec::new();
+
+    for line in prompt.lines() {
+        let trimmed = line.trim();
+        if !in_code && (trimmed.starts_with("```")) {
+            // Start of a code block — buffer it
+            in_code = true;
+            fence_marker = trimmed[..3].to_string();
+            code_buf.clear();
+            code_buf.push(line);
+        } else if in_code && trimmed.starts_with(&fence_marker) && trimmed.len() == fence_marker.len() {
+            // End of code block
+            code_buf.push(line);
+            let body_lines = code_buf.len().saturating_sub(2); // exclude ``` markers
+            if body_lines <= MAX_CODE_LINES {
+                // Short example → keep as-is
+                for l in &code_buf { result.push_str(l); result.push('\n'); }
+            } else {
+                // Long example → replace with a reminder to use KB tools
+                result.push_str(&format!(
+                    "[Code example omitted ({} lines). Use knowledge_search or read_knowledge_file to retrieve the actual implementation.]\n",
+                    body_lines
+                ));
+            }
+            in_code = false;
+            code_buf.clear();
+        } else if in_code {
+            code_buf.push(line);
+        } else {
+            result.push_str(line);
+            result.push('\n');
+        }
+    }
+    result
+}
+
 async fn run_google_conversation_loop(
     app_handle: &AppHandle,
     api_key: &str,
@@ -2204,6 +2421,17 @@ async fn run_google_conversation_loop(
         .unwrap_or_else(|_| Client::new());
     let google_tools = get_google_tools();
 
+    // For Gemini 3.x thinking models: strip large embedded code examples from
+    // the system prompt. The model's thinking + knowledge_search replaces them.
+    // This saves ~4000-6000 tokens per request while keeping all behavioral rules.
+    let compacted;
+    let effective_prompt = if model.starts_with("gemini-3") {
+        compacted = compact_prompt_for_thinking_model(system_prompt);
+        &compacted
+    } else {
+        system_prompt
+    };
+
     const MAX_RETRIES: u32 = 3;
     const RETRY_DELAY_SECS: u64 = 4;
     let mut retry_count: u32 = 0;
@@ -2212,11 +2440,25 @@ async fn run_google_conversation_loop(
 
     loop {
         let contents = build_google_contents(&messages);
+
+        // Set thinkingBudget for Gemini 3.x thinking models.
+        // Gemini 3.x always thinks internally — unlimited budget burns quota fast.
+        // 2048 tokens = enough for tool routing + code logic decisions, without overrun.
+        // Set to 0 to completely disable thinking (faster, fewer tokens, but less smart).
+        let gen_config = if model.starts_with("gemini-3") {
+            json!({
+                "temperature": 0.7,
+                "thinkingConfig": { "thinkingBudget": 2048 }
+            })
+        } else {
+            json!({ "temperature": 0.7 })
+        };
+
         let body = json!({
-            "systemInstruction": { "parts": [{ "text": system_prompt }] },
+            "systemInstruction": { "parts": [{ "text": effective_prompt }] },
             "contents": contents,
             "tools": google_tools,
-            "generationConfig": { "temperature": 0.7 }
+            "generationConfig": gen_config
         });
 
         let url = format!(
@@ -2304,10 +2546,13 @@ async fn run_google_conversation_loop(
                                 if let Some(fc) = part["functionCall"].as_object() {
                                     let name = fc.get("name").and_then(|v| v.as_str()).unwrap_or("").to_string();
                                     let args = fc.get("args").cloned().unwrap_or(json!({}));
-                                    // Capture thought_signature from Gemini thinking models.
-                                    // Must be echoed back verbatim in the next turn's history.
-                                    let thought_signature = fc.get("thoughtSignature")
-                                        .and_then(|v| v.as_str())
+                                    // Capture thought_signature — MANDATORY for Gemini 3.x, optional for 2.5.
+                                    // Gemini 3.x: signature is at the PART level (part["thoughtSignature"])
+                                    // Gemini 2.5: signature may be inside functionCall (fc["thoughtSignature"])
+                                    // We check both locations for maximum compatibility.
+                                    let thought_signature = part["thoughtSignature"]
+                                        .as_str()
+                                        .or_else(|| fc.get("thoughtSignature").and_then(|v| v.as_str()))
                                         .map(|s| s.to_string());
                                     let id = format!("call_{}", pending_tool_calls.len());
                                     let _ = app_handle.emit(
@@ -2482,6 +2727,14 @@ async fn execute_tool(
     if *no_workspace && matches!(name, "write_file" | "run_command" | "read_file" | "list_files" | "get_file_tree" | "search_in_files" | "diff_file") {
         return json!({
             "error": "BLOCKED: No project workspace is open. You MUST call 'create_project_workspace' FIRST."
+        });
+    }
+
+    // HARD BLOCK: Prevent the model from calling create_project_workspace when a workspace
+    // is already open. This stops disruptive folder-picker dialogs from appearing mid-task.
+    if name == "create_project_workspace" && !*no_workspace {
+        return json!({
+            "error": "BLOCKED: A workspace is already open. Do NOT call create_project_workspace again. Use write_file to create or modify files in the current workspace instead."
         });
     }
 
