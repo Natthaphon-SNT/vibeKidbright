@@ -24,6 +24,23 @@ jobs:
       - name: Install Frontend Dependencies
         run: npm install
 
+      - name: Sync knowledge_base to resources
+        run: |
+          $src = "knowledge_base"
+          $dst = "resources/knowledge_base"
+          if (-not (Test-Path $dst)) { New-Item -ItemType Directory -Path $dst -Force }
+          Get-ChildItem $src -Recurse -File | Where-Object {
+            $_.Name -ne ".embeddings.json" -and -not $_.Name.EndsWith(".backup")
+          } | ForEach-Object {
+            $rel = $_.FullName.Substring((Resolve-Path $src).Path.Length + 1)
+            $dstFile = Join-Path $dst $rel
+            $dstDir = Split-Path $dstFile -Parent
+            if (-not (Test-Path $dstDir)) { New-Item -ItemType Directory -Path $dstDir -Force | Out-Null }
+            Copy-Item $_.FullName $dstFile -Force
+          }
+          Write-Host "Knowledge base synced to resources/"
+        shell: pwsh
+
       - name: Build and Create Release
         uses: tauri-apps/tauri-action@v0
         env:

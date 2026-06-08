@@ -43,7 +43,7 @@
 - **ไม่รองรับ ADC บนพอร์ต IN1–IN4** (ต่างจาก iA และ V1.6 ที่รองรับ)
 
 ### Sensor Map — V1.5 Rev 3.1 (NECTEC Standard)
-> ⚠️ **SW2 = GPIO14** — ต่างจาก Rev 3.1G ที่ใช้ GPIO17
+> ⚠️ **SW2 = GPIO14** — เหมือนกันกับ Rev 3.1G และ iA (ทุกรุ่นใช้ GPIO14 ยกเว้น V1.6)
 
 | Sensor | Protocol | Bus/Pin | Address/Channel |
 |--------|----------|---------|-----------------|
@@ -61,7 +61,7 @@
 ---
 
 ### Sensor Map — V1.5 Rev 3.1G (Gravitech OEM)
-> ⚠️ **SW2 = GPIO 14** — ต่างจาก Rev 3.1 ที่ใช้ GPIO17
+> ⚠️ **SW2 = GPIO14** — เหมือนกันกับ Rev 3.1 และ iA (corrected)
 > ฮาร์ดแวร์อื่นทุกอย่างเหมือน Rev 3.1 (ไม่มี KXTJ3, ไม่รองรับ ADC บน IN1–IN4)
 
 | Sensor | Protocol | Bus/Pin | Address/Channel |
@@ -2069,7 +2069,7 @@ Emitter ของ NPN → GND
 
 | Feature | V1.5 Rev 3.1 (NECTEC) | V1.5 Rev 3.1**G** (Gravitech OEM) | V1.5 iA (INEX) | V1.6 (Gravitech) |
 |---|---|---|---|---|
-| **SW2 GPIO** | **GPIO14** | **GPIO17** | GPIO17 | GPIO17 |
+| **SW2 GPIO** | **GPIO14** | **GPIO14** | GPIO17 | GPIO17 |
 | Analog Input บน IN1–IN4 | ❌ ไม่รองรับ | ❌ ไม่รองรับ | ✅ รองรับ (ADC1_CH4–CH7) | ✅ รองรับ (ADC1_CH4–CH7) |
 | Accelerometer | ❌ ไม่มี | ❌ ไม่มี | ✅ KXTJ3-1057 (I2C_NUM_0, 0x0E) | ✅ มี |
 | Gyroscope | ❌ ไม่มี | ❌ ไม่มี | ❌ ไม่มี | ✅ มี |
@@ -2085,7 +2085,7 @@ Emitter ของ NPN → GND
 
 > ⚠️ **AI CRITICAL — SW2 PIN DIFFERENCE:**
 > - V1.5 Rev 3.1 (NECTEC): SW2 = **GPIO14**
-> - V1.5 Rev 3.1G (Gravitech OEM): SW2 = **GPIO17**
+> - V1.5 Rev 3.1G (Gravitech OEM): SW2 = **GPIO14** (corrected — same as Rev 3.1/iA)
 > ตรวจสอบ PCB silkscreen หรือ I2C scan result ก่อนเขียนโค้ดเสมอ
 >
 > ⚠️ **AI CRITICAL:** V1.5 Rev 3.1 และ Rev 3.1G ใช้ **Micro-USB** ไม่ใช่ USB-C และ **ไม่มี KXTJ3** — ห้ามเขียนโค้ดที่ init KXTJ3 สำหรับบอร์ดทั้งสอง
