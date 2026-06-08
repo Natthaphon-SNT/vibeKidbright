@@ -24,9 +24,9 @@
   },
   "bundle": {
     "active": true,
-    "resources": [
-      "../resources/**/*"
-    ],
+    "resources": {
+      "../resources/knowledge_base/**/*": "knowledge_base/"
+    },
     "targets": "all",
     "icon": [
       "icons/32x32.png",

@@ -261,14 +261,20 @@ interface FileTab {
 function AppShell() {
   const [toolchainReady, setToolchainReady] = React.useState(false);
 
-  if (!toolchainReady) {
-    return <ToolchainSetup onReady={() => setToolchainReady(true)} />;
-  }
-
-  return <App />;
+  return (
+    <>
+      <App toolchainReady={toolchainReady} />
+      {!toolchainReady && (
+        <ToolchainSetup
+          onReady={() => setToolchainReady(true)}
+          mini={true}
+        />
+      )}
+    </>
+  );
 }
 
-function App() {
+function App({ toolchainReady = true }: { toolchainReady?: boolean }) {
   const [darkMode, setDarkMode] = React.useState(() => {
     return localStorage.getItem("vibe-theme") === "dark";
   });
@@ -1173,9 +1179,10 @@ function App() {
           )}
           <button
             onClick={handleBuildFlash}
-            disabled={isBuilding || isSettingUpEspIdf}
+            disabled={isBuilding || isSettingUpEspIdf || !toolchainReady}
+            title={!toolchainReady ? "Waiting for toolchain download to complete..." : undefined}
             className="w-full justify-center text-sm px-4 py-2 rounded-lg transition-all duration-200 font-bold flex items-center gap-2 shadow-lg active:scale-[0.98]"
-            style={isBuilding
+            style={isBuilding || !toolchainReady
               ? { backgroundColor: 'var(--bg-hover)', color: 'var(--text-muted)', cursor: 'not-allowed' }
               : { backgroundColor: 'var(--accent)', color: '#fff', boxShadow: '0 4px 16px var(--accent-glow)' }
             }
@@ -1184,6 +1191,11 @@ function App() {
               <>
                 <div className="w-3 h-3 border-2 border-neutral-500 border-t-neutral-300 rounded-full animate-spin" />
                 Building...
+              </>
+            ) : !toolchainReady ? (
+              <>
+                <div className="w-3 h-3 border-2 border-amber-700 border-t-amber-400 rounded-full animate-spin" />
+                Toolchain Loading...
               </>
             ) : "Build & Flash"}
           </button>

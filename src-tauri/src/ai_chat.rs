@@ -79,6 +79,13 @@ pub fn get_pending_diffs() -> &'static Mutex<HashMap<PathBuf, String>> {
     PENDING_DIFFS.get_or_init(|| Mutex::new(HashMap::new()))
 }
 
+/// AppData/knowledge_base path — set by seed_knowledge_base() at startup using Tauri API.
+/// Used by resolve_kb_path() as the definitive fallback for installed mode.
+static APP_DATA_KB: OnceLock<PathBuf> = OnceLock::new();
+pub fn get_app_data_kb() -> Option<&'static PathBuf> {
+    APP_DATA_KB.get()
+}
+
 // ── Config helpers ────────────────────────────────────────────────────────────
 
 fn config_path() -> PathBuf { config_dir().join("config.json") }
@@ -142,13 +149,22 @@ fn resolve_kb_path(project_dir: &str) -> PathBuf {
         return fallback_kb;
     }
 
-    // Fallback 2: AppData/knowledge_base (installed version — seeded by seed_knowledge_base)
-    if let Ok(app_data) = std::env::var("APPDATA").or_else(|_| std::env::var("HOME")) {
-        let appdata_kb = std::path::PathBuf::from(app_data)
-            .join("com.cake.tauri-app")
-            .join("knowledge_base");
+    // Fallback 2: AppData/knowledge_base set by Tauri API at startup (installed version)
+    if let Some(appdata_kb) = get_app_data_kb() {
         if appdata_kb.exists() {
-            return appdata_kb;
+            return appdata_kb.clone();
+        }
+    }
+
+    // Fallback 3: Manual APPDATA env var (legacy / safety net)
+    if let Ok(app_data) = std::env::var("APPDATA").or_else(|_| std::env::var("HOME")) {
+        for name in &["com.cake.tauri-app", "VibeKidbright IDE", "vibekidbright-ide"] {
+            let appdata_kb = std::path::PathBuf::from(&app_data)
+                .join(name)
+                .join("knowledge_base");
+            if appdata_kb.exists() {
+                return appdata_kb;
+            }
         }
     }
     
@@ -156,58 +172,99 @@ fn resolve_kb_path(project_dir: &str) -> PathBuf {
 }
 
 /// Seed bundled knowledge_base files into AppData/knowledge_base (installed version).
-/// Called once on startup — skips files that already exist (ไม่ overwrite ไฟล์ที่ผู้ใช้แก้ไข).
+/// Called on every startup — overwrites bundled files (installer always has latest KB),
+/// but never overwrites user-added files (files not present in bundled KB).
 pub fn seed_knowledge_base(app_handle: &AppHandle) {
-    let Ok(app_data_dir) = app_handle.path().app_data_dir() else { return };
+    let Ok(app_data_dir) = app_handle.path().app_data_dir() else {
+        eprintln!("[KB Seed] Cannot resolve app_data_dir");
+        return;
+    };
     let dst = app_data_dir.join("knowledge_base");
 
-    // ลองหา source ของ KB ทีละ path จนกว่าจะเจอ
+    // ── Build candidate list ───────────────────────────────────────────────────
     let mut candidates: Vec<PathBuf> = Vec::new();
 
-    // 1. resource_dir/knowledge_base (Tauri v2 bundled resources)
+    // 0. Tauri v2 official API: resolve("knowledge_base", BaseDirectory::Resource)
+    //    นี่คือ official way ที่ถูกต้องที่สุดสำหรับ NSIS/MSI installer
+    if let Ok(resolved) = app_handle.path().resolve("knowledge_base", tauri::path::BaseDirectory::Resource) {
+        eprintln!("[KB Seed] resolve(Resource) = {}", resolved.display());
+        candidates.push(resolved);
+    }
+
+    // 1. Tauri v2: resource_dir() — ที่ Tauri วาง bundled resources ไว้
     if let Ok(resource_dir) = app_handle.path().resource_dir() {
+        eprintln!("[KB Seed] resource_dir = {}", resource_dir.display());
         candidates.push(resource_dir.join("knowledge_base"));
-        // 2. resource_dir/../knowledge_base (กรณี path relative)
+        // 1b. resource_dir/_up_/knowledge_base (Tauri NSIS บางเวอร์ชัน)
+        candidates.push(resource_dir.join("_up_").join("knowledge_base"));
         if let Some(parent) = resource_dir.parent() {
             candidates.push(parent.join("knowledge_base"));
         }
     }
 
-    // 3. exe_dir/knowledge_base (Windows MSI วาง resources ติดกับ .exe)
+    // 2. exe dir — Windows NSIS/MSI วาง resources ติดกับ .exe
     if let Ok(exe_path) = std::env::current_exe() {
         if let Some(exe_dir) = exe_path.parent() {
+            eprintln!("[KB Seed] exe_dir = {}", exe_dir.display());
             candidates.push(exe_dir.join("knowledge_base"));
-            // 4. exe_dir/../knowledge_base
+            candidates.push(exe_dir.join("resources").join("knowledge_base"));
             if let Some(parent) = exe_dir.parent() {
                 candidates.push(parent.join("knowledge_base"));
+                candidates.push(parent.join("resources").join("knowledge_base"));
             }
         }
     }
 
+    // ── Try each candidate ────────────────────────────────────────────────────
     for src in &candidates {
-        if src.exists() && src.join("formula_kid_controller.md").exists() {
+        eprintln!("[KB Seed] trying: {}", src.display());
+        if !src.exists() { continue; }
+
+        // ตรวจว่ามีไฟล์ KB อย่างน้อย 1 ไฟล์
+        let has_kb = std::fs::read_dir(src)
+            .map(|mut d| d.any(|e| {
+                e.map(|e| {
+                    let n = e.file_name().to_string_lossy().to_string();
+                    n.ends_with(".md") || n.ends_with(".txt") || n.ends_with(".c") || n.ends_with(".h")
+                }).unwrap_or(false)
+            }))
+            .unwrap_or(false);
+
+        if has_kb {
+            eprintln!("[KB Seed] found KB at: {}", src.display());
             let _ = std::fs::create_dir_all(&dst);
-            copy_dir_recursive(src, &dst);
+            // overwrite_bundled=true: ไฟล์ที่ bundled มาจะถูก overwrite เสมอ (อัพเดท KB ได้)
+            copy_dir_overwrite(src, &dst, true);
+            eprintln!("[KB Seed] seeded to: {}", dst.display());
+            // Set global path เพื่อให้ resolve_kb_path ใช้ได้ทันที
+            let _ = APP_DATA_KB.set(dst);
             return;
         }
     }
-    // ไม่เจอ KB ใน resource — ข้ามได้ (dev mode จัดการเองผ่าน resolve_kb_path)
+
+    eprintln!("[KB Seed] No bundled KB found in any candidate path — skipping (dev mode OK)");
+
+    // ยังคง set global path เพื่อให้ resolve_kb_path รู้ว่า dst อยู่ที่ไหน (อาจเคย seed ไปแล้ว)
+    let _ = APP_DATA_KB.set(dst);
 }
 
-fn copy_dir_recursive(src: &std::path::Path, dst: &std::path::Path) {
+/// Copy directory recursively.
+/// - `overwrite_bundled`: ถ้า true จะ overwrite ไฟล์ที่มีอยู่แล้ว (installer updates)
+/// - ข้าม .embeddings.json และ .backup เสมอ
+fn copy_dir_overwrite(src: &std::path::Path, dst: &std::path::Path, overwrite_bundled: bool) {
     let Ok(entries) = std::fs::read_dir(src) else { return };
     for entry in entries.flatten() {
         let src_path = entry.path();
         let dst_path = dst.join(entry.file_name());
         if src_path.is_dir() {
             let _ = std::fs::create_dir_all(&dst_path);
-            copy_dir_recursive(&src_path, &dst_path);
+            copy_dir_overwrite(&src_path, &dst_path, overwrite_bundled);
         } else {
-            // ข้าม .embeddings.json และ .backup (ไม่ต้อง bundle)
             let name = entry.file_name().to_string_lossy().to_string();
+            // ข้าม metadata files
             if name.ends_with(".backup") || name == ".embeddings.json" { continue; }
-            // ไม่ overwrite ไฟล์ที่มีอยู่แล้ว (ผู้ใช้อาจแก้ไขไว้)
-            if !dst_path.exists() {
+            // overwrite ถ้า flag เปิด หรือถ้าไฟล์ยังไม่มี
+            if overwrite_bundled || !dst_path.exists() {
                 let _ = std::fs::copy(&src_path, &dst_path);
             }
         }

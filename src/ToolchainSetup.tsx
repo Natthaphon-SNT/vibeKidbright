@@ -28,11 +28,13 @@ interface Props {
   onReady: () => void;
   /** URL ที่จะใช้ดาวน์โหลด ZIP (optional — ถ้าว่างจะใช้ default ใน Rust) */
   toolchainUrl?: string;
+  /** แสดงเป็น mini widget ซ้ายล่าง (ใช้ตอน background download) */
+  mini?: boolean;
 }
 
 // ── Main Component ─────────────────────────────────────────────────────────────
 
-export default function ToolchainSetup({ onReady, toolchainUrl }: Props) {
+export default function ToolchainSetup({ onReady, toolchainUrl, mini = false }: Props) {
   const [checkDone, setCheckDone] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [progress, setProgress] = useState<ToolchainProgress>({
@@ -48,6 +50,8 @@ export default function ToolchainSetup({ onReady, toolchainUrl }: Props) {
   // Auto-start countdown
   const [countdown, setCountdown] = useState<number | null>(null);
   const [autoStartCancelled, setAutoStartCancelled] = useState(false);
+  // Mini widget state
+  const [miniExpanded, setMiniExpanded] = useState(false);
 
   // ── Scroll logs to bottom ────────────────────────────────────────────────
   useEffect(() => {
@@ -153,6 +157,191 @@ export default function ToolchainSetup({ onReady, toolchainUrl }: Props) {
       : isReady
       ? "linear-gradient(90deg, #22c55e, #16a34a)"
       : "linear-gradient(90deg, #3b82f6, #1d4ed8, #6366f1)";
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // MINI WIDGET MODE (bottom-left floating)
+  // ─────────────────────────────────────────────────────────────────────────
+  if (mini) {
+    const shortMsg = progress.message.length > 50
+      ? progress.message.slice(0, 47) + "..."
+      : progress.message;
+
+    return (
+      <div
+        style={{
+          position: "fixed",
+          bottom: "16px",
+          left: "16px",
+          zIndex: 9998,
+          width: miniExpanded ? "340px" : "260px",
+          background: "rgba(10,15,25,0.96)",
+          border: isError ? "1px solid rgba(239,68,68,0.5)" : "1px solid rgba(59,130,246,0.35)",
+          borderRadius: "14px",
+          boxShadow: "0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(59,130,246,0.1)",
+          backdropFilter: "blur(20px)",
+          fontFamily: "'Inter', 'Segoe UI', system-ui, sans-serif",
+          transition: "width 0.3s ease, box-shadow 0.3s ease",
+          overflow: "hidden",
+        }}
+      >
+        <style>{`
+          @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+          @keyframes progress-shimmer { 0% { background-position: 200% center; } 100% { background-position: -200% center; } }
+          @keyframes mini-fadein { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+          .mini-widget { animation: mini-fadein 0.3s ease forwards; }
+          .mini-spinner { animation: spin 1s linear infinite; }
+          .mini-progress { background-size: 200% auto; animation: progress-shimmer 2s linear infinite; }
+        `}</style>
+
+        {/* Header row */}
+        <div
+          className="mini-widget"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            padding: "10px 12px 8px",
+            cursor: "pointer",
+          }}
+          onClick={() => setMiniExpanded(v => !v)}
+        >
+          {/* Spinner or status icon */}
+          {isDownloading ? (
+            <svg className="mini-spinner" width="14" height="14" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
+              <circle cx="12" cy="12" r="10" stroke="rgba(148,163,184,0.2)" strokeWidth="3" />
+              <path d="M12 2a10 10 0 0110 10" stroke="#3b82f6" strokeWidth="3" strokeLinecap="round" />
+            </svg>
+          ) : (
+            <span style={{ fontSize: "14px", flexShrink: 0 }}>
+              {isError ? "❌" : isCancelled ? "⛔" : isReady ? "✅" : "⏳"}
+            </span>
+          )}
+
+          {/* Label */}
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: "11px", fontWeight: 700, color: isError ? "#f87171" : "#93c5fd", letterSpacing: "0.3px", textTransform: "uppercase" }}>
+              {isDownloading
+                ? progress.stage === "extracting" ? "Extracting..." : "Downloading..."
+                : isError ? "Setup Error"
+                : isCancelled ? "Cancelled"
+                : isReady ? "Toolchain Ready!"
+                : "Setting up toolchain"}
+            </div>
+            <div style={{ fontSize: "10px", color: "rgba(148,163,184,0.7)", marginTop: "1px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              {shortMsg}
+            </div>
+          </div>
+
+          {/* Percent + chevron */}
+          <div style={{ display: "flex", alignItems: "center", gap: "6px", flexShrink: 0 }}>
+            {isDownloading && (
+              <span style={{ fontSize: "11px", fontWeight: 700, color: "#60a5fa", fontFamily: "monospace" }}>
+                {progress.percent}%
+              </span>
+            )}
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2.5" strokeLinecap="round" style={{ transform: miniExpanded ? "rotate(180deg)" : "none", transition: "transform 0.2s", flexShrink: 0 }}>
+              <path d="M6 9l6 6 6-6" />
+            </svg>
+          </div>
+        </div>
+
+        {/* Progress bar */}
+        {(isDownloading || isReady || isError || isCancelled) && (
+          <div style={{ padding: "0 12px 6px" }}>
+            <div style={{ height: "4px", borderRadius: "100px", background: "rgba(30,40,60,0.8)", overflow: "hidden" }}>
+              <div
+                className={isDownloading ? "mini-progress" : ""}
+                style={{
+                  height: "100%",
+                  width: `${progress.percent}%`,
+                  borderRadius: "100px",
+                  background: progressBarColor,
+                  transition: "width 0.3s ease",
+                }}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Expanded section: logs + actions */}
+        {miniExpanded && (
+          <div style={{ padding: "0 12px 12px", borderTop: "1px solid rgba(59,130,246,0.1)" }}>
+            {/* Live logs */}
+            {logs.length > 0 && (
+              <div
+                ref={logsRef}
+                style={{
+                  background: "rgba(5,10,20,0.6)",
+                  border: "1px solid rgba(59,130,246,0.1)",
+                  borderRadius: "8px",
+                  padding: "8px",
+                  maxHeight: "90px",
+                  overflowY: "auto",
+                  marginTop: "10px",
+                  marginBottom: "10px",
+                  scrollbarWidth: "thin",
+                  scrollbarColor: "rgba(59,130,246,0.3) transparent",
+                }}
+              >
+                {logs.slice(-20).map((log, i) => (
+                  <p key={i} style={{ margin: "1px 0", fontSize: "10px", color: log.includes("ERROR") ? "#f87171" : "rgba(148,163,184,0.6)", fontFamily: "monospace", lineHeight: 1.4 }}>
+                    {log}
+                  </p>
+                ))}
+              </div>
+            )}
+
+            {/* Buttons */}
+            <div style={{ display: "flex", gap: "6px", marginTop: logs.length > 0 ? 0 : "10px" }}>
+              {isDownloading ? (
+                <button
+                  onClick={cancelDownload}
+                  style={{
+                    flex: 1, padding: "7px", borderRadius: "8px",
+                    border: "1px solid rgba(239,68,68,0.3)",
+                    background: "rgba(239,68,68,0.08)",
+                    color: "#f87171", fontSize: "11px", fontWeight: 600, cursor: "pointer",
+                  }}
+                >
+                  ⛔ Cancel
+                </button>
+              ) : !isReady ? (
+                <button
+                  onClick={() => { setCountdown(null); startDownload(); }}
+                  disabled={!checkDone}
+                  style={{
+                    flex: 1, padding: "7px", borderRadius: "8px", border: "none",
+                    background: checkDone ? "linear-gradient(135deg, #1d4ed8, #3b82f6)" : "rgba(30,40,60,0.5)",
+                    color: checkDone ? "white" : "#64748b",
+                    fontSize: "11px", fontWeight: 700, cursor: checkDone ? "pointer" : "not-allowed",
+                  }}
+                >
+                  {countdown !== null && !autoStartCancelled
+                    ? `Auto-start in ${countdown}s...`
+                    : isError || isCancelled ? "🔄 Retry" : "⬇️ Install Toolchain"}
+                </button>
+              ) : null}
+
+              {/* Cancel auto-start */}
+              {countdown !== null && !autoStartCancelled && !isDownloading && (
+                <button
+                  onClick={() => { setAutoStartCancelled(true); setCountdown(null); }}
+                  style={{
+                    padding: "7px 10px", borderRadius: "8px",
+                    border: "1px solid rgba(148,163,184,0.15)",
+                    background: "transparent", color: "rgba(148,163,184,0.5)",
+                    fontSize: "10px", cursor: "pointer",
+                  }}
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   // ── Render ───────────────────────────────────────────────────────────────
   return (
