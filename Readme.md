@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <strong>AI-Powered IDE สำหรับพัฒนา ESP-IDF และ KidBright บน Desktop</strong>
+  <strong>vibeKidbright IDE สำหรับพัฒนา ESP-IDF และ KidBright บน Desktop</strong>
 </p>
 
 <p align="center">
