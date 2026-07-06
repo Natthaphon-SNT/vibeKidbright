@@ -16,7 +16,7 @@ jobs:
       - name: Checkout external knowledge_base repo
         uses: actions/checkout@v4
         with:
-          repository: https://github.com/Natthaphon-SNT/Knowledge
+          repository: Natthaphon-SNT/Knowledge
           path: external_repo
 
       - name: Extract external knowledge_base.zip
