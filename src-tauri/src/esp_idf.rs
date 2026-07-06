@@ -385,6 +385,47 @@ fn build_idf_path(tools_path: &Path) -> OsString {
     std::env::join_paths(paths).unwrap_or_else(|_| OsString::from(""))
 }
 
+pub fn find_esp_rom_elf_dir(tools_path: &Path) -> Option<String> {
+    let elfs_dir = tools_path.join("esp-rom-elfs");
+    if elfs_dir.exists() {
+        if let Ok(entries) = std::fs::read_dir(&elfs_dir) {
+            let mut subdirs: Vec<PathBuf> = entries
+                .flatten()
+                .map(|e| e.path())
+                .filter(|p| p.is_dir())
+                .collect();
+            subdirs.sort();
+            if let Some(dir) = subdirs.pop() {
+                let mut path_str = dir.to_string_lossy().into_owned();
+                if !path_str.ends_with('/') && !path_str.ends_with('\\') {
+                    path_str.push(std::path::MAIN_SEPARATOR);
+                }
+                return Some(path_str);
+            }
+        }
+    }
+    let elfs_dir_nested = tools_path.join("tools").join("esp-rom-elfs");
+    if elfs_dir_nested.exists() {
+        if let Ok(entries) = std::fs::read_dir(&elfs_dir_nested) {
+            let mut subdirs: Vec<PathBuf> = entries
+                .flatten()
+                .map(|e| e.path())
+                .filter(|p| p.is_dir())
+                .collect();
+            subdirs.sort();
+            if let Some(dir) = subdirs.pop() {
+                let mut path_str = dir.to_string_lossy().into_owned();
+                if !path_str.ends_with('/') && !path_str.ends_with('\\') {
+                    path_str.push(std::path::MAIN_SEPARATOR);
+                }
+                return Some(path_str);
+            }
+        }
+    }
+    None
+}
+
+
 #[tauri::command]
 pub async fn check_esp_idf(app_handle: AppHandle) -> Result<String, String> {
     let (actual_idf_path, _) = resolve_idf_paths(&app_handle)?;
@@ -577,16 +618,19 @@ pub async fn run_idf_command(
     let path_env = build_idf_path(&actual_tools_path);
     let idf_version = read_idf_version(&actual_idf_path);
 
-    let output = Command::new(&python_bin)
-        .arg(actual_idf_path.join("tools/idf.py"))
+    let mut cmd = Command::new(&python_bin);
+    cmd.arg(actual_idf_path.join("tools/idf.py"))
         .arg(&command)
         .args(&args)
         .env("IDF_PATH", &actual_idf_path)
         .env("IDF_TOOLS_PATH", &actual_tools_path)
         .env("IDF_PYTHON_ENV_PATH", &python_env_path)
         .env("ESP_IDF_VERSION", &idf_version)
-        .env("PATH", &path_env)
-        .output()
+        .env("PATH", &path_env);
+    if let Some(rom_elf_dir) = find_esp_rom_elf_dir(&actual_tools_path) {
+        cmd.env("ESP_ROM_ELF_DIR", rom_elf_dir);
+    }
+    let output = cmd.output()
         .map_err(|e| format!("Failed to execute idf.py: {}", e))?;
 
     if output.status.success() {
@@ -826,13 +870,17 @@ pub async fn run_shell_command(
     }
 
     command.args(&args)
-
         .env("IDF_PATH", &actual_idf_path)
         .env("IDF_TOOLS_PATH", &actual_tools_path)
         .env("IDF_PYTHON_ENV_PATH", &python_env_path)
         .env("ESP_IDF_VERSION", &idf_version)
-        .env("PATH", &path_env)
-        .stdout(Stdio::piped())
+        .env("PATH", &path_env);
+
+    if let Some(rom_elf_dir) = find_esp_rom_elf_dir(&actual_tools_path) {
+        command.env("ESP_ROM_ELF_DIR", rom_elf_dir);
+    }
+
+    command.stdout(Stdio::piped())
         .stderr(Stdio::piped());
 
     apply_no_window(&mut command);
@@ -1093,3 +1141,4 @@ pub async fn stop_serial_monitor() -> Result<String, String> {
     stop_serial_monitor_internal();
     Ok("Serial monitor disconnected".to_string())
 }
+

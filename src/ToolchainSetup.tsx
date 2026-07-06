@@ -138,6 +138,26 @@ export default function ToolchainSetup({ onReady, toolchainUrl, mini = false }: 
     setIsDownloading(false);
   };
 
+  const [isRepairing, setIsRepairing] = useState(false);
+
+  const repairPaths = async () => {
+    setIsRepairing(true);
+    setErrorMsg("");
+    setLogs(prev => [...prev, "[REPAIR] Patching Python venv paths..."]);
+    try {
+      const result = await invoke("repair_toolchain_paths") as string;
+      setLogs(prev => [...prev, `[REPAIR] ${result}`]);
+      // Re-check toolchain after repair
+      setTimeout(() => checkToolchain(), 500);
+    } catch (err) {
+      const msg = String(err);
+      setErrorMsg(msg);
+      setLogs(prev => [...prev, `[REPAIR ERROR] ${msg}`]);
+    } finally {
+      setIsRepairing(false);
+    }
+  };
+
   // ── Derived state ────────────────────────────────────────────────────────
   const isReady = progress.stage === "done";
   const isError = progress.stage === "error" || !!errorMsg;
@@ -757,6 +777,34 @@ export default function ToolchainSetup({ onReady, toolchainUrl, mini = false }: 
             Download size: ~1 GB · Extracted to AppData · One-time only
           </p>
         )}
+
+        {/* Repair Python Paths — shown when toolchain exists but Python might be broken */}
+        {!isDownloading && (
+          <div style={{ marginTop: "12px", textAlign: "center" }}>
+            <button
+              id="btn-repair-paths"
+              onClick={repairPaths}
+              disabled={isRepairing}
+              style={{
+                background: "none",
+                border: "none",
+                color: isRepairing ? "rgba(148,163,184,0.4)" : "rgba(251,191,36,0.7)",
+                fontSize: "11px",
+                cursor: isRepairing ? "not-allowed" : "pointer",
+                padding: "4px 8px",
+                borderRadius: "6px",
+                transition: "all 0.2s",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "5px",
+              }}
+              title="แก้ปัญหา: No Python at 'C:\\Users\\...' — ใช้เมื่อ build ไม่ผ่านบนเครื่องใหม่"
+            >
+              {isRepairing ? "⏳ Repairing..." : "🔧 Repair Python Paths (fix 'No Python' error)"}
+            </button>
+          </div>
+        )}
+
       </div>
     </div>
   );

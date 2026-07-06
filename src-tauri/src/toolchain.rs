@@ -212,6 +212,27 @@ pub async fn remove_toolchain(app_handle: AppHandle) -> Result<String, String> {
     ))
 }
 
+/// แก้ไข Python venv paths ที่ยังชี้ไปยังเครื่อง dev เดิม (C:\Users\Acer\...)
+/// เรียกใช้บนเครื่องที่ติดตั้ง toolchain แล้วแต่ build ไม่ผ่านด้วย "No Python at ..." error
+#[tauri::command]
+pub async fn repair_toolchain_paths(app_handle: AppHandle) -> Result<String, String> {
+    let toolchain_dir = get_toolchain_dir(&app_handle)?;
+    if !toolchain_dir.exists() {
+        return Err("Toolchain not installed yet. Please install it first.".to_string());
+    }
+
+    // Run the venv path patcher
+    let dir = toolchain_dir.clone();
+    tokio::task::spawn_blocking(move || patch_venv_paths(&dir))
+        .await
+        .map_err(|e| format!("Task panicked: {}", e))??;
+
+    Ok(format!(
+        "Python venv paths repaired successfully in {}",
+        toolchain_dir.display()
+    ))
+}
+
 /// คืนค่า path สำคัญต่างๆ ของ toolchain ให้ frontend ตรวจสอบ
 #[tauri::command]
 pub async fn get_toolchain_paths(
@@ -503,11 +524,17 @@ fn download_and_extract(
         res?;
     }
 
-    if cancel.load(Ordering::SeqCst) {
-        return Err("Extraction cancelled.".to_string());
+    // ─── Phase 4: Patch venv paths (fix machine-specific Python paths) ─────
+    // The bundled venv was created on the developer's machine (e.g. C:\Users\Acer\...).
+    // We rewrite pyvenv.cfg `home =` lines to point to the bundled idf-python in
+    // the actual install directory so Python can be found on any machine.
+    emit_progress(app, "extracting", 99, "Patching Python venv paths for this machine...");
+    if let Err(e) = patch_venv_paths(dest_dir) {
+        // Non-fatal — log but continue.  Build will fail with a clearer message if needed.
+        eprintln!("[Toolchain] pyvenv patch warning: {}", e);
     }
 
-    // ─── Phase 4: Sentinel file ────────────────────────────────────────────
+    // ─── Phase 5: Sentinel file ────────────────────────────────────────────
     std::fs::write(dest_dir.join(SENTINEL_FILE), TOOLCHAIN_VERSION)
         .map_err(|e| format!("Failed to write sentinel: {}", e))?;
 
@@ -625,22 +652,16 @@ pub async fn build_firmware_with_toolchain(
         ));
     }
 
-    // หา Python venv ใน toolchain
-    let python_venv = find_first_venv(&tools_path.join("python_env"))
-        .ok_or_else(|| "Python venv not found in toolchain".to_string())?;
-
-    let python_bin = if cfg!(windows) {
-        python_venv.join("Scripts").join("python.exe")
-    } else {
-        python_venv.join("bin").join("python3")
-    };
-
-    if !python_bin.exists() {
-        return Err(format!(
-            "Python binary not found at {}",
-            python_bin.display()
-        ));
-    }
+    // หา Python จาก toolchain โดยตรง (ไม่พึ่ง venv launcher stub ที่มี hardcoded path)
+    // Priority: 1) idf-python bundled  2) venv python (ถ้า pyvenv.cfg ถูก patch แล้ว)
+    let (python_bin, python_venv) = find_toolchain_python(&tools_path)
+        .ok_or_else(|| {
+            format!(
+                "Cannot find Python in toolchain at {}. \
+                Try clicking 'Repair Python Paths' or reinstall the toolchain.",
+                tools_path.display()
+            )
+        })?;
 
     // สร้าง PATH ที่ชี้ไปยัง toolchain ของเรา
     let custom_path = build_toolchain_path(&tools_path);
@@ -664,15 +685,18 @@ pub async fn build_firmware_with_toolchain(
         use std::process::{Command, Stdio};
         use std::io::BufRead;
 
-        let mut child = Command::new(&python_bin_clone)
-            .arg(&idf_py)
+        let mut cmd = Command::new(&python_bin_clone);
+        cmd.arg(&idf_py)
             .args(&args)
             .current_dir(&project_path)
             .env("IDF_PATH", &idf_path_clone)
             .env("IDF_TOOLS_PATH", &tools_path_clone)
             .env("IDF_PYTHON_ENV_PATH", &python_venv_clone)
-            .env("PATH", &custom_path_clone)
-            .stdout(Stdio::piped())
+            .env("PATH", &custom_path_clone);
+        if let Some(rom_elf_dir) = crate::esp_idf::find_esp_rom_elf_dir(&tools_path_clone) {
+            cmd.env("ESP_ROM_ELF_DIR", rom_elf_dir);
+        }
+        let mut child = cmd.stdout(Stdio::piped())
             .stderr(Stdio::piped())
             .spawn()
             .map_err(|e| format!("Failed to start build: {}", e))?;
@@ -722,6 +746,276 @@ fn find_first_venv(python_env_dir: &Path) -> Option<PathBuf> {
         let name = entry.file_name().to_string_lossy().to_string();
         if name.starts_with("idf") && name.contains("_py") && name.ends_with("_env") {
             return Some(entry.path());
+        }
+    }
+    None
+}
+
+/// Find Python that will actually work on the current machine.
+///
+/// Strategy (most reliable first):
+///   1. Bundled idf-python inside toolchain/tools/idf-python/<ver>/python.exe
+///      — This is the standalone CPython that ESP-IDF ships, no venv stub involved.
+///   2. Venv launcher in python_env/<env>/Scripts/python.exe
+///      — Only works if pyvenv.cfg has been patched to point to the current machine.
+///
+/// Returns (python_binary, venv_directory).
+fn find_toolchain_python(tools_path: &Path) -> Option<(PathBuf, PathBuf)> {
+    let venv_dir = find_first_venv(&tools_path.join("python_env"))?;
+
+    // ── Option 1: bundled idf-python (preferred — machine-independent) ─────
+    let idf_python_bin = find_bundled_python(tools_path);
+    if let Some(ref bin) = idf_python_bin {
+        if bin.exists() {
+            eprintln!("[Toolchain] Using bundled idf-python: {}", bin.display());
+            return Some((bin.clone(), venv_dir.clone()));
+        }
+    }
+
+    // ── Option 2: venv launcher (works only after pyvenv.cfg patch) ─────────
+    // Read home= from pyvenv.cfg and verify that Python actually exists there.
+    let cfg_path = venv_dir.join("pyvenv.cfg");
+    if let Ok(cfg) = std::fs::read_to_string(&cfg_path) {
+        let home = cfg.lines()
+            .find(|l| l.trim().to_lowercase().starts_with("home") && l.contains('='))
+            .and_then(|l| l.splitn(2, '=').nth(1))
+            .map(|s| s.trim().to_string());
+
+        if let Some(home_dir) = home {
+            let home_path = PathBuf::from(&home_dir);
+            // Verify the home= Python actually exists on THIS machine
+            let home_python = if cfg!(windows) {
+                home_path.join("python.exe")
+            } else {
+                home_path.join("python3")
+            };
+            if home_python.exists() {
+                // home= is valid — the venv launcher should work
+                let venv_python = if cfg!(windows) {
+                    venv_dir.join("Scripts").join("python.exe")
+                } else {
+                    venv_dir.join("bin").join("python3")
+                };
+                if venv_python.exists() {
+                    eprintln!("[Toolchain] Using venv python (home= valid): {}", venv_python.display());
+                    return Some((venv_python, venv_dir));
+                }
+            } else {
+                // home= is stale (C:\Users\Acer\...) — auto-patch now
+                eprintln!("[Toolchain] pyvenv.cfg home= not found ({}), auto-patching...", home_dir);
+                if let Some(ref fresh_python) = idf_python_bin {
+                    // Patch pyvenv.cfg inline
+                    let new_home = fresh_python.parent()
+                        .map(|p| p.to_string_lossy().into_owned())
+                        .unwrap_or_default();
+                    let patched = cfg.lines().map(|line| {
+                        if line.trim().to_lowercase().starts_with("home") && line.contains('=') {
+                            format!("home = {}", new_home)
+                        } else {
+                            line.to_string()
+                        }
+                    }).collect::<Vec<_>>().join("\r\n");
+                    let _ = std::fs::write(&cfg_path, &patched);
+                    eprintln!("[Toolchain] Patched {} home= → {}", cfg_path.display(), new_home);
+                    return Some((fresh_python.clone(), venv_dir));
+                }
+            }
+        }
+    }
+
+    None
+}
+
+/// Find the bundled idf-python binary in the toolchain tools directory.
+/// Searches: tools/idf-python/<version>/python.exe and similar layouts.
+fn find_bundled_python(tools_path: &Path) -> Option<PathBuf> {
+    let idf_python_root = tools_path.join("tools").join("idf-python");
+    if idf_python_root.is_dir() {
+        let mut versions: Vec<PathBuf> = std::fs::read_dir(&idf_python_root)
+            .ok()?.flatten().map(|e| e.path()).filter(|p| p.is_dir()).collect();
+        versions.sort(); // highest version last
+        versions.reverse();
+        for ver_dir in &versions {
+            // python.exe directly in version dir (e.g. idf-python/3.11.2/python.exe)
+            if cfg!(windows) {
+                let candidate = ver_dir.join("python.exe");
+                if candidate.exists() { return Some(candidate); }
+            } else {
+                for name in &["python3", "python"] {
+                    let candidate = ver_dir.join(name);
+                    if candidate.exists() { return Some(candidate); }
+                }
+            }
+        }
+    }
+    // Fallback: scan tools/tools/ at depth ≤3
+    find_python_in_dir(&tools_path.join("tools"), 0, 3)
+        .or_else(|| find_python_in_dir(tools_path, 0, 3))
+}
+
+/// Walk a directory tree looking for python.exe / python3 (max_depth limit).
+fn find_python_in_dir(dir: &Path, depth: u32, max_depth: u32) -> Option<PathBuf> {
+    if depth > max_depth { return None; }
+    let Ok(entries) = std::fs::read_dir(dir) else { return None; };
+    let mut dirs = Vec::new();
+    for entry in entries.flatten() {
+        let p = entry.path();
+        if p.is_file() {
+            let name = p.file_name().unwrap_or_default().to_string_lossy().to_lowercase();
+            if name == "python.exe" || name == "python3" || name == "python" {
+                return Some(p);
+            }
+        } else if p.is_dir() {
+            dirs.push(p);
+        }
+    }
+    for d in dirs {
+        if let Some(found) = find_python_in_dir(&d, depth + 1, max_depth) {
+            return Some(found);
+        }
+    }
+    None
+}
+
+/// Called at app startup: silently patch pyvenv.cfg files so Python paths always
+/// reflect the current machine's toolchain install location.
+/// Safe to call even if toolchain is not installed (no-op).
+pub fn auto_repair_on_startup(toolchain_dir: &Path) {
+    if !toolchain_dir.join(SENTINEL_FILE).exists() { return; }
+    if let Err(e) = patch_venv_paths(toolchain_dir) {
+        eprintln!("[Startup] pyvenv auto-repair warning: {}", e);
+    } else {
+        eprintln!("[Startup] pyvenv paths verified/patched for this machine.");
+    }
+}
+
+/// Patch all pyvenv.cfg files found under `toolchain_dir` so that the `home =` line
+/// points to the **bundled** idf-python bin directory on the current machine.
+///
+/// Background: Python venvs store an absolute `home =` path in pyvenv.cfg that
+/// references the Python interpreter used to create the venv.  When the toolchain
+/// ZIP was built on the developer's machine (e.g. C:\Users\Acer\...) that path is
+/// baked in and will not exist on any other PC, causing:
+///   No Python at 'C:\Users\Acer\...' error.
+///
+/// We fix this by:
+///   1. Finding the bundled idf-python executable under toolchain/tools/idf-python/
+///   2. Rewriting `home = <anything>` → `home = <bundled_python_dir>` in every pyvenv.cfg.
+fn patch_venv_paths(toolchain_dir: &Path) -> Result<(), String> {
+    // ── Step 1: locate bundled idf-python ─────────────────────────────────
+    // Expected layout after extraction:
+    //   toolchain/tools/idf-python/<version>/python.exe   (Windows)
+    //   toolchain/tools/idf-python/<version>/python3      (Unix)
+    let tools_dir = toolchain_dir.join("tools");
+    let idf_python_dir = tools_dir.join("idf-python");
+
+    let bundled_python_bin_dir: Option<PathBuf> = (|| -> Option<PathBuf> {
+        // Walk: idf-python/<version>/python.exe
+        if idf_python_dir.is_dir() {
+            let versions: Vec<_> = std::fs::read_dir(&idf_python_dir).ok()?.flatten()
+                .map(|e| e.path())
+                .filter(|p| p.is_dir())
+                .collect();
+            for ver in &versions {
+                // Direct python.exe in version dir
+                if cfg!(windows) {
+                    if ver.join("python.exe").exists() { return Some(ver.clone()); }
+                } else {
+                    if ver.join("python3").exists() || ver.join("python").exists() { return Some(ver.clone()); }
+                }
+                // python.exe inside bin/
+                let bin = ver.join("bin");
+                if bin.exists() { return Some(bin); }
+            }
+        }
+        // Fallback: scan tools/ for any directory containing python.exe at depth ≤3
+        find_python_dir(&tools_dir, 0, 3)
+    })();
+
+    // ── Step 2: find all pyvenv.cfg files under toolchain/ ────────────────
+    let mut cfg_files: Vec<PathBuf> = Vec::new();
+    collect_pyvenv_cfgs(toolchain_dir, &mut cfg_files);
+
+    if cfg_files.is_empty() {
+        eprintln!("[Patch] No pyvenv.cfg found under {} — skipping patch", toolchain_dir.display());
+        return Ok(());
+    }
+
+    eprintln!("[Patch] Found {} pyvenv.cfg file(s)", cfg_files.len());
+
+    // ── Step 3: rewrite `home = ...` in each cfg ──────────────────────────
+    for cfg_path in &cfg_files {
+        let content = match std::fs::read_to_string(cfg_path) {
+            Ok(c) => c,
+            Err(e) => { eprintln!("[Patch] Cannot read {}: {}", cfg_path.display(), e); continue; }
+        };
+
+        // Determine the correct `home` value:
+        // Prefer bundled idf-python dir; fall back to the venv's own Scripts/bin dir.
+        let new_home: String = if let Some(ref bp) = bundled_python_bin_dir {
+            bp.to_string_lossy().into_owned()
+        } else {
+            // If no bundled python found, keep the venv's own Scripts/bin
+            let venv_dir = cfg_path.parent().unwrap_or(cfg_path);
+            let bin = if cfg!(windows) { venv_dir.join("Scripts") } else { venv_dir.join("bin") };
+            bin.to_string_lossy().into_owned()
+        };
+
+        let patched = content
+            .lines()
+            .map(|line| {
+                let trimmed = line.trim();
+                if trimmed.to_lowercase().starts_with("home") && trimmed.contains('=') {
+                    format!("home = {}", new_home)
+                } else {
+                    line.to_string()
+                }
+            })
+            .collect::<Vec<_>>()
+            .join("\r\n"); // keep Windows line endings
+
+        if let Err(e) = std::fs::write(cfg_path, &patched) {
+            eprintln!("[Patch] Cannot write {}: {}", cfg_path.display(), e);
+        } else {
+            eprintln!("[Patch] Patched {} → home = {}", cfg_path.display(), new_home);
+        }
+    }
+
+    Ok(())
+}
+
+/// Recursively collect all `pyvenv.cfg` files under `dir` (max depth 8).
+fn collect_pyvenv_cfgs(dir: &Path, out: &mut Vec<PathBuf>) {
+    fn walk(dir: &Path, depth: u32, out: &mut Vec<PathBuf>) {
+        if depth > 8 { return; }
+        let Ok(entries) = std::fs::read_dir(dir) else { return; };
+        for entry in entries.flatten() {
+            let p = entry.path();
+            if p.is_dir() {
+                walk(&p, depth + 1, out);
+            } else if p.file_name().map(|n| n == "pyvenv.cfg").unwrap_or(false) {
+                out.push(p);
+            }
+        }
+    }
+    walk(dir, 0, out);
+}
+
+/// Walk `dir` up to `max_depth` and return the first directory containing python.exe / python3.
+fn find_python_dir(dir: &Path, depth: u32, max_depth: u32) -> Option<PathBuf> {
+    if depth > max_depth { return None; }
+    let Ok(entries) = std::fs::read_dir(dir) else { return None; };
+    for entry in entries.flatten() {
+        let p = entry.path();
+        if p.is_file() {
+            let name = p.file_name().unwrap_or_default().to_string_lossy().to_lowercase();
+            if name == "python.exe" || name == "python3" || name == "python" {
+                return p.parent().map(|d| d.to_path_buf());
+            }
+        } else if p.is_dir() {
+            if let Some(found) = find_python_dir(&p, depth + 1, max_depth) {
+                return Some(found);
+            }
         }
     }
     None

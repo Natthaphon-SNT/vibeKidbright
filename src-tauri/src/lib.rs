@@ -19,6 +19,11 @@ pub fn run() {
             app.manage(ai_chat::AiBackupState::default());
             // Seed bundled knowledge_base files into AppData on first launch
             ai_chat::seed_knowledge_base(app.handle());
+            // Auto-patch pyvenv.cfg every startup so Python paths match this machine
+            // (fixes "No Python at C:\Users\Acer\..." on machines other than the dev machine)
+            if let Ok(toolchain_dir) = toolchain::get_toolchain_dir(app.handle()) {
+                toolchain::auto_repair_on_startup(&toolchain_dir);
+            }
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -79,6 +84,7 @@ pub fn run() {
             toolchain::download_toolchain,
             toolchain::cancel_toolchain_download,
             toolchain::remove_toolchain,
+            toolchain::repair_toolchain_paths,
             toolchain::get_toolchain_paths,
             toolchain::build_firmware_with_toolchain,
         ])

@@ -70,7 +70,7 @@ fn get_cloud_client() -> &'static Client {
     CLOUD_HTTP_CLIENT.get_or_init(|| {
         Client::builder()
             .connect_timeout(std::time::Duration::from_secs(15))
-            .timeout(std::time::Duration::from_secs(120))
+            .timeout(std::time::Duration::from_secs(600))
             .build()
             .unwrap_or_else(|_| Client::new())
     })
@@ -937,7 +937,14 @@ pub async fn send_ai_message(
             }
         }
 
-        let hardware_rules = std::fs::read_to_string(kb_path.join("formula_kid_controller.md")).unwrap_or_default();
+        // Only inject hardware rules if the file is NOT disabled by the user.
+        let hw_file = kb_path.join("formula_kid_controller.md");
+        let hw_file_disabled = kb_path.join("formula_kid_controller.md.disabled");
+        let hardware_rules = if hw_file.exists() && !hw_file_disabled.exists() {
+            std::fs::read_to_string(&hw_file).unwrap_or_default()
+        } else {
+            String::new()
+        };
         if !hardware_rules.is_empty() {
             dynamic_system_prompt.push_str(&format!(
                 "\n\n## MANDATORY HARDWARE RULES (always apply)\n{}\n",
@@ -2095,11 +2102,9 @@ async fn run_conversation_loop(
     } else {
         true
     };
-
-    const MAX_RETRIES: u32 = 3;
     const RETRY_DELAY_SECS: u64 = 4;
     let mut retry_count: u32 = 0;
-    // FIX: Guard against infinite tool-call loops.
+    // Guard against infinite tool-call loops.
     let mut tool_turns: u32 = 0;
 
     loop {
@@ -2136,11 +2141,52 @@ async fn run_conversation_loop(
                 .header("X-Title", "vibeKidbright IDE");
         }
 
-        let response = request
-            .body(body.to_string())
-            .send()
-            .await
-            .map_err(|e| format!("Connection to {} failed: {}", url, e))?;
+        let current_timeout = if is_local_url || is_openrouter {
+            match retry_count {
+                0 => std::time::Duration::from_secs(30),
+                1 => std::time::Duration::from_secs(120),
+                _ => std::time::Duration::from_secs(300),
+            }
+        } else {
+            std::time::Duration::from_secs(120)
+        };
+
+        let send_future = request.body(body.to_string()).send();
+        let response_result = if is_local_url || is_openrouter {
+            match tokio::time::timeout(current_timeout, send_future).await {
+                Ok(Ok(res)) => Ok(res),
+                Ok(Err(e)) => Err(format!("Connection error: {}", e)),
+                Err(_) => Err("timeout".to_string()),
+            }
+        } else {
+            send_future.await.map_err(|e| format!("Connection to {} failed: {}", url, e))
+        };
+
+        let response = match response_result {
+            Ok(res) => res,
+            Err(e) => {
+                if is_local_url || is_openrouter {
+                    let is_timeout = e == "timeout" || e.to_lowercase().contains("timeout") || e.to_lowercase().contains("timed out");
+                    retry_count += 1;
+                    if retry_count >= 3 {
+                        if is_timeout {
+                            return Err("⏱️ Connection timed out. Please check your local server or OpenRouter connection.".to_string());
+                        } else {
+                            return Err(format!("Connection to {} failed after 3 attempts: {}", url, e));
+                        }
+                    }
+                    let err_desc = if is_timeout { "Timed out" } else { "Connection failed" };
+                    let _ = app_handle.emit(
+                        "terminal-output",
+                        format!("[AI] ⚠️ {} (attempt {}/3). Retrying in {}s...", err_desc, retry_count, RETRY_DELAY_SECS),
+                    );
+                    tokio::time::sleep(tokio::time::Duration::from_secs(RETRY_DELAY_SECS)).await;
+                    continue;
+                } else {
+                    return Err(e);
+                }
+            }
+        };
 
         if !response.status().is_success() {
             let status = response.status();
@@ -2154,15 +2200,15 @@ async fn run_conversation_loop(
             };
             if status.as_u16() == 429 {
                 retry_count += 1;
-                if retry_count > MAX_RETRIES {
+                if retry_count >= 3 {
                     return Err(format!(
-                        "❌ Model '{}' is rate-limited on {} and all {} retries failed.",
-                        model, provider_name, MAX_RETRIES
+                        "❌ Model '{}' is rate-limited on {} and all 3 retries failed.",
+                        model, provider_name
                     ));
                 }
                 let _ = app_handle.emit(
                     "terminal-output",
-                    format!("[AI] ⚠️ Rate limited (attempt {}/{}). Retrying in {}s...", retry_count, MAX_RETRIES, RETRY_DELAY_SECS),
+                    format!("[AI] ⚠️ Rate limited (attempt {}/3). Retrying in {}s...", retry_count, RETRY_DELAY_SECS),
                 );
                 tokio::time::sleep(tokio::time::Duration::from_secs(RETRY_DELAY_SECS)).await;
                 continue;
@@ -2195,16 +2241,27 @@ async fn run_conversation_loop(
         let mut pending_tool_calls: Vec<PendingToolCall> = Vec::new();
         let mut buffer = String::new();
 
+        let mut stream_failed_or_timed_out = false;
+        let mut stream_error_msg = String::new();
 
         while let Some(chunk_result) = {
             if is_local_url {
-                // No timeout for local servers — large models can be slow
-                stream.next().await
-            } else {
-                match tokio::time::timeout(std::time::Duration::from_secs(90), stream.next()).await {
+                match tokio::time::timeout(current_timeout, stream.next()).await {
                     Ok(item) => item,
                     Err(_) => {
-                        return Err("⏱️ Stream timeout: The AI server stopped responding for 90 seconds. Please retry.".to_string());
+                        stream_failed_or_timed_out = true;
+                        stream_error_msg = "timeout".to_string();
+                        None
+                    }
+                }
+            } else {
+                let stream_timeout_duration = if is_openrouter { current_timeout } else { std::time::Duration::from_secs(90) };
+                match tokio::time::timeout(stream_timeout_duration, stream.next()).await {
+                    Ok(item) => item,
+                    Err(_) => {
+                        stream_failed_or_timed_out = true;
+                        stream_error_msg = "timeout".to_string();
+                        None
                     }
                 }
             }
@@ -2228,7 +2285,9 @@ async fn run_conversation_loop(
                         );
                         break;
                     }
-                    return Err(format!("Stream error: {}", err_str));
+                    stream_failed_or_timed_out = true;
+                    stream_error_msg = err_str;
+                    break;
                 }
             };
             let chunk_str = String::from_utf8_lossy(&chunk);
@@ -2336,6 +2395,34 @@ async fn run_conversation_loop(
                     if let Some(args) = function_call.get("arguments").and_then(|v| v.as_str()) {
                         pending_tool_calls[0].arguments.push_str(args);
                     }
+                }
+            }
+        }
+
+        if stream_failed_or_timed_out {
+            if (is_local_url || is_openrouter) && accumulated_text.is_empty() && think_text.is_empty() {
+                let is_timeout = stream_error_msg == "timeout" || stream_error_msg.to_lowercase().contains("timeout") || stream_error_msg.to_lowercase().contains("timed out");
+                retry_count += 1;
+                if retry_count < 3 {
+                    let err_desc = if is_timeout { "Timed out" } else { "Connection failed" };
+                    let _ = app_handle.emit(
+                        "terminal-output",
+                        format!("[AI] ⚠️ Stream {} (attempt {}/3). Retrying in {}s...", err_desc, retry_count, RETRY_DELAY_SECS),
+                    );
+                    tokio::time::sleep(tokio::time::Duration::from_secs(RETRY_DELAY_SECS)).await;
+                    continue;
+                } else {
+                    if is_timeout {
+                        return Err("⏱️ Connection timed out. Please check your local server or OpenRouter connection.".to_string());
+                    } else {
+                        return Err(format!("Stream failed: {}", stream_error_msg));
+                    }
+                }
+            } else {
+                if stream_error_msg == "timeout" {
+                    return Err("⏱️ Stream timeout: The AI server stopped responding. Please retry.".to_string());
+                } else {
+                    return Err(format!("Stream error: {}", stream_error_msg));
                 }
             }
         }
@@ -3141,6 +3228,9 @@ async fn execute_tool(
                 .env("IDF_TOOLS_PATH", &tools_path)
                 .env("ESP_IDF_VERSION", &idf_version)
                 .env("PATH", build_ai_idf_path_cached(&tools_path));
+            if let Some(rom_elf_dir) = crate::esp_idf::find_esp_rom_elf_dir(&tools_path) {
+                cmd.env("ESP_ROM_ELF_DIR", rom_elf_dir);
+            }
             match cmd.output().await {
                 Ok(output) => {
                     let stdout = String::from_utf8_lossy(&output.stdout).to_string();
@@ -3188,6 +3278,9 @@ async fn execute_tool(
                     .env("IDF_TOOLS_PATH", &tools_path)
                     .env("ESP_IDF_VERSION", idf_version)
                     .env("PATH", build_ai_idf_path_cached(&tools_path));
+                if let Some(rom_elf_dir) = crate::esp_idf::find_esp_rom_elf_dir(&tools_path) {
+                    process.env("ESP_ROM_ELF_DIR", rom_elf_dir);
+                }
                 if let Some(python_bin) = find_idf_python_bin(&tools_path) {
                     if let Some(rel) = command.trim_start().strip_prefix("idf.py") {
                         let tail = rel.trim();
@@ -3535,6 +3628,8 @@ fn collect_kb_files_inner(root: &Path, current: &Path, result: &mut Vec<(PathBuf
         if path.is_dir() {
             collect_kb_files_inner(root, &path, result);
         } else if path.is_file() {
+            // Skip files that the user has disabled via the UI toggle (renamed to *.disabled).
+            if name.ends_with(".disabled") { continue; }
             let ext = path.extension().and_then(|e| e.to_str()).unwrap_or("").to_lowercase();
             if matches!(ext.as_str(), "txt" | "md" | "c" | "h") {
                 let rel = path.strip_prefix(root).unwrap_or(&path);
