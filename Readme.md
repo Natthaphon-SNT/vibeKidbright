@@ -1,371 +1,246 @@
-# vibeKidbright — คู่มือสำหรับมือใหม่
+# vibeKidbright
 
-> **โปรแกรม IDE สำหรับเขียนโค้ด ESP32 พร้อม AI ช่วยเหลือ**  
-> ไม่ต้องมีความรู้พื้นฐาน — อ่านทีละขั้นตอน ทำตามได้เลย ✅
+<p align="center">
+  <img src="resources/icon.png" alt="vibeKidbright Logo" width="120"/>
+</p>
 
----
+<p align="center">
+  <strong>AI-Powered IDE สำหรับพัฒนา ESP-IDF และ KidBright บน Desktop</strong>
+</p>
 
-## 📖 สารบัญ
-
-- [vibeKidbright คืออะไร?](#-vibeKidbright-คืออะไร)
-- [บอร์ดที่รองรับ และ เซนเซอร์](#บอร์ดที่รองรับ)
-- [ก่อนเริ่ม — ต้องมีอะไรบ้าง?](#-ก่อนเริ่ม--ต้องมีอะไรบ้าง)
-- [STEP 1 — ติดตั้งโปรแกรม](#-step-1--ดาวน์โหลดและติดตั้งโปรแกรม)
-- [STEP 2 — ติดตั้ง Toolchain (สำคัญมาก!)](#-step-2--ติดตั้ง-toolchain)
-- [STEP 3 — เปิดโปรแกรมครั้งแรก](#-step-3--เปิดโปรแกรมครั้งแรก)
-- [STEP 4 — สร้างโปรเจกต์แรก](#-step-4--สร้างโปรเจกต์แรก)
-- [STEP 5 — Build และ Flash ลง ESP32](#-step-5--build-และ-flash-ลง-esp32)
-- [STEP 6 — ใช้ AI ช่วยเขียนโค้ด](#-step-6--ใช้-ai-ช่วยเขียนโค้ด)
-- [ปัญหาที่พบบ่อย (FAQ)](#-ปัญหาที่พบบ่อย)
-- [ความหมายของปุ่มต่างๆ](#-ความหมายของปุ่มต่างๆ)
+<p align="center">
+  <a href="https://github.com/Natthaphon-SNT/vibeKidbright/releases/tag/v0.1.0">
+    <img src="https://img.shields.io/badge/version-v0.1.0-blue.svg" alt="Version"/>
+  </a>
+  <img src="https://img.shields.io/badge/platform-Windows-lightgrey.svg" alt="Platform"/>
+  <img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License"/>
+  <img src="https://img.shields.io/badge/built%20with-Tauri%20%2B%20React-orange.svg" alt="Tech Stack"/>
+</p>
 
 ---
 
-## 🤔 vibeKidbright คืออะไร?
+## 📖 ภาพรวม
 
-**vibeKidbright** คือโปรแกรมสำหรับเขียนโค้ดบอร์ด **KidBright / ESP32** บน Windows  
-คิดง่ายๆ ว่ามันคือ "VS Code แต่เอาไว้โปรแกรม ESP32 โดยเฉพาะ + มี AI คอยช่วย"
+**vibeKidbright** คือ IDE สมัยใหม่ที่ขับเคลื่อนด้วย AI ออกแบบมาเพื่อการพัฒนาโปรเจกต์ ESP-IDF (Espressif IoT Development Framework) โดยเฉพาะ รองรับบอร์ด ESP32 ทุกรุ่น รวมถึง **KidBright32** และ **KidBright μAI Plus**
 
-### ทำอะไรได้บ้าง?
-| ฟีเจอร์ | คืออะไร |
-|---------|---------|
-| Project Manager | จัดการโปรเจกต์ได้ง่าย สร้างใหม่หรือเปิดของเก่า |
-| Vibe Coder (AI) | ถามคำถาม ขอให้เขียนโค้ดให้ หรือตรวจแก้บัก |
-| Terminal | รัน command และดู log จาก ESP32 ได้เลย |
-| Build & Flash | กดปุ่มเดียว คอมไพล์แล้วอัพโค้ดลงบอร์ดได้ |
-
-### บอร์ดที่รองรับ
-
-| บอร์ด | USB | เซนเซอร์พิเศษ | หมายเหตุ |
-|-------|-----|--------------|---------|
-| **KidBright 32 V1.5 Rev.3.1** | Micro-USB | — | NECTEC Standard |
-| **KidBright 32 V1.5 Rev.3.1G** | Micro-USB | — | Gravitech OEM |
-| **KidBright32iA** | USB-C | Accelerometer (KXTJ3) | INEX |
-| **Formula Kid Controller V1.1** | Micro-USB | Joystick RC | ใช้คู่กับรถ Formula Kid CAR |
-
-### เซนเซอร์ที่มีมาในบอร์ดทุกรุ่น (On-board)
-
-| เซนเซอร์ | วัดอะไร | หมายเหตุ |
-|----------|---------|---------|
-| LDR / Phototransistor | ความสว่าง | LDR ใน Rev.3.1/3.1G, Phototransistor ใน 32iA |
-| LM73 | อุณหภูมิ (-40 ถึง 150°C) | I2C |
-| HT16K33 | ควบคุม LED Matrix 16×8 | I2C |
-| RTC MCP794xx | นาฬิกาเวลาจริง | ต้องใส่ถ่าน CR1220 |
-| KXTJ3-1057 | ความเร่ง 3 แกน (X/Y/Z) | เฉพาะ 32iA |
-| Passive Buzzer | เสียง | ต่อตรงกับ GPIO13 |
-| SW1, SW2 | ปุ่มกด 2 ปุ่ม | Active LOW |
-
-### อุปกรณ์เสริมที่รองรับ (ต่อเพิ่มได้)
-
-| อุปกรณ์ | ต่อผ่าน | ใช้ทำอะไร |
-|---------|---------|----------|
-| iKB-1 / iKB-1Z | KB-Chain (I2C) | เพิ่ม Digital I/O 8 ช่อง + ขับ Motor 2 ตัว + Servo 6 ตัว |
-| OLED SSD1306 (128×64) | I2C / GPIO อิสระ | จอแสดงผลขนาดเล็ก |
-| SKATE Rev 1.3 | GPIO + I2C | Shield สำหรับหุ่นยนต์ Self-Balancing (L298N + MPU6050) |
-| DHT11/DHT22 | IN1–IN4 (JST) | วัดอุณหภูมิ + ความชื้น |
-| HC-SR04 Ultrasonic | IN1–IN4 (JST) | วัดระยะทาง |
-| PIR Motion Sensor | IN1–IN4 (JST) | ตรวจจับการเคลื่อนไหว |
+สร้างขึ้นด้วย **Tauri + React + TypeScript** ทำให้ได้แอพพลิเคชั่น Desktop ที่เบา เร็ว และมีประสิทธิภาพสูง พร้อม AI Assistant ในตัวที่ช่วยเขียนและวิเคราะห์โค้ด Firmware ได้โดยตรง
 
 ---
 
-## 📋 ก่อนเริ่ม — ต้องมีอะไรบ้าง?
+## ✨ ฟีเจอร์หลัก
 
-### ของที่ต้องมี
-- ✅ คอมพิวเตอร์ Windows 10 หรือ 11
-- ✅ บอร์ด KidBright หรือ ESP32
-- ✅ สาย USB สำหรับเชื่อมต่อบอร์ด
-- ✅ อินเทอร์เน็ต (สำหรับดาวน์โหลด)
+### 📁 Project Management
+- **สร้างโปรเจกต์ใหม่** — สร้าง ESP-IDF project structure ได้ทันทีจากหน้า UI
+- **เปิดโปรเจกต์ที่มีอยู่** — เปิด folder ของโปรเจกต์ ESP-IDF เดิมได้โดยตรง
+- **File Explorer** — แสดงต้นไม้ไฟล์ของโปรเจกต์ทั้งหมด พร้อมเปิด/แก้ไขไฟล์ได้ในหน้าเดียว
 
-### พื้นที่ที่ต้องใช้
-- โปรแกรม vibeKidbright: ~50 MB
-- Toolchain (ESP-IDF + เครื่องมือ): ~3-5 GB ⚠️ ใช้เยอะ เตรียมพื้นที่ไว้ด้วย
+### 🤖 Vibe Coder — AI Assistant
+- **อ่านโค้ดของคุณ** — AI สามารถอ่านไฟล์ source ปัจจุบันและทำความเข้าใจ context ของโปรเจกต์
+- **แนะนำการแก้ไขโค้ด** — ถามปัญหาเกี่ยวกับ firmware, logic, หรือ bug ได้เป็นภาษาธรรมชาติ
+- **Inject Code โดยตรง** — AI สามารถเขียนโค้ดแล้วแทรกเข้าไปในไฟล์ของคุณได้ทันทีโดยไม่ต้อง copy-paste
+- **Knowledge Base** — มีฐานข้อมูลความรู้เฉพาะทางสำหรับ KidBright และ ESP-IDF เพื่อให้คำตอบที่แม่นยำ
 
----
+### 🖥️ Interactive Terminal
+- **Built-in Terminal** — Terminal แบบ interactive ในตัว ไม่ต้องเปิด Command Prompt แยก
+- **Real-time Logs** — แสดง output จาก ESP-IDF build system, `idf.py`, และ CMake แบบ real-time
+- **Shell Commands** — รันคำสั่งทั่วไปได้เลยจาก terminal ภายในแอพ
 
-## 📥 STEP 1 — ดาวน์โหลดและติดตั้งโปรแกรม
+### ⚡ One-Click Build & Flash
+- **Build** — คอมไพล์โปรเจกต์ด้วยปุ่มเดียว (รัน `idf.py build` ใต้ฝากระโปรง)
+- **Flash** — เขียน firmware ลง ESP32 ผ่านพอร์ต Serial โดยไม่ต้องพิมพ์คำสั่ง
+- **Monitor** — เปิด Serial Monitor เพื่อดู log จาก device แบบ real-time
+- **Clean** — ล้าง build artifacts ได้จากปุ่มเดียว
 
-> ⏱️ ใช้เวลาประมาณ 5 นาที
-
-### 1.1 ดาวน์โหลด
-
-1. เปิดเบราว์เซอร์ ไปที่ลิงก์นี้:  
-   👉 **https://github.com/Natthaphon-SNT/vibeKidbright/releases**
-
-2. เลือก release ล่าสุด (มีป้าย **Latest** สีเขียว)
-
-3. ดาวน์โหลดไฟล์ตามนี้:
-
-   | ไฟล์ | คืออะไร | แนะนำ? |
-   |------|---------|--------|
-   | `tauri-app_x.x.x_x64-setup.exe` | ตัวติดตั้ง (ง่ายที่สุด) | ✅ แนะนำ |
-   | `tauri-app_x.x.x_x64_en-US.msi` | ตัวติดตั้งแบบ MSI | ใช้ได้ |
-
-   > **💡 ถ้าไม่รู้จะเลือกอะไร** → เลือก `.exe` เสมอ
-
-### 1.2 ติดตั้ง
-
-1. ดับเบิ้ลคลิกที่ไฟล์ `.exe` ที่ดาวน์โหลดมา
-2. ถ้าขึ้น **"Windows protected your PC"** → คลิก **"More info"** → **"Run anyway"**  
-   *(นี่คือปกติ เพราะโปรแกรมยังไม่ได้จ่ายค่า certificate ให้ Microsoft)*
-3. คลิก **Next** → **Install** → **Finish**
-4. โปรแกรมจะติดตั้งเสร็จ และมี shortcut บน Desktop
+### 🎨 Modern UI / UX
+- **Dark Theme** — ธีมสีเข้มที่ออกแบบมาสำหรับการโค้ดโดยเฉพาะ
+- **Tailwind CSS** — UI สะอาด ทันสมัย ปรับขนาดได้อัตโนมัติ
+- **Responsive Layout** — แบ่ง panel ระหว่าง Editor, Terminal, และ AI Chat ได้ยืดหยุ่น
 
 ---
 
-## 🔧 STEP 2 — ติดตั้ง Toolchain
+## 📦 เวอร์ชั่น
 
-> ⚠️ ขั้นตอนนี้สำคัญมาก ถ้าข้ามจะ Build ไม่ได้!  
-> ⏱️ ใช้เวลาประมาณ 30-60 นาที (ขึ้นอยู่กับอินเทอร์เน็ต)
+### v0.1.0 — Initial Release (10 เมษายน 2026)
+> รองรับ **Windows** เท่านั้น
 
-**Toolchain** คืออุปกรณ์แปลงโค้ดที่เราเขียน ให้กลายเป็นภาษาที่ ESP32 เข้าใจได้
+ฟีเจอร์ที่มาพร้อม v0.1.0:
+- Project Management (สร้าง/เปิดโปรเจกต์)
+- Vibe Coder AI Assistant (อ่านโค้ด + Inject Code)
+- Built-in Interactive Terminal
+- One-Click Build, Flash, Monitor, Clean
+- Dark Theme UI
+- Knowledge Base สำหรับ KidBright + ESP-IDF
+- GitHub Actions CI/CD pipeline สำหรับ auto-build release
 
-### วิธีติดตั้ง Toolchain ผ่านโปรแกรม (แนะนำ)
-
-1. เปิดโปรแกรม **vibeKidbright**
-2. ครั้งแรกที่เปิด จะมีหน้า **"Toolchain Setup"** ขึ้นมาอัตโนมัติ
-3. คลิก **"Install Toolchain"** หรือ **"ติดตั้ง Toolchain"**
-4. รอจนดาวน์โหลดเสร็จ (ดูแถบ progress)
-5. เมื่อขึ้นว่า **"Complete"** หรือ **"สำเร็จ"** ก็เสร็จแล้ว
-
-> **💡 ระหว่างรอ:** อย่าปิดโปรแกรม และอย่าปิดคอม
-
-### วิธีติดตั้ง Toolchain ด้วยตัวเอง (ถ้าโปรแกรมไม่ทำให้)
-
-1. ดาวน์โหลด **ESP-IDF** จาก:  
-   👉 https://dl.espressif.com/dl/esp-idf/
-
-2. เลือก **"ESP-IDF Online Installer for Windows"**
-
-3. รันไฟล์ที่ดาวน์โหลดมา และทำตามขั้นตอน
-
-4. เมื่อติดตั้งเสร็จ เปิด **ESP-IDF CMD** แล้วพิมพ์:
-   ```
-   idf.py --version
-   ```
-   ถ้าขึ้นเลข version แสดงว่าติดตั้งสำเร็จ ✅
+**ดาวน์โหลด:** ไปที่ [Releases](https://github.com/Natthaphon-SNT/vibeKidbright/releases/tag/v0.1.0) แล้วดาวน์โหลดไฟล์ `.msi` หรือ `.exe`
 
 ---
 
-## 🚀 STEP 3 — เปิดโปรแกรมครั้งแรก
+## 🚀 การติดตั้ง (สำหรับผู้ใช้ทั่วไป)
 
-1. ดับเบิ้ลคลิก shortcut **vibeKidbright** บน Desktop
-2. รอโปรแกรมโหลด (อาจใช้เวลา 10-20 วินาทีครั้งแรก)
-3. จะเห็นหน้าหลักของโปรแกรม
+### Windows (แนะนำ)
+1. ไปที่ [Releases](https://github.com/Natthaphon-SNT/vibeKidbright/releases) 
+2. ดาวน์โหลดไฟล์ `.msi` หรือ `.exe` จาก release ล่าสุด
+3. ดับเบิลคลิกติดตั้ง แล้วเปิดใช้งานได้เลย
 
-### หน้าตาของโปรแกรม
+> ⚠️ ต้องติดตั้ง **ESP-IDF** ไว้ก่อน และตั้งค่า environment variables ให้ถูกต้อง
 
+---
+
+## 🛠️ การ Build จาก Source (สำหรับนักพัฒนา)
+
+### Prerequisites
+
+ต้องติดตั้งสิ่งต่อไปนี้ก่อน:
+
+| เครื่องมือ | เวอร์ชั่น | หมายเหตุ |
+|---|---|---|
+| [Node.js](https://nodejs.org/) | v18 หรือใหม่กว่า | Runtime สำหรับ Frontend |
+| [Rust](https://www.rust-lang.org/) | stable | Backend ของ Tauri |
+| Tauri CLI | ล่าสุด | `cargo install tauri-cli` |
+| [ESP-IDF](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/) | v5.x | Framework สำหรับ ESP32 |
+| Xcode CLI Tools | — | **macOS เท่านั้น** |
+
+### Clone และติดตั้ง
+
+```bash
+# 1. Clone repository
+git clone https://github.com/Natthaphon-SNT/vibeKidbright.git
+cd vibeKidbright
+
+# 2. ติดตั้ง Node dependencies
+npm install
 ```
-┌───────────────────────────────────────────────────────────────────────┐
-│  [📁 File Explorer]  │  [📝 Code Editor]         │   [ Ai Chat ]      |
-│                      │                           │                     |
-│  - โฟลเดอร์โปรเจกต์  │        เขียนโค้ดตรงนี้          │                     |
-│  - ไฟล์ต่างๆ         │                           │                        |
-│                      │                           │                     |
-├                       ┤                           │                     |
-│                        │                           │                   |
-│──────────────────────├───────────────────────────┤                     |
-│    [ Build & Flash ] │  [🖥️ Terminal]            │                    |
-│                      │  ดู log ตรงนี้             │      -ถามตรงนี้         |
-└────────────────────────────────────────────────────────────────────────┘
+
+### Development Mode
+
+```bash
+npm run tauri dev
+```
+
+คำสั่งนี้จะ:
+- เปิด Vite dev server สำหรับ Frontend (React + TypeScript)
+- Compile และรัน Tauri-Rust backend
+- เปิดหน้าต่างแอพในโหมด development พร้อม hot-reload
+
+### Production Build
+
+```bash
+npm run build
+npm run tauri build
+```
+
+ไฟล์ installer จะอยู่ที่:
+```
+src-tauri/target/release/bundle/
+├── msi/          # Windows MSI installer
+├── nsis/         # Windows EXE installer
+└── (macOS/Linux bundle หากรันบน platform นั้น)
 ```
 
 ---
 
-## 📂 STEP 4 — สร้างโปรเจกต์แรก
-
-### 4.1 สร้างโปรเจกต์ใหม่
-
-1. คลิกที่ **"New Project"** หรือ **"สร้างโปรเจกต์ใหม่"**
-2. ตั้งชื่อโปรเจกต์ (เช่น `my_first_project`) — **ใช้แค่ภาษาอังกฤษและ _ เท่านั้น ห้ามมีช่องว่าง**
-3. เลือกโฟลเดอร์ที่จะบันทึก (เช่น `C:\Projects\`)
-4. คลิก **"Create"**
-
-### 4.2 โครงสร้างโปรเจกต์
+## 📂 โครงสร้างโปรเจกต์
 
 ```
-my_first_project/
-├── main/
-│   ├── CMakeLists.txt    ← อย่าแก้ไฟล์นี้ (ถ้าไม่รู้ว่าทำอะไร)
-│   └── main.c            ← ✅ เขียนโค้ดตรงนี้!
-├── CMakeLists.txt        ← อย่าแก้
-└── sdkconfig             ← ตั้งค่าบอร์ด (แก้ได้ผ่านเมนู)
+vibeKidbright/
+├── .github/
+│   └── workflows/         # GitHub Actions CI/CD (auto-build release)
+├── knowledge_base/        # ฐานข้อมูลความรู้สำหรับ AI (ESP-IDF, KidBright)
+├── public/                # Static assets (icons, images)
+├── resources/             # App resources (icon สำหรับ Tauri)
+├── src/                   # Frontend Source (React + TypeScript)
+│   ├── components/        # React components (Editor, Terminal, AI Panel, etc.)
+│   ├── hooks/             # Custom React hooks
+│   ├── lib/               # Utility functions
+│   └── App.tsx            # Root component
+├── src-tauri/             # Tauri Backend (Rust)
+│   ├── src/
+│   │   ├── main.rs        # Entry point ของ Rust backend
+│   │   └── lib.rs         # Tauri commands (build, flash, terminal, file ops)
+│   └── tauri.conf.json    # Tauri configuration
+├── index.html             # HTML entry point
+├── package.json           # Node dependencies
+├── vite.config.ts         # Vite bundler config
+├── tsconfig.json          # TypeScript config
+└── CMakeLists.txt         # CMake config (ตัวอย่าง ESP-IDF project)
 ```
 
-### 4.3 ลองเขียนโค้ดแรก
+---
 
-เปิดไฟล์ `main/main.c` แล้วพิมพ์:
+## 🔧 เทคโนโลยีที่ใช้
 
-```c
-#include <stdio.h>
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-
-void app_main(void)
-{
-    while (1) {
-        printf("Hello from KidBright!\n");
-        vTaskDelay(1000 / portTICK_PERIOD_MS);  // รอ 1 วินาที
-    }
-}
-```
-
-> **💡 โค้ดนี้ทำอะไร?**  
-> พิมพ์คำว่า "Hello from KidBright!" ซ้ำทุก 1 วินาที
+| Layer | เทคโนโลยี |
+|---|---|
+| **Frontend** | React, TypeScript, Vite |
+| **Styling** | Tailwind CSS |
+| **Desktop Shell** | Tauri v2 |
+| **Backend Logic** | Rust |
+| **AI Integration** | Anthropic Claude API (ผ่าน Knowledge Base) |
+| **Embedded Target** | ESP-IDF (ESP32, KidBright32, KidBright μAI Plus) |
+| **Build System** | CMake + Ninja (ผ่าน idf.py) |
+| **CI/CD** | GitHub Actions |
 
 ---
 
-## ⚡ STEP 5 — Build และ Flash ลง ESP32
+## 🎯 รองรับบอร์ดอะไรบ้าง
 
-### 5.1 เชื่อมต่อบอร์ด
+vibeKidbright ออกแบบมาสำหรับ ESP32-based boards โดยเฉพาะ:
 
-1. เสียบสาย USB จากบอร์ด KidBright/ESP32 เข้าคอม
-2. ไปที่ **Device Manager** (พิมพ์ใน search bar ของ Windows)
-3. ดูที่หัวข้อ **"Ports (COM & LPT)"** จะเห็น `COM3` หรือ `COM4` หรือตัวเลขอื่น  
-   → จำหมายเลข COM นี้ไว้ (เช่น `COM4`)
+- **ESP32** (ทุกรุ่น)
+- **ESP32-S2 / S3**
+- **ESP32-C3 / C6**
+- **KidBright32** (IPST)
+- **KidBright μAI Plus** (IPST)
 
-### 5.2 ตั้งค่า Port
-
-1. ในโปรแกรม vibeKidbright หาเมนู **"Port"** หรือ **"Serial Port"**
-2. เลือก COM ที่ตรงกับบอร์ดของคุณ (เช่น `COM4`)
-
-### 5.3 Build โปรเจกต์
-
-> **Build** = แปลงโค้ดที่เขียน ให้กลายเป็นไฟล์ที่บอร์ดอ่านได้
-
-1. คลิกปุ่ม **"Build"** (รูปค้อน 🔨 หรือ ▶️)
-2. ดู **Terminal** ด้านล่าง จะมีข้อความวิ่ง
-3. รอจนขึ้นว่า:
-   ```
-   Project build complete.
-   ```
-   แสดงว่าสำเร็จ ✅
-
-4. ถ้าเห็น **error** (ตัวอักษรสีแดง) → ดู [ปัญหาที่พบบ่อย](#-ปัญหาที่พบบ่อย)
-
-### 5.4 Flash ลงบอร์ด
-
-> **Flash** = อัพโค้ดเข้าไปในบอร์ด ESP32
-
-1. คลิกปุ่ม **"Flash"** (รูปฟ้าผ่า ⚡ หรือปุ่มลูกศรชี้ลง)
-2. รอจนขึ้นว่า:
-   ```
-   Leaving...
-   Hard resetting via RTS pin...
-   ```
-   แสดงว่าอัพโค้ดสำเร็จ ✅
-
-3. เปิด **Serial Monitor** (หรือดูใน Terminal) จะเห็น:
-   ```
-   Hello from KidBright!
-   Hello from KidBright!
-   Hello from KidBright!
-   ```
-
-🎉 **ยินดีด้วย! คุณโปรแกรม ESP32 สำเร็จแล้ว!**
+> การ Flash และ Monitor ใช้ `idf.py flash monitor` ผ่าน USB Serial ตามปกติ
 
 ---
 
-## 🤖 STEP 6 — ใช้ AI ช่วยเขียนโค้ด
+## 📋 Prerequisites สำหรับใช้งาน Flash
 
-**Vibe Coder** คือ AI ที่อยู่ในโปรแกรม ใช้ถามได้เลยเหมือน ChatGPT แต่เน้นเรื่อง ESP32
+ก่อน Flash firmware จำเป็นต้องมี:
 
-### วิธีเปิด AI Chat
-
-1. คลิกที่แผง **"Vibe Coder"** หรือ **"AI Chat"** ด้านข้าง
-2. พิมพ์คำถามในช่องด้านล่าง
-3. กด Enter หรือคลิกส่ง
-
-### ตัวอย่างที่ถาม AI ได้
-
-```
-💬 "เขียนโค้ดให้ LED กระพริบทุก 500ms"
-
-💬 "โค้ดนี้มี error อะไร ช่วยแก้ให้ด้วย"
-
-💬 "อธิบายว่า FreeRTOS คืออะไร"
-
-💬 "วิธีอ่านค่าจาก sensor อุณหภูมิ DHT22"
-```
-
-### AI สามารถทำอะไรได้บ้าง?
-
-- ✅ เขียนโค้ดให้
-- ✅ แก้ bug ให้
-- ✅ อธิบายโค้ดที่ไม่เข้าใจ
-- ✅ แนะนำ library ที่เหมาะสม
-- ✅ ใส่โค้ดตรงๆ เข้าไปในไฟล์ให้เลย (Auto-inject)
+1. ติดตั้ง ESP-IDF และ set `IDF_PATH` ใน environment variables
+2. Python 3.8+ (มาพร้อม ESP-IDF)
+3. USB Driver สำหรับ CH340/CP2102 (บอร์ด KidBright ใช้ CH340)
+4. พอร์ต COM ที่มองเห็นได้ใน Device Manager
 
 ---
 
-## ❓ ปัญหาที่พบบ่อย
+## 🤝 Contributing
 
-### 🔴 Build ไม่ผ่าน — ขึ้น error แดง
+ยินดีรับ Pull Request และ Issue ทุกรูปแบบ:
 
-**สาเหตุที่พบบ่อย:**
-
-| error ที่เห็น | วิธีแก้ |
-|--------------|---------|
-| `idf.py not found` | ยังไม่ได้ติดตั้ง Toolchain → กลับไป [STEP 2](#-step-2--ติดตั้ง-toolchain) |
-| `No such file or directory` | ชื่อโฟลเดอร์มีช่องว่างหรือภาษาไทย → ย้ายโปรเจกต์ไปไว้ที่ `C:\Projects\` |
-| `syntax error` | โค้ดผิด → ถาม AI ให้แก้ |
-| `'React' is declared but never read` | เปิดไฟล์ที่ error และลบบรรทัด `import React from 'react'` ออก |
-
-### 🔴 Flash ไม่ได้ — ขึ้น "Failed to connect"
-
-1. ตรวจว่าเสียบสาย USB แน่นหรือไม่
-2. กดปุ่ม **BOOT** ค้างบนบอร์ด แล้วคลิก Flash อีกครั้ง
-3. ลองเปลี่ยนสาย USB (บางเส้นชาร์จได้แต่ส่งข้อมูลไม่ได้)
-4. ตรวจว่าเลือก COM port ถูกต้องหรือไม่
-
-### 🔴 ไม่เห็นบอร์ดใน Device Manager
-
-ต้องติดตั้ง driver:
-- **CH340**: https://sparks.gogo.co.nz/ch340.html
-- **CP2102**: https://www.silabs.com/developers/usb-to-uart-bridge-vcp-drivers
-
-### 🔴 Terminal ไม่มีตัวหนังสือขึ้นเลย
-
-- ลอง restart โปรแกรม
-- ตรวจว่า Toolchain ติดตั้งเสร็จแล้ว
+1. Fork repository นี้
+2. สร้าง feature branch: `git checkout -b feature/your-feature`
+3. Commit การเปลี่ยนแปลง: `git commit -m 'Add some feature'`
+4. Push ขึ้น branch: `git push origin feature/your-feature`
+5. เปิด Pull Request
 
 ---
 
-## 🔑 ความหมายของปุ่มต่างๆ
+## 🐛 Known Issues (v0.1.0)
 
-| ปุ่ม | ชื่อ | ทำอะไร |
-|------|------|---------|
-| 🔨 Build | Build | แปลงโค้ดเป็นไฟล์ binary |
-| ⚡ Flash | Flash | อัพโค้ดลงบอร์ด ESP32 |
-| 🔄 Build & Flash | Build + Flash | ทำทั้งสองอย่างในครั้งเดียว |
-| 🖥️ Monitor | Serial Monitor | เปิดดู output จากบอร์ด |
-| 🧹 Clean | Clean | ลบไฟล์ build เก่าออก (ใช้เมื่อ build แปลกๆ) |
-| 📁 Open | Open Project | เปิดโปรเจกต์ที่มีอยู่แล้ว |
-| ➕ New | New Project | สร้างโปรเจกต์ใหม่ |
-
----
-
-## 📚 เรียนรู้เพิ่มเติม
-
-- **ESP32 คืออะไร?** → https://docs.espressif.com/projects/esp-idf/en/latest/esp32/
-- **ตัวอย่างโค้ด ESP-IDF** → https://github.com/espressif/esp-idf/tree/master/examples
-- **KidBright Board** → https://www.kidbright.info/
-
----
-
-## 🆘 ขอความช่วยเหลือ
-
-ถ้ายังติดปัญหา สามารถ:
-1. **ถาม AI ในโปรแกรม** — อธิบาย error ที่เจอให้ AI ช่วยแก้
-2. **เปิด Issue บน GitHub** → https://github.com/Natthaphon-SNT/vibeKidbright/issues  
-   (แนบ error message มาด้วยจะช่วยได้มาก)
+- รองรับ **Windows เท่านั้น** ในปัจจุบัน (macOS/Linux อยู่ใน roadmap)
+- ESP-IDF ต้องติดตั้งแยกและตั้งค่า PATH ด้วยตนเอง
+- หากพบปัญหา COM port conflict (เช่น Arduino IDE เปิดอยู่พร้อมกัน) ให้ปิดแอพอื่นก่อน Flash
 
 ---
 
 ## 📄 License
 
-This project is under MIT License
+This project is licensed under the **MIT License** — see [LICENSE](LICENSE) for details.
 
 ---
 
-> 💡 **เคล็ดลับสุดท้าย:** ถ้าไม่รู้ว่าจะเริ่มยังไง ให้พิมพ์ถาม AI ในโปรแกรมได้เลย!  
-> AI จะช่วยแนะนำตั้งแต่ต้นจนจบครับ 🤖
+## 📬 ติดต่อ / Support
+
+- **Issues:** [GitHub Issues](https://github.com/Natthaphon-SNT/vibeKidbright/issues)
+- **Releases:** [GitHub Releases](https://github.com/Natthaphon-SNT/vibeKidbright/releases)
+
+---
+
+<p align="center">
+  Made with ❤️ for the KidBright & ESP32 Community
+</p>
