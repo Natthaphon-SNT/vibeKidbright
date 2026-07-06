@@ -804,7 +804,7 @@ function App({ toolchainReady = true }: { toolchainReady?: boolean }) {
     });
   };
 
-  /** ดาวน์โหลด toolchain จาก GitHub Release (v1.0.1) */
+  /** ดาวน์โหลด toolchain จาก GitHub Release (tags: framework, toolchain) */
   const handleAutoInstallGithub = async () => {
     if (isSettingUpEspIdf) return;
 
@@ -1540,7 +1540,7 @@ function App({ toolchainReady = true }: { toolchainReady?: boolean }) {
             <div className="bg-neutral-900/60 border border-neutral-700 rounded-lg p-4 mb-5">
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-red-400 text-sm font-bold">⬇ Auto Install</span>
-                <span className="text-[10px] text-neutral-500 bg-neutral-700 px-1.5 py-0.5 rounded">GitHub Release v1.0.1 (~2.1 GB)</span>
+                <span className="text-[10px] text-neutral-500 bg-neutral-700 px-1.5 py-0.5 rounded">GitHub Release (~2.28 GB)</span>
               </div>
               <p className="text-[11px] text-neutral-500 mb-3">
                 ดาวน์โหลด <code className="text-neutral-400">frameworks.zip</code> + <code className="text-neutral-400">tools.zip</code> จาก GitHub Release แล้วแตกไฟล์ลง AppData โดยอัตโนมัติ (ครั้งเดียว)

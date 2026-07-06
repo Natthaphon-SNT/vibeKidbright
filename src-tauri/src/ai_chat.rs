@@ -62,6 +62,37 @@ fn get_kb_query_cache() -> &'static Mutex<HashMap<String, Value>> {
     KB_QUERY_CACHE.get_or_init(|| Mutex::new(HashMap::new()))
 }
 
+/// Static HTTP client for cloud APIs (OpenRouter, OpenAI) — shared connection pool.
+/// Timeout: 120s total. Recreating a Client per request causes socket exhaustion
+/// and causes each subsequent request to take progressively longer.
+static CLOUD_HTTP_CLIENT: OnceLock<Client> = OnceLock::new();
+fn get_cloud_client() -> &'static Client {
+    CLOUD_HTTP_CLIENT.get_or_init(|| {
+        Client::builder()
+            .connect_timeout(std::time::Duration::from_secs(15))
+            .timeout(std::time::Duration::from_secs(120))
+            .build()
+            .unwrap_or_else(|_| Client::new())
+    })
+}
+
+/// Static HTTP client for local LLM servers (Ollama, LM Studio).
+/// Auto-decompression disabled — local SSE is plain text, not gzip/brotli.
+/// Timeout: 600s to allow slow models to finish.
+static LOCAL_HTTP_CLIENT: OnceLock<Client> = OnceLock::new();
+fn get_local_client() -> &'static Client {
+    LOCAL_HTTP_CLIENT.get_or_init(|| {
+        Client::builder()
+            .connect_timeout(std::time::Duration::from_secs(15))
+            .timeout(std::time::Duration::from_secs(600))
+            .no_gzip()
+            .no_brotli()
+            .no_deflate()
+            .build()
+            .unwrap_or_else(|_| Client::new())
+    })
+}
+
 /// Max tool-call turns per conversation to prevent infinite loops.
 const MAX_TOOL_TURNS: u32 = 20;
 
@@ -91,8 +122,14 @@ pub fn get_app_data_kb() -> Option<&'static PathBuf> {
 fn config_path() -> PathBuf { config_dir().join("config.json") }
 
 fn config_dir() -> PathBuf {
-    let home = std::env::var("HOME").unwrap_or_else(|_| ".".to_string());
-    PathBuf::from(home).join(".vibekidbright")
+    // Windows: use APPDATA (e.g. C:\Users\<user>\AppData\Roaming)
+    // Linux/macOS: use HOME
+    // Fallback: use current directory (should never happen in practice)
+    let base = std::env::var("APPDATA")
+        .or_else(|_| std::env::var("USERPROFILE"))
+        .or_else(|_| std::env::var("HOME"))
+        .unwrap_or_else(|_| ".".to_string());
+    PathBuf::from(base).join(".vibekidbright")
 }
 
 fn read_config() -> Value {
@@ -758,16 +795,14 @@ pub async fn send_ai_message(
             )
         };
 
-        let is_free_tier = [
-            "gemini-1.5", "gemini-2.0", "gemini-2.5", "gemini-3",
-            "meta-llama", "qwen", "deepseek",
-            "nvidia/nemotron", "arcee-ai", "minimax",
-            "z-ai/glm", "openai/gpt-oss", "google/gemma",
-            "mistralai/mistral-7b", "microsoft/phi-4",
-            ":free",
-        ]
-        .iter()
-        .any(|&m| model.to_lowercase().contains(m));
+        // A model is free-tier ONLY if it explicitly ends with ":free" suffix
+        // (OpenRouter convention). Google and OpenAI/paid models always go through
+        // direct call — gemini-2.5-flash-lite and similar models can be charged
+        // when the free quota is exceeded, so they must NOT use fallback routing.
+        let is_free_tier = model.to_lowercase().ends_with(":free")
+            || model == "free"
+            || model == "openrouter/free"
+            || model == "auto-free";
 
         if model == "free" || model == "openrouter/free" || model == "auto-free" {
             let best_free_models = vec![
@@ -2036,24 +2071,14 @@ async fn run_conversation_loop(
             }
     };
 
-    // Local LLM servers (LM Studio, Ollama) send SSE as plain text.
-    // reqwest's auto-decompression treats it as gzip/brotli and fails with
-    // "error decoding response body". Disable decompression for local servers.
-    let client = if is_local_url {
-        Client::builder()
-            .connect_timeout(std::time::Duration::from_secs(15))
-            .timeout(std::time::Duration::from_secs(600))
-            .no_gzip()
-            .no_brotli()
-            .no_deflate()
-            .build()
-            .unwrap_or_else(|_| Client::new())
+    // Use a static shared HTTP client to reuse connection pool across requests.
+    // Creating a new Client per call causes socket accumulation:
+    //   call 1 = 30s, call 2 = 2min, call 3 = 5min → timeout
+    // Static clients share the connection pool and keep-alive sockets.
+    let client: &Client = if is_local_url {
+        get_local_client()
     } else {
-        Client::builder()
-            .connect_timeout(std::time::Duration::from_secs(15))
-            .timeout(std::time::Duration::from_secs(300))
-            .build()
-            .unwrap_or_else(|_| Client::new())
+        get_cloud_client()
     };
     let tools = get_tools();
 

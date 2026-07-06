@@ -19,9 +19,9 @@ use tauri::{AppHandle, Emitter, Manager};
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-/// GitHub Release v1.0.1 — มี 2 ไฟล์แยกกัน:
-///   frameworks.zip  (~286 MB)  → แตกลง toolchain/
-///   tools.zip       (~1.85 GB) → แตกลง toolchain/
+/// GitHub Releases framework & toolchain — มี 2 ไฟล์แยกกัน:
+///   frameworks.zip  (~300 MB)  → แตกลง toolchain/
+///   tools.zip       (~1.98 GB) → แตกลง toolchain/
 ///
 /// โครงสร้างหลังแตกไฟล์:
 ///   toolchain/
@@ -33,12 +33,12 @@ use tauri::{AppHandle, Emitter, Manager};
 const TOOLCHAIN_PARTS: &[(&str, &str)] = &[
     // (URL, label)
     (
-        "https://github.com/Natthaphon-SNT/vibeKidbright/releases/download/v1.0.1/frameworks.zip",
-        "frameworks (~286 MB)",
+        "https://github.com/Natthaphon-SNT/vibeKidbright/releases/download/framework/frameworks.zip",
+        "frameworks (~300 MB)",
     ),
     (
-        "https://github.com/Natthaphon-SNT/vibeKidbright/releases/download/v1.0.1/tools.zip",
-        "tools (~1.85 GB)",
+        "https://github.com/Natthaphon-SNT/vibeKidbright/releases/download/toolchain/tools.zip",
+        "tools (~1.98 GB)",
     ),
 ];
 

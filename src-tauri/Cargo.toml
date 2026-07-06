@@ -22,7 +22,7 @@ tauri = { version = "2", features = [] }
 tauri-plugin-opener = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-reqwest = { version = "0.12", features = ["json", "stream", "blocking", "rustls-tls", "cookies"] }
+reqwest = { version = "0.12", features = ["json", "stream", "blocking", "rustls-tls", "cookies", "multipart"] }
 tokio = { version = "1", features = ["full"] }
 futures = "0.3"
 rfd = "0.15"
@@ -33,3 +33,4 @@ regex = "1"
 dunce = "1"
 zip = "2"                    # สำหรับแตกไฟล์ toolchain .zip
 directories = "5.0"          # สำหรับหาโฟลเดอร์ AppData ของผู้ใช้
+base64 = "0.22"              # สำหรับ decode firmware binary จาก cloud build API

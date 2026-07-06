@@ -2,6 +2,7 @@ mod esp_idf;
 mod ai_chat;
 mod toolchain;
 
+
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
 fn greet(name: &str) -> String {
@@ -79,7 +80,7 @@ pub fn run() {
             toolchain::cancel_toolchain_download,
             toolchain::remove_toolchain,
             toolchain::get_toolchain_paths,
-            toolchain::build_firmware_with_toolchain
+            toolchain::build_firmware_with_toolchain,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

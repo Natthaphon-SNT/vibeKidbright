@@ -72,6 +72,24 @@ fn resolve_custom_config_paths() -> Option<(PathBuf, PathBuf)> {
     }
     let idf_path = PathBuf::from(idf);
     let tools_path = PathBuf::from(tools);
+
+    // Validate that paths actually exist on THIS machine.
+    // If they don't exist (e.g. pointing to developer's C:\Users\Acer\...),
+    // auto-clear the stale config so the installer toolchain is used instead.
+    if !idf_path.exists() || !tools_path.exists() {
+        eprintln!(
+            "[ESP-IDF] Stale custom paths detected (not found on this machine): idf={} tools={} — clearing.",
+            idf, tools
+        );
+        let mut stale = read_esp_idf_config();
+        if let serde_json::Value::Object(ref mut map) = stale {
+            map.remove("custom_idf_path");
+            map.remove("custom_tools_path");
+        }
+        write_esp_idf_config(&stale);
+        return None;
+    }
+
     if idf_path.join("tools/idf.py").exists() && tools_path.exists() {
         Some((idf_path, tools_path))
     } else {
