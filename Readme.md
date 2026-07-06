@@ -237,6 +237,7 @@ This project is licensed under the **MIT License** — see [LICENSE](LICENSE) fo
 ## 📬 ติดต่อ / Support
 
 - **Issues:** [GitHub Issues](https://github.com/Natthaphon-SNT/vibeKidbright/issues)
+-             [LINE ID](dragon3541)
 - **Releases:** [GitHub Releases](https://github.com/Natthaphon-SNT/vibeKidbright/releases)
 
 ---
