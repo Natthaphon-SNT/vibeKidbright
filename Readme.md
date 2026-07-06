@@ -60,10 +60,10 @@
 
 ## 📦 เวอร์ชั่น
 
-### v0.1.0 — Initial Release (10 เมษายน 2026)
+### v3.0.0 — Initial Release (6 กรกฎาคม 2026)
 > รองรับ **Windows** เท่านั้น
 
-ฟีเจอร์ที่มาพร้อม v0.1.0:
+ฟีเจอร์ที่มาพร้อม v3.0.0:
 - Project Management (สร้าง/เปิดโปรเจกต์)
 - Vibe Coder AI Assistant (อ่านโค้ด + Inject Code)
 - Built-in Interactive Terminal
@@ -72,7 +72,7 @@
 - Knowledge Base สำหรับ KidBright + ESP-IDF
 - GitHub Actions CI/CD pipeline สำหรับ auto-build release
 
-**ดาวน์โหลด:** ไปที่ [Releases](https://github.com/Natthaphon-SNT/vibeKidbright/releases/tag/v0.1.0) แล้วดาวน์โหลดไฟล์ `.msi` หรือ `.exe`
+**ดาวน์โหลด:** ไปที่ [Releases](https://github.com/Natthaphon-SNT/vibeKidbright/releases/tag/v3.0.0) แล้วดาวน์โหลดไฟล์ `.msi` หรือ `.exe`
 
 ---
 
@@ -220,7 +220,7 @@ vibeKidbright ออกแบบมาสำหรับ ESP32-based boards โ�
 
 ---
 
-## 🐛 Known Issues (v0.1.0)
+## 🐛 Known Issues (v3.0.0)
 
 - รองรับ **Windows เท่านั้น** ในปัจจุบัน (macOS/Linux อยู่ใน roadmap)
 - ESP-IDF ต้องติดตั้งแยกและตั้งค่า PATH ด้วยตนเอง
