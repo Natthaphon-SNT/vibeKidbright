@@ -1,44 +1,71 @@
 name: Build Windows Installer
-
 on:
   push:
     branches: [ main ]
-  workflow_dispatch: # อนุญาตให้กดสั่งรันด้วยตัวเองได้บนหน้าเว็บ
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: windows-latest
-
     steps:
-      - name: Checkout repository
+      - name: Checkout main repository
         uses: actions/checkout@v4
+        with:
+          path: main_repo
+
+      - name: Checkout external knowledge_base repo
+        uses: actions/checkout@v4
+        with:
+          repository: https://github.com/Natthaphon-SNT/Knowledge
+          path: external_repo
+
+      - name: Extract external knowledge_base.zip
+        run: |
+          $zip = "external_repo/knowledge_base.zip"
+          if (-not (Test-Path $zip)) { Write-Error "ไม่พบไฟล์ $zip"; exit 1 }
+          Expand-Archive -Path $zip -DestinationPath "external_repo/extracted" -Force
+        shell: pwsh
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: 'npm'                          # Cache npm dependencies
+          cache-dependency-path: main_repo/package-lock.json
 
       - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Install Frontend Dependencies
-        run: npm install
+      - name: Cache Rust build artifacts
+        uses: Swatinem/rust-cache@v2           # Cache ~/.cargo และ target/
+        with:
+          workspaces: main_repo/src-tauri -> target
 
-      - name: Sync knowledge_base to resources
+      - name: Install Frontend Dependencies
+        working-directory: main_repo
+        run: npm ci                            # ci เร็วกว่า install เพราะไม่ resolve ใหม่
+
+      - name: Merge knowledge_base from both repos
         run: |
-          $src = "knowledge_base"
-          $dst = "resources/knowledge_base"
+          $dst = "main_repo/resources/knowledge_base"
           if (-not (Test-Path $dst)) { New-Item -ItemType Directory -Path $dst -Force }
-          Get-ChildItem $src -Recurse -File | Where-Object {
-            $_.Name -ne ".embeddings.json" -and -not $_.Name.EndsWith(".backup")
-          } | ForEach-Object {
-            $rel = $_.FullName.Substring((Resolve-Path $src).Path.Length + 1)
-            $dstFile = Join-Path $dst $rel
-            $dstDir = Split-Path $dstFile -Parent
-            if (-not (Test-Path $dstDir)) { New-Item -ItemType Directory -Path $dstDir -Force | Out-Null }
-            Copy-Item $_.FullName $dstFile -Force
+
+          function Sync-KnowledgeBase($src) {
+            if (-not (Test-Path $src)) { Write-Host "Skipping $src (not found)"; return }
+            Get-ChildItem $src -Recurse -File | Where-Object {
+              $_.Name -ne ".embeddings.json" -and -not $_.Name.EndsWith(".backup")
+            } | ForEach-Object {
+              $rel = $_.FullName.Substring((Resolve-Path $src).Path.Length + 1)
+              $dstFile = Join-Path $dst $rel
+              $dstDir = Split-Path $dstFile -Parent
+              if (-not (Test-Path $dstDir)) { New-Item -ItemType Directory -Path $dstDir -Force | Out-Null }
+              Copy-Item $_.FullName $dstFile -Force
+            }
           }
-          Write-Host "Knowledge base synced to resources/"
+
+          Sync-KnowledgeBase "external_repo/extracted/knowledge_base"
+          Sync-KnowledgeBase "main_repo/knowledge_base"
+          Write-Host "Merge complete -> $dst"
         shell: pwsh
 
       - name: Build and Create Release
@@ -46,8 +73,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tagName: v__VERSION__ # ดึงเวอร์ชันจาก tauri.conf.json อัตโนมัติ
+          projectPath: main_repo
+          tagName: v__VERSION__
           releaseName: 'vibeKidbright v__VERSION__ (Windows)'
           releaseBody: 'ดาวน์โหลดไฟล์ .msi หรือ .exe ด้านล่างเพื่อติดตั้งบน Windows'
-          releaseDraft: true # สร้างเป็น Draft ไว้ก่อน เผื่อให้คุณเข้าไปตรวจสอบก่อนกด Publish
+          releaseDraft: true
           prerelease: false
