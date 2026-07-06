@@ -1024,23 +1024,26 @@ fn find_python_dir(dir: &Path, depth: u32, max_depth: u32) -> Option<PathBuf> {
 fn build_toolchain_path(tools_path: &Path) -> std::ffi::OsString {
     let mut paths: Vec<PathBuf> = Vec::new();
 
-    // เพิ่ม venv Scripts/bin
+    // 1. venv Scripts/bin (Python) — must come first so idf.py picks up the right python
     if let Some(venv) = find_first_venv(&tools_path.join("python_env")) {
-        let bin = if cfg!(windows) {
-            venv.join("Scripts")
-        } else {
-            venv.join("bin")
-        };
-        if bin.exists() {
-            paths.push(bin);
+        let bin = if cfg!(windows) { venv.join("Scripts") } else { venv.join("bin") };
+        if bin.exists() { paths.push(bin); }
+    }
+    // Also add bundled idf-python directory
+    if let Some(py) = find_bundled_python(tools_path) {
+        if let Some(py_dir) = py.parent() {
+            paths.push(py_dir.to_path_buf());
         }
     }
 
-    // สแกน bin directories ใน tools/
-    scan_bin_dirs(&tools_path.join("tools"), 0, 4, &mut paths);
-    scan_bin_dirs(tools_path, 0, 4, &mut paths);
+    // 2. Scan .espressif/tools/ — adds ninja, cmake, compiler bin dirs, etc.
+    //    Uses scan_esp_tool_dirs which handles BOTH:
+    //      <tool>/<ver>/bin/<exe>  (cmake, gcc, ...)
+    //      <tool>/<ver>/<exe>      (ninja.exe directly in version dir)
+    scan_esp_tool_dirs(&tools_path.join("tools"), &mut paths);
+    scan_esp_tool_dirs(tools_path, &mut paths);
 
-    // ต่อท้ายด้วย PATH ของระบบ
+    // 3. System PATH (fallback)
     if let Some(system_path) = std::env::var_os("PATH") {
         paths.extend(std::env::split_paths(&system_path));
     }
@@ -1048,21 +1051,59 @@ fn build_toolchain_path(tools_path: &Path) -> std::ffi::OsString {
     std::env::join_paths(paths).unwrap_or_else(|_| std::ffi::OsString::from(""))
 }
 
-fn scan_bin_dirs(dir: &Path, depth: u32, max_depth: u32, out: &mut Vec<PathBuf>) {
-    if depth > max_depth {
-        return;
-    }
-    if let Ok(entries) = std::fs::read_dir(dir) {
-        for entry in entries.flatten() {
-            let p = entry.path();
-            if p.is_dir() {
-                if p.file_name().map(|n| n == "bin").unwrap_or(false) {
-                    out.push(p.clone());
-                }
-                scan_bin_dirs(&p, depth + 1, max_depth, out);
+/// Scan an ESP-IDF tools directory structure and collect all directories that
+/// contain executable files.  Handles the two common ESP-IDF tool layouts:
+///   a) <tool>/<version>/bin/<exe>      → adds bin/
+///   b) <tool>/<version>/<exe>          → adds version/ directly (ninja, idf-python)
+///   c) <tool>/<variant>/<ver>/bin/     → adds bin/ (xtensa-esp-elf sub-variants)
+fn scan_esp_tool_dirs(tools_dir: &Path, paths: &mut Vec<PathBuf>) {
+    let Ok(tools) = std::fs::read_dir(tools_dir) else { return; };
+    for tool_entry in tools.flatten() {
+        let tool_path = tool_entry.path();
+        if !tool_path.is_dir() { continue; }
+        let Ok(versions) = std::fs::read_dir(&tool_path) else { continue; };
+        for ver_entry in versions.flatten() {
+            let ver_path = ver_entry.path();
+            if !ver_path.is_dir() { continue; }
+            // Layout a: bin/ subdir
+            let bin_dir = ver_path.join("bin");
+            if bin_dir.is_dir() { paths.push(bin_dir); }
+            // Layout b: executables directly in version dir
+            if dir_has_executables(&ver_path) { paths.push(ver_path.clone()); }
+            // Layout c: one more level deep
+            let Ok(sub_entries) = std::fs::read_dir(&ver_path) else { continue; };
+            for sub_entry in sub_entries.flatten() {
+                let sub = sub_entry.path();
+                if !sub.is_dir() { continue; }
+                let sub_bin = sub.join("bin");
+                if sub_bin.is_dir() { paths.push(sub_bin); }
+                if dir_has_executables(&sub) { paths.push(sub); }
             }
         }
     }
+}
+
+/// Returns true if a directory directly contains at least one executable file.
+fn dir_has_executables(dir: &Path) -> bool {
+    let Ok(entries) = std::fs::read_dir(dir) else { return false; };
+    for entry in entries.flatten() {
+        let p = entry.path();
+        if !p.is_file() { continue; }
+        if cfg!(windows) {
+            if p.extension().and_then(|e| e.to_str()).map(|e| e.eq_ignore_ascii_case("exe")).unwrap_or(false) {
+                return true;
+            }
+        } else {
+            #[cfg(unix)]
+            {
+                use std::os::unix::fs::PermissionsExt;
+                if let Ok(meta) = p.metadata() {
+                    if meta.permissions().mode() & 0o111 != 0 { return true; }
+                }
+            }
+        }
+    }
+    false
 }
 
 // ── Google Drive Token Extractor ──────────────────────────────────────────────

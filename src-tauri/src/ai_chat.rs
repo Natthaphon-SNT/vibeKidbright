@@ -558,9 +558,9 @@ pub async fn refresh_knowledge_base(project_dir: String) -> Result<usize, String
 pub fn get_knowledge_base_files(project_dir: String) -> Vec<String> {
     let kb_path = resolve_kb_path(&project_dir);
     if !kb_path.exists() { return Vec::new(); }
-    // FIX: use recursive collector so sensor_examples/ subfolders are returned,
-    // matching the behaviour of keyword_knowledge_search and reindex_knowledge_base.
-    let all_files = collect_kb_files(&kb_path);
+    // Use collect_kb_files_all so .disabled files are included for UI display.
+    // (collect_kb_files skips .disabled — that's for search/index only)
+    let all_files = collect_kb_files_all(&kb_path);
     let mut files: Vec<String> = all_files
         .into_iter()
         .map(|(_, rel_key)| rel_key)
@@ -3619,17 +3619,24 @@ fn chunk_text(text: &str, target_size: usize, overlap: usize) -> Vec<String> {
 // Returns Vec of (absolute_path, relative_key) pairs.
 // The relative_key uses forward slashes so it is OS-independent (e.g. "sensor_examples/accel_kxtj3.c").
 
-fn collect_kb_files_inner(root: &Path, current: &Path, result: &mut Vec<(PathBuf, String)>) {
+fn collect_kb_files_inner(root: &Path, current: &Path, result: &mut Vec<(PathBuf, String)>, include_disabled: bool) {
     let Ok(entries) = std::fs::read_dir(current) else { return; };
     for entry in entries.flatten() {
         let path = entry.path();
         let name = entry.file_name().to_string_lossy().to_string();
         if name.starts_with('.') { continue; } // skip hidden / .embeddings.json
         if path.is_dir() {
-            collect_kb_files_inner(root, &path, result);
+            collect_kb_files_inner(root, &path, result, include_disabled);
         } else if path.is_file() {
-            // Skip files that the user has disabled via the UI toggle (renamed to *.disabled).
-            if name.ends_with(".disabled") { continue; }
+            // .disabled files: include when listing for UI, skip when indexing/searching
+            if name.ends_with(".disabled") {
+                if include_disabled {
+                    let rel = path.strip_prefix(root).unwrap_or(&path);
+                    let rel_key = rel.to_string_lossy().replace('\\', "/");
+                    result.push((path.clone(), rel_key));
+                }
+                continue;
+            }
             let ext = path.extension().and_then(|e| e.to_str()).unwrap_or("").to_lowercase();
             if matches!(ext.as_str(), "txt" | "md" | "c" | "h") {
                 let rel = path.strip_prefix(root).unwrap_or(&path);
@@ -3640,9 +3647,17 @@ fn collect_kb_files_inner(root: &Path, current: &Path, result: &mut Vec<(PathBuf
     }
 }
 
+/// For search & indexing — skips .disabled files entirely.
 fn collect_kb_files(root: &Path) -> Vec<(PathBuf, String)> {
     let mut result = Vec::new();
-    collect_kb_files_inner(root, root, &mut result);
+    collect_kb_files_inner(root, root, &mut result, false);
+    result
+}
+
+/// For UI listing — includes .disabled files so the user can see and re-enable them.
+fn collect_kb_files_all(root: &Path) -> Vec<(PathBuf, String)> {
+    let mut result = Vec::new();
+    collect_kb_files_inner(root, root, &mut result, true);
     result
 }
 

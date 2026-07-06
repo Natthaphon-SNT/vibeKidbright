@@ -316,56 +316,88 @@ fn read_idf_version(idf_path: &Path) -> String {
         .to_string()
 }
 
-fn find_tool_bins(path: &Path, current_depth: u32, max_depth: u32, paths: &mut Vec<PathBuf>) {
-    if current_depth > max_depth {
-        return;
-    }
-
-    if let Ok(entries) = std::fs::read_dir(path) {
-        for entry in entries.flatten() {
-            let p = entry.path();
-            if p.is_dir() {
-                let name = p.file_name().unwrap_or_default().to_string_lossy();
-                if name == "bin" {
-                    paths.push(p.clone());
-                }
-                // Recursive search ลงไปใน sub-directory
-                find_tool_bins(&p, current_depth + 1, max_depth, paths);
+/// Scan an ESP-IDF tools directory and add all executable directories to `paths`.
+/// Handles two common structures:
+///   1. <tool>/<version>/bin/<exe>        → adds bin/
+///   2. <tool>/<version>/<exe>            → adds version/ directly  (ninja, idf-python, ...)
+///   3. <tool>/<variant>/<version>/bin/   → adds bin/  (xtensa-esp-elf variants)
+fn scan_esp_tool_dirs(tools_dir: &Path, paths: &mut Vec<PathBuf>) {
+    let Ok(tools) = std::fs::read_dir(tools_dir) else { return; };
+    for tool_entry in tools.flatten() {
+        let tool_path = tool_entry.path();
+        if !tool_path.is_dir() { continue; }
+        // Each sub-directory is a "tool name" (e.g. ninja, cmake, xtensa-esp-elf)
+        let Ok(versions) = std::fs::read_dir(&tool_path) else { continue; };
+        for ver_entry in versions.flatten() {
+            let ver_path = ver_entry.path();
+            if !ver_path.is_dir() { continue; }
+            // Does version dir have a bin/ subdir?
+            let bin_dir = ver_path.join("bin");
+            if bin_dir.is_dir() {
+                paths.push(bin_dir);
+            }
+            // Does version dir itself contain executable files? (ninja, python, ...)
+            if dir_has_executables(&ver_path) {
+                paths.push(ver_path.clone());
+            }
+            // Some tools have one more level: <tool>/<variant>/<version>/bin/
+            let Ok(sub_entries) = std::fs::read_dir(&ver_path) else { continue; };
+            for sub_entry in sub_entries.flatten() {
+                let sub = sub_entry.path();
+                if !sub.is_dir() { continue; }
+                let sub_bin = sub.join("bin");
+                if sub_bin.is_dir() { paths.push(sub_bin); }
+                if dir_has_executables(&sub) { paths.push(sub); }
             }
         }
     }
 }
 
+/// Returns true if a directory directly contains at least one executable file.
+fn dir_has_executables(dir: &Path) -> bool {
+    let Ok(entries) = std::fs::read_dir(dir) else { return false; };
+    for entry in entries.flatten() {
+        let p = entry.path();
+        if !p.is_file() { continue; }
+        let name = p.file_name().unwrap_or_default().to_string_lossy().to_lowercase();
+        if cfg!(windows) {
+            if name.ends_with(".exe") { return true; }
+        } else {
+            // On Unix check execute bit
+            #[cfg(unix)]
+            {
+                use std::os::unix::fs::PermissionsExt;
+                if let Ok(meta) = p.metadata() {
+                    if meta.permissions().mode() & 0o111 != 0 { return true; }
+                }
+            }
+        }
+    }
+    false
+}
+
 /// Build a PATH string that includes ESP-IDF toolchain directories.
-/// Also scans the user's D:\Espressif\tools for Ninja, CMake, and compilers.
 fn build_idf_path(tools_path: &Path) -> OsString {
     let mut paths: Vec<PathBuf> = Vec::new();
 
-    // แก้ไข: เอา mut ออกจากหน้า scan
-    let scan = |tools_dir: &Path, paths: &mut Vec<PathBuf>| {
-        // เรียกใช้ฟังก์ชัน find_tool_bins ที่เราเพิ่มเข้าไปข้างบน
-        find_tool_bins(tools_dir, 0, 4, paths);
-    };
+    // 1. Scan .espressif/tools/ — handles ninja, cmake, compilers, idf-python
+    scan_esp_tool_dirs(&tools_path.join("tools"), &mut paths);
+    // Also scan the tools_path root in case structure is flat
+    scan_esp_tool_dirs(tools_path, &mut paths);
 
-    // 1. Scan the resolved tools_path
-    // หมายเหตุ: เรียกใช้ find_tool_bins โดยตรงหรือผ่าน scan ก็ได้ 
-    // ในที่นี้ผมปรับให้เรียกตามโครงสร้างเดิมที่คุณวางไว้
-    scan(&tools_path.join("tools"), &mut paths);
-    scan(tools_path, &mut paths);
-
-    // 2. Also check config-saved tools dir for Ninja/CMake
+    // 2. Also check config-saved tools dir for extra tools (Ninja/CMake from IDF manager)
     let config = read_esp_idf_config();
     if let Some(custom_tools) = config["custom_tools_path"].as_str() {
         let custom_tools_dir = PathBuf::from(custom_tools);
         if custom_tools_dir.join("tools") != tools_path.join("tools") {
-            scan(&custom_tools_dir.join("tools"), &mut paths);
+            scan_esp_tool_dirs(&custom_tools_dir.join("tools"), &mut paths);
         }
         if custom_tools_dir != tools_path {
-            scan(&custom_tools_dir, &mut paths);
+            scan_esp_tool_dirs(&custom_tools_dir, &mut paths);
         }
     }
 
-    // 3. Add venv Scripts/bin dirs (โค้ดส่วนเดิมของคุณ...)
+    // 3. Add venv Scripts/bin dirs
     let python_env_dir = tools_path.join("python_env");
     if let Ok(entries) = std::fs::read_dir(&python_env_dir) {
         for entry in entries.flatten() {
@@ -375,9 +407,8 @@ fn build_idf_path(tools_path: &Path) -> OsString {
             }
         }
     }
-    
-    // ... (ส่วนที่เหลือคงเดิม) ...
 
+    // 4. System PATH (fallback)
     if let Some(system_path) = std::env::var_os("PATH") {
         paths.extend(std::env::split_paths(&system_path));
     }
