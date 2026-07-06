@@ -657,7 +657,12 @@ pub async fn run_idf_command(
         .env("IDF_TOOLS_PATH", &actual_tools_path)
         .env("IDF_PYTHON_ENV_PATH", &python_env_path)
         .env("ESP_IDF_VERSION", &idf_version)
-        .env("PATH", &path_env);
+        .env("PATH", &path_env)
+        // Force Python to use UTF-8 regardless of Windows system locale (cp874, cp932, etc.)
+        // This fixes kconfgen UnicodeDecodeError on non-English Windows machines.
+        .env("PYTHONUTF8", "1")
+        .env("PYTHONIOENCODING", "utf-8")
+        .env("PYTHONLEGACYWINDOWSSTDIO", "0");
     if let Some(rom_elf_dir) = find_esp_rom_elf_dir(&actual_tools_path) {
         cmd.env("ESP_ROM_ELF_DIR", rom_elf_dir);
     }
@@ -905,7 +910,12 @@ pub async fn run_shell_command(
         .env("IDF_TOOLS_PATH", &actual_tools_path)
         .env("IDF_PYTHON_ENV_PATH", &python_env_path)
         .env("ESP_IDF_VERSION", &idf_version)
-        .env("PATH", &path_env);
+        .env("PATH", &path_env)
+        // Force Python to use UTF-8 regardless of Windows system locale (cp874, cp932, etc.)
+        // This fixes kconfgen UnicodeDecodeError on non-English Windows machines.
+        .env("PYTHONUTF8", "1")
+        .env("PYTHONIOENCODING", "utf-8")
+        .env("PYTHONLEGACYWINDOWSSTDIO", "0");
 
     if let Some(rom_elf_dir) = find_esp_rom_elf_dir(&actual_tools_path) {
         command.env("ESP_ROM_ELF_DIR", rom_elf_dir);

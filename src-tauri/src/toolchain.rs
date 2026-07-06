@@ -692,7 +692,12 @@ pub async fn build_firmware_with_toolchain(
             .env("IDF_PATH", &idf_path_clone)
             .env("IDF_TOOLS_PATH", &tools_path_clone)
             .env("IDF_PYTHON_ENV_PATH", &python_venv_clone)
-            .env("PATH", &custom_path_clone);
+            .env("PATH", &custom_path_clone)
+            // Force Python to use UTF-8 regardless of Windows system locale (cp874, cp932, etc.)
+            // This fixes kconfgen UnicodeDecodeError on non-English Windows machines.
+            .env("PYTHONUTF8", "1")
+            .env("PYTHONIOENCODING", "utf-8")
+            .env("PYTHONLEGACYWINDOWSSTDIO", "0");
         if let Some(rom_elf_dir) = crate::esp_idf::find_esp_rom_elf_dir(&tools_path_clone) {
             cmd.env("ESP_ROM_ELF_DIR", rom_elf_dir);
         }
