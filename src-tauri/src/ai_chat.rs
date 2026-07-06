@@ -1070,8 +1070,24 @@ HARD RULE: "KB not loaded" or empty search result is NOT permission to generate 
 - NEVER use `esp_wifi_set_storage()` — deprecated in v5.x
 - NEVER use `ESP_NOW_WIFI_RATE_1M` — undefined in v5.5+
 - ESP-NOW channel MUST match controller (default: channel 1)
-- Minimal correct wifi_init for ESP-NOW receiver:
-  `esp_netif_init() -> esp_event_loop_create_default() -> esp_wifi_init() -> esp_wifi_set_mode(WIFI_MODE_STA) -> esp_wifi_start() -> esp_wifi_set_channel(1, WIFI_SECOND_CHAN_NONE)`
+- **BOTH sender and receiver MUST call `esp_wifi_disconnect()` after `esp_wifi_start()` to prevent connecting to any AP.**
+- Minimal correct wifi_init for ESP-NOW (sender & receiver):
+  `esp_netif_init() -> esp_event_loop_create_default() -> esp_wifi_init() -> esp_wifi_set_mode(WIFI_MODE_STA) -> esp_wifi_start() -> esp_wifi_disconnect() -> esp_now_init() -> esp_now_register_*_cb()`
+- **Minibike Sender** prints its own MAC on boot: `esp_wifi_get_mac(WIFI_IF_STA, mac)` then `ESP_LOGI`.
+- **Minibike Sender send callback signature (ESP-IDF v5.x):**
+  ```c
+  static void on_sent(const uint8_t *mac_addr, esp_now_send_status_t status) {
+      (void)mac_addr;
+      s_espnow_ready = (status == ESP_NOW_SEND_SUCCESS);
+  }
+  ```
+  Note: `s_espnow_ready` is `volatile bool` updated from the callback and displayed on OLED.
+- **Minibike Receiver receive callback signature (ESP-IDF v5.x):**
+  ```c
+  static void on_recv(const esp_now_recv_info_t *info, const uint8_t *data, int len) {
+      if (len == sizeof(int32_t)) memcpy((void *)&g_cmd, data, sizeof(int32_t));
+  }
+  ```
 
 ### SENSOR RULES (MANDATORY):
 - **Temperature Sensor**: The ESP32 chip does NOT have an on-chip temperature sensor usable in this context. You MUST NEVER use `esp_driver_tsens` or `temperature_sensor_install()`. Instead, use the on-board **LM73-compatible** I2C sensor via `I2C_NUM_1` (SDA=GPIO4, SCL=GPIO5, Address=0x4D).
@@ -1092,14 +1108,7 @@ HARD RULE: "KB not loaded" or empty search result is NOT permission to generate 
 - ALWAYS use `i2c_master_write_read_device()` (combined transaction). NEVER split into separate write + read calls.
 
 ### ADC RULES (MANDATORY — ESP-IDF v5.x):
-#### ❌ BANNED Legacy API (deleted in v5):
-- `#include "driver/adc.h"` — BANNED
-- `#include "esp_adc_cal.h"` — BANNED
-- `adc1_config_width()`, `adc1_config_channel_atten()`, `adc1_get_raw()` — BANNED
-- `esp_adc_cal_characterize()` — BANNED
-- **`ADC_ATTEN_DB_11` — DEPRECATED. ALWAYS use `ADC_ATTEN_DB_12` instead.**
-
-#### ✅ Correct Oneshot API:
+#### ✅ Correct Oneshot API (DEFAULT for all new code):
 ```c
 #include "esp_adc/adc_oneshot.h"     // ✅
 #include "esp_adc/adc_cali.h"        // ✅ (only if calibration needed)
@@ -1111,6 +1120,21 @@ adc_oneshot_read(...)                // 3. Read raw
 adc_cali_raw_to_voltage(...)         // 4. Optional: convert to mV
 ```
 > NEVER include `adc_cali.h` when only reading LDR raw values — calibration is optional.
+> **`ADC_ATTEN_DB_11` — DEPRECATED in oneshot API. ALWAYS use `ADC_ATTEN_DB_12` for oneshot.**
+
+#### ⚠️ Legacy ADC API — EXCEPTION for Minibike Sender only:
+The file `minibike_sender.c` uses Legacy ADC API intentionally (simple joystick reading, no calibration needed):
+```c
+// ✅ ALLOWED in minibike_sender.c ONLY
+#include "driver/adc.h"
+#include "esp_adc_cal.h"
+adc1_config_width(ADC_WIDTH_BIT_12);
+adc1_config_channel_atten(ADC1_CHANNEL_6, ADC_ATTEN_DB_11);  // GPIO34
+adc1_config_channel_atten(ADC1_CHANNEL_7, ADC_ATTEN_DB_11);  // GPIO35
+int raw = adc1_get_raw(ADC1_CHANNEL_6);
+```
+- Channel macros: `ADC1_CHANNEL_6` (GPIO34), `ADC1_CHANNEL_7` (GPIO35)
+- For ALL other projects: use `esp_adc/adc_oneshot.h` instead.
 
 ### ESP-IDF PROJECT STRUCTURE RULES (MANDATORY):
 1. **Root Directory Awareness:** The current working directory is ALWAYS the Project Root.
@@ -1161,13 +1185,41 @@ adc_cali_raw_to_voltage(...)         // 4. Optional: convert to mV
 ### BOARD DETECTION — MANDATORY FIRST STEP:
 Before writing ANY code that involves GPIO, I2C, buttons, or sensors, you MUST know which board revision the user has.
 - **If the user has NOT mentioned the board revision in the current conversation**, you MUST ask EXACTLY this question (in Thai) before proceeding:
-  > "บอร์ดของคุณเป็นรุ่นไหนครับ? (โปรดระบุ: V1.1 / V1.2 / V1.3 / V1.4 / Rev 3.1 / Rev 3.1G / iA / KidBright32i / KidBright32iA / V1.6 / KidBright32iP / μAI)"
+  > "บอร์ดของคุณเป็นรุ่นไหนครับ? (โปรดระบุ: V1.1 / V1.2 / V1.3 / V1.4 / Rev 3.1 / Rev 3.1G / iA / KidBright32i / KidBright32iA / V1.6 / KidBright32iP / μAI / KidBright Controller V1 / Formula Kid Controller)"
 - **NEVER tell the user their board revision does not exist.** All of the above revisions are VALID. If the user says "V1.3", "1.3", "v 1.3", etc., treat it as the V1.3 board (FTDI USB, GPIO layout same as V1.1/V1.2, SW2=GPIO14).
+- **If user says "Controller V1" / "KidBright Controller" / "Minibike Sender"** → treat as **KidBright Controller V1** (ESP32 bare module, ADC joystick, OLED SH1106, ESP-NOW sender).
+- **If user says "Formula Kid Controller" / "KB1.3 Controller" / "KB1.5G Controller"** → treat as **Formula Kid Controller** (KidBright32 V1.5 Rev3.1/3.1G + Formula Kid rev 1.1, RC timing joystick GPIO26/27/32/33, S1=GPIO36, S2=GPIO39).
 - **Do NOT assume `iA` as default** if the user hasn't specified. Wait for the answer before generating hardware-specific code.
 - **Once the user confirms the revision**, lock that revision for the entire session. Do not ask again.
 - **Exception:** If the code only uses peripherals identical across ALL revisions (e.g., LM73 on I2C_1, buzzer on GPIO13, LED matrix on 0x70), you MAY proceed without asking — but add a comment: `// NOTE: GPIO config below assumes [REVISION]. Verify your board.`
 
 ### BOARD HARDWARE REVISIONS (MANDATORY READING):
+- **KidBright Controller V1** (ESP32 bare module — Minibike Sender):
+  - **ไม่มี HT16K33 Matrix, ไม่มี Buzzer, ไม่มี LM73** — เป็น bare ESP32 module
+  - Joystick X: GPIO34 (ADC1_CHANNEL_6, input-only), Joystick Y: GPIO35 (ADC1_CHANNEL_7, input-only)
+  - SW1 = GPIO16, SW2 = GPIO14 — Active LOW, GPIO_PULLUP_ENABLE
+  - OLED SH1106: I2C_NUM_0 (SDA=GPIO21, SCL=GPIO22), I2C Address 0x3C
+  - ADC API: Legacy (`driver/adc.h`) — `adc1_get_raw()`, `ADC_ATTEN_DB_11`
+  - ESP-NOW: Sender, channel 1, WiFi STA, `esp_wifi_disconnect()` after start
+  - CMakeLists: `PRIV_REQUIRES driver esp_wifi nvs_flash esp_event esp_netif`
+  - **ห้ามใช้ `esp_adc/adc_oneshot.h`** บนบอร์ดนี้ — ใช้ legacy API เท่านั้น
+  - **ห้ามใช้ SSD1306 init sequence** กับ OLED — ต้องใช้ SH1106 (`0x8D,0x14` charge pump)
+  - ดูไฟล์กฎ: `minibike.md`
+- **Formula Kid Controller (KB1.3 / KB1.5G)** (KidBright32 V1.5 Rev3.1/3.1G + extension):
+  - MCU board: KidBright32 V1.5 Rev 3.1 (KB1.3) หรือ Rev 3.1G (KB1.5G)
+  - Joystick: **RC Timing** (ไม่ใช่ ADC!) — JS1 Y: TRIG=GPIO26(OUT1)/CAP=GPIO32(IN1), JS2 X: TRIG=GPIO27(OUT2)/CAP=GPIO33(IN2)
+  - S1 button = GPIO36 (input-only, external pull-up, NO pull-up in code, NO interrupt with ESP-NOW)
+  - S2 button = GPIO39 (input-only, external pull-up, NO pull-up in code, NO interrupt with ESP-NOW)
+  - SW1 ปุ่มบนบอร์ด = GPIO16, SW2 ปุ่มบนบอร์ด = GPIO14 (คนละวงจรกับ S1/S2)
+  - LED Matrix: HT16K33 @ I2C_NUM_0 (SDA=21, SCL=22, addr 0x70) — **Matrix หมุน 180°**
+  - **ไม่มี KXTJ3 Accelerometer** บนทั้ง KB1.3 และ KB1.5G
+  - RC Timing constants: R_SERIE=1000Ω, RC_FACTOR_5V=9.788075945, CAP_TIMEOUT_US=500000
+  - ESP-NOW encoding: JS1→ -100…+100, JS2→ +400 offset, 999=stop (Priority JS1>JS2>stop)
+  - Dead zone: JS1=±10, JS2=±20
+  - CMakeLists: `PRIV_REQUIRES driver esp_timer esp_wifi nvs_flash`
+  - **ห้ามใช้ `GPIO_PULLUP_ENABLE` บน GPIO36/39**
+  - **ห้ามใช้ interrupt บน GPIO36/39 เมื่อใช้ ESP-NOW** — ใช้ polling เท่านั้น
+  - ดูไฟล์กฎ: `formula_kid_controller.md`
 - **V1.1 / V1.2 (Cypress USB, ESP32)** (2018):
   - SW1 = GPIO16, SW2 = GPIO14 ← CRITICAL
   - LED WiFi=GPIO2, LED NTP=GPIO5(shared I2C SCL), LED IoT=GPIO12, LED BT=GPIO23
@@ -1461,6 +1513,25 @@ LM73 TEMPERATURE READ: ALWAYS use `i2c_master_write_read_device()` (combined tra
 ### EXTERNAL SENSORS & ACTUATORS RULES (V1.3/V1.6):
 - **V1.3 vs V1.6:** V1.3 DOES NOT support Analog Input on IN1-IN4. V1.6 supports it (ADC1 CH4-CH7). Always check board version before using Analog sensors (like external LDR).
 - **I2C BUS (BME280/LCD):** External I2C screens and BME280 share `I2C_NUM_0` with the LED Matrix. **DO NOT** reinstall the I2C driver if it's already installed.
+
+### OLED SH1106 RULES (MINIBIKE SENDER — MANDATORY):
+- **IC: SH1106** — ไม่ใช่ SSD1306. Init sequence และ column offset ต่างกัน
+- **I2C Address:** `0x3C`, I2C_NUM_0 (SDA=GPIO21, SCL=GPIO22, 400kHz)
+- **Column offset MUST be 2:** ใน page write ต้องส่ง `0x02` (lower column) แทน `0x00`
+  ```c
+  oled_cmd(0xB0 | page);  // page address
+  oled_cmd(0x02);          // lower column = 2  ← CRITICAL (SH1106 offset)
+  oled_cmd(0x10);          // higher column = 0
+  ```
+- **Charge pump command (SH1106-specific):** ใช้ `0x8D, 0x14` — ห้ามใช้ `0xAD, 0x8B` (SSD1306)
+- **`oled_init()` MUST be called BEFORE `espnow_init()`** ใน `app_main()`
+- **Framebuffer:** `uint8_t s_oled_fb[1024]` (128 cols × 64 rows / 8)
+- **OLED display layout (Minibike Sender):**
+  - Page 0: สถานะ ESP-NOW (`"ESP-NOW READY"` หรือ `"ESP-NOW FAIL"`)
+  - Page 2: ทิศทาง (`"DIR: FORWARD"` / `"DIR: BACKWARD"` / `"DIR: LEFT"` / `"DIR: RIGHT"` / `"DIR: STOP"`)
+- **Update policy:** อัปเดต OLED เฉพาะเมื่อค่าเปลี่ยน (`changed` flag) ป้องกัน I2C spam
+- ❌ ห้ามใช้ column lower = `0x00` — จะทำให้ภาพเลื่อน 2 pixel
+- ❌ ห้ามใช้ SSD1306 init sequence กับ SH1106 — charge pump command ต่างกัน
 - **DS18B20:** When using waterproof DS18B20 on 1-Wire, you MUST use a 4.7k pull-up resistor.
 - **MOTORS/RELAYS:** **NEVER** drive Fan/Vibration motors directly from GPIO (max 40mA). ALWAYS use a transistor, driver module, or relay.
 - **ACTIVE LOW OUTPUTS:** OUT1(GPIO26), OUT2(GPIO27), and USB Host Output(GPIO25) are ALL **ACTIVE LOW**. `gpio_set_level(..., 0)` = ON, `gpio_set_level(..., 1)` = OFF. NEVER use GPIO17 or GPIO23 for USB output — the correct pin is **GPIO25 ONLY**.
