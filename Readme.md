@@ -1,7 +1,7 @@
 # vibeKidbright
 
 <p align="center">
-  <img src="resources/icon.png" alt="vibeKidbright Logo" width="120"/>
+  <img src="src-tauri/icons/icon.png" alt="vibeKidbright Logo" width="120"/>
 </p>
 
 <p align="center">
@@ -9,8 +9,8 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Natthaphon-SNT/vibeKidbright/releases/tag/v0.1.0">
-    <img src="https://img.shields.io/badge/version-v0.1.0-blue.svg" alt="Version"/>
+  <a href="https://github.com/Natthaphon-SNT/vibeKidbright/releases/tag/v3.0.0">
+    <img src="https://img.shields.io/badge/version-v3.0.0-blue.svg" alt="Version"/>
   </a>
   <img src="https://img.shields.io/badge/platform-Windows-lightgrey.svg" alt="Platform"/>
   <img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License"/>
