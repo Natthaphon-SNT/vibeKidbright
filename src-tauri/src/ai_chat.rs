@@ -2102,7 +2102,8 @@ async fn run_conversation_loop(
     } else {
         true
     };
-    const RETRY_DELAY_SECS: u64 = 4;
+    const RETRY_DELAY_SECS: u64 = 15;  // Wait 15s between timeouts/connection errors
+    const RATE_LIMIT_DELAY_SECS: u64 = 30; // Wait 30s before retrying on 429
     let mut retry_count: u32 = 0;
     // Guard against infinite tool-call loops.
     let mut tool_turns: u32 = 0;
@@ -2143,12 +2144,12 @@ async fn run_conversation_loop(
 
         let current_timeout = if is_local_url || is_openrouter {
             match retry_count {
-                0 => std::time::Duration::from_secs(30),
-                1 => std::time::Duration::from_secs(120),
-                _ => std::time::Duration::from_secs(300),
+                0 => std::time::Duration::from_secs(120),
+                1 => std::time::Duration::from_secs(300),
+                _ => std::time::Duration::from_secs(600),
             }
         } else {
-            std::time::Duration::from_secs(120)
+            std::time::Duration::from_secs(180)
         };
 
         let send_future = request.body(body.to_string()).send();
@@ -2168,17 +2169,17 @@ async fn run_conversation_loop(
                 if is_local_url || is_openrouter {
                     let is_timeout = e == "timeout" || e.to_lowercase().contains("timeout") || e.to_lowercase().contains("timed out");
                     retry_count += 1;
-                    if retry_count >= 3 {
+                    if retry_count >= 5 {
                         if is_timeout {
-                            return Err("⏱️ Connection timed out. Please check your local server or OpenRouter connection.".to_string());
+                            return Err("⏱️ Connection timed out after 5 attempts. Please check your local server or OpenRouter connection.".to_string());
                         } else {
-                            return Err(format!("Connection to {} failed after 3 attempts: {}", url, e));
+                            return Err(format!("Connection to {} failed after 5 attempts: {}", url, e));
                         }
                     }
                     let err_desc = if is_timeout { "Timed out" } else { "Connection failed" };
                     let _ = app_handle.emit(
                         "terminal-output",
-                        format!("[AI] ⚠️ {} (attempt {}/3). Retrying in {}s...", err_desc, retry_count, RETRY_DELAY_SECS),
+                        format!("[AI] ⚠️ {} (attempt {}/5). Retrying in {}s...", err_desc, retry_count, RETRY_DELAY_SECS),
                     );
                     tokio::time::sleep(tokio::time::Duration::from_secs(RETRY_DELAY_SECS)).await;
                     continue;
@@ -2200,17 +2201,19 @@ async fn run_conversation_loop(
             };
             if status.as_u16() == 429 {
                 retry_count += 1;
-                if retry_count >= 3 {
+                if retry_count >= 5 {
                     return Err(format!(
-                        "❌ Model '{}' is rate-limited on {} and all 3 retries failed.",
+                        "❌ Model '{}' is rate-limited on {} and all 5 retries failed.",
                         model, provider_name
                     ));
                 }
+                // Use progressive wait: 30s for first 429, 60s for subsequent
+                let wait_secs = if retry_count == 1 { RATE_LIMIT_DELAY_SECS } else { RATE_LIMIT_DELAY_SECS * 2 };
                 let _ = app_handle.emit(
                     "terminal-output",
-                    format!("[AI] ⚠️ Rate limited (attempt {}/3). Retrying in {}s...", retry_count, RETRY_DELAY_SECS),
+                    format!("[AI] ⚠️ Rate limited (attempt {}/5). Retrying in {}s...", retry_count, wait_secs),
                 );
-                tokio::time::sleep(tokio::time::Duration::from_secs(RETRY_DELAY_SECS)).await;
+                tokio::time::sleep(tokio::time::Duration::from_secs(wait_secs)).await;
                 continue;
             }
             if status.as_u16() == 402 {
@@ -2255,7 +2258,7 @@ async fn run_conversation_loop(
                     }
                 }
             } else {
-                let stream_timeout_duration = if is_openrouter { current_timeout } else { std::time::Duration::from_secs(90) };
+                let stream_timeout_duration = if is_openrouter { current_timeout } else { current_timeout };
                 match tokio::time::timeout(stream_timeout_duration, stream.next()).await {
                     Ok(item) => item,
                     Err(_) => {
