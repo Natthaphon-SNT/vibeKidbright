@@ -68,14 +68,38 @@ jobs:
           Write-Host "Merge complete -> $dst"
         shell: pwsh
 
-      - name: Build and Create Release
+      - name: Decode PFX Certificate
+        run: |
+          $pfx_cert_byte = [System.Convert]::FromBase64String("${{ secrets.CERT_PFX_BASE64 }}")
+          [IO.File]::WriteAllBytes("cert.pfx", $pfx_cert_byte)
+        shell: pwsh
+
+      - name: Build Tauri App
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           projectPath: main_repo
-          tagName: v__VERSION__
-          releaseName: 'vibeKidbright v__VERSION__ (Windows)'
-          releaseBody: 'ดาวน์โหลดไฟล์ .msi หรือ .exe ด้านล่างเพื่อติดตั้งบน Windows'
-          releaseDraft: true
+          # ไม่ใส่ tagName เพื่อให้ tauri-action แค่ Build อย่างเดียว ไม่ Upload
+
+      - name: Sign installer
+        run: |
+          & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\signtool.exe" sign `
+            /f cert.pfx `
+            /p "${{ secrets.CERT_PASSWORD }}" `
+            /fd SHA256 `
+            /t "http://timestamp.digicert.com" `
+            "main_repo\src-tauri\target\release\bundle\nsis\VibeKidbright IDE_3.3.0_x64-setup.exe"
+        shell: pwsh
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v__VERSION__
+          name: 'vibeKidbright v__VERSION__ (Windows)'
+          body: 'ดาวน์โหลดไฟล์ .msi หรือ .exe ด้านล่างเพื่อติดตั้งบน Windows'
+          draft: true
           prerelease: false
+          files: |
+            main_repo/src-tauri/target/release/bundle/nsis/*.exe
+            main_repo/src-tauri/target/release/bundle/msi/*.msi
