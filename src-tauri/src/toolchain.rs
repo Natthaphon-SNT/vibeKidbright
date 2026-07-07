@@ -701,7 +701,8 @@ pub async fn build_firmware_with_toolchain(
         if let Some(rom_elf_dir) = crate::esp_idf::find_esp_rom_elf_dir(&tools_path_clone) {
             cmd.env("ESP_ROM_ELF_DIR", rom_elf_dir);
         }
-        let mut child = cmd.stdout(Stdio::piped())
+        let mut child = cmd.stdin(Stdio::null())
+            .stdout(Stdio::piped())
             .stderr(Stdio::piped())
             .spawn()
             .map_err(|e| format!("Failed to start build: {}", e))?;
