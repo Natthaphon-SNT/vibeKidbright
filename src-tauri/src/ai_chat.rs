@@ -786,11 +786,11 @@ pub async fn send_ai_message(
             let config = read_config();
             (
                 config["google_api_key"].as_str().unwrap_or("").to_string(),
-                config["google_model"].as_str().unwrap_or("gemini-1.5-flash").to_string(),
+                config["google_model"].as_str().unwrap_or("gemini-2.5-flash").to_string(),
                 config["openrouter_api_key"].as_str().unwrap_or("").to_string(),
                 config["openrouter_model"]
                     .as_str()
-                    .unwrap_or("meta-llama/llama-3.3-70b-instruct:free")
+                    .unwrap_or("google/gemini-2.5-flash:free")
                     .to_string(),
             )
         };
@@ -807,31 +807,19 @@ pub async fn send_ai_message(
         if model == "free" || model == "openrouter/free" || model == "auto-free" {
             let best_free_models = vec![
                 // ── Tier 1: Best reasoning + coding free models ───────────────
-                "qwen/qwen3-coder:free",                    // 480B, best free coder
-                "deepseek/deepseek-r1-0528:free",           // Latest DeepSeek R1 reasoning
-                "deepseek/deepseek-r1:free",                // Strong reasoning
-                "deepseek/deepseek-chat-v3-0324:free",      // V3 fast coding
-                "microsoft/phi-4-reasoning:free",           // Phi-4 reasoning
-                // ── Tier 2: Large capable free models ────────────────────────
-                "openai/gpt-oss-120b:free",                 // GPT-class 120B
-                "nvidia/nemotron-3-super-120b-a12b:free",   // top weekly
-                "meta-llama/llama-4-maverick:free",         // Llama 4 Maverick 17Bx128E
-                "meta-llama/llama-4-scout:free",            // Llama 4 Scout
-                "meta-llama/llama-3.3-70b-instruct:free",   // Reliable fallback
-                // ── Tier 3: Mid-size free models ──────────────────────────────
-                "stepfun/step-3.5-flash:free",
-                "google/gemma-4-31b-it:free",
-                "google/gemma-3-27b-it:free",
-                "arcee-ai/trinity-large-preview:free",
-                "minimax/minimax-m2.5:free",
-                "qwen/qwen3.6-plus-04-02:free",
-                // ── Tier 4: Lightweight fallbacks ─────────────────────────────
+                "google/gemini-2.5-flash:free",             // Best overall free
+                "meta-llama/llama-3.3-70b-instruct:free",   // 70B standard
+                "qwen/qwen-2.5-coder-32b-instruct:free",    // Best coder
+                "deepseek/deepseek-chat:free",              // DeepSeek V3
+                "nvidia/llama-3.1-nemotron-70b-instruct:free", // Nemotron
+                // ── Tier 2: Mid-size free models ──────────────────────────────
+                "microsoft/phi-3-medium-128k-instruct:free",
                 "mistralai/mistral-7b-instruct:free",
-                "nvidia/nemotron-3-nano-30b-a3b:free",
-                "openai/gpt-oss-20b:free",
-                "arcee-ai/trinity-mini:free",
-                "z-ai/glm-4.5-air:free",
-                "qwen/qwen-max:free",
+                "google/gemma-2-9b-it:free",
+                "huggingfaceh4/zephyr-7b-beta:free",
+                "qwen/qwen-2-7b-instruct:free",
+                "meta-llama/llama-3-8b-instruct:free",
+                "openchat/openchat-7b:free",
             ];
             
             let or_url = "https://openrouter.ai/api/v1".to_string();
@@ -884,13 +872,11 @@ pub async fn send_ai_message(
                 
                 // Add guaranteed working fallbacks just in case the user's config_or_model is deprecated/removed.
                 let guaranteed_fallbacks = vec![
-                    "qwen/qwen3-coder:free",
-                    "deepseek/deepseek-r1-0528:free",
-                    "deepseek/deepseek-r1:free",
-                    "meta-llama/llama-4-maverick:free",
-                    "nvidia/nemotron-3-super-120b-a12b:free",
+                    "google/gemini-2.5-flash:free",
                     "meta-llama/llama-3.3-70b-instruct:free",
-                    "google/gemma-4-31b-it:free",
+                    "qwen/qwen-2.5-coder-32b-instruct:free",
+                    "deepseek/deepseek-chat:free",
+                    "nvidia/llama-3.1-nemotron-70b-instruct:free",
                     "mistralai/mistral-7b-instruct:free",
                 ];
                 for gf in guaranteed_fallbacks {
