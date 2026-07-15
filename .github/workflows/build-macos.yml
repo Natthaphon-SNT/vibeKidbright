@@ -1,0 +1,155 @@
+name: Build macOS Installer
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout main repository
+        uses: actions/checkout@v4
+        with:
+          path: main_repo
+
+      - name: Checkout external knowledge_base repo
+        uses: actions/checkout@v4
+        with:
+          repository: Natthaphon-SNT/Knowledge
+          path: external_repo
+
+      - name: Extract external knowledge_base.zip
+        run: |
+          ZIP="external_repo/knowledge_base.zip"
+          if [ ! -f "$ZIP" ]; then echo "ไม่พบไฟล์ $ZIP"; exit 1; fi
+          mkdir -p external_repo/extracted
+          unzip -o "$ZIP" -d external_repo/extracted
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: main_repo/package-lock.json
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin,x86_64-apple-darwin
+
+      - name: Cache Rust build artifacts
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: main_repo/src-tauri -> target
+
+      - name: Install Frontend Dependencies
+        working-directory: main_repo
+        run: npm ci
+
+      - name: Merge knowledge_base from both repos
+        run: |
+          DST="main_repo/resources/knowledge_base"
+          mkdir -p "$DST"
+
+          sync_kb() {
+            SRC="$1"
+            if [ ! -d "$SRC" ]; then echo "Skipping $SRC (not found)"; return; fi
+            find "$SRC" -type f \
+              ! -name ".embeddings.json" \
+              ! -name "*.backup" \
+            | while read FILE; do
+              REL="${FILE#$SRC/}"
+              DST_FILE="$DST/$REL"
+              mkdir -p "$(dirname "$DST_FILE")"
+              cp "$FILE" "$DST_FILE"
+            done
+          }
+
+          sync_kb "external_repo/extracted/knowledge_base"
+          sync_kb "main_repo/knowledge_base"
+          echo "Merge complete -> $DST"
+
+      - name: Get app version from tauri.conf.json
+        id: get_version
+        run: |
+          VERSION=$(python3 -c "import json; d=json.load(open('main_repo/src-tauri/tauri.conf.json')); print(d['version'])")
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "TAG=v$VERSION" >> $GITHUB_OUTPUT
+          echo "Version: $VERSION"
+
+      # ─── Code Signing Setup (ต้องการ Apple Developer secrets) ────────────────
+      # ถ้าไม่มี secrets เหล่านี้ step นี้จะถูกข้ามไปโดยอัตโนมัติ
+      - name: Import Apple Developer Certificate
+        if: ${{ secrets.APPLE_CERTIFICATE != '' }}
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        run: |
+          # สร้าง keychain ชั่วคราว
+          KEYCHAIN_PATH="$RUNNER_TEMP/build.keychain"
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+
+          # Decode และ import certificate
+          echo "$APPLE_CERTIFICATE" | base64 --decode > "$RUNNER_TEMP/cert.p12"
+          security import "$RUNNER_TEMP/cert.p12" \
+            -k "$KEYCHAIN_PATH" \
+            -P "$APPLE_CERTIFICATE_PASSWORD" \
+            -T /usr/bin/codesign \
+            -T /usr/bin/productsign
+          security list-keychain -d user -s "$KEYCHAIN_PATH"
+          security set-key-partition-list \
+            -S apple-tool:,apple: \
+            -s -k "$KEYCHAIN_PASSWORD" \
+            "$KEYCHAIN_PATH"
+          rm "$RUNNER_TEMP/cert.p12"
+          echo "✅ Certificate imported successfully"
+
+      # ─── Build Tauri App ──────────────────────────────────────────────────────
+      - name: Build Tauri App (Universal Binary — Apple Silicon + Intel)
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # ตัวแปรสำหรับ Apple signing (ถ้าตั้งค่าไว้)
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        with:
+          projectPath: main_repo
+          args: --target universal-apple-darwin
+
+      # ─── Notarize ไฟล์ DMG (ต้องการ Apple ID secrets) ───────────────────────
+      - name: Notarize DMG with Apple Notary Service
+        if: ${{ secrets.APPLE_ID != '' }}
+        run: |
+          DMG=$(find main_repo/src-tauri/target/universal-apple-darwin/release/bundle/dmg -name "*.dmg" | head -1)
+          if [ -z "$DMG" ]; then
+            echo "❌ ไม่พบไฟล์ .dmg"
+            exit 1
+          fi
+          echo "📦 Notarizing: $DMG"
+          xcrun notarytool submit "$DMG" \
+            --apple-id "${{ secrets.APPLE_ID }}" \
+            --password "${{ secrets.APPLE_ID_PASSWORD }}" \
+            --team-id "${{ secrets.APPLE_TEAM_ID }}" \
+            --wait \
+            --timeout 30m
+          xcrun stapler staple "$DMG"
+          echo "✅ Notarization complete"
+
+      # ─── Release ─────────────────────────────────────────────────────────────
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.get_version.outputs.TAG }}
+          name: 'vibeKidbright ${{ steps.get_version.outputs.TAG }} (macOS)'
+          body: 'ดาวน์โหลดไฟล์ .dmg ด้านล่างเพื่อติดตั้งบน macOS (รองรับทั้ง Apple Silicon และ Intel)'
+          draft: true
+          prerelease: false
+          files: |
+            main_repo/src-tauri/target/universal-apple-darwin/release/bundle/dmg/*.dmg
