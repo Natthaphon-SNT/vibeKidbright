@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Natthaphon-SNT/vibeKidbright/releases/tag/v3.0.0">
+  <a href="https://github.com/Natthaphon-SNT/vibeKidbright/releases/tag/v3.4.0">
     <img src="https://img.shields.io/badge/version-v3.0.0-blue.svg" alt="Version"/>
   </a>
   <img src="https://img.shields.io/badge/platform-Windows-lightgrey.svg" alt="Platform"/>
