@@ -1135,6 +1135,35 @@ HARD RULE: "KB not loaded" or empty search result is NOT permission to generate 
 - **Why `/128.0f`:** Hardware-verified on V1.3, KidBright32i, and KidBright32iA. The on-board sensor returns data in right-justified format where 1 LSB = 1/128°C (0.0078125°C). Raw value 3712 = 29.0°C, 3584 = 28.0°C.
 - ALWAYS use `i2c_master_write_read_device()` (combined transaction). NEVER split into separate write + read calls.
 
+### LED MATRIX RULES (HT16K33 16x8 — MANDATORY):
+- **Hardware Bus**: HT16K33 on `I2C_NUM_0` (SDA=GPIO21, SCL=GPIO22, Address `0x70`, default speed `100000` Hz).
+- **CRITICAL: Interleaved Display Mapping**:
+  - The 16x8 display consists of TWO 8x8 matrices connected to a single HT16K33 chip.
+  - **Left 8x8 Panel (Columns 0–7)**: Mapped to **EVEN** RAM byte addresses (`buf[1 + c*2]`).
+  - **Right 8x8 Panel (Columns 8–15)**: Mapped to **ODD** RAM byte addresses (`buf[2 + c*2]`).
+  - **Buffer Size**: 17 bytes total (`buf[0] = 0x00` RAM pointer, `buf[1..16]` column data).
+  - ❌ **BANNED**: Writing 16 columns sequentially to RAM (causes characters to split, overlap, or show only on one side).
+  - ✅ **MANDATORY `matrix_draw` pattern**:
+    ```c
+    static void matrix_draw(const uint8_t cols[16]) {
+        uint8_t buf[17] = {0};
+        buf[0] = 0x00; // RAM Start Address 0x00
+        for (int c = 0; c < 8; c++) {
+            buf[1 + (c * 2)] = cols[c];     // Left 8x8 (Cols 0-7)  -> Even addresses
+            buf[2 + (c * 2)] = cols[c + 8]; // Right 8x8 (Cols 8-15) -> Odd addresses
+        }
+        i2c_master_write_to_device(I2C_NUM_0, 0x70, buf, sizeof(buf), pdMS_TO_TICKS(100));
+    }
+    ```
+- **CRITICAL: Y-Axis Inversion**:
+  - KidBright matrix hardware is wired upside-down. Always invert Y with `(7 - row)`.
+  - ❌ `out_cols[col] |= (1 << row);` (Upside-down)
+  - ✅ `out_cols[col] |= (1 << (7 - row));`
+- **CRITICAL: HT16K33 Init Sequence**:
+  - Each command MUST be sent as a separate 1-byte I2C write transaction:
+    `0x21` (Osc ON), `0x81` (Display ON), `0xEF` (Brightness Max 16/16).
+  - ❌ Sending `{0x21, 0x81, 0xEF}` as a 3-byte array in a single write leaves the display blank.
+
 ### ADC RULES (MANDATORY — ESP-IDF v5.x):
 #### ✅ Correct Oneshot API (DEFAULT for all new code):
 ```c
@@ -3386,9 +3415,6 @@ fn compute_unified_diff(old: &str, new: &str, path: &str) -> String {
     let new_lines: Vec<&str> = new.lines().collect();
     let mut out = format!("--- {}\n+++ {}\n", path, path);
 
-    // Simple line-by-line diff.  For production the `similar` crate is preferred,
-    // but this avoids an extra dependency while still producing a readable output.
-    // We emit a single hunk covering the entire file with correct line counters.
     let old_count = old_lines.len();
     let new_count = new_lines.len();
     out.push_str(&format!("@@ -{},{} +{},{} @@\n", 1, old_count, 1, new_count));
@@ -3412,9 +3438,7 @@ fn compute_unified_diff(old: &str, new: &str, path: &str) -> String {
 
 // ── Web search ────────────────────────────────────────────────────────────────
 
-/// FIX: DuckDuckGo scraper with fallback user-agents and a secondary fallback to Bing.
 async fn search_the_web(query: &str) -> Result<Value, String> {
-    // Try DDG with two different user-agents before falling back to Bing.
     let user_agents = [
         "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
         "Mozilla/5.0 (X11; Linux x86_64; rv:125.0) Gecko/20100101 Firefox/125.0",
@@ -3426,7 +3450,6 @@ async fn search_the_web(query: &str) -> Result<Value, String> {
             }
         }
     }
-    // Fallback to Bing
     try_bing_search(query).await
 }
 
@@ -3479,7 +3502,6 @@ async fn try_bing_search(query: &str) -> Result<Value, String> {
     let html = response.text().await
         .map_err(|e| format!("Failed to read Bing body: {}", e))?;
     let document = Html::parse_document(&html);
-    // Bing results are in <li class="b_algo"> elements
     let result_sel = Selector::parse("li.b_algo").map_err(|_| "Bad selector")?;
     let title_sel = Selector::parse("h2 a").map_err(|_| "Bad selector")?;
     let snippet_sel = Selector::parse(".b_caption p").map_err(|_| "Bad selector")?;
@@ -3504,14 +3526,20 @@ async fn try_bing_search(query: &str) -> Result<Value, String> {
 // ── Embeddings ────────────────────────────────────────────────────────────────
 
 async fn get_embeddings_internal(api_key: &str, mut base_url: String, text: &str) -> Result<Vec<f32>, String> {
+    if api_key.is_empty() {
+        return Err("No API key configured for embeddings".to_string());
+    }
     if !base_url.starts_with("http") && !base_url.is_empty() {
         base_url = format!("http://{}", base_url);
     }
-
     if !base_url.contains("/v1") {
         base_url = format!("{}/v1", base_url.trim_end_matches('/'));
     }
-    let client = Client::new();
+    let client = Client::builder()
+        .connect_timeout(std::time::Duration::from_secs(2))
+        .timeout(std::time::Duration::from_secs(2))
+        .build()
+        .map_err(|e| format!("Failed to create client: {}", e))?;
     let res = client.post(format!("{}/embeddings", base_url.trim_end_matches('/')))
         .header("Authorization", format!("Bearer {}", api_key))
         .json(&json!({ "input": text, "model": "text-embedding-3-small" }))
@@ -3543,6 +3571,7 @@ async fn get_embeddings(_app_handle: &AppHandle, text: &str) -> Result<Vec<f32>,
 }
 
 fn cosine_similarity(v1: &[f32], v2: &[f32]) -> f32 {
+    if v1.is_empty() || v2.is_empty() || v1.len() != v2.len() { return 0.0; }
     let dot: f32 = v1.iter().zip(v2.iter()).map(|(a, b)| a * b).sum();
     let n1: f32 = v1.iter().map(|a| a * a).sum::<f32>().sqrt();
     let n2: f32 = v2.iter().map(|a| a * a).sum::<f32>().sqrt();
@@ -3555,58 +3584,32 @@ fn chunk_text(text: &str, target_size: usize, overlap: usize) -> Vec<String> {
     let mut chunks: Vec<String> = Vec::new();
     let mut current = String::new();
 
-    // Split on sentence terminators first, then fall back to word boundaries.
-    let sentence_ends: Vec<usize> = text.char_indices()
-        .filter(|(i, c)| {
-            (*c == '.' || *c == '!' || *c == '?')
-                && text.get(*i + 1..).map(|s| s.starts_with(' ') || s.starts_with('\n')).unwrap_or(true)
-        })
-        .map(|(i, _)| i + 1)
-        .collect();
-
-    let mut last = 0;
-    let mut sentences: Vec<&str> = Vec::new();
-    for &end in &sentence_ends {
-        sentences.push(&text[last..end]);
-        last = end;
-    }
-    if last < text.len() {
-        sentences.push(&text[last..]);
-    }
-
-    let mut overlap_buf = String::new();
-
-    for sentence in &sentences {
-        if current.len() + sentence.len() > target_size && !current.is_empty() {
-            chunks.push(current.clone());
-            // Carry overlap: take the tail up to `overlap` chars, but honour UTF-8 boundaries.
-            overlap_buf.clear();
-            let byte_len = current.len();
-            let tail_byte_start = byte_len.saturating_sub(overlap);
-            // Walk forward to the next valid char boundary.
-            let safe_start = (tail_byte_start..byte_len)
-                .find(|&i| current.is_char_boundary(i))
-                .unwrap_or(byte_len);
-            overlap_buf.push_str(&current[safe_start..]);
-            current = overlap_buf.clone();
-            current.push(' ');
+    let paragraphs: Vec<&str> = text.split("\n\n").collect();
+    for para in paragraphs {
+        let para = para.trim();
+        if para.is_empty() { continue; }
+        if current.len() + para.len() + 2 <= target_size {
+            if !current.is_empty() { current.push_str("\n\n"); }
+            current.push_str(para);
+        } else {
+            if !current.is_empty() { chunks.push(current); }
+            if overlap > 0 && !chunks.is_empty() {
+                let last = chunks.last().unwrap();
+                let tail = if last.len() > overlap { &last[last.len() - overlap..] } else { last };
+                current = format!("{}\n\n{}", tail, para);
+            } else {
+                current = para.to_string();
+            }
         }
-        current.push_str(sentence);
     }
-    if !current.trim().is_empty() {
-        chunks.push(current);
-    }
+    if !current.is_empty() { chunks.push(current); }
     if chunks.is_empty() && !text.is_empty() {
-        // Absolute fallback for text with no sentence terminators.
         chunks.push(text.chars().take(target_size).collect());
     }
     chunks
 }
 
 // ── Helper: recursive KB file collector ──────────────────────────────────────
-// Walks knowledge_base/ recursively and collects text/doc files (md, txt, c, h).
-// Returns Vec of (absolute_path, relative_key) pairs.
-// The relative_key uses forward slashes so it is OS-independent (e.g. "sensor_examples/accel_kxtj3.c").
 
 fn collect_kb_files_inner(root: &Path, current: &Path, result: &mut Vec<(PathBuf, String)>, include_disabled: bool) {
     let Ok(entries) = std::fs::read_dir(current) else { return; };
@@ -3617,7 +3620,6 @@ fn collect_kb_files_inner(root: &Path, current: &Path, result: &mut Vec<(PathBuf
         if path.is_dir() {
             collect_kb_files_inner(root, &path, result, include_disabled);
         } else if path.is_file() {
-            // .disabled files: include when listing for UI, skip when indexing/searching
             if name.ends_with(".disabled") {
                 if include_disabled {
                     let rel = path.strip_prefix(root).unwrap_or(&path);
@@ -3636,14 +3638,12 @@ fn collect_kb_files_inner(root: &Path, current: &Path, result: &mut Vec<(PathBuf
     }
 }
 
-/// For search & indexing — skips .disabled files entirely.
 fn collect_kb_files(root: &Path) -> Vec<(PathBuf, String)> {
     let mut result = Vec::new();
     collect_kb_files_inner(root, root, &mut result, false);
     result
 }
 
-/// For UI listing — includes .disabled files so the user can see and re-enable them.
 fn collect_kb_files_all(root: &Path) -> Vec<(PathBuf, String)> {
     let mut result = Vec::new();
     collect_kb_files_inner(root, root, &mut result, true);
@@ -3651,7 +3651,7 @@ fn collect_kb_files_all(root: &Path) -> Vec<(PathBuf, String)> {
 }
 
 async fn reindex_knowledge_base(project_path: &Path) -> Result<usize, String> {
-    let kb_path = project_path.join("knowledge_base");
+    let kb_path = resolve_kb_path(&project_path.to_string_lossy());
     if !kb_path.exists() { return Ok(0); }
     let index_file = kb_path.join(".embeddings.json");
     let mut index: VectorIndex = if index_file.exists() {
@@ -3667,7 +3667,9 @@ async fn reindex_knowledge_base(project_path: &Path) -> Result<usize, String> {
             config["base_url"].as_str().unwrap_or("https://api.openai.com/v1").to_string(),
         )
     };
-    // FIX: Use recursive collector so sensor_examples/ and other subfolders are indexed.
+    if api_key.is_empty() {
+        return Ok(index.chunks.len());
+    }
     let all_files = collect_kb_files(&kb_path);
     let mut changed = false;
     for (file_path, rel_key) in &all_files {
@@ -3677,18 +3679,21 @@ async fn reindex_knowledge_base(project_path: &Path) -> Result<usize, String> {
             .unwrap_or(0);
         if index.last_indexed.get(rel_key).cloned().unwrap_or(0) < mtime {
             if let Ok(content) = std::fs::read_to_string(file_path) {
-                index.chunks.retain(|c| &c.file_name != rel_key);
-                // Use sentence-boundary chunking.
                 let chunks = chunk_text(&content, 800, 100);
+                let mut new_chunks = Vec::new();
                 for chunk_content in chunks {
                     if let Ok(embedding) = get_embeddings_internal(&api_key, base_url.clone(), &chunk_content).await {
-                        index.chunks.push(KnowledgeChunk {
+                        new_chunks.push(KnowledgeChunk {
                             file_name: rel_key.clone(), content: chunk_content, embedding,
                         });
                     }
                 }
-                index.last_indexed.insert(rel_key.clone(), mtime);
-                changed = true;
+                if !new_chunks.is_empty() {
+                    index.chunks.retain(|c| &c.file_name != rel_key);
+                    index.chunks.extend(new_chunks);
+                    index.last_indexed.insert(rel_key.clone(), mtime);
+                    changed = true;
+                }
             }
         }
     }
@@ -3702,12 +3707,11 @@ async fn reindex_knowledge_base(project_path: &Path) -> Result<usize, String> {
 // ── Knowledge search (with query cache) ───────────────────────────────────────
 
 pub async fn knowledge_search(app_handle: &AppHandle, project_path: &Path, query: &str) -> Value {
-    let kb_path = project_path.join("knowledge_base");
+    let kb_path = resolve_kb_path(&project_path.to_string_lossy());
     if !kb_path.exists() {
         return json!({ "message": "No knowledge_base folder found." });
     }
 
-    // FIX: Check in-memory query cache before doing any I/O or embeddings.
     {
         let cache = get_kb_query_cache().lock().unwrap();
         if let Some(cached) = cache.get(query) {
@@ -3715,16 +3719,24 @@ pub async fn knowledge_search(app_handle: &AppHandle, project_path: &Path, query
         }
     }
 
-    let result = {
-        let vector_results = vector_knowledge_search(app_handle, project_path, query).await;
-        if vector_results.as_array().map(|a| !a.is_empty()).unwrap_or(false) {
-            vector_results
-        } else {
-            keyword_knowledge_search(&kb_path, query)
+    // Fast local chunk keyword search (< 5ms)
+    let keyword_results = keyword_knowledge_search(&kb_path, query);
+    let has_keyword_results = keyword_results.as_array().map(|a| !a.is_empty()).unwrap_or(false);
+
+    let result = if has_keyword_results {
+        // Local pre-computed chunks from .embeddings.json matched instantly!
+        keyword_results
+    } else {
+        // Try vector search with 2-second timeout max
+        match tokio::time::timeout(
+            std::time::Duration::from_secs(2),
+            vector_knowledge_search(app_handle, project_path, query)
+        ).await {
+            Ok(res) if res.as_array().map(|a| !a.is_empty()).unwrap_or(false) => res,
+            _ => keyword_results,
         }
     };
 
-    // Store in cache.
     {
         let mut cache = get_kb_query_cache().lock().unwrap();
         cache.insert(query.to_string(), result.clone());
@@ -3738,7 +3750,35 @@ fn keyword_knowledge_search(kb_path: &Path, query: &str) -> Value {
     if keywords.is_empty() {
         return json!({ "message": "Query too short for keyword search." });
     }
-    // FIX: Use recursive collector so sensor_examples/ subfolders and .c files are searched.
+
+    // 1. Check pre-computed chunks in .embeddings.json first
+    let index_file = kb_path.join(".embeddings.json");
+    if index_file.exists() {
+        if let Ok(data) = std::fs::read_to_string(&index_file) {
+            if let Ok(index) = serde_json::from_str::<VectorIndex>(&data) {
+                if !index.chunks.is_empty() {
+                    let mut chunk_matches: Vec<(f32, &KnowledgeChunk)> = Vec::new();
+                    for chunk in &index.chunks {
+                        let content_lower = chunk.content.to_lowercase();
+                        let matched = keywords.iter().filter(|kw| content_lower.contains(*kw)).count();
+                        if matched > 0 {
+                            let score = matched as f32 / keywords.len() as f32;
+                            chunk_matches.push((score, chunk));
+                        }
+                    }
+                    if !chunk_matches.is_empty() {
+                        chunk_matches.sort_by(|a, b| b.0.partial_cmp(&a.0).unwrap_or(std::cmp::Ordering::Equal));
+                        let results: Vec<Value> = chunk_matches.iter().take(5).map(|(score, chunk)| {
+                            json!({ "file": chunk.file_name, "score": score, "content": chunk.content, "method": "chunk_keyword" })
+                        }).collect();
+                        return json!(results);
+                    }
+                }
+            }
+        }
+    }
+
+    // 2. Fallback to raw file line search
     let all_files = collect_kb_files(kb_path);
     let mut results: Vec<Value> = Vec::new();
     for (file_path, rel_key) in &all_files {
@@ -3775,7 +3815,6 @@ fn keyword_knowledge_search(kb_path: &Path, query: &str) -> Value {
     });
     results.truncate(5);
     if results.is_empty() {
-        // Full-dump fallback: return first 3000 chars of every file in KB.
         let all: Vec<Value> = all_files.iter().filter_map(|(fp, rk)| {
             std::fs::read_to_string(fp).ok().map(|content| {
                 json!({ "file": rk, "score": 0.1, "content": content.chars().take(3000).collect::<String>(), "method": "full_dump" })
@@ -3793,7 +3832,7 @@ async fn vector_knowledge_search(app_handle: &AppHandle, project_path: &Path, qu
         Ok(e) => e,
         Err(_) => return json!([]),
     };
-    let kb_path = project_path.join("knowledge_base");
+    let kb_path = resolve_kb_path(&project_path.to_string_lossy());
     let index_file = kb_path.join(".embeddings.json");
     if !index_file.exists() { return json!([]); }
     let data = std::fs::read_to_string(&index_file).unwrap_or_default();
@@ -3803,7 +3842,7 @@ async fn vector_knowledge_search(app_handle: &AppHandle, project_path: &Path, qu
         .map(|c| (cosine_similarity(&query_embedding, &c.embedding), c))
         .filter(|(s, _)| *s > 0.3)
         .collect();
-    matches.sort_by(|a, b| b.0.partial_cmp(&a.0).unwrap());
+    matches.sort_by(|a, b| b.0.partial_cmp(&a.0).unwrap_or(std::cmp::Ordering::Equal));
     let results: Vec<Value> = matches.iter().take(5).map(|(score, chunk)| {
         json!({ "file": chunk.file_name, "score": score, "content": chunk.content, "method": "vector" })
     }).collect();

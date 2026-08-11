@@ -4,6 +4,8 @@ import { listen } from "@tauri-apps/api/event";
 import AiChat from "./AiChat";
 import CodeEditor from "./CodeEditor";
 import ToolchainSetup from "./ToolchainSetup";
+import WikiView from "./WikiView";
+
 
 interface FileEntry {
   name: string;
@@ -301,8 +303,16 @@ function App({ toolchainReady = true }: { toolchainReady?: boolean }) {
     const saved = localStorage.getItem("vibe-ai-panel");
     return saved === null ? true : saved === "true"; // default: เปิดอยู่เสมอ
   });
+  const [activeView, setActiveView] = useState<"editor" | "wiki">(() => {
+    return (localStorage.getItem("vibe-active-view") as "editor" | "wiki") || "editor";
+  });
+
   const [projectDir, setProjectDir] = useState(".");
   const [isBuilding, setIsBuilding] = useState(false);
+  const [buildStep, setBuildStep] = useState(0);
+  const [buildTotal, setBuildTotal] = useState(0);
+  const [buildCurrentTask, setBuildCurrentTask] = useState("");
+  const [buildResult, setBuildResult] = useState<"idle" | "building" | "success" | "failed">("idle");
   const [serialPorts, setSerialPorts] = useState<string[]>([]);
   const [selectedSerialPort, setSelectedSerialPort] = useState("");
   const [serialBaud, setSerialBaud] = useState("115200");
@@ -329,6 +339,7 @@ function App({ toolchainReady = true }: { toolchainReady?: boolean }) {
   }, []);
   const scrollRef = useRef<HTMLDivElement>(null);
   const openFilesRef = useRef<FileTab[]>(openFiles);
+  const parseBuildProgressRef = useRef<(msg: string) => void>(() => {});
   useEffect(() => { openFilesRef.current = openFiles; }, [openFiles]);
 
   const normPath = (p: string) => p.replace(/\\/g, '/').toLowerCase();
@@ -417,7 +428,9 @@ function App({ toolchainReady = true }: { toolchainReady?: boolean }) {
 
   useEffect(() => {
     const unlistenTerminal = listen("terminal-output", (event) => {
-      setLogs((prev) => [...prev, event.payload as string]);
+      const line = event.payload as string;
+      parseBuildProgressRef.current(line);
+      setLogs((prev) => [...prev, line]);
     });
 
     const unlistenFile = listen("file-modified", async (event) => {
@@ -921,9 +934,79 @@ function App({ toolchainReady = true }: { toolchainReady?: boolean }) {
     }
   };
 
+  const parseBuildProgress = (msg: string) => {
+    // Strip optional timestamp prefix added by addLog: "[3:41:18 PM] ..."
+    const raw = msg.replace(/^\[\d{1,2}:\d{2}:\d{2}\s+[AP]M\]\s+/, "").trim();
+
+    // 1. Parse ninja-style compilation progress: [N/M] Some Task Description
+    const ninjaMatch = raw.match(/^\[(\d+)\/(\d+)\]\s+(.+)/);
+    if (ninjaMatch) {
+      const current = parseInt(ninjaMatch[1], 10);
+      const total = parseInt(ninjaMatch[2], 10);
+      const taskRaw = ninjaMatch[3].trim();
+
+      let task = taskRaw;
+      if (task.includes("Building C object")) task = "Building C object";
+      else if (task.includes("Building CXX object")) task = "Building C++ object";
+      else if (task.includes("Linking C static library")) task = "Linking static library";
+      else if (task.includes("Linking CXX executable")) task = "Linking executable";
+      else if (task.includes("Generating")) task = "Generating linker script";
+      else if (task.includes("Performing build step")) task = "Building bootloader";
+      else if (task.includes("Completed")) task = "Bootloader complete";
+      else if (task.includes("No install step")) task = "Skipping install";
+      else if (task.length > 40) task = task.substring(0, 40) + "...";
+
+      setBuildStep(current);
+      setBuildTotal(total);
+      setBuildCurrentTask(task);
+      return;
+    }
+
+    // 2. Parse esptool flash percentage: Writing at 0x00010000... (45 %)
+    const flashPctMatch = raw.match(/Writing at 0x[0-9a-fA-F]+\.\.\.\s*\(([0-9]+)\s*%\)/i) || raw.match(/\(([0-9]+)\s*%\)/);
+    if (flashPctMatch && (raw.includes("Writing at") || raw.includes("Wrote") || raw.includes("%"))) {
+      const pct = Math.min(100, Math.max(0, parseInt(flashPctMatch[1], 10)));
+      setBuildStep(pct);
+      setBuildTotal(100);
+      setBuildCurrentTask(`Flashing to board (${pct}%)`);
+      return;
+    }
+
+    // 3. Detect flash / upload phase markers
+    if (raw.includes("Connecting...") || raw.includes("Connecting..")) {
+      setBuildStep(0);
+      setBuildTotal(100);
+      setBuildCurrentTask("Connecting to board...");
+    } else if (raw.includes("Chip is") || raw.includes("Features:")) {
+      setBuildCurrentTask("Chip detected, preparing flash...");
+    } else if (raw.includes("Writing at 0x") || raw.startsWith("Compressed")) {
+      setBuildCurrentTask("Flashing firmware...");
+    } else if (raw.includes("Hash of data verified")) {
+      setBuildStep(100);
+      setBuildTotal(100);
+      setBuildCurrentTask("Flash verified ✓");
+    } else if (raw.includes("Hard resetting") || (raw.includes("Done") && raw.includes("resetting"))) {
+      setBuildStep(100);
+      setBuildTotal(100);
+      setBuildCurrentTask("Resetting board ✓");
+    } else if (raw.startsWith("FAILED:") || raw.includes("ninja failed with exit code")) {
+      setBuildResult("failed");
+      setBuildCurrentTask("Build failed ✗");
+    } else if (raw.includes("--- Starting Build")) {
+      setBuildResult("building");
+      setBuildStep(0);
+      setBuildTotal(0);
+      setBuildCurrentTask("Initializing build...");
+    }
+  };
+
   const addLog = (msg: string) => {
+    parseBuildProgress(msg);
     setLogs((prev) => [...prev, `[${new Date().toLocaleTimeString()}] ${msg}`]);
   };
+
+  // Keep ref in sync so event listeners always have the latest parser
+  parseBuildProgressRef.current = parseBuildProgress;
 
   const handleTerminalSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -1008,6 +1091,10 @@ function App({ toolchainReady = true }: { toolchainReady?: boolean }) {
     }
 
     setIsBuilding(true);
+    setBuildResult("building");
+    setBuildStep(0);
+    setBuildTotal(0);
+    setBuildCurrentTask("Initializing...");
     addLog("--- Starting Build & Flash ---");
 
     try {
@@ -1022,8 +1109,13 @@ function App({ toolchainReady = true }: { toolchainReady?: boolean }) {
       await runIdfWrappedCommand("idf.py", flashArgs, projectDir);
     } catch (err) {
       addLog(`Build failed: ${err}`);
+      setBuildResult("failed");
+      setBuildCurrentTask("Build failed");
     } finally {
       setIsBuilding(false);
+      // If we didn't explicitly set failed, mark as success
+      setBuildResult(prev => prev === "building" ? "success" : prev);
+      setBuildCurrentTask(prev => prev === "Initializing..." ? "" : prev);
     }
   };
 
@@ -1165,7 +1257,33 @@ function App({ toolchainReady = true }: { toolchainReady?: boolean }) {
             >✦</span>
             Vibe Coder
           </button>
+
+          {/* AI Wiki button */}
+          <button
+            onClick={() => {
+              const next: "editor" | "wiki" = activeView === "wiki" ? "editor" : "wiki";
+              setActiveView(next);
+              localStorage.setItem("vibe-active-view", next);
+            }}
+            className="w-full text-left p-2 rounded flex items-center gap-2 text-sm transition-colors group"
+            style={activeView === "wiki"
+              ? { backgroundColor: 'rgba(167,139,250,0.12)', color: '#a78bfa' }
+              : { color: 'var(--text-muted)' }
+            }
+            onMouseEnter={e => { if (activeView !== "wiki") e.currentTarget.style.backgroundColor = 'var(--bg-hover)'; }}
+            onMouseLeave={e => { if (activeView !== "wiki") e.currentTarget.style.backgroundColor = ''; }}
+          >
+            <span
+              className="w-4 h-4 flex items-center justify-center rounded text-[10px]"
+              style={activeView === "wiki"
+                ? { backgroundColor: 'rgba(167,139,250,0.2)', color: '#a78bfa' }
+                : { backgroundColor: 'var(--bg-hover)', color: 'var(--text-muted)' }
+              }
+            >📚</span>
+            AI Wiki
+          </button>
         </div>
+
 
         <div className="p-4" style={{ borderTop: '1px solid var(--border-color)', backgroundColor: 'var(--bg-hover)' }}>
           <div className="flex items-center gap-2 text-xs mb-3">
@@ -1203,64 +1321,171 @@ function App({ toolchainReady = true }: { toolchainReady?: boolean }) {
       </div>
 
       {/* Main Area */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 min-w-0" style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+
+        {/* ── Wiki View ──────────────────────────────────────────────── */}
+        {activeView === "wiki" && (
+          <div style={{ flex: 1, overflow: 'hidden', display: 'flex' }}>
+            <WikiView />
+          </div>
+        )}
+
+        {/* ── Editor + Terminal (hidden when Wiki is active) ─────────── */}
+        {activeView !== "wiki" && (
+          <>
         <div className="flex-1 overflow-hidden relative" style={{ backgroundColor: 'var(--bg-main)' }}>
+
           <div className="absolute inset-0 flex flex-col">
-            {/* Tab Bar */}
-            <div className="h-10 flex items-center justify-between backdrop-blur-sm z-10 overflow-hidden" style={{ borderBottom: '1px solid var(--border-color)', backgroundColor: 'var(--bg-panel)' }}>
-              <div className="flex items-center overflow-x-auto no-scrollbar flex-1">
-                {openFiles.map((file) => (
-                  <div
-                    key={file.path}
-                    onClick={() => setActiveFilePath(file.path)}
-                    className="flex items-center gap-2 px-4 h-full cursor-pointer transition-colors text-xs font-medium whitespace-nowrap"
-                    style={normPath(activeFilePath) === normPath(file.path)
-                      ? { backgroundColor: 'var(--bg-active)', color: 'var(--accent)', borderBottom: '2px solid var(--accent)', borderRight: '1px solid var(--border-color)' }
-                      : { color: 'var(--text-muted)', borderRight: '1px solid var(--border-color)' }
-                    }
-                  >
-                    {/* Unsaved changes indicator */}
-                    {isFileDirty(file) && (
-                      <span className="w-2 h-2 rounded-full bg-amber-400 shadow-[0_0_6px_rgba(251,191,36,0.5)] shrink-0" title="Unsaved changes" />
-                    )}
-                    <span>{file.name}</span>
-                    <button
-                      onClick={(e) => closeFile(file.path, e)}
-                      className="hover:text-red-400 transition-colors p-0.5 rounded-sm ml-1"
+            {/* Tab Bar + Build Progress */}
+            <div className="flex flex-col z-10" style={{ borderBottom: '1px solid var(--border-color)', backgroundColor: 'var(--bg-panel)' }}>
+              {/* Tab Row */}
+              <div className="h-10 flex items-center justify-between backdrop-blur-sm overflow-hidden">
+                <div className="flex items-center overflow-x-auto no-scrollbar flex-1">
+                  {openFiles.map((file) => (
+                    <div
+                      key={file.path}
+                      onClick={() => setActiveFilePath(file.path)}
+                      className="flex items-center gap-2 px-4 h-10 cursor-pointer transition-colors text-xs font-medium whitespace-nowrap"
+                      style={normPath(activeFilePath) === normPath(file.path)
+                        ? { backgroundColor: 'var(--bg-active)', color: 'var(--accent)', borderBottom: '2px solid var(--accent)', borderRight: '1px solid var(--border-color)' }
+                        : { color: 'var(--text-muted)', borderRight: '1px solid var(--border-color)' }
+                      }
                     >
-                      {isFileDirty(file) ? "●" : "×"}
+                      {/* Unsaved changes indicator */}
+                      {isFileDirty(file) && (
+                        <span className="w-2 h-2 rounded-full bg-amber-400 shadow-[0_0_6px_rgba(251,191,36,0.5)] shrink-0" title="Unsaved changes" />
+                      )}
+                      <span>{file.name}</span>
+                      <button
+                        onClick={(e) => closeFile(file.path, e)}
+                        className="hover:text-red-400 transition-colors p-0.5 rounded-sm ml-1"
+                      >
+                        {isFileDirty(file) ? "●" : "×"}
+                      </button>
+                    </div>
+                  ))}
+                  {openFiles.length === 0 && (
+                    <div className="px-4 text-xs italic" style={{ color: 'var(--text-muted)' }}>No files open</div>
+                  )}
+                </div>
+
+                {activeFile && (
+                  <div className="flex items-center gap-2 px-3 shrink-0 h-full" style={{ borderLeft: '1px solid var(--border-color)', backgroundColor: 'var(--bg-hover)' }}>
+                    <button
+                      onClick={() => reloadFile(activeFile.path)}
+                      className="p-1.5 rounded transition-colors"
+                      style={{ color: 'var(--text-muted)' }}
+                      onMouseEnter={e => { e.currentTarget.style.color = 'var(--danger)'; e.currentTarget.style.backgroundColor = 'var(--bg-active)'; }}
+                      onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.backgroundColor = ''; }}
+                      title="Reload from disk"
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                      </svg>
+                    </button>
+                    <button
+                      onClick={handleSaveProjectAs}
+                      className="flex items-center gap-1.5 px-3 py-1 text-[10px] font-bold rounded transition-all active:scale-95 uppercase tracking-wider"
+                      style={{ backgroundColor: 'rgba(16,185,129,0.12)', color: '#10b981', border: '1px solid rgba(16,185,129,0.25)' }}
+                      onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#059669'; e.currentTarget.style.color = '#fff'; }}
+                      onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'rgba(16,185,129,0.12)'; e.currentTarget.style.color = '#10b981'; }}
+                      title="Save Project As... (copies the whole folder to a new location)"
+                    >
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                      </svg>
+                      Save Project
                     </button>
                   </div>
-                ))}
-                {openFiles.length === 0 && (
-                  <div className="px-4 text-xs text-neutral-600 italic">No files open</div>
                 )}
               </div>
 
-              {activeFile && (
-                <div className="flex items-center gap-2 px-3 border-l border-neutral-800 shrink-0 h-full bg-neutral-900/40">
-                  <button
-                    onClick={() => reloadFile(activeFile.path)}
-                    className="p-1.5 text-neutral-500 hover:text-red-400 transition-colors rounded hover:bg-neutral-800"
-                    title="Reload from disk"
-                  >
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              {/* Build Progress Bar — shown during/after build */}
+              {(isBuilding || buildResult === "success" || buildResult === "failed") && (
+                <div
+                  className="px-3 py-1.5 flex items-center gap-3 animate-fadein"
+                  style={{
+                    borderTop: '1px solid var(--border-color)',
+                    backgroundColor: buildResult === "failed"
+                      ? 'rgba(185,28,28,0.06)'
+                      : buildResult === "success"
+                      ? 'rgba(13,127,69,0.06)'
+                      : 'var(--bg-hover)'
+                  }}
+                >
+                  {/* Status icon */}
+                  {isBuilding ? (
+                    <div className="w-3 h-3 border-2 rounded-full animate-spin shrink-0"
+                      style={{ borderColor: 'var(--accent)', borderTopColor: 'transparent' }} />
+                  ) : buildResult === "success" ? (
+                    <svg className="w-3 h-3 shrink-0" fill="none" viewBox="0 0 24 24" style={{ color: 'var(--success)' }}>
+                      <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                     </svg>
-                  </button>
-                  <button
-                    onClick={handleSaveProjectAs}
-                    className="flex items-center gap-1.5 px-3 py-1 bg-emerald-600/20 hover:bg-emerald-600 text-[10px] font-bold text-emerald-400 hover:text-white rounded transition-all active:scale-95 uppercase tracking-wider"
-                    title="Save Project As... (copies the whole folder to a new location)"
-                  >
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                  ) : (
+                    <svg className="w-3 h-3 shrink-0" fill="none" viewBox="0 0 24 24" style={{ color: 'var(--danger)' }}>
+                      <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
                     </svg>
-                    Save Project
-                  </button>
+                  )}
+
+                  {/* Progress bar track */}
+                  <div className="flex-1 flex flex-col gap-0.5">
+                    <div className="w-full rounded-full overflow-hidden" style={{ height: '5px', backgroundColor: 'var(--border-color)' }}>
+                      <div
+                        className="h-full rounded-full transition-all duration-300"
+                        style={{
+                          width: buildTotal > 0
+                            ? `${Math.min(100, Math.round((buildStep / buildTotal) * 100))}%`
+                            : isBuilding ? '100%' : '100%',
+                          backgroundColor: buildResult === "failed"
+                            ? 'var(--danger)'
+                            : buildResult === "success"
+                            ? 'var(--success)'
+                            : 'var(--accent)',
+                          animation: isBuilding && buildTotal === 0 ? 'progressPulse 1.5s ease-in-out infinite' : undefined
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Task label */}
+                  <span
+                    className="text-[10px] font-medium shrink-0 max-w-[280px] truncate"
+                    style={{
+                      color: buildResult === "failed"
+                        ? 'var(--danger)'
+                        : buildResult === "success"
+                        ? 'var(--success)'
+                        : 'var(--text-secondary)'
+                    }}
+                    title={buildCurrentTask}
+                  >
+                    {buildCurrentTask || (isBuilding ? 'Building...' : '')}
+                  </span>
+
+                  {/* Step counter / Percentage */}
+                  {buildTotal > 0 && (
+                    <span className="text-[10px] font-bold tabular-nums shrink-0" style={{ color: 'var(--text-muted)' }}>
+                      {buildTotal === 100
+                        ? `${Math.round((buildStep / buildTotal) * 100)}%`
+                        : `${buildStep}/${buildTotal}`}
+                    </span>
+                  )}
+
+                  {/* Dismiss on success/fail */}
+                  {!isBuilding && (
+                    <button
+                      onClick={() => setBuildResult("idle")}
+                      className="text-[10px] shrink-0 px-1.5 py-0.5 rounded transition-colors"
+                      style={{ color: 'var(--text-muted)', backgroundColor: 'var(--bg-hover)' }}
+                      title="Dismiss"
+                    >
+                      ×
+                    </button>
+                  )}
                 </div>
               )}
             </div>
+
             {activeFile ? (
               <CodeEditor
                 key={activeFile.path}
@@ -1274,10 +1499,10 @@ function App({ toolchainReady = true }: { toolchainReady?: boolean }) {
               <div className="flex-1 flex items-center justify-center" style={{ backgroundColor: 'var(--bg-editor)' }}>
                 <div className="text-center space-y-3 opacity-40">
                   <div className="text-4xl">✨</div>
-                  <p className="text-sm text-neutral-500 font-medium">
+                  <p className="text-sm font-medium" style={{ color: 'var(--text-muted)' }}>
                     {projectDir === "." ? "Open or create a project to start coding" : "Select a file from the sidebar"}
                   </p>
-                  <p className="text-xs text-neutral-600">
+                  <p className="text-xs" style={{ color: 'var(--text-disabled)' }}>
                     Ctrl+S to save • Syntax highlighting for C, Python, JSON & more
                   </p>
                 </div>
@@ -1375,9 +1600,12 @@ function App({ toolchainReady = true }: { toolchainReady?: boolean }) {
             </button>
           </div>
         </div>
+          </>
+        )} {/* end activeView !== "wiki" */}
       </div>
 
       {/* AI Chat Panel */}
+
       {showAiPanel && (
         <div className="w-96 relative flex flex-col" style={{ borderLeft: '1px solid var(--border-color)' }}>
           <AiChat

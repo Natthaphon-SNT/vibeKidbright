@@ -3,6 +3,7 @@
 //
 // แสดงผลตอนเปิดแอปครั้งแรก หรือเมื่อ toolchain หายไป
 // หน้าจอจะหายไปอัตโนมัติเมื่อ download + extract เสร็จสมบูรณ์
+// การติดตั้งไม่สามารถยกเลิกได้ — บังคับให้เสร็จสมบูรณ์
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { useEffect, useRef, useState } from "react";
@@ -12,7 +13,7 @@ import { listen } from "@tauri-apps/api/event";
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 interface ToolchainProgress {
-  stage: "downloading" | "extracting" | "done" | "error" | "cancelled";
+  stage: "downloading" | "extracting" | "done" | "error";
   percent: number;
   message: string;
 }
@@ -47,9 +48,8 @@ export default function ToolchainSetup({ onReady, toolchainUrl, mini = false }: 
   const [showUrlInput, setShowUrlInput] = useState(false);
   const [logs, setLogs] = useState<string[]>([]);
   const logsRef = useRef<HTMLDivElement>(null);
-  // Auto-start countdown
+  // Auto-start countdown (ไม่สามารถยกเลิกได้)
   const [countdown, setCountdown] = useState<number | null>(null);
-  const [autoStartCancelled, setAutoStartCancelled] = useState(false);
   // Mini widget state
   const [miniExpanded, setMiniExpanded] = useState(false);
 
@@ -70,7 +70,7 @@ export default function ToolchainSetup({ onReady, toolchainUrl, mini = false }: 
       if (p.stage === "done") {
         setTimeout(() => onReady(), 800); // brief pause to show 100%
       }
-      if (p.stage === "error" || p.stage === "cancelled") {
+      if (p.stage === "error") {
         setIsDownloading(false);
         setErrorMsg(p.message);
       }
@@ -96,7 +96,7 @@ export default function ToolchainSetup({ onReady, toolchainUrl, mini = false }: 
         setProgress({ stage: "done", percent: 100, message: `Toolchain v${status.version} ready.` });
         setTimeout(() => onReady(), 500);
       } else {
-        // not_installed → เริ่ม auto-countdown 5 วินาที
+        // not_installed → เริ่ม auto-countdown 5 วินาที (ไม่สามารถยกเลิกได้)
         setCountdown(5);
       }
     } catch (err) {
@@ -105,13 +105,13 @@ export default function ToolchainSetup({ onReady, toolchainUrl, mini = false }: 
     }
   };
 
-  // ── Auto-start countdown ───────────────────────────────────────────────
+  // ── Auto-start countdown (บังคับ — ห้ามยกเลิก) ────────────────────────────
   useEffect(() => {
-    if (countdown === null || autoStartCancelled || isDownloading) return;
+    if (countdown === null || isDownloading) return;
     if (countdown === 0) { startDownload(); return; }
     const t = setTimeout(() => setCountdown((c) => (c !== null ? c - 1 : null)), 1000);
     return () => clearTimeout(t);
-  }, [countdown, autoStartCancelled, isDownloading]);
+  }, [countdown, isDownloading]);
 
   const startDownload = async () => {
     if (isDownloading) return;
@@ -131,11 +131,6 @@ export default function ToolchainSetup({ onReady, toolchainUrl, mini = false }: 
       setProgress({ stage: "error", percent: 0, message: msg });
       setIsDownloading(false);
     }
-  };
-
-  const cancelDownload = async () => {
-    await invoke("cancel_toolchain_download").catch(() => {});
-    setIsDownloading(false);
   };
 
   const [isRepairing, setIsRepairing] = useState(false);
@@ -161,18 +156,16 @@ export default function ToolchainSetup({ onReady, toolchainUrl, mini = false }: 
   // ── Derived state ────────────────────────────────────────────────────────
   const isReady = progress.stage === "done";
   const isError = progress.stage === "error" || !!errorMsg;
-  const isCancelled = progress.stage === "cancelled";
 
   const stageLabel: Record<string, string> = {
     downloading: "📥 Downloading toolchain...",
     extracting: "📦 Extracting files...",
     done: "✅ Ready!",
     error: "❌ Error",
-    cancelled: "⛔ Cancelled",
   };
 
   const progressBarColor =
-    isError || isCancelled
+    isError
       ? "linear-gradient(90deg, #ef4444, #dc2626)"
       : isReady
       ? "linear-gradient(90deg, #22c55e, #16a34a)"
@@ -233,7 +226,7 @@ export default function ToolchainSetup({ onReady, toolchainUrl, mini = false }: 
             </svg>
           ) : (
             <span style={{ fontSize: "14px", flexShrink: 0 }}>
-              {isError ? "❌" : isCancelled ? "⛔" : isReady ? "✅" : "⏳"}
+              {isError ? "❌" : isReady ? "✅" : "⏳"}
             </span>
           )}
 
@@ -243,8 +236,8 @@ export default function ToolchainSetup({ onReady, toolchainUrl, mini = false }: 
               {isDownloading
                 ? progress.stage === "extracting" ? "Extracting..." : "Downloading..."
                 : isError ? "Setup Error"
-                : isCancelled ? "Cancelled"
                 : isReady ? "Toolchain Ready!"
+                : countdown !== null ? `Auto-installing in ${countdown}s...`
                 : "Setting up toolchain"}
             </div>
             <div style={{ fontSize: "10px", color: "rgba(148,163,184,0.7)", marginTop: "1px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
@@ -266,7 +259,7 @@ export default function ToolchainSetup({ onReady, toolchainUrl, mini = false }: 
         </div>
 
         {/* Progress bar */}
-        {(isDownloading || isReady || isError || isCancelled) && (
+        {(isDownloading || isReady || isError) && (
           <div style={{ padding: "0 12px 6px" }}>
             <div style={{ height: "4px", borderRadius: "100px", background: "rgba(30,40,60,0.8)", overflow: "hidden" }}>
               <div
@@ -286,6 +279,21 @@ export default function ToolchainSetup({ onReady, toolchainUrl, mini = false }: 
         {/* Expanded section: logs + actions */}
         {miniExpanded && (
           <div style={{ padding: "0 12px 12px", borderTop: "1px solid rgba(59,130,246,0.1)" }}>
+            {/* Mandatory notice */}
+            {!isReady && !isError && (
+              <div style={{
+                marginTop: "10px",
+                padding: "6px 8px",
+                background: "rgba(59,130,246,0.08)",
+                border: "1px solid rgba(59,130,246,0.2)",
+                borderRadius: "6px",
+                fontSize: "10px",
+                color: "rgba(148,163,184,0.7)",
+              }}>
+                🔒 การติดตั้ง toolchain เป็นขั้นตอนบังคับ กรุณารอจนเสร็จสมบูรณ์
+              </div>
+            )}
+
             {/* Live logs */}
             {logs.length > 0 && (
               <div
@@ -311,52 +319,37 @@ export default function ToolchainSetup({ onReady, toolchainUrl, mini = false }: 
               </div>
             )}
 
-            {/* Buttons */}
-            <div style={{ display: "flex", gap: "6px", marginTop: logs.length > 0 ? 0 : "10px" }}>
-              {isDownloading ? (
-                <button
-                  onClick={cancelDownload}
-                  style={{
-                    flex: 1, padding: "7px", borderRadius: "8px",
-                    border: "1px solid rgba(239,68,68,0.3)",
-                    background: "rgba(239,68,68,0.08)",
-                    color: "#f87171", fontSize: "11px", fontWeight: 600, cursor: "pointer",
-                  }}
-                >
-                  ⛔ Cancel
-                </button>
-              ) : !isReady ? (
-                <button
-                  onClick={() => { setCountdown(null); startDownload(); }}
-                  disabled={!checkDone}
-                  style={{
-                    flex: 1, padding: "7px", borderRadius: "8px", border: "none",
-                    background: checkDone ? "linear-gradient(135deg, #1d4ed8, #3b82f6)" : "rgba(30,40,60,0.5)",
-                    color: checkDone ? "white" : "#64748b",
-                    fontSize: "11px", fontWeight: 700, cursor: checkDone ? "pointer" : "not-allowed",
-                  }}
-                >
-                  {countdown !== null && !autoStartCancelled
-                    ? `Auto-start in ${countdown}s...`
-                    : isError || isCancelled ? "🔄 Retry" : "⬇️ Install Toolchain"}
-                </button>
-              ) : null}
+            {/* Retry button on error */}
+            {isError && !isDownloading && (
+              <button
+                onClick={() => { setCountdown(null); startDownload(); }}
+                style={{
+                  width: "100%", padding: "7px", borderRadius: "8px", border: "none",
+                  background: "linear-gradient(135deg, #1d4ed8, #3b82f6)",
+                  color: "white", fontSize: "11px", fontWeight: 700, cursor: "pointer",
+                  marginTop: logs.length > 0 ? 0 : "10px",
+                }}
+              >
+                🔄 Retry Installation
+              </button>
+            )}
 
-              {/* Cancel auto-start */}
-              {countdown !== null && !autoStartCancelled && !isDownloading && (
-                <button
-                  onClick={() => { setAutoStartCancelled(true); setCountdown(null); }}
-                  style={{
-                    padding: "7px 10px", borderRadius: "8px",
-                    border: "1px solid rgba(148,163,184,0.15)",
-                    background: "transparent", color: "rgba(148,163,184,0.5)",
-                    fontSize: "10px", cursor: "pointer",
-                  }}
-                >
-                  ✕
-                </button>
-              )}
-            </div>
+            {/* Start now button (before download starts) */}
+            {!isDownloading && !isReady && !isError && countdown !== null && (
+              <button
+                onClick={() => { setCountdown(null); startDownload(); }}
+                disabled={!checkDone}
+                style={{
+                  width: "100%", padding: "7px", borderRadius: "8px", border: "none",
+                  background: checkDone ? "linear-gradient(135deg, #1d4ed8, #3b82f6)" : "rgba(30,40,60,0.5)",
+                  color: checkDone ? "white" : "#64748b",
+                  fontSize: "11px", fontWeight: 700, cursor: checkDone ? "pointer" : "not-allowed",
+                  marginTop: "10px",
+                }}
+              >
+                ⬇️ Install Now (auto in {countdown}s)
+              </button>
+            )}
           </div>
         )}
       </div>
@@ -477,8 +470,28 @@ export default function ToolchainSetup({ onReady, toolchainUrl, mini = false }: 
           </p>
         </div>
 
+        {/* Mandatory Installation Notice */}
+        {!isReady && !isError && (
+          <div style={{
+            marginBottom: "20px",
+            padding: "10px 14px",
+            background: "rgba(59,130,246,0.06)",
+            border: "1px solid rgba(59,130,246,0.2)",
+            borderRadius: "10px",
+            display: "flex",
+            alignItems: "flex-start",
+            gap: "10px",
+          }}>
+            <span style={{ fontSize: "16px", flexShrink: 0 }}>🔒</span>
+            <p style={{ fontSize: "12px", color: "rgba(148,163,184,0.7)", margin: 0, lineHeight: 1.5 }}>
+              การติดตั้ง Toolchain เป็น<strong style={{ color: "#93c5fd" }}> ขั้นตอนบังคับ</strong> ที่จำเป็นต้องทำก่อนใช้งานโปรแกรม
+              กรุณารอจนกว่าการติดตั้งจะเสร็จสมบูรณ์ (~1 GB · ครั้งเดียวเท่านั้น)
+            </p>
+          </div>
+        )}
+
         {/* Progress Section (shown during download or when done) */}
-        {(isDownloading || isReady || isError || isCancelled) && (
+        {(isDownloading || isReady || isError) && (
           <div style={{ marginBottom: "24px" }}>
             {/* Stage label */}
             <div
@@ -548,7 +561,7 @@ export default function ToolchainSetup({ onReady, toolchainUrl, mini = false }: 
           </div>
         )}
 
-        {/* Custom URL input (collapsed by default) */}
+        {/* Custom URL input (collapsed by default, only show before download) */}
         {!isDownloading && !isReady && (
           <div style={{ marginBottom: "20px" }}>
             <button
@@ -651,101 +664,81 @@ export default function ToolchainSetup({ onReady, toolchainUrl, mini = false }: 
 
         {/* Action buttons */}
         <div style={{ display: "flex", gap: "12px" }}>
-          {/* Primary button */}
-          {!isReady && (
-            <>
-              {isDownloading ? (
-                <button
-                  id="btn-cancel-download"
-                  onClick={cancelDownload}
-                  style={{
-                    flex: 1,
-                    padding: "14px",
-                    borderRadius: "12px",
-                    border: "1px solid rgba(239,68,68,0.3)",
-                    background: "rgba(239,68,68,0.08)",
-                    color: "#f87171",
-                    fontSize: "14px",
-                    fontWeight: 600,
-                    cursor: "pointer",
-                    transition: "all 0.2s",
-                  }}
-                >
-                  ⛔ Cancel Download
-                </button>
-              ) : (
-                <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "8px" }}>
-                  {/* Install / countdown button */}
-                  <button
-                    id="btn-start-download"
-                    onClick={() => { setCountdown(null); startDownload(); }}
-                    disabled={!checkDone}
-                    style={{
-                      width: "100%",
-                      padding: "14px",
-                      borderRadius: "12px",
-                      border: "none",
-                      background: !checkDone
-                        ? "rgba(30,40,60,0.5)"
-                        : "linear-gradient(135deg, #1d4ed8, #3b82f6, #6366f1)",
-                      color: !checkDone ? "#64748b" : "white",
-                      fontSize: "14px",
-                      fontWeight: 700,
-                      cursor: !checkDone ? "not-allowed" : "pointer",
-                      boxShadow: checkDone ? "0 4px 24px rgba(59,130,246,0.4)" : "none",
-                      transition: "all 0.2s",
-                      letterSpacing: "0.2px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: "10px",
-                    }}
-                  >
-                    {/* Countdown ring */}
-                    {countdown !== null && !autoStartCancelled && (
-                      <svg width="22" height="22" viewBox="0 0 30 30" style={{ flexShrink: 0 }}>
-                        <circle cx="15" cy="15" r="14" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="2.5" />
-                        <circle
-                          cx="15" cy="15" r="14"
-                          fill="none" stroke="#fff" strokeWidth="2.5"
-                          strokeLinecap="round"
-                          className="countdown-arc"
-                          style={{ transformOrigin: "center", transform: "rotate(-90deg)" }}
-                        />
-                        <text x="15" y="19" textAnchor="middle" fill="white" fontSize="11" fontWeight="700" fontFamily="monospace">
-                          {countdown}
-                        </text>
-                      </svg>
-                    )}
-                    {isError || isCancelled
-                      ? "🔄 Try Again"
-                      : countdown !== null && !autoStartCancelled
-                      ? `Auto-installing in ${countdown}s...`
-                      : "⬇️ Install Toolchain (1-time)"}
-                  </button>
+          {/* Downloading: show lock message instead of cancel */}
+          {isDownloading && (
+            <div style={{
+              flex: 1,
+              padding: "14px",
+              borderRadius: "12px",
+              border: "1px solid rgba(59,130,246,0.2)",
+              background: "rgba(59,130,246,0.05)",
+              textAlign: "center",
+              fontSize: "13px",
+              color: "rgba(148,163,184,0.6)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "8px",
+            }}>
+              <svg className="spinner" width="14" height="14" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="10" stroke="rgba(148,163,184,0.2)" strokeWidth="3" />
+                <path d="M12 2a10 10 0 0110 10" stroke="#3b82f6" strokeWidth="3" strokeLinecap="round" />
+              </svg>
+              กำลังติดตั้ง... กรุณารอ
+            </div>
+          )}
 
-                  {/* Cancel auto-start (only shown during countdown) */}
-                  {countdown !== null && !autoStartCancelled && !isDownloading && (
-                    <button
-                      onClick={() => { setAutoStartCancelled(true); setCountdown(null); }}
-                      style={{
-                        width: "100%",
-                        padding: "8px",
-                        borderRadius: "10px",
-                        border: "1px solid rgba(148,163,184,0.15)",
-                        background: "transparent",
-                        color: "rgba(148,163,184,0.6)",
-                        fontSize: "12px",
-                        cursor: "pointer",
-                        transition: "all 0.2s",
-                      }}
-                    >
-                      Cancel auto-start
-                    </button>
-                  )}
-                </div>
-              )}
-            </>
+          {/* Not downloading, not ready → show install/countdown button */}
+          {!isDownloading && !isReady && (
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "8px" }}>
+              <button
+                id="btn-start-download"
+                onClick={() => { setCountdown(null); startDownload(); }}
+                disabled={!checkDone}
+                style={{
+                  width: "100%",
+                  padding: "14px",
+                  borderRadius: "12px",
+                  border: "none",
+                  background: !checkDone
+                    ? "rgba(30,40,60,0.5)"
+                    : "linear-gradient(135deg, #1d4ed8, #3b82f6, #6366f1)",
+                  color: !checkDone ? "#64748b" : "white",
+                  fontSize: "14px",
+                  fontWeight: 700,
+                  cursor: !checkDone ? "not-allowed" : "pointer",
+                  boxShadow: checkDone ? "0 4px 24px rgba(59,130,246,0.4)" : "none",
+                  transition: "all 0.2s",
+                  letterSpacing: "0.2px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "10px",
+                }}
+              >
+                {/* Countdown ring */}
+                {countdown !== null && (
+                  <svg width="22" height="22" viewBox="0 0 30 30" style={{ flexShrink: 0 }}>
+                    <circle cx="15" cy="15" r="14" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="2.5" />
+                    <circle
+                      cx="15" cy="15" r="14"
+                      fill="none" stroke="#fff" strokeWidth="2.5"
+                      strokeLinecap="round"
+                      className="countdown-arc"
+                      style={{ transformOrigin: "center", transform: "rotate(-90deg)" }}
+                    />
+                    <text x="15" y="19" textAnchor="middle" fill="white" fontSize="11" fontWeight="700" fontFamily="monospace">
+                      {countdown}
+                    </text>
+                  </svg>
+                )}
+                {isError
+                  ? "🔄 Try Again"
+                  : countdown !== null
+                  ? `Auto-installing in ${countdown}s...`
+                  : "⬇️ Install Toolchain (1-time)"}
+              </button>
+            </div>
           )}
 
           {isReady && (
@@ -771,7 +764,7 @@ export default function ToolchainSetup({ onReady, toolchainUrl, mini = false }: 
           )}
         </div>
 
-        {/* Skip / Already installed note */}
+        {/* Download info note */}
         {!isDownloading && !isReady && (
           <p style={{ textAlign: "center", marginTop: "16px", fontSize: "12px", color: "#334155" }}>
             Download size: ~1 GB · Extracted to AppData · One-time only

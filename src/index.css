@@ -312,3 +312,9 @@ code, pre, .font-mono {
   50%       { box-shadow: 0 0 0 6px transparent; }
 }
 .animate-glow { animation: pulseGlow 2s ease-in-out infinite; }
+
+@keyframes progressPulse {
+  0%   { opacity: 1; }
+  50%  { opacity: 0.4; }
+  100% { opacity: 1; }
+}
