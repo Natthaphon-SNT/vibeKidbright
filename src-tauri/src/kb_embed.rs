@@ -15,6 +15,7 @@
 ///   let model = get_local_embedder()?;
 ///   let embeddings = model.embed(vec!["text"], None)?;  // returns Vec<Vec<f32>>
 
+#[allow(unused_imports)]
 use fastembed::{EmbeddingModel, InitOptions, InitOptionsUserDefined, TextEmbedding};
 use std::sync::{Mutex, OnceLock};
 

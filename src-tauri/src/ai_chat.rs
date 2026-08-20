@@ -484,52 +484,47 @@ pub fn invalidate_idf_path_cache() {
 // Fallback: if keyring fails (e.g. headless CI), reads from config.json as before.
 
 fn get_secure_key(service: &str, config_field: &str) -> String {
-    // 1. Try OS keychain first
+    // 1. Try config.json first (always reliable, primary storage)
+    let config_val = read_config()[config_field].as_str().unwrap_or("").to_string();
+    if !config_val.is_empty() {
+        return config_val;
+    }
+    // 2. Fallback: OS keychain (for older installs where key was only in keyring)
     if let Ok(entry) = keyring::Entry::new(service, "vibekidbright") {
         if let Ok(key) = entry.get_password() {
             if !key.is_empty() {
+                // Restore to config.json so future reads work reliably
+                let mut c = read_config();
+                c[config_field] = json!(&key);
+                write_config(&c);
                 return key;
             }
         }
     }
-    // 2. Fallback: read from config.json (for migration from old plain-text store)
-    read_config()[config_field].as_str().unwrap_or("").to_string()
+    String::new()
 }
 
 fn set_secure_key(service: &str, config_field: &str, key: &str) {
     if key.is_empty() {
-        // Clear from keyring
+        // Clear from both keyring and config.json
         if let Ok(entry) = keyring::Entry::new(service, "vibekidbright") {
             let _ = entry.delete_credential();
         }
-        // Also clear from config.json (migration cleanup)
         let mut c = read_config();
         c[config_field] = json!("");
         write_config(&c);
     } else {
-        // Store in OS keychain
-        let stored_in_keyring = keyring::Entry::new(service, "vibekidbright")
-            .and_then(|e| e.set_password(key))
-            .is_ok();
-
-        // If keyring failed (e.g. headless env), fall back to config.json
-        if !stored_in_keyring {
-            let mut c = read_config();
-            c[config_field] = json!(key);
-            write_config(&c);
-        } else {
-            // Keyring succeeded — clear the plaintext value from config.json
-            let mut c = read_config();
-            if c[config_field].as_str().is_some() {
-                c[config_field] = json!("");
-                write_config(&c);
-            }
-        }
+        // Always write to config.json (reliable primary storage)
+        let mut c = read_config();
+        c[config_field] = json!(key);
+        write_config(&c);
+        // Also store in OS keychain as additional security layer (best-effort)
+        let _ = keyring::Entry::new(service, "vibekidbright").and_then(|e| e.set_password(key));
     }
 }
 
 /// Auto-migrate and sanitize legacy plain-text API keys from config.json into OS Keychain on app launch.
-/// Ensures config.json on disk NEVER retains plain-text API keys.
+/// NOTE: config.json is kept as primary storage for reliability. Keyring is addional layer only.
 pub fn migrate_plaintext_keys_on_startup() {
     let config = read_config();
     let services = [
@@ -539,22 +534,13 @@ pub fn migrate_plaintext_keys_on_startup() {
         ("vibekidbright-search", "search_api_key"),
     ];
 
-    let mut needs_write = false;
-    let mut updated_config = config.clone();
-
     for (service, field) in services {
         if let Some(val) = config[field].as_str() {
             if !val.is_empty() {
+                // Copy to keyring (best-effort, do NOT remove from config.json)
                 let _ = keyring::Entry::new(service, "vibekidbright").and_then(|e| e.set_password(val));
-                updated_config[field] = json!("");
-                needs_write = true;
             }
         }
-    }
-
-    if needs_write {
-        write_config(&updated_config);
-        eprintln!("[Security Migration] Sanitized config.json — moved plaintext API keys to OS keychain.");
     }
 }
 
@@ -2900,6 +2886,7 @@ fn cosine_similarity(v1: &[f32], v2: &[f32]) -> f32 {
 
 /// FIX: Sentence-boundary chunking — splits on ". ", "! ", "? ", and newlines
 /// to keep embedded context semantically coherent.
+#[allow(dead_code)]
 fn chunk_text(text: &str, target_size: usize, overlap: usize) -> Vec<String> {
     let mut chunks: Vec<String> = Vec::new();
     let mut current = String::new();
