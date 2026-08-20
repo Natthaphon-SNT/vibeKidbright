@@ -774,19 +774,19 @@ pub async fn send_ai_message(
         let prov = config["provider"].as_str().unwrap_or("openai").to_string();
         let (key, model, url) = if prov == "openrouter" {
             (
-                config["openrouter_api_key"].as_str().unwrap_or("").to_string(),
+                get_secure_key("vibekidbright-openrouter", "openrouter_api_key"),
                 config["openrouter_model"].as_str().unwrap_or("anthropic/claude-3.5-sonnet").to_string(),
                 "https://openrouter.ai/api/v1".to_string(),
             )
         } else if prov == "google" {
             (
-                config["google_api_key"].as_str().unwrap_or("").to_string(),
+                get_secure_key("vibekidbright-google", "google_api_key"),
                 config["google_model"].as_str().unwrap_or("gemini-2.5-flash").to_string(),
                 "https://generativelanguage.googleapis.com/v1beta".to_string(),
             )
         } else {
             (
-                config["api_key"].as_str().unwrap_or("").to_string(),
+                get_secure_key("vibekidbright-openai", "api_key"),
                 config["model"].as_str().unwrap_or("gpt-4o").to_string(),
                 config["base_url"].as_str().unwrap_or("https://api.openai.com/v1").to_string(),
             )
@@ -849,9 +849,9 @@ pub async fn send_ai_message(
         let (config_google_key, config_google_model, config_or_key, config_or_model) = {
             let config = read_config();
             (
-                config["google_api_key"].as_str().unwrap_or("").to_string(),
+                get_secure_key("vibekidbright-google", "google_api_key"),
                 config["google_model"].as_str().unwrap_or("gemini-2.5-flash").to_string(),
-                config["openrouter_api_key"].as_str().unwrap_or("").to_string(),
+                get_secure_key("vibekidbright-openrouter", "openrouter_api_key"),
                 config["openrouter_model"]
                     .as_str()
                     .unwrap_or("google/gemini-2.5-flash:free")
@@ -2843,7 +2843,7 @@ async fn get_embeddings(_app_handle: &AppHandle, text: &str) -> Result<Vec<f32>,
     let (api_key, base_url) = {
         let config = read_config();
         (
-            config["api_key"].as_str().unwrap_or("").to_string(),
+            get_secure_key("vibekidbright-openai", "api_key"),
             config["base_url"].as_str().unwrap_or("https://api.openai.com/v1").to_string(),
         )
     };

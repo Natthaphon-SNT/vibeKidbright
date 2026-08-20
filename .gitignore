@@ -32,3 +32,13 @@ resources/.espressif/
 *.temp
 *.swp
 *.swo
+
+# Credentials and App Data
+config.json
+*.config.json
+.vibekidbright/
+*.sqlite*
+*.db
+cert.pfx
+cert.p12
+
