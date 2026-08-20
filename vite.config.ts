@@ -30,4 +30,20 @@ export default defineConfig(async () => ({
       ignored: ["**/src-tauri/**", "**/build/**", "**/.espressif/**"],
     },
   },
+
+  // ── Vitest configuration ────────────────────────────────────────────────────
+  test: {
+    // Use jsdom to simulate browser DOM APIs
+    environment: "jsdom",
+    // Import @testing-library/jest-dom matchers (toBeInTheDocument, etc.)
+    setupFiles: ["./src/test/setup.ts"],
+    // Coverage via native v8 (no Babel needed)
+    coverage: {
+      provider: "v8",
+      reporter: ["text", "json", "html"],
+      include: ["src/**/*.{ts,tsx}"],
+      exclude: ["src/test/**", "src/**/*.d.ts"],
+    },
+    globals: true,
+  },
 }));

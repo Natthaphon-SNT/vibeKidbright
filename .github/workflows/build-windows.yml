@@ -84,6 +84,18 @@ jobs:
           [IO.File]::WriteAllBytes("cert.pfx", $pfx_cert_byte)
         shell: pwsh
 
+      # ─── Run Frontend Unit Tests (vitest) ────────────────────────────────────
+      - name: Run frontend unit tests
+        working-directory: main_repo
+        run: npm test
+        shell: pwsh
+
+      # ─── Run Rust Unit Tests ──────────────────────────────────────────────────
+      - name: Run Rust unit tests
+        working-directory: main_repo/src-tauri
+        run: cargo test --lib -- --nocapture
+        shell: pwsh
+
       - name: Build Tauri App
         uses: tauri-apps/tauri-action@v0
         env:

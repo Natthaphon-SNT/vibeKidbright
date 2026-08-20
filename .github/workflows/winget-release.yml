@@ -8,8 +8,32 @@ jobs:
   winget:
     runs-on: windows-latest
     steps:
+      # ── Verify WINGET_TOKEN exists ──────────────────────────────────────────
+      - name: Check WINGET_TOKEN secret
+        run: |
+          if (-not "${{ secrets.WINGET_TOKEN }}") {
+            Write-Error "WINGET_TOKEN secret is not set. Go to Settings → Secrets and add a PAT with public_repo scope on your winget-pkgs fork."
+            exit 1
+          }
+          Write-Host "WINGET_TOKEN is configured ✓"
+        shell: pwsh
+
+      # ── Submit to winget-pkgs via vedantmgoyal9/winget-releaser ────────────
+      # This action:
+      #   1. Detects the release assets (.exe/.msi) automatically
+      #   2. Computes their SHA256 hashes
+      #   3. Updates the manifest YAML files
+      #   4. Opens a Pull Request to microsoft/winget-pkgs
+      #
+      # Prerequisites (one-time setup):
+      #   - Fork https://github.com/microsoft/winget-pkgs to your own GitHub account
+      #   - Create a PAT with "public_repo" scope on that fork account
+      #   - Add the PAT as repository secret: Settings → Secrets → WINGET_TOKEN
+      #   - The first submission must be manually approved by the winget team
       - name: Submit to winget
         uses: vedantmgoyal9/winget-releaser@v2
         with:
           identifier: Natthaphon-SNT.vibeKidbright
           token: ${{ secrets.WINGET_TOKEN }}
+          # Release assets matching pattern (auto-detects .exe and .msi)
+          installers-regex: '\.exe$'

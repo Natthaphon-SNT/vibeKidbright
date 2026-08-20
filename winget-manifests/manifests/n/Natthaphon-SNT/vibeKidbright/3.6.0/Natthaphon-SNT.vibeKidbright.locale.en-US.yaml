@@ -1,0 +1,31 @@
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.defaultLocale.1.6.0.schema.json
+
+PackageIdentifier: Natthaphon-SNT.vibeKidbright
+PackageVersion: 3.6.0
+PackageLocale: en-US
+Publisher: Natthaphon-SNT
+PublisherUrl: https://github.com/Natthaphon-SNT
+PackageName: vibeKidbright IDE
+PackageUrl: https://github.com/Natthaphon-SNT/vibeKidbright
+License: MIT
+LicenseUrl: https://github.com/Natthaphon-SNT/vibeKidbright/blob/main/LICENSE
+ShortDescription: AI-powered ESP-IDF IDE for KidBright32 and ESP32 boards, built with Tauri + React.
+Description: |-
+  vibeKidbright IDE is a modern AI-powered desktop IDE for developing ESP-IDF firmware.
+  It supports ESP32, KidBright32, and KidBright μAI Plus boards.
+  Features include: AI coding assistant (Vibe Coder), built-in terminal, one-click build/flash/monitor,
+  Monaco code editor, local Knowledge Base for KidBright/ESP-IDF docs, and multi-provider AI support
+  (OpenAI, Google Gemini, OpenRouter, local LLMs via Ollama/LM Studio).
+  v3.6.0 adds: offline RAG with local ONNX embedding, SQLite vector store, OS keychain API key storage,
+  Myers diff algorithm, and comprehensive unit tests.
+Tags:
+  - esp32
+  - kidbright
+  - esp-idf
+  - embedded
+  - ide
+  - ai
+  - firmware
+ReleaseNotesUrl: https://github.com/Natthaphon-SNT/vibeKidbright/releases/tag/v3.6.0
+ManifestType: defaultLocale
+ManifestVersion: 1.6.0

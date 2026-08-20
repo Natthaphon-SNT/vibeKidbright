@@ -34,3 +34,11 @@ dunce = "1"
 zip = "2"                    # สำหรับแตกไฟล์ toolchain .zip
 directories = "5.0"          # สำหรับหาโฟลเดอร์ AppData ของผู้ใช้
 base64 = "0.22"              # สำหรับ decode firmware binary จาก cloud build API
+keyring = "3"               # OS keychain (Windows Credential Manager / macOS Keychain / libsecret)
+similar = "2"               # Myers diff algorithm สำหรับ diff_file tool ที่แม่นยำกว่า
+# ── RAG Upgrade: Local Embedding + SQLite Vector Store ──────────────────────
+fastembed = "4"             # Local ONNX embedding (all-MiniLM-L6-v2 — offline, no API key needed)
+rusqlite = { version = "0.32", features = ["bundled"] }  # SQLite with bundled libsqlite3
+
+[dev-dependencies]
+tempfile = "3"              # Temporary directories for unit tests (kb_store tests)

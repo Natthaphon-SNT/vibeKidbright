@@ -1,6 +1,9 @@
 mod esp_idf;
 mod ai_chat;
 mod toolchain;
+mod kb_store;   // SQLite vector store for RAG
+mod kb_embed;   // Local ONNX embedding (fastembed, offline)
+mod ai;         // Modular AI subsystem structure (refactoring roadmap)
 
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
@@ -19,6 +22,20 @@ pub fn run() {
             app.manage(ai_chat::AiBackupState::default());
             // Seed bundled knowledge_base files into AppData on first launch
             ai_chat::seed_knowledge_base(app.handle());
+            // Pre-initialize local embedding model in background so it's ready when user
+            // first searches the KB. Downloads ~45 MB on first run, then cached.
+            let app_data = app.handle().path().app_data_dir().ok();
+            std::thread::spawn(move || {
+                if let Some(dir) = app_data {
+                    let cache = dir.join("fastembed-cache");
+                    let _ = std::fs::create_dir_all(&cache);
+                    if let Err(e) = kb_embed::init_local_embedder(Some(&cache)) {
+                        eprintln!("[Startup] Local embedder init: {e}");
+                    }
+                } else {
+                    let _ = kb_embed::init_local_embedder(None);
+                }
+            });
             // Auto-patch pyvenv.cfg every startup so Python paths match this machine
             // (fixes "No Python at C:\Users\Acer\..." on machines other than the dev machine)
             if let Ok(toolchain_dir) = toolchain::get_toolchain_dir(app.handle()) {

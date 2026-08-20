@@ -109,6 +109,16 @@ jobs:
           rm "$RUNNER_TEMP/cert.p12"
           echo "✅ Certificate imported successfully"
 
+      # ─── Run Frontend Unit Tests (vitest) ────────────────────────────────────
+      - name: Run frontend unit tests
+        working-directory: main_repo
+        run: npm test
+
+      # ─── Run Rust Unit Tests ──────────────────────────────────────────────────
+      - name: Run Rust unit tests
+        working-directory: main_repo/src-tauri
+        run: cargo test --lib -- --nocapture
+
       # ─── Build Tauri App ──────────────────────────────────────────────────────
       - name: Build Tauri App (Universal Binary — Apple Silicon + Intel)
         uses: tauri-apps/tauri-action@v0
