@@ -528,7 +528,47 @@ fn set_secure_key(service: &str, config_field: &str, key: &str) {
     }
 }
 
+/// Auto-migrate and sanitize legacy plain-text API keys from config.json into OS Keychain on app launch.
+/// Ensures config.json on disk NEVER retains plain-text API keys.
+pub fn migrate_plaintext_keys_on_startup() {
+    let config = read_config();
+    let services = [
+        ("vibekidbright-openai", "api_key"),
+        ("vibekidbright-openrouter", "openrouter_api_key"),
+        ("vibekidbright-google", "google_api_key"),
+        ("vibekidbright-search", "search_api_key"),
+    ];
+
+    let mut needs_write = false;
+    let mut updated_config = config.clone();
+
+    for (service, field) in services {
+        if let Some(val) = config[field].as_str() {
+            if !val.is_empty() {
+                let _ = keyring::Entry::new(service, "vibekidbright").and_then(|e| e.set_password(val));
+                updated_config[field] = json!("");
+                needs_write = true;
+            }
+        }
+    }
+
+    if needs_write {
+        write_config(&updated_config);
+        eprintln!("[Security Migration] Sanitized config.json — moved plaintext API keys to OS keychain.");
+    }
+}
+
+#[tauri::command]
+pub async fn clear_all_api_keys() -> Result<(), String> {
+    set_secure_key("vibekidbright-openai", "api_key", "");
+    set_secure_key("vibekidbright-openrouter", "openrouter_api_key", "");
+    set_secure_key("vibekidbright-google", "google_api_key", "");
+    set_secure_key("vibekidbright-search", "search_api_key", "");
+    Ok(())
+}
+
 // ── Tauri commands ─────────────────────────────────────────────────────────────
+
 
 #[tauri::command]
 pub async fn get_api_key() -> Result<String, String> {

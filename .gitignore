@@ -39,6 +39,9 @@ config.json
 .vibekidbright/
 *.sqlite*
 *.db
+*.backup
 cert.pfx
 cert.p12
+
+
 

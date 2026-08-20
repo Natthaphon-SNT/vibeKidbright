@@ -354,11 +354,11 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
                 : provider === "google"
                     ? !googleApiKey
                     : !api_key &&
-                      !baseUrl.includes("localhost") &&
-                      !baseUrl.includes("127.0.0.1") &&
-                      !baseUrl.match(/\d+\.\d+\.\d+\.\d+/) &&
-                      !baseUrl.includes("192.168.") &&
-                      !baseUrl.includes("10.");
+                    !baseUrl.includes("localhost") &&
+                    !baseUrl.includes("127.0.0.1") &&
+                    !baseUrl.match(/\d+\.\d+\.\d+\.\d+/) &&
+                    !baseUrl.includes("192.168.") &&
+                    !baseUrl.includes("10.");
 
         if (missingKey) {
             setShowSettings(true);
@@ -434,6 +434,21 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
             console.error("Failed to save AI settings:", err);
         }
     };
+
+    const handleClearKeys = async () => {
+        try {
+            await invoke("clear_all_api_keys");
+            setApiKey("");
+            setApiKeyInput("");
+            setOpenrouterApiKey("");
+            setOpenrouterApiKeyInput("");
+            setGoogleApiKey("");
+            setGoogleApiKeyInput("");
+        } catch (err) {
+            console.error("Failed to clear API keys:", err);
+        }
+    };
+
 
     const handleProviderChange = (newProvider: "openai" | "local" | "openrouter" | "google") => {
         setProviderInput(newProvider);
@@ -791,13 +806,13 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
                                             style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center" }}
                                         >
                                             <optgroup label="🚀 GPT-4o Series">
-                                            <option value="gpt-4o">⭐ GPT-4o (Vision + Tools)</option>
-                                            <option value="gpt-4o-mini">GPT-4o Mini (Fast & Cheap)</option>
-                                            <option value="chatgpt-4o-latest">ChatGPT-4o Latest</option>
+                                                <option value="gpt-4o">⭐ GPT-4o (Vision + Tools)</option>
+                                                <option value="gpt-4o-mini">GPT-4o Mini (Fast & Cheap)</option>
+                                                <option value="chatgpt-4o-latest">ChatGPT-4o Latest</option>
                                             </optgroup>
                                             <optgroup label="🧠 Reasoning Series">
-                                            <option value="o1-preview">o1 Preview (Advanced Reasoning — Slow)</option>
-                                            <option value="o1-mini">o1-mini (Reasoning — Fast)</option>
+                                                <option value="o1-preview">o1 Preview (Advanced Reasoning — Slow)</option>
+                                                <option value="o1-mini">o1-mini (Reasoning — Fast)</option>
                                             </optgroup>
                                         </select>
                                         <input

@@ -20,6 +20,8 @@ pub fn run() {
         .setup(|app| {
             app.manage(ai_chat::AiAbortState(std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false))));
             app.manage(ai_chat::AiBackupState::default());
+            // Sanitize config.json on startup (moves legacy plaintext keys to OS Keychain)
+            ai_chat::migrate_plaintext_keys_on_startup();
             // Seed bundled knowledge_base files into AppData on first launch
             ai_chat::seed_knowledge_base(app.handle());
             // Pre-initialize local embedding model in background so it's ready when user
@@ -86,6 +88,7 @@ pub fn run() {
             ai_chat::set_google_api_key,
             ai_chat::get_google_model,
             ai_chat::set_google_model,
+            ai_chat::clear_all_api_keys,
             ai_chat::get_knowledge_base_files,
             ai_chat::open_knowledge_base_folder,
             ai_chat::add_knowledge_base_files,
