@@ -435,21 +435,6 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
         }
     };
 
-    const handleClearKeys = async () => {
-        try {
-            await invoke("clear_all_api_keys");
-            setApiKey("");
-            setApiKeyInput("");
-            setOpenrouterApiKey("");
-            setOpenrouterApiKeyInput("");
-            setGoogleApiKey("");
-            setGoogleApiKeyInput("");
-        } catch (err) {
-            console.error("Failed to clear API keys:", err);
-        }
-    };
-
-
     const handleProviderChange = (newProvider: "openai" | "local" | "openrouter" | "google") => {
         setProviderInput(newProvider);
         if (newProvider === "openai") {
