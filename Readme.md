@@ -5,243 +5,203 @@
 </p>
 
 <p align="center">
-  <strong>vibeKidbright IDE สำหรับพัฒนา ESP-IDF และ KidBright บน Desktop</strong>
+  <strong>vibeKidbright — AI-Powered Desktop IDE สำหรับพัฒนา ESP-IDF และ KidBright</strong>
 </p>
 
 <p align="center">
-  <a href="https://github.com/Natthaphon-SNT/vibeKidbright/releases/tag/v3.4.0">
-    <img src="https://img.shields.io/badge/version-v3.4.0-blue.svg" alt="Version"/>
+  <a href="https://github.com/Natthaphon-SNT/vibeKidbright/releases">
+    <img src="https://img.shields.io/badge/version-v3.6.4-blue.svg" alt="Version"/>
   </a>
-  <img src="https://img.shields.io/badge/platform-Windows-lightgrey.svg" alt="Platform"/>
+  <img src="https://img.shields.io/badge/platform-Windows%20%7C%20macOS-lightgrey.svg" alt="Platform"/>
   <img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License"/>
-  <img src="https://img.shields.io/badge/built%20with-Tauri%20%2B%20React-orange.svg" alt="Tech Stack"/>
+  <img src="https://img.shields.io/badge/built%20with-Tauri%20v2%20%2B%20React%2019-orange.svg" alt="Tech Stack"/>
+  <img src="https://img.shields.io/badge/winget-available-blueviolet.svg" alt="WinGet"/>
 </p>
 
 ---
 
-## 📖 ภาพรวม
+## 📖 ภาพรวม (Overview)
 
-**vibeKidbright** คือ IDE สมัยใหม่ที่ขับเคลื่อนด้วย AI ออกแบบมาเพื่อการพัฒนาโปรเจกต์ ESP-IDF (Espressif IoT Development Framework) โดยเฉพาะ รองรับบอร์ด ESP32 ทุกรุ่น รวมถึง **KidBright32** และ **KidBright μAI Plus**
+**vibeKidbright** คือ Next-Generation IDE สำหรับการพัฒนา Firmware บนไมโครคอนโทรลเลอร์ ESP32 และ KidBright ด้วย **ESP-IDF (Espressif IoT Development Framework)** 
 
-สร้างขึ้นด้วย **Tauri + React + TypeScript** ทำให้ได้แอพพลิเคชั่น Desktop ที่เบา เร็ว และมีประสิทธิภาพสูง พร้อม AI Assistant ในตัวที่ช่วยเขียนและวิเคราะห์โค้ด Firmware ได้โดยตรง
-
----
-
-## ✨ ฟีเจอร์หลัก
-
-### 📁 Project Management
-- **สร้างโปรเจกต์ใหม่** — สร้าง ESP-IDF project structure ได้ทันทีจากหน้า UI
-- **เปิดโปรเจกต์ที่มีอยู่** — เปิด folder ของโปรเจกต์ ESP-IDF เดิมได้โดยตรง
-- **File Explorer** — แสดงต้นไม้ไฟล์ของโปรเจกต์ทั้งหมด พร้อมเปิด/แก้ไขไฟล์ได้ในหน้าเดียว
-
-### 🤖 Vibe Coder — AI Assistant
-- **อ่านโค้ดของคุณ** — AI สามารถอ่านไฟล์ source ปัจจุบันและทำความเข้าใจ context ของโปรเจกต์
-- **แนะนำการแก้ไขโค้ด** — ถามปัญหาเกี่ยวกับ firmware, logic, หรือ bug ได้เป็นภาษาธรรมชาติ
-- **Inject Code โดยตรง** — AI สามารถเขียนโค้ดแล้วแทรกเข้าไปในไฟล์ของคุณได้ทันทีโดยไม่ต้อง copy-paste
-- **Knowledge Base** — มีฐานข้อมูลความรู้เฉพาะทางสำหรับ KidBright และ ESP-IDF เพื่อให้คำตอบที่แม่นยำ
-
-### 🖥️ Interactive Terminal
-- **Built-in Terminal** — Terminal แบบ interactive ในตัว ไม่ต้องเปิด Command Prompt แยก
-- **Real-time Logs** — แสดง output จาก ESP-IDF build system, `idf.py`, และ CMake แบบ real-time
-- **Shell Commands** — รันคำสั่งทั่วไปได้เลยจาก terminal ภายในแอพ
-
-### ⚡ One-Click Build & Flash
-- **Build** — คอมไพล์โปรเจกต์ด้วยปุ่มเดียว (รัน `idf.py build` ใต้ฝากระโปรง)
-- **Flash** — เขียน firmware ลง ESP32 ผ่านพอร์ต Serial โดยไม่ต้องพิมพ์คำสั่ง
-- **Monitor** — เปิด Serial Monitor เพื่อดู log จาก device แบบ real-time
-- **Clean** — ล้าง build artifacts ได้จากปุ่มเดียว
-
-### 🎨 Modern UI / UX
-- **Dark Theme** — ธีมสีเข้มที่ออกแบบมาสำหรับการโค้ดโดยเฉพาะ
-- **Tailwind CSS** — UI สะอาด ทันสมัย ปรับขนาดได้อัตโนมัติ
-- **Responsive Layout** — แบ่ง panel ระหว่าง Editor, Terminal, และ AI Chat ได้ยืดหยุ่น
+สร้างขึ้นบนสถาปัตยกรรม **Tauri v2 + React 19 + TypeScript + Rust** มอบประสิทธิภาพที่เบา ทำงานรวดเร็ว ใช้ทรัพยากรเครื่องน้อย พร้อมระบบ **AI Copilot** ที่รองรับ Multi-Provider, **Local RAG (Vector Database ในตัวแบบ Offline)** และระบบ **Happy Meal Toolchain Manager** ที่ช่วยดาวน์โหลดและติดตั้ง ESP-IDF อัตโนมัติในคลิกเดียวโดยไม่ต้องตั้งค่าระบบด้วยตนเองให้ยุ่งยาก
 
 ---
 
-## 📦 เวอร์ชั่น
+## ✨ ฟีเจอร์หลัก (Key Features)
 
-### v3.0.0 — Initial Release (6 กรกฎาคม 2026)
-> รองรับ **Windows** เท่านั้น
+### 🍱 Happy Meal Toolchain Manager (ติดตั้งง่ายในคลิกเดียว)
+- **Zero-Configuration Setup** — ดาวน์โหลดและติดตั้ง Toolchain (ESP-IDF + Python + Compiler) แบบ Pre-packaged ลงในเครื่องให้อัตโนมัติ
+- **Auto Environment Repair** — มีระบบตรวจจับและ Auto-repair path ของ `pyvenv.cfg` และ Toolchain environment เมื่อย้ายเครื่องหรือเปลี่ยน Directory
+- **Progress Tracking** — แสดงสถานะและเปอร์เซ็นต์การดาวน์โหลด/แตกไฟล์แบบ Real-time พร้อมโหมด Mini Widget
 
-ฟีเจอร์ที่มาพร้อม v3.0.0:
-- Project Management (สร้าง/เปิดโปรเจกต์)
-- Vibe Coder AI Assistant (อ่านโค้ด + Inject Code)
-- Built-in Interactive Terminal
-- One-Click Build, Flash, Monitor, Clean
-- Dark Theme UI
-- Knowledge Base สำหรับ KidBright + ESP-IDF
-- GitHub Actions CI/CD pipeline สำหรับ auto-build release
+### 🤖 Vibe Coder — Multi-Provider AI Assistant
+- **Multi-Provider Support** — รองรับโมเดลภาษาหลากหลาย:
+  - **Google Gemini** (Gemini 2.5 Flash, Pro พร้อมรองรับ Thinking Mode และ Thought Signature)
+  - **OpenAI** (GPT-4o, GPT-4.1)
+  - **OpenRouter** (เข้าถึงโมเดลชั้นนำทั่วโลก)
+  - **Local LLM** (Ollama, LM Studio สำหรับการใช้งานแบบ Offline 100% และความเป็นส่วนตัว)
+- **Agentic Function Calling / Tools** — AI สามารถเรียกเครื่องมือเพื่อช่วยงานได้จริง:
+  - อ่านโค้ดและโครงสร้างไฟล์ในโปรเจกต์
+  - เขียน/แก้ไขโค้ดพร้อมแสดง **Unified Diff Preview** ให้ผู้ใช้ตรวจสอบและกดยอมรับ (Accept) หรือยกเลิก (Reject)
+  - รันคำสั่ง Terminal และค้นหาไฟล์อย่างปลอดภัย
+- **ความปลอดภัยระดับ OS Keychain** — จัดเก็บ API Keys ใน Windows Credential Manager หรือ macOS Keychain โดยอัตโนมัติ ไม่มีการบันทึก Plaintext ลงบน Disk
 
-**ดาวน์โหลด:** ไปที่ [Releases](https://github.com/Natthaphon-SNT/vibeKidbright/releases/tag/v3.0.0) แล้วดาวน์โหลดไฟล์ `.msi` หรือ `.exe`
+### 🧠 Local RAG & Hybrid Knowledge Base (ฐานข้อมูลความรู้ในตัว)
+- **Local Embedding Engine (fastembed)** — สร้าง Vector Embedding ด้วยโมเดล `all-MiniLM-L6-v2` แบบ Offline 100% โดยไม่ต้องใช้ API Key
+- **SQLite Vector Store** — จัดเก็บและค้นหา Knowledge Chunks ผ่าน SQLite ภายในเครื่องอย่างรวดเร็ว
+- **Hybrid Search** — ค้นหาข้อมูลเชิงความหมาย (Semantic Search) ผสานกับการค้นหาคำสำคัญ (Keyword Search) สำหรับวงจร บอร์ด KidBright, ไดรเวอร์ และ API ของ ESP-IDF
+- **Built-in Wiki View** — มีหน้าสำหรับเปิดอ่านคู่มือ บทเรียน และ Schematic ของบอร์ดได้โดยตรงจากโปรแกรม
+
+### 💻 Monaco Code Editor & Project Management
+- **Monaco Editor Integration** — ระบบ Code Editor ระดับเดียวกับ VS Code รองรับ Syntax Highlighting สำหรับ C/C++, CMakeLists, Kconfig, JSON, Python ฯลฯ
+- **Project Tree Explorer** — จัดการไฟล์ สร้าง โฟลเดอร์ เปลี่ยนชื่อ ลบไฟล์ได้ง่ายดาย
+- **Project Template Generator** — สร้างโครงสร้างโปรเจกต์ ESP-IDF เริ่มต้นได้ทันที
+
+### ⚡ One-Click Build, Flash & Serial Monitor
+- **Build Firmware** — คอมไพล์โปรเจกต์ด้วยปุ่มเดียวผ่าน Toolchain ภายในแอพ
+- **Flash to Board** — อัปโหลด Firmware เข้า ESP32/KidBright ผ่านพอร์ต Serial
+- **Real-time Serial Monitor** — เปิดหน้าต่างรับ-ส่งข้อความ Serial Log แบบสดจากบอร์ด พร้อม auto-scroll และ clear log
+- **Interactive Terminal** — หน้าต่าง Terminal ในตัวที่ส่งคำสั่ง shell หรือ idf.py ได้อย่างอิสระ
 
 ---
 
-## 🚀 การติดตั้ง (สำหรับผู้ใช้ทั่วไป)
+## 🎯 รองรับบอร์ดและฮาร์ดแวร์
 
-### Windows (แนะนำ)
-1. ไปที่ [Releases](https://github.com/Natthaphon-SNT/vibeKidbright/releases) 
-2. ดาวน์โหลดไฟล์ `.msi` หรือ `.exe` จาก release ล่าสุด
-3. ดับเบิลคลิกติดตั้ง แล้วเปิดใช้งานได้เลย
-
-> ⚠️ ต้องติดตั้ง **ESP-IDF** ไว้ก่อน และตั้งค่า environment variables ให้ถูกต้อง
+- **KidBright32** (ทุกเวอร์ชัน: V1.3, V1.5, V1.6)
+- **KidBright μAI Plus**
+- **ESP32** (ESP32-WROOM, ESP32-WROVER)
+- **ESP32-S2 / ESP32-S3**
+- **ESP32-C3 / ESP32-C6**
 
 ---
 
-## 🛠️ การ Build จาก Source (สำหรับนักพัฒนา)
+## 🚀 การติดตั้ง (Installation)
 
-### Prerequisites
+### วิธีที่ 1: ติดตั้งผ่าน WinGet (Windows - แนะนำ)
+เปิด Command Prompt หรือ PowerShell แล้วพิมพ์:
+```powershell
+winget install Natthaphon-SNT.vibeKidbright
+```
 
-ต้องติดตั้งสิ่งต่อไปนี้ก่อน:
+### วิธีที่ 2: ดาวน์โหลดตัวติดตั้ง (Windows / macOS)
+1. ไปที่ [GitHub Releases](https://github.com/Natthaphon-SNT/vibeKidbright/releases)
+2. เลือกดาวน์โหลดไฟล์ติดตั้งตามระบบปฏิบัติการของคุณ:
+   - **Windows:** ดาวน์โหลดไฟล์ `.exe` (NSIS Installer) หรือ `.msi`
+   - **macOS:** ดาวน์โหลดไฟล์ `.dmg` (Universal Binary รองรับทั้ง Apple Silicon M1/M2/M3/M4 และ Intel)
+3. เปิดไฟล์และทำตามขั้นตอนการติดตั้ง
 
-| เครื่องมือ | เวอร์ชั่น | หมายเหตุ |
-|---|---|---|
-| [Node.js](https://nodejs.org/) | v18 หรือใหม่กว่า | Runtime สำหรับ Frontend |
-| [Rust](https://www.rust-lang.org/) | stable | Backend ของ Tauri |
-| Tauri CLI | ล่าสุด | `cargo install tauri-cli` |
-| [ESP-IDF](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/) | v5.x | Framework สำหรับ ESP32 |
-| Xcode CLI Tools | — | **macOS เท่านั้น** |
+---
 
-### Clone และติดตั้ง
+## 🛠️ การรันและพัฒนาจาก Source Code (Developer Guide)
+
+### สิ่งที่ต้องเตรียม (Prerequisites)
+- [Node.js](https://nodejs.org/) (v20+ หรือ v22 แนะนำ)
+- [Rust](https://www.rust-lang.org/) (เวอร์ชัน Stable ล่าสุด)
+- [Tauri CLI v2](https://v2.tauri.app/) (`cargo install tauri-cli --version "^2"`)
+- (สำหรับ macOS) Xcode Command Line Tools
+
+### ขั้นตอนการรัน
 
 ```bash
 # 1. Clone repository
 git clone https://github.com/Natthaphon-SNT/vibeKidbright.git
 cd vibeKidbright
 
-# 2. ติดตั้ง Node dependencies
+# 2. ติดตั้ง Node Dependencies
 npm install
-```
 
-### Development Mode
-
-```bash
+# 3. รัน Development Server (Vite + Tauri)
 npm run tauri dev
 ```
 
-คำสั่งนี้จะ:
-- เปิด Vite dev server สำหรับ Frontend (React + TypeScript)
-- Compile และรัน Tauri-Rust backend
-- เปิดหน้าต่างแอพในโหมด development พร้อม hot-reload
-
-### Production Build
+### การทดสอบ (Testing)
 
 ```bash
+# รัน Frontend Unit Tests (Vitest)
+npm test
+
+# รัน Backend Tests (Rust)
+cargo test --manifest-path src-tauri/Cargo.toml
+```
+
+### การ Build สำหรับ Production
+
+```bash
+# Build ทั้ง Frontend และ Desktop Package
 npm run build
 npm run tauri build
 ```
 
-ไฟล์ installer จะอยู่ที่:
-```
-src-tauri/target/release/bundle/
-├── msi/          # Windows MSI installer
-├── nsis/         # Windows EXE installer
-└── (macOS/Linux bundle หากรันบน platform นั้น)
-```
+ไฟล์ Installer จะถูกสร้างไว้ที่: `src-tauri/target/release/bundle/`
 
 ---
 
-## 📂 โครงสร้างโปรเจกต์
+## 📂 โครงสร้างโปรเจกต์ (Project Structure)
 
 ```
 vibeKidbright/
 ├── .github/
-│   └── workflows/         # GitHub Actions CI/CD (auto-build release)
-├── knowledge_base/        # ฐานข้อมูลความรู้สำหรับ AI (ESP-IDF, KidBright)
-├── public/                # Static assets (icons, images)
-├── resources/             # App resources (icon สำหรับ Tauri)
-├── src/                   # Frontend Source (React + TypeScript)
-│   ├── components/        # React components (Editor, Terminal, AI Panel, etc.)
-│   ├── hooks/             # Custom React hooks
-│   ├── lib/               # Utility functions
-│   └── App.tsx            # Root component
-├── src-tauri/             # Tauri Backend (Rust)
+│   └── workflows/         # CI/CD Workflows (Windows, macOS, WinGet releases)
+├── knowledge_base/        # เนื้อหาเอกสารและฐานความรู้สำหรับ AI (Markdown, Schematics)
+├── resources/             # ทรัพยากรของแอป (Knowledge base bundle, Assets)
+├── src/                   # Frontend Application (React 19 + TypeScript)
+│   ├── AiChat.tsx         # ระบบ AI Assistant UI, Tool execution & Diff review
+│   ├── CodeEditor.tsx     # Monaco Editor Wrapper พร้อม Syntax Config
+│   ├── ToolchainSetup.tsx # หน้าต่าง Happy Meal Toolchain Manager
+│   ├── WikiView.tsx       # ตัวอ่านเอกสาร Knowledge Base Viewer
+│   ├── App.tsx            # Main Application Layout & State Management
+│   ├── utils.ts           # Pure utility functions
+│   └── test/              # Frontend Unit Test Suite (Vitest)
+├── src-tauri/             # Backend Application (Tauri v2 + Rust)
 │   ├── src/
-│   │   ├── main.rs        # Entry point ของ Rust backend
-│   │   └── lib.rs         # Tauri commands (build, flash, terminal, file ops)
-│   └── tauri.conf.json    # Tauri configuration
-├── index.html             # HTML entry point
-├── package.json           # Node dependencies
-├── vite.config.ts         # Vite bundler config
-├── tsconfig.json          # TypeScript config
-└── CMakeLists.txt         # CMake config (ตัวอย่าง ESP-IDF project)
+│   │   ├── main.rs        # Application Entry Point
+│   │   ├── lib.rs         # Tauri App Builder, Plugins, Commands Registry
+│   │   ├── ai_chat.rs     # AI Core, Stream processing, Tools & Keychain
+│   │   ├── esp_idf.rs     # ESP-IDF CLI runner, Serial Monitor & Project Ops
+│   │   ├── toolchain.rs   # Happy Meal Toolchain downloader & Auto-repair
+│   │   ├── kb_store.rs    # SQLite-backed Vector Store
+│   │   ├── kb_embed.rs    # Local fastembed (ONNX) embedding pipeline
+│   │   └── ai/            # Modular AI Subsystem Architecture
+│   ├── Cargo.toml         # Rust dependencies
+│   └── tauri.conf.json    # Tauri configuration (Window, Security, Bundle)
+├── winget-manifests/      # WinGet Package Repository Manifests
+├── package.json           # Frontend dependencies & scripts
+└── vite.config.ts         # Vite bundler configuration
 ```
 
 ---
 
-## 🔧 เทคโนโลยีที่ใช้
+## 🔧 เทคโนโลยีที่ใช้งาน (Tech Stack)
 
 | Layer | เทคโนโลยี |
 |---|---|
-| **Frontend** | React, TypeScript, Vite |
-| **Styling** | Tailwind CSS |
-| **Desktop Shell** | Tauri v2 |
-| **Backend Logic** | Rust |
-| **AI Integration** | Anthropic Claude API (ผ่าน Knowledge Base) |
-| **Embedded Target** | ESP-IDF (ESP32, KidBright32, KidBright μAI Plus) |
-| **Build System** | CMake + Ninja (ผ่าน idf.py) |
-| **CI/CD** | GitHub Actions |
-
----
-
-## 🎯 รองรับบอร์ดอะไรบ้าง
-
-vibeKidbright ออกแบบมาสำหรับ ESP32-based boards โดยเฉพาะ:
-
-- **ESP32** (ทุกรุ่น)
-- **ESP32-S2 / S3**
-- **ESP32-C3 / C6**
-- **KidBright32** (IPST)
-- **KidBright μAI Plus** (IPST)
-
-> การ Flash และ Monitor ใช้ `idf.py flash monitor` ผ่าน USB Serial ตามปกติ
-
----
-
-## 📋 Prerequisites สำหรับใช้งาน Flash
-
-ก่อน Flash firmware จำเป็นต้องมี:
-
-1. ติดตั้ง ESP-IDF และ set `IDF_PATH` ใน environment variables
-2. Python 3.8+ (มาพร้อม ESP-IDF)
-3. USB Driver สำหรับ CH340/CP2102 (บอร์ด KidBright ใช้ CH340)
-4. พอร์ต COM ที่มองเห็นได้ใน Device Manager
-
----
-
-## 🤝 Contributing
-
-ยินดีรับ Pull Request และ Issue ทุกรูปแบบ:
-
-1. Fork repository นี้
-2. สร้าง feature branch: `git checkout -b feature/your-feature`
-3. Commit การเปลี่ยนแปลง: `git commit -m 'Add some feature'`
-4. Push ขึ้น branch: `git push origin feature/your-feature`
-5. เปิด Pull Request
-
----
-
-## 🐛 Known Issues (v3.0.0)
-
-- รองรับ **Windows เท่านั้น** ในปัจจุบัน (macOS/Linux อยู่ใน roadmap)
-- ESP-IDF ต้องติดตั้งแยกและตั้งค่า PATH ด้วยตนเอง
-- หากพบปัญหา COM port conflict (เช่น Arduino IDE เปิดอยู่พร้อมกัน) ให้ปิดแอพอื่นก่อน Flash
+| **Desktop Framework** | [Tauri v2](https://v2.tauri.app/) (Rust) |
+| **Frontend UI** | [React 19](https://react.dev/), [TypeScript](https://www.typescriptlang.org/), [Tailwind CSS v4](https://tailwindcss.com/) |
+| **Code Editor** | [Monaco Editor](https://microsoft.github.io/monaco-editor/) (`@monaco-editor/react`) |
+| **Local AI & RAG** | [fastembed-rs](https://github.com/Anush008/fastembed-rs) (all-MiniLM-L6-v2 ONNX) + [rusqlite](https://github.com/rusqlite/rusqlite) (SQLite WAL) |
+| **AI Providers** | Google Gemini API, OpenAI API, OpenRouter, Local Ollama / LM Studio |
+| **Security** | OS Keychain (`keyring-rs`) สำหรับเก็บ API Keys |
+| **Embedded Framework** | ESP-IDF (FreeRTOS, CMake, Ninja, esptool) |
+| **CI/CD** | GitHub Actions (Auto-build Windows EXE/MSI, macOS Universal DMG, WinGet automation) |
 
 ---
 
 ## 📄 License
 
-This project is licensed under the **MIT License** — see [LICENSE](LICENSE) for details.
+This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
 
 ---
 
-## 📬 ติดต่อ / Support
+## 📬 ติดต่อ / ช่องทางติดต่อผู้พัฒนา
 
-- **Issues:** [GitHub Issues](https://github.com/Natthaphon-SNT/vibeKidbright/issues)
+- **Issues & Discussions:** [GitHub Issues](https://github.com/Natthaphon-SNT/vibeKidbright/issues)
 - **Releases:** [GitHub Releases](https://github.com/Natthaphon-SNT/vibeKidbright/releases)
-- **LINE ID:** [dragon3541] **LINE Name:** [Peter B. Parker]
+- **Maintainer:** Natthaphon-SNT
+- **LINE ID:** `dragon3541` | **LINE Name:** Peter B. Parker
 
 ---
 
 <p align="center">
-  Made with ❤️ for the KidBright & ESP32 Community
+  Made with ❤️ for the KidBright, ESP32 & Embedded Developers Community
 </p>
