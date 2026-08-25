@@ -40,8 +40,10 @@ config.json
 *.sqlite*
 *.db
 *.backup
-cert.pfx
-cert.p12
+*.pfx
+*.p12
+cert_base64.txt
+cert_base64*.txt
 
 
 
