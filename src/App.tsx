@@ -6,6 +6,7 @@ import CodeEditor from "./CodeEditor";
 import ToolchainSetup from "./ToolchainSetup";
 import WikiView from "./WikiView";
 import { parseErrorLine, type ParsedBuildError } from "./errorHints";
+import BuildErrorList from "./BuildErrorList";
 
 
 interface FileEntry {
@@ -1552,47 +1553,12 @@ function App({ toolchainReady = true }: { toolchainReady?: boolean }) {
               )}
 
               {/* Friendly Build Error Helper — plain-language list of what went wrong */}
-              {buildResult === "failed" && buildErrors.length > 0 && (
-                <div className="mx-2 mb-1 rounded-lg overflow-hidden animate-fadein" style={{ border: '1px solid var(--danger)', backgroundColor: 'rgba(185,28,28,0.05)' }}>
-                  <div className="px-3 py-2 flex items-center gap-2" style={{ borderBottom: '1px solid rgba(185,28,28,0.25)' }}>
-                    <span className="text-sm">⚠️</span>
-                    <span className="text-[12px] font-bold" style={{ color: 'var(--danger)' }}>
-                      Build failed — {buildErrors.length} problem{buildErrors.length > 1 ? "s" : ""} found
-                    </span>
-                    <button
-                      onClick={askAiToFixErrors}
-                      className="ml-auto text-[11px] font-bold px-2.5 py-1 rounded-md transition-opacity hover:opacity-80 shrink-0"
-                      style={{ backgroundColor: 'var(--accent)', color: '#ffffff' }}
-                      title="ให้ Vibe Coder ช่วยแก้ / Let Vibe Coder fix it"
-                    >
-                      🤖 Ask Vibe Coder to Fix
-                    </button>
-                  </div>
-                  <div className="max-h-44 overflow-y-auto">
-                    {buildErrors.map((err, i) => (
-                      <div key={i} className="px-3 py-2 flex items-start gap-2.5" style={{ borderBottom: i < buildErrors.length - 1 ? '1px solid var(--border-color)' : undefined }}>
-                        <span className="text-[11px] mt-0.5 shrink-0">❌</span>
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-[12px] font-bold" style={{ color: 'var(--danger)' }}>{err.title}</span>
-                            {err.file && (
-                              <button
-                                onClick={() => jumpToError(err)}
-                                className="text-[10px] font-mono px-1.5 py-0.5 rounded transition-colors hover:bg-red-500/20"
-                                style={{ color: 'var(--accent)', backgroundColor: 'var(--bg-hover)' }}
-                                title="เปิดไฟล์ตรงบรรทัดนี้ / Open at this line"
-                              >
-                                {err.file.split(/[\/\\]/).pop()}{err.line ? `:${err.line}` : ""}
-                              </button>
-                            )}
-                          </div>
-                          <div className="text-[12px] mt-0.5 leading-relaxed">🇹🇭 {err.thaiHint}</div>
-                          <div className="text-[10px] mt-0.5 opacity-70">{err.englishHint}</div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+              {buildResult === "failed" && (
+                <BuildErrorList
+                  errors={buildErrors}
+                  onJumpToError={jumpToError}
+                  onAskAiFix={askAiToFixErrors}
+                />
               )}
             </div>
 
