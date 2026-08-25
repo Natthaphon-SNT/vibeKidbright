@@ -182,6 +182,7 @@ const defineVibeDarkTheme: BeforeMount = (monaco) => {
 
 import { useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
+import { toast } from "./Toast";
 import { DiffEditor } from "@monaco-editor/react";
 
 export interface GotoLineRequest {
@@ -251,6 +252,7 @@ export default function CodeEditor({
                 })
                 .catch(err => {
                     console.error("Failed to check pending diff:", err);
+                    toast("Could not check for pending AI changes.", "error");
                     if (isMounted) setPendingContent(null);
                 });
         };
@@ -283,8 +285,7 @@ export default function CodeEditor({
                     }
                 } catch (e) {
                     console.error("Error handling ai-diff-pending:", e);
-                }
-            }).then(fn => {
+                }            }).then(fn => {
                 if (!isMounted) fn();
                 else unlisten = fn;
             });
@@ -303,6 +304,7 @@ export default function CodeEditor({
             // The file-modified event will trigger a reload of the content from disk automatically
         } catch (err) {
             console.error("Failed to accept diff:", err);
+            toast("Failed to apply AI changes. Please try again.", "error");
         }
     };
 
@@ -312,6 +314,7 @@ export default function CodeEditor({
             setPendingContent(null);
         } catch (err) {
             console.error("Failed to reject diff:", err);
+            toast("Failed to discard AI changes. Please try again.", "error");
         }
     };
 

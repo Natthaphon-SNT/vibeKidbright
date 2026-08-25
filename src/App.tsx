@@ -7,6 +7,7 @@ import ToolchainSetup from "./ToolchainSetup";
 import WikiView from "./WikiView";
 import { parseErrorLine, type ParsedBuildError } from "./errorHints";
 import BuildErrorList from "./BuildErrorList";
+import { toast, ToastHost } from "./Toast";
 
 
 interface FileEntry {
@@ -268,6 +269,7 @@ function AppShell() {
   return (
     <>
       <App toolchainReady={toolchainReady} />
+      <ToastHost />
       {!toolchainReady && (
         <ToolchainSetup
           onReady={() => setToolchainReady(true)}
@@ -569,7 +571,7 @@ function App({ toolchainReady = true }: { toolchainReady?: boolean }) {
       }
     } catch (err) {
       addLog(`❌ Failed to save project: ${err}`);
-      alert(`Save Project As failed:\n${err}`);
+      toast(`Save Project As failed: ${err}`, "error");
     }
   };
 
@@ -601,7 +603,7 @@ function App({ toolchainReady = true }: { toolchainReady?: boolean }) {
       }
       if (normPath(activeFilePath) === normPath(path)) setActiveFilePath("");
     } catch (err) {
-      alert(`Failed to delete:\n${err}`);
+      toast(`Failed to delete: ${err}`, "error");
     }
   };
 
@@ -642,7 +644,7 @@ function App({ toolchainReady = true }: { toolchainReady?: boolean }) {
         setOpenFolders(prev => new Set(prev).add(parentPath));
       }
     } catch (err) {
-      alert(`Operation failed:\n${err}`);
+      toast(`Operation failed: ${err}`, "error");
     }
 
     setInlineAction(null);
@@ -657,6 +659,7 @@ function App({ toolchainReady = true }: { toolchainReady?: boolean }) {
       setProjectFiles(files as FileEntry[]);
     } catch (err) {
       console.error("Failed to load project files:", err);
+      toast("Could not load the project file list.", "error");
     }
   };
 
@@ -786,7 +789,7 @@ function App({ toolchainReady = true }: { toolchainReady?: boolean }) {
       loadProjectFiles();
     } catch (err) {
       addLog(`❌ Failed to overwrite file: ${err}`);
-      alert(`Safety check failed:\n${err}`);
+      toast(`Safety check failed: ${err}`, "error");
     }
   };
 
@@ -802,7 +805,7 @@ function App({ toolchainReady = true }: { toolchainReady?: boolean }) {
         setActiveFilePath("");
         addLog(`Project opened: ${path}`);
       } else {
-        alert("Selected directory is not a valid ESP-IDF project (missing CMakeLists.txt)");
+        toast("Not a valid ESP-IDF project (missing CMakeLists.txt)", "error");
       }
     } catch (err) {
       addLog(`Error opening project: ${err}`);
@@ -1094,7 +1097,7 @@ function App({ toolchainReady = true }: { toolchainReady?: boolean }) {
     } catch (err) {
       console.error("New project error:", err);
       addLog(`❌ ERROR: ${err}`);
-      alert(`Failed to create project: ${err}`);
+      toast(`Failed to create project: ${err}`, "error");
     }
   };
 
@@ -1103,7 +1106,7 @@ function App({ toolchainReady = true }: { toolchainReady?: boolean }) {
     
     if (projectDir === ".") {
       addLog("❌ Error: No project selected to build.");
-      alert("Please open or create a project first from the sidebar.");
+      toast("Please open or create a project first from the sidebar.", "info");
       return;
     }
 

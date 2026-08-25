@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
+import { toast } from "./Toast";
 
 interface Message {
     id: string;
@@ -112,6 +113,7 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile, sendApiRef }: { proje
             }
         } catch (e) {
             console.error("Failed to load chat history:", e);
+            toast("Could not load saved chat history.", "error");
         }
 
         // Load API key and model on mount
@@ -459,6 +461,7 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile, sendApiRef }: { proje
             setShowSettings(false);
         } catch (err) {
             console.error("Failed to save AI settings:", err);
+            toast(`Failed to save AI settings: ${err}`, "error");
         }
     };
 
@@ -1166,7 +1169,7 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile, sendApiRef }: { proje
                                             {isIndexing ? 'Indexing...' : 'Re-index'}
                                         </button>
                                         <button
-                                            onClick={() => invoke("add_knowledge_base_files", { projectDir }).then(() => invoke("get_knowledge_base_files", { projectDir }).then(f => setKnowledgeFiles(f as string[]))).catch(err => console.error("Error adding file:", err))}
+                                            onClick={() => invoke("add_knowledge_base_files", { projectDir }).then(() => invoke("get_knowledge_base_files", { projectDir }).then(f => setKnowledgeFiles(f as string[]))).catch(err => { console.error("Error adding file:", err); toast("Could not add knowledge base files.", "error"); })}
                                             className="text-[10px] text-red-400 hover:underline flex items-center gap-1"
                                         >
                                             <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1211,7 +1214,7 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile, sendApiRef }: { proje
                                                                 invoke("toggle_knowledge_base_file", { projectDir, fileName: file })
                                                                     .then(() => invoke("get_knowledge_base_files", { projectDir }))
                                                                     .then(f => setKnowledgeFiles(f as string[]))
-                                                                    .catch(err => console.error("Failed to toggle file:", err));
+                                                                    .catch(err => { console.error("Failed to toggle file:", err); toast("Could not update knowledge base file.", "error"); });
                                                             }}
                                                             className={`p-0.5 rounded transition-colors ml-1 ${isEnabled ? 'text-amber-400/50 hover:text-amber-400' : 'text-emerald-400/50 hover:text-emerald-400'}`}
                                                             title={isEnabled ? "ซ่อนไฟล์จากแชท (Disable)" : "เปิดใช้งานในแชท (Enable)"}
