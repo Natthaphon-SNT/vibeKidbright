@@ -1183,3 +1183,92 @@ pub async fn stop_serial_monitor() -> Result<String, String> {
     Ok("Serial monitor disconnected".to_string())
 }
 
+
+// ── Unit Tests ────────────────────────────────────────────────────────────────
+// Pure-logic / filesystem tests — no Tauri AppHandle or network required.
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs;
+
+    #[test]
+    fn venv_bin_dir_platform_layout() {
+        let venv = Path::new("/venv");
+        let bin = venv_bin_dir(venv);
+        if cfg!(target_os = "windows") {
+            assert_eq!(bin, PathBuf::from("/venv/Scripts"));
+        } else {
+            assert_eq!(bin, PathBuf::from("/venv/bin"));
+        }
+    }
+
+    #[test]
+    fn venv_python_candidates_are_python_named() {
+        let cands = venv_python_candidates(Path::new("/venv"));
+        assert!(!cands.is_empty(), "must produce at least one candidate");
+        for c in &cands {
+            assert!(
+                c.file_name().unwrap().to_string_lossy().starts_with("python"),
+                "unexpected candidate: {}",
+                c.display()
+            );
+        }
+    }
+
+    #[test]
+    fn read_idf_version_trims_and_missing_ok() {
+        let tmp = tempfile::tempdir().unwrap();
+        assert_eq!(read_idf_version(tmp.path()), "", "missing version.txt → empty string");
+        fs::write(tmp.path().join("version.txt"), "v5.2.1\n").unwrap();
+        assert_eq!(read_idf_version(tmp.path()), "v5.2.1");
+    }
+
+    #[test]
+    fn dir_has_executables_empty_dir_is_false() {
+        let tmp = tempfile::tempdir().unwrap();
+        assert!(!dir_has_executables(tmp.path()));
+    }
+
+    #[test]
+    fn scan_esp_tool_dirs_finds_bin_dirs() {
+        // Structure: <root>/ninja/1.11/bin/ninja(.exe)
+        let tmp = tempfile::tempdir().unwrap();
+        let bin_dir = tmp.path().join("ninja").join("1.11").join("bin");
+        fs::create_dir_all(&bin_dir).unwrap();
+        let exe_name = if cfg!(windows) { "ninja.exe" } else { "ninja" };
+        fs::write(bin_dir.join(exe_name), b"x").unwrap();
+
+        // Non-existent directory → nothing added, no panic
+        let mut paths = Vec::new();
+        scan_esp_tool_dirs(&tmp.path().join("does-not-exist"), &mut paths);
+        assert!(paths.is_empty());
+
+        // Existing structure → bin dir discovered
+        scan_esp_tool_dirs(tmp.path(), &mut paths);
+        assert!(
+            paths.iter().any(|p| p.ends_with("bin")),
+            "bin dir must be discovered, got: {:?}",
+            paths
+        );
+    }
+
+    #[test]
+    fn canonical_idf_pair_validates_idf_py_presence() {
+        let tmp = tempfile::tempdir().unwrap();
+        let idf = tmp.path().join("esp-idf");
+        fs::create_dir_all(idf.join("tools")).unwrap();
+        let tools = tmp.path().join(".espressif");
+        fs::create_dir_all(&tools).unwrap();
+
+        // Missing tools/idf.py → descriptive error
+        let err = canonical_idf_pair(&idf, &tools).unwrap_err();
+        assert!(err.contains("idf.py"), "unexpected error: {}", err);
+
+        // With idf.py present → canonicalized pair returned
+        fs::write(idf.join("tools").join("idf.py"), "# python entry point").unwrap();
+        let (got_idf, got_tools) = canonical_idf_pair(&idf, &tools).unwrap();
+        assert_eq!(got_idf.file_name(), Some(std::ffi::OsStr::new("esp-idf")));
+        assert!(got_tools.exists());
+    }
+}

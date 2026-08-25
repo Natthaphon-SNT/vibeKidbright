@@ -1131,3 +1131,84 @@ fn extract_gdrive_token(html: &str) -> Option<String> {
     }
     None
 }
+
+// ── Unit Tests ────────────────────────────────────────────────────────────────
+// Pure-logic tests for URL resolution, token extraction and filesystem scans.
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs;
+
+    // ── extract_gdrive_token ──────────────────────────────────────────────────
+
+    #[test]
+    fn gdrive_token_extracted_from_confirm_param() {
+        let html = "https://drive.usercontent.google.com/download?id=1&confirm=Abc_9-X&x=y";
+        assert_eq!(extract_gdrive_token(html), Some("Abc_9-X".to_string()));
+    }
+
+    #[test]
+    fn gdrive_token_extracted_after_html_entity() {
+        // First "confirm=" yields empty token → must fall through to "&amp;confirm="
+        let html = "confirm=&amp;confirm=z12_3";
+        assert_eq!(extract_gdrive_token(html), Some("z12_3".to_string()));
+    }
+
+    #[test]
+    fn gdrive_token_bare_t_is_rejected() {
+        // "t" is the placeholder sentinel — must not be treated as a real token
+        assert_eq!(extract_gdrive_token("?id=x&confirm=t"), None);
+    }
+
+    #[test]
+    fn gdrive_token_absent_returns_none() {
+        assert_eq!(extract_gdrive_token("nothing to see here"), None);
+    }
+
+    // ── resolve_download_url ──────────────────────────────────────────────────
+
+    #[test]
+    fn resolve_download_url_passthrough_non_gdrive() {
+        let url = "https://example.com/toolchain.zip";
+        assert_eq!(resolve_download_url(url), url);
+    }
+
+    #[test]
+    fn resolve_download_url_file_d_form() {
+        let out = resolve_download_url("https://drive.google.com/file/d/FILE123/view?usp=sharing");
+        assert!(
+            out.contains("download?id=FILE123"),
+            "expected FILE123 in rewritten URL, got: {}",
+            out
+        );
+        assert!(out.contains("confirm=t"));
+    }
+
+    #[test]
+    fn resolve_download_url_query_id_form() {
+        let out = resolve_download_url("https://docs.google.com/uc?id=ABC456&export=download");
+        assert!(
+            out.contains("download?id=ABC456"),
+            "expected ABC456 in rewritten URL, got: {}",
+            out
+        );
+    }
+
+    #[test]
+    fn resolve_download_url_gdrive_without_id_is_passthrough() {
+        let url = "https://drive.google.com/folder";
+        assert_eq!(resolve_download_url(url), url);
+    }
+
+    // ── is_toolchain_ready ────────────────────────────────────────────────────
+
+    #[test]
+    fn toolchain_ready_requires_sentinel_file() {
+        let tmp = tempfile::tempdir().unwrap();
+        assert!(!is_toolchain_ready(tmp.path()));
+
+        fs::write(tmp.path().join(SENTINEL_FILE), "v1").unwrap();
+        assert!(is_toolchain_ready(tmp.path()));
+    }
+}
