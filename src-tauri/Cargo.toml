@@ -1,8 +1,8 @@
 [package]
-name = "tauri-app"
+name = "vibe-kidbright"
 version = "0.1.0"
-description = "A Tauri App"
-authors = ["you"]
+description = "VibeKidbright IDE - a kid-friendly AI-assisted IDE for KidBright32 boards"
+authors = ["Natthaphon-SNT <zfrankenz123@gmail.com>"]
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
