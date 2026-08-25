@@ -48,7 +48,7 @@ function ApplyButton({ onApply, targetFile }: { onApply: () => void, targetFile?
 }
 
 
-function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: string, onInjectCode: (code: string) => void, onApplyToFile?: (filePath: string, code: string) => void }) {
+function AiChat({ projectDir, onInjectCode, onApplyToFile, sendApiRef }: { projectDir: string, onInjectCode: (code: string) => void, onApplyToFile?: (filePath: string, code: string) => void, sendApiRef?: { current: ((text: string) => void) | null } }) {
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState("");
     const [isLoading, setIsLoading] = useState(false);
@@ -69,8 +69,8 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
     const [apiKeyInput, setApiKeyInput] = useState("");
     const [baseUrl, setBaseUrl] = useState("https://api.openai.com/v1");
     const [baseUrlInput, setBaseUrlInput] = useState("https://api.openai.com/v1");
-    const [provider, setProvider] = useState<"openai" | "local" | "openrouter" | "google">("openai");
-    const [providerInput, setProviderInput] = useState<"openai" | "local" | "openrouter" | "google">("openai");
+    const [provider, setProvider] = useState<"openai" | "local" | "openrouter" | "google" | "zen">("openai");
+    const [providerInput, setProviderInput] = useState<"openai" | "local" | "openrouter" | "google" | "zen">("openai");
     const [modelInput, setModelInput] = useState("gpt-4o");
     const [openrouterApiKey, setOpenrouterApiKey] = useState("");
     const [openrouterApiKeyInput, setOpenrouterApiKeyInput] = useState("");
@@ -80,6 +80,10 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
     const [googleApiKeyInput, setGoogleApiKeyInput] = useState("");
     const [_googleModel, setGoogleModel] = useState("gemini-2.5-flash");
     const [googleModelInput, setGoogleModelInput] = useState("gemini-2.5-flash");
+    const [zenApiKey, setZenApiKey] = useState("");
+    const [zenApiKeyInput, setZenApiKeyInput] = useState("");
+    const [_zenModel, setZenModel] = useState("nemotron-3.5-lightning-free");
+    const [zenModelInput, setZenModelInput] = useState("nemotron-3.5-lightning-free");
     const [knowledgeFiles, setKnowledgeFiles] = useState<string[]>([]);
     const [isIndexing, setIsIndexing] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
@@ -126,7 +130,7 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
             setBaseUrlInput(u);
         });
         invoke("get_provider").then((p) => {
-            const pr = p as "openai" | "local" | "openrouter" | "google";
+            const pr = p as "openai" | "local" | "openrouter" | "google" | "zen";
             setProvider(pr);
             setProviderInput(pr);
         });
@@ -149,6 +153,16 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
             const mod = m as string;
             setGoogleModel(mod);
             setGoogleModelInput(mod);
+        });
+        invoke("get_zen_api_key").then((key) => {
+            const k = key as string;
+            setZenApiKey(k);
+            setZenApiKeyInput(k);
+        });
+        invoke("get_zen_model").then((m) => {
+            const mod = m as string;
+            setZenModel(mod);
+            setZenModelInput(mod);
         });
         // Listen for streaming events
         const unlistenActiveModel = listen("ai-active-model", (event) => {
@@ -353,7 +367,9 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
                 ? !openrouterApiKey
                 : provider === "google"
                     ? !googleApiKey
-                    : !api_key &&
+                    : provider === "zen"
+                        ? !zenApiKey
+                        : !api_key &&
                     !baseUrl.includes("localhost") &&
                     !baseUrl.includes("127.0.0.1") &&
                     !baseUrl.match(/\d+\.\d+\.\d+\.\d+/) &&
@@ -410,6 +426,13 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
         }
     };
 
+    // Expose sendMessage to the parent (e.g. "Ask Vibe Coder to Fix" build errors)
+    useEffect(() => {
+        if (!sendApiRef) return;
+        sendApiRef.current = (text: string) => { sendMessage(text); };
+        return () => { sendApiRef.current = null; };
+    });
+
     const saveSettings = async () => {
         try {
             await invoke("set_api_key", { key: apiKeyInput });
@@ -420,6 +443,8 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
             await invoke("set_openrouter_model", { model: openrouterModelInput });
             await invoke("set_google_api_key", { key: googleApiKeyInput });
             await invoke("set_google_model", { model: googleModelInput });
+            await invoke("set_zen_api_key", { key: zenApiKeyInput });
+            await invoke("set_zen_model", { model: zenModelInput });
 
             setApiKey(apiKeyInput);
             setBaseUrl(baseUrlInput);
@@ -428,6 +453,8 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
             setOpenrouterModel(openrouterModelInput);
             setGoogleApiKey(googleApiKeyInput);
             setGoogleModel(googleModelInput);
+            setZenApiKey(zenApiKeyInput);
+            setZenModel(zenModelInput);
 
             setShowSettings(false);
         } catch (err) {
@@ -435,7 +462,7 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
         }
     };
 
-    const handleProviderChange = (newProvider: "openai" | "local" | "openrouter" | "google") => {
+    const handleProviderChange = (newProvider: "openai" | "local" | "openrouter" | "google" | "zen") => {
         setProviderInput(newProvider);
         if (newProvider === "openai") {
             setBaseUrlInput("https://api.openai.com/v1");
@@ -443,6 +470,8 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
         } else if (newProvider === "local") {
             setBaseUrlInput("http://localhost:1234/v1");
             setModelInput("qwen2.5-coder-7b-instruct");
+        } else if (newProvider === "zen") {
+            // Zen gateway URL is fixed server-side; model lives in zenModelInput
         } else {
             // openrouter — baseUrl is fixed, model comes from openrouterModelInput
             setBaseUrlInput("https://openrouter.ai/api/v1");
@@ -641,9 +670,10 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
                         <span className={`text-[8px] px-1.5 py-0.5 rounded font-bold uppercase ${provider === "openai" ? "bg-violet-500/10 text-violet-400" :
                             provider === "openrouter" ? "bg-orange-500/10 text-orange-400" :
                                 provider === "google" ? "bg-red-500/10 text-red-400" :
-                                    "bg-emerald-500/10 text-emerald-400"
+                                    provider === "zen" ? "bg-cyan-500/10 text-cyan-400" :
+                                        "bg-emerald-500/10 text-emerald-400"
                             }`}>
-                            {provider === "openai" ? "Cloud" : provider === "openrouter" ? "OpenRouter" : provider === "google" ? "Google AI" : "Local"}
+                            {provider === "openai" ? "Cloud" : provider === "openrouter" ? "OpenRouter" : provider === "google" ? "Google AI" : provider === "zen" ? "Zen" : "Local"}
                         </span>
                     )}
                 </div>
@@ -733,14 +763,20 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
                             AI Provider Settings
                         </h3>
 
-                        {/* Provider Switcher Tabs */}
+                        {/* Provider Switcher Tabs — single-select: only one tab can be active */}
                         <div className="flex p-1 rounded-lg mb-6 gap-1" style={{ backgroundColor: 'var(--bg-terminal)', border: '1px solid var(--border-color)' }}>
                             <button
                                 onClick={() => handleProviderChange("openai")}
                                 className="flex-1 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded transition-all"
                                 style={providerInput === 'openai' ? { backgroundColor: 'var(--accent)', color: '#fff', boxShadow: 'var(--shadow-sm)' } : { color: 'var(--text-muted)' }}
                             >
-                                Cloud (OpenAI)
+                                Cloud
+                            </button>
+                            <button
+                                onClick={() => handleProviderChange("zen")}
+                                className={`flex-1 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded transition-all ${providerInput === "zen" ? "bg-cyan-500 text-white shadow-lg shadow-cyan-500/20" : "text-neutral-500 hover:text-neutral-300"}`}
+                            >
+                                Zen ✨
                             </button>
                             <button
                                 onClick={() => handleProviderChange("openrouter")}
@@ -768,8 +804,8 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
                                 <div className="space-y-4 animate-in fade-in slide-in-from-top-1 duration-200">
                                     <div>
                                         <label className="text-xs text-neutral-400 mb-1 flex justify-between items-center">
-                                            <span>OpenAI API Key</span>
-                                            <a href="https://platform.openai.com/api-keys" target="_blank" rel="noreferrer" className="text-[10px] text-violet-400 hover:underline">Get Free Key ↗</a>
+                                            <span>OpenAI-compatible API Key</span>
+                                            <a href="https://opencode.ai/zen" target="_blank" rel="noreferrer" className="text-[10px] text-violet-400 hover:underline">Get Free Key ↗</a>
                                         </label>
                                         <input
                                             type="password"
@@ -778,6 +814,35 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
                                             placeholder="sk-..."
                                             className="w-full bg-neutral-900 border border-neutral-600 rounded-lg px-3 py-2 text-sm text-neutral-200 focus:outline-none focus:border-violet-500 transition-colors"
                                         />
+                                    </div>
+                                    <div>
+                                        <label className="text-xs text-neutral-400 mb-1 flex justify-between items-center">
+                                            <span>Cloud Base URL</span>
+                                            <span className="text-[10px] text-neutral-500 normal-case tracking-normal font-normal">ขั้นสูง — ค่า default ใช้ OpenAI ได้เลย</span>
+                                        </label>
+                                        <div className="flex gap-1.5 mb-1.5 flex-wrap">
+                                            {[
+                                                { label: "OpenAI", url: "https://api.openai.com/v1" },
+                                                { label: "OpenCode Zen (ฟรี)", url: "https://opencode.ai/zen/v1" },
+                                                { label: "OpenCode Go", url: "https://opencode.ai/zen/go/v1" },
+                                            ].map((p) => (
+                                                <button
+                                                    key={p.url}
+                                                    onClick={() => setBaseUrlInput(p.url)}
+                                                    className={`text-[10px] px-2 py-1 rounded border transition-colors ${baseUrlInput === p.url ? "bg-violet-600/20 border-violet-500 text-violet-300" : "border-neutral-700 text-neutral-400 hover:border-neutral-500"}`}
+                                                >
+                                                    {p.label}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        <input
+                                            type="text"
+                                            value={baseUrlInput}
+                                            onChange={(e) => setBaseUrlInput(e.target.value)}
+                                            placeholder="https://api.openai.com/v1"
+                                            className="w-full bg-neutral-900 border border-neutral-600 rounded-lg px-3 py-2 text-xs text-neutral-200 focus:outline-none focus:border-violet-500 transition-colors font-mono"
+                                        />
+                                        <p className="text-[10px] text-neutral-500 mt-1">💡 OpenCode Zen มีโมเดลฟรี เช่น hy3-free, nemotron-3.5-lightning-free (เข้ากันได้กับ OpenAI API)</p>
                                     </div>
                                     <div>
                                         <label className="text-xs text-neutral-400 mb-2 flex justify-between items-center font-bold uppercase tracking-wider">
@@ -807,6 +872,70 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile }: { projectDir: strin
                                             placeholder="หรือพิมพ์ Model ID เอง เช่น gpt-4.1"
                                             className="w-full mt-1.5 bg-neutral-900 border border-neutral-700 rounded-lg px-3 py-1.5 text-xs text-neutral-300 focus:outline-none focus:border-violet-500 transition-colors font-mono"
                                         />
+                                    </div>
+                                </div>
+                            )}
+
+                            {providerInput === "zen" && (
+                                <div className="space-y-4 animate-in fade-in slide-in-from-top-1 duration-200">
+                                    <div>
+                                        <label className="text-xs text-neutral-400 mb-1 flex justify-between items-center">
+                                            <span>Zen API Key</span>
+                                            <a href="https://opencode.ai/zen" target="_blank" rel="noreferrer" className="text-[10px] text-cyan-400 hover:underline">Get Free Key ↗</a>
+                                        </label>
+                                        <input
+                                            type="password"
+                                            value={zenApiKeyInput}
+                                            onChange={(e) => setZenApiKeyInput(e.target.value)}
+                                            placeholder="sk-..."
+                                            className="w-full bg-neutral-900 border border-neutral-600 rounded-lg px-3 py-2 text-sm text-neutral-200 focus:outline-none focus:border-cyan-500 transition-colors"
+                                        />
+                                        <p className="text-[10px] text-neutral-500 mt-1">🌐 Gateway: <span className="font-mono">https://opencode.ai/zen/v1</span> (ตั้งค่าอัตโนมัติ)</p>
+                                    </div>
+                                    <div>
+                                        <label className="text-xs text-neutral-400 mb-2 flex justify-between items-center font-bold uppercase tracking-wider">
+                                            <span>Zen Model</span>
+                                            <a href="https://opencode.ai/docs/zen#pricing" target="_blank" rel="noreferrer" className="text-[10px] text-cyan-400 hover:underline normal-case tracking-normal font-normal">ราคาทั้งหมด ↗</a>
+                                        </label>
+                                        <select
+                                            value={zenModelInput}
+                                            onChange={(e) => setZenModelInput(e.target.value)}
+                                            className="w-full bg-neutral-900 border border-neutral-600 rounded-lg px-3 py-2 text-sm text-neutral-200 focus:outline-none focus:border-cyan-500 transition-colors appearance-none cursor-pointer"
+                                            style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center" }}
+                                        >
+                                            <optgroup label="🆓 ฟรี (Free Tier)">
+                                                <option value="nemotron-3.5-lightning-free">⚡ Nemotron 3.5 Lightning (เร็ว — แนะนำ)</option>
+                                                <option value="nemotron-3-ultra-free">🧠 Nemotron 3 Ultra</option>
+                                                <option value="hy3-free">Hy3 Free</option>
+                                                <option value="mimo-v2.5-free">MiMo-V2.5 Free</option>
+                                                <option value="big-pickle">🥒 Big Pickle (Stealth)</option>
+                                                <option value="x-preview-f-free">Ox Alpha Free (Stealth)</option>
+                                                <option value="muse-spark-1.2-contributor-free">Muse Spark 1.2 Contributor</option>
+                                            </optgroup>
+                                            <optgroup label="💰 เสียเงิน (Pay-as-you-go)">
+                                                <option value="deepseek-v4-flash">DeepSeek V4 Flash ($0.22+ /1M)</option>
+                                                <option value="deepseek-v4-pro">DeepSeek V4 Pro ($0.66+ /1M)</option>
+                                                <option value="minimax-m2.5">MiniMax M2.5 ($0.30 /1M)</option>
+                                                <option value="minimax-m2.7">MiniMax M2.7 ($0.30 /1M)</option>
+                                                <option value="minimax-m3">MiniMax M3 ($0.30 /1M)</option>
+                                                <option value="glm-5">GLM 5 ($1.00 /1M)</option>
+                                                <option value="glm-5.1">GLM 5.1 ($1.40 /1M)</option>
+                                                <option value="glm-5.2">GLM 5.2 ($1.40 /1M)</option>
+                                                <option value="kimi-k2.5">Kimi K2.5 ($0.60 /1M)</option>
+                                                <option value="kimi-k2.6">Kimi K2.6 ($0.95 /1M)</option>
+                                                <option value="kimi-k2.7-code">Kimi K2.7 Code ($0.95 /1M)</option>
+                                                <option value="kimi-k3">Kimi K3 ($3.00 /1M)</option>
+                                            </optgroup>
+                                        </select>
+                                        <input
+                                            type="text"
+                                            value={zenModelInput}
+                                            onChange={(e) => setZenModelInput(e.target.value)}
+                                            placeholder="หรือพิมพ์ Model ID เอง"
+                                            className="w-full mt-1.5 bg-neutral-900 border border-neutral-700 rounded-lg px-3 py-1.5 text-xs text-neutral-300 focus:outline-none focus:border-cyan-500 transition-colors font-mono"
+                                        />
+                                        <p className="text-[10px] text-neutral-500 mt-1">⚠️ โมเดลฟรีบางตัวอาจใช้ข้อมูลเพื่อปรับปรุงโมเดลระหว่างช่วงทดสอบ — อย่าส่งข้อมูลส่วนบุคคล</p>
+                                        <p className="text-[10px] text-neutral-600 mt-0.5">โมเดล GPT / Claude / Gemini ของ Zen ใช้ endpoint แบบอื่น จึงยังไม่รองรับในแท็บนี้</p>
                                     </div>
                                 </div>
                             )}

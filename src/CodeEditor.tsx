@@ -184,12 +184,20 @@ import { useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { DiffEditor } from "@monaco-editor/react";
 
+export interface GotoLineRequest {
+    path: string;
+    line: number;
+    column?: number;
+    token: number;
+}
+
 interface CodeEditorProps {
     value: string;
     onChange: (value: string) => void;
     filePath: string;
     onSave?: () => void;
     isDarkMode?: boolean;
+    gotoLineRequest?: GotoLineRequest | null;
 }
 
 export default function CodeEditor({
@@ -198,6 +206,7 @@ export default function CodeEditor({
     filePath,
     onSave,
     isDarkMode = true,
+    gotoLineRequest = null,
 }: CodeEditorProps) {
     const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
     const language = getLanguageFromPath(filePath);
@@ -205,6 +214,18 @@ export default function CodeEditor({
     
     // State to hold pending diff content
     const [pendingContent, setPendingContent] = useState<string | null>(null);
+
+    // Latest goto request, applied on mount (Monaco loads async) and on change
+    const gotoRef = useRef<GotoLineRequest | null>(gotoLineRequest);
+    useEffect(() => {
+        gotoRef.current = gotoLineRequest;
+        const ed = editorRef.current;
+        if (ed && gotoLineRequest) {
+            ed.revealLineInCenter(gotoLineRequest.line);
+            ed.setPosition({ lineNumber: gotoLineRequest.line, column: gotoLineRequest.column ?? 1 });
+            ed.focus();
+        }
+    }, [gotoLineRequest]);
 
     // Keep onSave callback fresh without recreating keybinding
     const onSaveRef = useRef(onSave);
@@ -306,6 +327,13 @@ export default function CodeEditor({
                 onSaveRef.current?.();
             },
         });
+
+        // Apply a pending jump-to-line request (e.g. from a build error)
+        const pendingGoto = gotoRef.current;
+        if (pendingGoto) {
+            editor.revealLineInCenter(pendingGoto.line);
+            editor.setPosition({ lineNumber: pendingGoto.line, column: pendingGoto.column ?? 1 });
+        }
 
         // Focus the editor
         editor.focus();

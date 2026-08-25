@@ -5,6 +5,7 @@ import AiChat from "./AiChat";
 import CodeEditor from "./CodeEditor";
 import ToolchainSetup from "./ToolchainSetup";
 import WikiView from "./WikiView";
+import { parseErrorLine, type ParsedBuildError } from "./errorHints";
 
 
 interface FileEntry {
@@ -313,6 +314,8 @@ function App({ toolchainReady = true }: { toolchainReady?: boolean }) {
   const [buildTotal, setBuildTotal] = useState(0);
   const [buildCurrentTask, setBuildCurrentTask] = useState("");
   const [buildResult, setBuildResult] = useState<"idle" | "building" | "success" | "failed">("idle");
+  const [buildErrors, setBuildErrors] = useState<ParsedBuildError[]>([]);
+  const [gotoLineRequest, setGotoLineRequest] = useState<{ path: string; line: number; column?: number; token: number } | null>(null);
   const [serialPorts, setSerialPorts] = useState<string[]>([]);
   const [selectedSerialPort, setSelectedSerialPort] = useState("");
   const [serialBaud, setSerialBaud] = useState("115200");
@@ -340,6 +343,7 @@ function App({ toolchainReady = true }: { toolchainReady?: boolean }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const openFilesRef = useRef<FileTab[]>(openFiles);
   const parseBuildProgressRef = useRef<(msg: string) => void>(() => {});
+  const aiChatSendRef = useRef<((text: string) => void) | null>(null);
   useEffect(() => { openFilesRef.current = openFiles; }, [openFiles]);
 
   const normPath = (p: string) => p.replace(/\\/g, '/').toLowerCase();
@@ -938,6 +942,17 @@ function App({ toolchainReady = true }: { toolchainReady?: boolean }) {
     // Strip optional timestamp prefix added by addLog: "[3:41:18 PM] ..."
     const raw = msg.replace(/^\[\d{1,2}:\d{2}:\d{2}\s+[AP]M\]\s+/, "").trim();
 
+    // 0. Collect friendly build errors from compiler / linker / esptool output
+    const parsedErr = parseErrorLine(raw);
+    if (parsedErr) {
+      setBuildErrors((prev) => {
+        const key = `${parsedErr.file ?? ""}:${parsedErr.line ?? 0}:${parsedErr.message}`;
+        if (prev.some((e) => `${e.file ?? ""}:${e.line ?? 0}:${e.message}` === key)) return prev;
+        if (prev.length >= 20) return prev;
+        return [...prev, parsedErr];
+      });
+    }
+
     // 1. Parse ninja-style compilation progress: [N/M] Some Task Description
     const ninjaMatch = raw.match(/^\[(\d+)\/(\d+)\]\s+(.+)/);
     if (ninjaMatch) {
@@ -996,6 +1011,7 @@ function App({ toolchainReady = true }: { toolchainReady?: boolean }) {
       setBuildResult("building");
       setBuildStep(0);
       setBuildTotal(0);
+      setBuildErrors([]);
       setBuildCurrentTask("Initializing build...");
     }
   };
@@ -1094,6 +1110,7 @@ function App({ toolchainReady = true }: { toolchainReady?: boolean }) {
     setBuildResult("building");
     setBuildStep(0);
     setBuildTotal(0);
+    setBuildErrors([]);
     setBuildCurrentTask("Initializing...");
     addLog("--- Starting Build & Flash ---");
 
@@ -1117,6 +1134,41 @@ function App({ toolchainReady = true }: { toolchainReady?: boolean }) {
       setBuildResult(prev => prev === "building" ? "success" : prev);
       setBuildCurrentTask(prev => prev === "Initializing..." ? "" : prev);
     }
+  };
+
+  // Open the file from a build error (if needed) and jump to the offending line
+  const jumpToError = async (err: ParsedBuildError) => {
+    if (!err.file) return;
+    const target = err.line ?? 1;
+    const np = normPath(err.file);
+    const existing = openFiles.find(f => normPath(f.path) === np);
+    if (existing) {
+      setActiveFilePath(existing.path);
+      setGotoLineRequest({ path: existing.path, line: target, column: err.column, token: Date.now() });
+      return;
+    }
+    try {
+      await handleFileClick(err.file);
+      setGotoLineRequest({ path: err.file, line: target, column: err.column, token: Date.now() });
+    } catch {
+      addLog(`❌ Failed to open ${err.file}`);
+    }
+  };
+
+  // Send the collected build errors to Vibe Coder and ask for a simple fix
+  const askAiToFixErrors = () => {
+    if (buildErrors.length === 0) return;
+    const errText = buildErrors.slice(0, 5)
+      .map((e, i) => `${i + 1}. [${e.title}] ${e.file ? `${e.file}:${e.line ?? "?"}` : "(flash/hardware)"}\n   ${e.message}`)
+      .join("\n");
+    const prompt =
+      `The Build & Flash of my ESP-IDF project just failed. Here are the detected problems:\n\n${errText}\n\n` +
+      `Please explain each error in simple Thai first (one sentence each), then use read_file to look at the code ` +
+      `and write_file to fix it. Show me exactly what you changed and why.`;
+    setShowAiPanel(true);
+    setTimeout(() => {
+      aiChatSendRef.current?.(prompt);
+    }, 200);
   };
 
   return (
@@ -1240,17 +1292,26 @@ function App({ toolchainReady = true }: { toolchainReady?: boolean }) {
             {isSettingUpEspIdf ? "Installing ESP-IDF..." : "Setup / Repair ESP-IDF"}
           </button>
           <button
-            onClick={() => { const next = !showAiPanel; setShowAiPanel(next); localStorage.setItem("vibe-ai-panel", String(next)); }}
+            onClick={() => {
+              const next = !showAiPanel;
+              setShowAiPanel(next);
+              localStorage.setItem("vibe-ai-panel", String(next));
+              // Exclusive selection: opening Vibe Coder leaves the Wiki view
+              if (next && activeView === "wiki") {
+                setActiveView("editor");
+                localStorage.setItem("vibe-active-view", "editor");
+              }
+            }}
             className="w-full text-left p-2 rounded flex items-center gap-2 text-sm transition-colors group"
-            style={showAiPanel
+            style={showAiPanel && activeView !== "wiki"
               ? { backgroundColor: 'var(--pms-293-pale)', color: 'var(--accent)' }
               : { color: 'var(--text-muted)' }
             }
-            onMouseEnter={e => { if (!showAiPanel) e.currentTarget.style.backgroundColor = 'var(--bg-hover)'; }}
-            onMouseLeave={e => { if (!showAiPanel) e.currentTarget.style.backgroundColor = ''; }}
+            onMouseEnter={e => { if (!(showAiPanel && activeView !== "wiki")) e.currentTarget.style.backgroundColor = 'var(--bg-hover)'; }}
+            onMouseLeave={e => { if (!(showAiPanel && activeView !== "wiki")) e.currentTarget.style.backgroundColor = ''; }}
           >
             <span className="w-4 h-4 flex items-center justify-center rounded text-[10px] font-bold"
-              style={showAiPanel
+              style={showAiPanel && activeView !== "wiki"
                 ? { backgroundColor: 'var(--pms-293-pale)', color: 'var(--accent)' }
                 : { backgroundColor: 'var(--bg-hover)', color: 'var(--text-muted)' }
               }
@@ -1264,6 +1325,11 @@ function App({ toolchainReady = true }: { toolchainReady?: boolean }) {
               const next: "editor" | "wiki" = activeView === "wiki" ? "editor" : "wiki";
               setActiveView(next);
               localStorage.setItem("vibe-active-view", next);
+              // Exclusive selection: entering the Wiki closes the Vibe Coder panel
+              if (next === "wiki" && showAiPanel) {
+                setShowAiPanel(false);
+                localStorage.setItem("vibe-ai-panel", "false");
+              }
             }}
             className="w-full text-left p-2 rounded flex items-center gap-2 text-sm transition-colors group"
             style={activeView === "wiki"
@@ -1484,6 +1550,50 @@ function App({ toolchainReady = true }: { toolchainReady?: boolean }) {
                   )}
                 </div>
               )}
+
+              {/* Friendly Build Error Helper — plain-language list of what went wrong */}
+              {buildResult === "failed" && buildErrors.length > 0 && (
+                <div className="mx-2 mb-1 rounded-lg overflow-hidden animate-fadein" style={{ border: '1px solid var(--danger)', backgroundColor: 'rgba(185,28,28,0.05)' }}>
+                  <div className="px-3 py-2 flex items-center gap-2" style={{ borderBottom: '1px solid rgba(185,28,28,0.25)' }}>
+                    <span className="text-sm">⚠️</span>
+                    <span className="text-[12px] font-bold" style={{ color: 'var(--danger)' }}>
+                      Build failed — {buildErrors.length} problem{buildErrors.length > 1 ? "s" : ""} found
+                    </span>
+                    <button
+                      onClick={askAiToFixErrors}
+                      className="ml-auto text-[11px] font-bold px-2.5 py-1 rounded-md transition-opacity hover:opacity-80 shrink-0"
+                      style={{ backgroundColor: 'var(--accent)', color: '#ffffff' }}
+                      title="ให้ Vibe Coder ช่วยแก้ / Let Vibe Coder fix it"
+                    >
+                      🤖 Ask Vibe Coder to Fix
+                    </button>
+                  </div>
+                  <div className="max-h-44 overflow-y-auto">
+                    {buildErrors.map((err, i) => (
+                      <div key={i} className="px-3 py-2 flex items-start gap-2.5" style={{ borderBottom: i < buildErrors.length - 1 ? '1px solid var(--border-color)' : undefined }}>
+                        <span className="text-[11px] mt-0.5 shrink-0">❌</span>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-[12px] font-bold" style={{ color: 'var(--danger)' }}>{err.title}</span>
+                            {err.file && (
+                              <button
+                                onClick={() => jumpToError(err)}
+                                className="text-[10px] font-mono px-1.5 py-0.5 rounded transition-colors hover:bg-red-500/20"
+                                style={{ color: 'var(--accent)', backgroundColor: 'var(--bg-hover)' }}
+                                title="เปิดไฟล์ตรงบรรทัดนี้ / Open at this line"
+                              >
+                                {err.file.split(/[\/\\]/).pop()}{err.line ? `:${err.line}` : ""}
+                              </button>
+                            )}
+                          </div>
+                          <div className="text-[12px] mt-0.5 leading-relaxed">🇹🇭 {err.thaiHint}</div>
+                          <div className="text-[10px] mt-0.5 opacity-70">{err.englishHint}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {activeFile ? (
@@ -1494,6 +1604,7 @@ function App({ toolchainReady = true }: { toolchainReady?: boolean }) {
                 filePath={activeFile.path}
                 onSave={saveAllFiles}
                 isDarkMode={darkMode}
+                gotoLineRequest={gotoLineRequest && normPath(gotoLineRequest.path) === normPath(activeFile.path) ? gotoLineRequest : null}
               />
             ) : (
               <div className="flex-1 flex items-center justify-center" style={{ backgroundColor: 'var(--bg-editor)' }}>
@@ -1612,6 +1723,7 @@ function App({ toolchainReady = true }: { toolchainReady?: boolean }) {
             projectDir={projectDir}
             onInjectCode={(newCode) => updateActiveFileContent(newCode)}
             onApplyToFile={handleApplyToFile}
+            sendApiRef={aiChatSendRef}
           />
         </div>
       )}

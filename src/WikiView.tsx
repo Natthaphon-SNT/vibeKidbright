@@ -26,7 +26,7 @@ interface WikiArticle {
 }
 
 interface AiSettings {
-  provider: "openai" | "local" | "openrouter" | "google";
+  provider: "openai" | "local" | "openrouter" | "google" | "zen";
   apiKey: string;
   baseUrl: string;
   model: string;
@@ -34,6 +34,8 @@ interface AiSettings {
   openrouterModel: string;
   googleApiKey: string;
   googleModel: string;
+  zenApiKey: string;
+  zenModel: string;
 }
 
 // ── Storage ───────────────────────────────────────────────────────────────────
@@ -117,6 +119,10 @@ async function callAI(settings: AiSettings, systemPrompt: string, userPrompt: st
     model = settings.openrouterModel;
     headers["Authorization"] = `Bearer ${settings.openrouterApiKey}`;
     headers["HTTP-Referer"] = "https://vibekidbright.app";
+  } else if (settings.provider === "zen") {
+    url = "https://opencode.ai/zen/v1/chat/completions";
+    model = settings.zenModel;
+    headers["Authorization"] = `Bearer ${settings.zenApiKey}`;
   } else if (settings.provider === "local") {
     url = `${settings.baseUrl}/chat/completions`;
     model = settings.model;
@@ -167,6 +173,8 @@ export default function WikiView() {
     openrouterModel: "google/gemini-2.5-flash:free",
     googleApiKey: "",
     googleModel: "gemini-2.5-flash",
+    zenApiKey: "",
+    zenModel: "nemotron-3.5-lightning-free",
   });
 
   // Editor state
@@ -192,7 +200,9 @@ export default function WikiView() {
       invoke("get_openrouter_model").catch(() => "google/gemini-2.5-flash:free"),
       invoke("get_google_api_key").catch(() => ""),
       invoke("get_google_model").catch(() => "gemini-2.5-flash"),
-    ]).then(([provider, apiKey, baseUrl, model, orKey, orModel, gKey, gModel]) => {
+      invoke("get_zen_api_key").catch(() => ""),
+      invoke("get_zen_model").catch(() => "nemotron-3.5-lightning-free"),
+    ]).then(([provider, apiKey, baseUrl, model, orKey, orModel, gKey, gModel, zKey, zModel]) => {
       setAiSettings({
         provider: (provider as string) as AiSettings["provider"],
         apiKey: apiKey as string,
@@ -202,6 +212,8 @@ export default function WikiView() {
         openrouterModel: orModel as string,
         googleApiKey: gKey as string,
         googleModel: gModel as string,
+        zenApiKey: zKey as string,
+        zenModel: zModel as string,
       });
     });
   }, []);
@@ -751,6 +763,7 @@ export default function WikiView() {
           <p style={{ fontSize: "10px", color: "#334155", margin: "4px 0 0" }}>
             {aiSettings.provider === "google" ? `Gemini · ${aiSettings.googleModel}` :
              aiSettings.provider === "openrouter" ? `OpenRouter · ${aiSettings.openrouterModel}` :
+             aiSettings.provider === "zen" ? `Zen · ${aiSettings.zenModel}` :
              aiSettings.provider === "local" ? "Local LLM" :
              `OpenAI · ${aiSettings.model}`}
           </p>

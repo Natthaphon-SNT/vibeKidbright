@@ -610,6 +610,24 @@ pub async fn set_openrouter_model(model: String) -> Result<(), String> {
     let mut c = read_config(); c["openrouter_model"] = json!(model); write_config(&c); Ok(())
 }
 #[tauri::command]
+pub async fn get_zen_api_key() -> Result<String, String> {
+    Ok(get_secure_key("vibekidbright-zen", "zen_api_key"))
+}
+#[tauri::command]
+pub async fn set_zen_api_key(key: String) -> Result<(), String> {
+    set_secure_key("vibekidbright-zen", "zen_api_key", &key);
+    Ok(())
+}
+#[tauri::command]
+pub async fn get_zen_model() -> Result<String, String> {
+    Ok(read_config()["zen_model"].as_str()
+        .unwrap_or("nemotron-3.5-lightning-free").to_string())
+}
+#[tauri::command]
+pub async fn set_zen_model(model: String) -> Result<(), String> {
+    let mut c = read_config(); c["zen_model"] = json!(model); write_config(&c); Ok(())
+}
+#[tauri::command]
 pub async fn get_search_api_key() -> Result<String, String> {
     Ok(get_secure_key("vibekidbright-search", "search_api_key"))
 }
@@ -804,6 +822,12 @@ pub async fn send_ai_message(
                 config["openrouter_model"].as_str().unwrap_or("anthropic/claude-3.5-sonnet").to_string(),
                 "https://openrouter.ai/api/v1".to_string(),
             )
+        } else if prov == "zen" {
+            (
+                get_secure_key("vibekidbright-zen", "zen_api_key"),
+                config["zen_model"].as_str().unwrap_or("nemotron-3.5-lightning-free").to_string(),
+                "https://opencode.ai/zen/v1".to_string(),
+            )
         } else if prov == "google" {
             (
                 get_secure_key("vibekidbright-google", "google_api_key"),
@@ -836,6 +860,9 @@ pub async fn send_ai_message(
 
     if api_key.is_empty() && provider == "openrouter" {
         return Err("OpenRouter API key not set. Please configure it in AI Provider Settings.".to_string());
+    }
+    if api_key.is_empty() && provider == "zen" {
+        return Err("OpenCode Zen API key not set. Get a free key at https://opencode.ai/zen".to_string());
     }
     if api_key.is_empty() && provider == "google" {
         return Err("Google AI API key not set. Please configure it in AI Provider Settings.".to_string());
