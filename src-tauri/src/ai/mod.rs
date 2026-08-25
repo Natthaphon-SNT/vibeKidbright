@@ -42,3 +42,4 @@
 // This file is a thin re-export layer until the full split is done.
 
 pub mod config;
+pub mod kb;
