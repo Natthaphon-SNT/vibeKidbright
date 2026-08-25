@@ -43,3 +43,4 @@
 
 pub mod config;
 pub mod kb;
+pub mod tools;
