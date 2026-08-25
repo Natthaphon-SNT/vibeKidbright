@@ -53,52 +53,62 @@ pub fn write_config(config: &Value) {
 // Windows: Credential Manager  |  macOS: Keychain  |  Linux: libsecret / kwallet
 // Keys are per-service: "vibekidbright-openai", "vibekidbright-openrouter", etc.
 //
-// Fallback: if keyring fails (e.g. headless CI), reads from config.json as before.
+// The keychain is the PRIMARY storage. config.json is only a last-resort
+// fallback (e.g. headless CI where the keychain is unavailable); any plaintext
+// key found there is migrated into the keychain and then erased from disk.
 
 pub fn get_secure_key(service: &str, config_field: &str) -> String {
-    // 1. Try config.json first (always reliable, primary storage)
-    let config_val = read_config()[config_field].as_str().unwrap_or("").to_string();
-    if !config_val.is_empty() {
-        return config_val;
-    }
-    // 2. Fallback: OS keychain (for older installs where key was only in keyring)
+    // 1. OS keychain (primary storage)
     if let Ok(entry) = keyring::Entry::new(service, "vibekidbright") {
         if let Ok(key) = entry.get_password() {
             if !key.is_empty() {
-                // Restore to config.json so future reads work reliably
-                let mut c = read_config();
-                c[config_field] = json!(&key);
-                write_config(&c);
                 return key;
             }
         }
+    }
+    // 2. Fallback: legacy plaintext value in config.json — migrate it into the
+    //    keychain and wipe it so no plaintext remains on disk. If the keychain
+    //    write fails, keep the legacy value as-is (reliability first).
+    let legacy = read_config()[config_field].as_str().unwrap_or("").to_string();
+    if !legacy.is_empty() {
+        if let Ok(entry) = keyring::Entry::new(service, "vibekidbright") {
+            if entry.set_password(&legacy).is_ok() {
+                let mut c = read_config();
+                c[config_field] = json!("");
+                write_config(&c);
+            }
+        }
+        return legacy;
     }
     String::new()
 }
 
 pub fn set_secure_key(service: &str, config_field: &str, key: &str) {
-    if key.is_empty() {
-        // Clear from both keyring and config.json
+    let keyring_ok = if key.is_empty() {
+        // Clear from the keychain
         if let Ok(entry) = keyring::Entry::new(service, "vibekidbright") {
             let _ = entry.delete_credential();
         }
-        let mut c = read_config();
-        c[config_field] = json!("");
-        write_config(&c);
+        true
     } else {
-        // Always write to config.json (reliable primary storage)
-        let mut c = read_config();
-        c[config_field] = json!(key);
-        write_config(&c);
-        // Also store in OS keychain as additional security layer (best-effort)
-        let _ = keyring::Entry::new(service, "vibekidbright").and_then(|e| e.set_password(key));
-    }
+        matches!(
+            keyring::Entry::new(service, "vibekidbright").and_then(|e| e.set_password(key)),
+            Ok(())
+        )
+    };
+    // Only wipe the plaintext field when the keychain actually holds the secret;
+    // otherwise keep it as a last-resort fallback (e.g. headless CI environments).
+    let stored = if keyring_ok { "" } else { key };
+    let mut c = read_config();
+    c[config_field] = json!(stored);
+    write_config(&c);
 }
 
-/// Auto-migrate and sanitize legacy plain-text API keys from config.json into OS Keychain on app launch.
-/// NOTE: config.json is kept as primary storage for reliability. Keyring is addional layer only.
+/// Auto-migrate legacy plain-text API keys from config.json into the OS Keychain
+/// on app launch, then erase them from config.json so nothing sensitive is left
+/// on disk. Safe to call on every startup — no-op when there is nothing to do.
 pub fn migrate_plaintext_keys_on_startup() {
-    let config = read_config();
+    let mut config = read_config();
     let services = [
         ("vibekidbright-openai", "api_key"),
         ("vibekidbright-openrouter", "openrouter_api_key"),
@@ -106,13 +116,24 @@ pub fn migrate_plaintext_keys_on_startup() {
         ("vibekidbright-search", "search_api_key"),
     ];
 
+    let mut changed = false;
     for (service, field) in services {
         if let Some(val) = config[field].as_str() {
             if !val.is_empty() {
-                // Copy to keyring (best-effort, do NOT remove from config.json)
-                let _ = keyring::Entry::new(service, "vibekidbright").and_then(|e| e.set_password(val));
+                // Copy to keychain; only erase from config.json on success.
+                let copied = keyring::Entry::new(service, "vibekidbright")
+                    .and_then(|e| e.set_password(val))
+                    .is_ok();
+                if copied {
+                    config[field] = json!("");
+                    changed = true;
+                }
             }
         }
+    }
+
+    if changed {
+        write_config(&config);
     }
 }
 
