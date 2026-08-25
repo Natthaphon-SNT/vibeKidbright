@@ -113,6 +113,7 @@ pub fn migrate_plaintext_keys_on_startup() {
         ("vibekidbright-openai", "api_key"),
         ("vibekidbright-openrouter", "openrouter_api_key"),
         ("vibekidbright-google", "google_api_key"),
+        ("vibekidbright-zen", "zen_api_key"),
         ("vibekidbright-search", "search_api_key"),
     ];
 
@@ -142,6 +143,7 @@ pub async fn clear_all_api_keys() -> Result<(), String> {
     set_secure_key("vibekidbright-openai", "api_key", "");
     set_secure_key("vibekidbright-openrouter", "openrouter_api_key", "");
     set_secure_key("vibekidbright-google", "google_api_key", "");
+    set_secure_key("vibekidbright-zen", "zen_api_key", "");
     set_secure_key("vibekidbright-search", "search_api_key", "");
     Ok(())
 }
