@@ -24,6 +24,8 @@
   },
   "bundle": {
     "active": true,
+    "publisher": "NECTEC Inc.",
+    "copyright": "Copyright © 2026 NECTEC Inc.",
     "resources": {
       "../resources/knowledge_base/**/*": "knowledge_base/"
     },
