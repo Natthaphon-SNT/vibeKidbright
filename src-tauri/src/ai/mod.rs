@@ -39,7 +39,6 @@
 //! 5. Move providers/openai.rs and providers/google.rs last (depend on everything)
 //! 6. Update ai_chat.rs to import from sub-modules instead of defining inline
 
-// This file intentionally left with documentation only.
-// The module is currently a thin re-export layer until the full split is done.
+// This file is a thin re-export layer until the full split is done.
 
-// Note: Actual pub use statements will be added here once code is moved.
+pub mod config;
