@@ -537,14 +537,8 @@ pub async fn send_ai_message(
         let (key, model, url) = if prov == "openrouter" {
             (
                 get_secure_key("vibekidbright-openrouter", "openrouter_api_key"),
-                config["openrouter_model"].as_str().unwrap_or("anthropic/claude-3.5-sonnet").to_string(),
+                config["openrouter_model"].as_str().unwrap_or("google/gemini-2.5-flash:free").to_string(),
                 "https://openrouter.ai/api/v1".to_string(),
-            )
-        } else if prov == "zen" {
-            (
-                get_secure_key("vibekidbright-zen", "zen_api_key"),
-                config["zen_model"].as_str().unwrap_or("nemotron-3.5-lightning-free").to_string(),
-                "https://opencode.ai/zen/v1".to_string(),
             )
         } else if prov == "google" {
             (
@@ -555,7 +549,7 @@ pub async fn send_ai_message(
         } else {
             (
                 get_secure_key("vibekidbright-openai", "api_key"),
-                config["model"].as_str().unwrap_or("gpt-4o").to_string(),
+                config["model"].as_str().unwrap_or("gpt-4.1").to_string(),
                 config["base_url"].as_str().unwrap_or("https://api.openai.com/v1").to_string(),
             )
         };
@@ -578,9 +572,6 @@ pub async fn send_ai_message(
 
     if api_key.is_empty() && provider == "openrouter" {
         return Err("OpenRouter API key not set. Please configure it in AI Provider Settings.".to_string());
-    }
-    if api_key.is_empty() && provider == "zen" {
-        return Err("OpenCode Zen API key not set. Get a free key at https://opencode.ai/zen".to_string());
     }
     if api_key.is_empty() && provider == "google" {
         return Err("Google AI API key not set. Please configure it in AI Provider Settings.".to_string());
@@ -643,18 +634,19 @@ pub async fn send_ai_message(
             let best_free_models = vec![
                 // ── Tier 1: Best reasoning + coding free models ───────────────
                 "google/gemini-2.5-flash:free",             // Best overall free
-                "meta-llama/llama-3.3-70b-instruct:free",   // 70B standard
-                "qwen/qwen-2.5-coder-32b-instruct:free",    // Best coder
-                "deepseek/deepseek-chat:free",              // DeepSeek V3
-                "nvidia/llama-3.1-nemotron-70b-instruct:free", // Nemotron
+                "google/gemini-2.5-flash-lite:free",        // Lightest Gemini free
+                "meta-llama/llama-3.3-70b-instruct:free",   // Llama 3.3 70B
+                "deepseek/deepseek-chat-v3-0324:free",      // DeepSeek V3 (latest)
+                "deepseek/deepseek-r1:free",                // DeepSeek R1 reasoning
+                "qwen/qwen3-235b-a22b:free",                // Qwen3 flagship free
+                "qwen/qwen-2.5-coder-32b-instruct:free",   // Best coder free
+                "mistralai/mistral-small-3.2:free",         // Mistral small free
                 // ── Tier 2: Mid-size free models ──────────────────────────────
-                "microsoft/phi-3-medium-128k-instruct:free",
+                "meta-llama/llama-3.1-70b-instruct:free",
+                "microsoft/phi-4-multimodal-instruct:free",
                 "mistralai/mistral-7b-instruct:free",
-                "google/gemma-2-9b-it:free",
-                "huggingfaceh4/zephyr-7b-beta:free",
-                "qwen/qwen-2-7b-instruct:free",
-                "meta-llama/llama-3-8b-instruct:free",
-                "openchat/openchat-7b:free",
+                "google/gemma-3-12b-it:free",
+                "qwen/qwen-2.5-7b-instruct:free",
             ];
             
             let or_url = "https://openrouter.ai/api/v1".to_string();

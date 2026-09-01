@@ -658,6 +658,8 @@ pub async fn run_idf_command(
         .env("IDF_PYTHON_ENV_PATH", &python_env_path)
         .env("ESP_IDF_VERSION", &idf_version)
         .env("PATH", &path_env)
+        // Always set IDF_TARGET so cmake never has to guess from sdkconfig
+        .env("IDF_TARGET", "esp32")
         // Force Python to use UTF-8 regardless of Windows system locale (cp874, cp932, etc.)
         // This fixes kconfgen UnicodeDecodeError on non-English Windows machines.
         .env("PYTHONUTF8", "1")
@@ -911,6 +913,8 @@ pub async fn run_shell_command(
         .env("IDF_PYTHON_ENV_PATH", &python_env_path)
         .env("ESP_IDF_VERSION", &idf_version)
         .env("PATH", &path_env)
+        // Always set IDF_TARGET so cmake never has to guess from sdkconfig
+        .env("IDF_TARGET", "esp32")
         // Force Python to use UTF-8 regardless of Windows system locale (cp874, cp932, etc.)
         // This fixes kconfgen UnicodeDecodeError on non-English Windows machines.
         .env("PYTHONUTF8", "1")

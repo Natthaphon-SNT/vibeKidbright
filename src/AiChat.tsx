@@ -70,9 +70,9 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile, sendApiRef }: { proje
     const [apiKeyInput, setApiKeyInput] = useState("");
     const [baseUrl, setBaseUrl] = useState("https://api.openai.com/v1");
     const [baseUrlInput, setBaseUrlInput] = useState("https://api.openai.com/v1");
-    const [provider, setProvider] = useState<"openai" | "local" | "openrouter" | "google" | "zen">("openai");
-    const [providerInput, setProviderInput] = useState<"openai" | "local" | "openrouter" | "google" | "zen">("openai");
-    const [modelInput, setModelInput] = useState("gpt-4o");
+    const [provider, setProvider] = useState<"openai" | "local" | "openrouter" | "google">("openai");
+    const [providerInput, setProviderInput] = useState<"openai" | "local" | "openrouter" | "google">("openai");
+    const [modelInput, setModelInput] = useState("gpt-4.1");
     const [openrouterApiKey, setOpenrouterApiKey] = useState("");
     const [openrouterApiKeyInput, setOpenrouterApiKeyInput] = useState("");
     const [_openrouterModel, setOpenrouterModel] = useState("google/gemini-2.5-flash:free");
@@ -81,10 +81,6 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile, sendApiRef }: { proje
     const [googleApiKeyInput, setGoogleApiKeyInput] = useState("");
     const [_googleModel, setGoogleModel] = useState("gemini-2.5-flash");
     const [googleModelInput, setGoogleModelInput] = useState("gemini-2.5-flash");
-    const [zenApiKey, setZenApiKey] = useState("");
-    const [zenApiKeyInput, setZenApiKeyInput] = useState("");
-    const [_zenModel, setZenModel] = useState("nemotron-3.5-lightning-free");
-    const [zenModelInput, setZenModelInput] = useState("nemotron-3.5-lightning-free");
     const [knowledgeFiles, setKnowledgeFiles] = useState<string[]>([]);
     const [isIndexing, setIsIndexing] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
@@ -132,7 +128,7 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile, sendApiRef }: { proje
             setBaseUrlInput(u);
         });
         invoke("get_provider").then((p) => {
-            const pr = p as "openai" | "local" | "openrouter" | "google" | "zen";
+            const pr = p as "openai" | "local" | "openrouter" | "google";
             setProvider(pr);
             setProviderInput(pr);
         });
@@ -155,16 +151,6 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile, sendApiRef }: { proje
             const mod = m as string;
             setGoogleModel(mod);
             setGoogleModelInput(mod);
-        });
-        invoke("get_zen_api_key").then((key) => {
-            const k = key as string;
-            setZenApiKey(k);
-            setZenApiKeyInput(k);
-        });
-        invoke("get_zen_model").then((m) => {
-            const mod = m as string;
-            setZenModel(mod);
-            setZenModelInput(mod);
         });
         // Listen for streaming events
         const unlistenActiveModel = listen("ai-active-model", (event) => {
@@ -369,9 +355,7 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile, sendApiRef }: { proje
                 ? !openrouterApiKey
                 : provider === "google"
                     ? !googleApiKey
-                    : provider === "zen"
-                        ? !zenApiKey
-                        : !api_key &&
+                    : !api_key &&
                     !baseUrl.includes("localhost") &&
                     !baseUrl.includes("127.0.0.1") &&
                     !baseUrl.match(/\d+\.\d+\.\d+\.\d+/) &&
@@ -445,8 +429,6 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile, sendApiRef }: { proje
             await invoke("set_openrouter_model", { model: openrouterModelInput });
             await invoke("set_google_api_key", { key: googleApiKeyInput });
             await invoke("set_google_model", { model: googleModelInput });
-            await invoke("set_zen_api_key", { key: zenApiKeyInput });
-            await invoke("set_zen_model", { model: zenModelInput });
 
             setApiKey(apiKeyInput);
             setBaseUrl(baseUrlInput);
@@ -455,8 +437,6 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile, sendApiRef }: { proje
             setOpenrouterModel(openrouterModelInput);
             setGoogleApiKey(googleApiKeyInput);
             setGoogleModel(googleModelInput);
-            setZenApiKey(zenApiKeyInput);
-            setZenModel(zenModelInput);
 
             setShowSettings(false);
         } catch (err) {
@@ -465,20 +445,18 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile, sendApiRef }: { proje
         }
     };
 
-    const handleProviderChange = (newProvider: "openai" | "local" | "openrouter" | "google" | "zen") => {
+    const handleProviderChange = (newProvider: "openai" | "local" | "openrouter" | "google") => {
         setProviderInput(newProvider);
         if (newProvider === "openai") {
             setBaseUrlInput("https://api.openai.com/v1");
-            setModelInput("gpt-4o");
+            setModelInput("gpt-4.1");
         } else if (newProvider === "local") {
             setBaseUrlInput("http://localhost:1234/v1");
             setModelInput("qwen2.5-coder-7b-instruct");
-        } else if (newProvider === "zen") {
-            // Zen gateway URL is fixed server-side; model lives in zenModelInput
-        } else {
-            // openrouter — baseUrl is fixed, model comes from openrouterModelInput
+        } else if (newProvider === "openrouter") {
             setBaseUrlInput("https://openrouter.ai/api/v1");
         }
+        // google — URL is fixed server-side
     };
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -673,10 +651,9 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile, sendApiRef }: { proje
                         <span className={`text-[8px] px-1.5 py-0.5 rounded font-bold uppercase ${provider === "openai" ? "bg-violet-500/10 text-violet-400" :
                             provider === "openrouter" ? "bg-orange-500/10 text-orange-400" :
                                 provider === "google" ? "bg-red-500/10 text-red-400" :
-                                    provider === "zen" ? "bg-cyan-500/10 text-cyan-400" :
-                                        "bg-emerald-500/10 text-emerald-400"
+                                    "bg-emerald-500/10 text-emerald-400"
                             }`}>
-                            {provider === "openai" ? "Cloud" : provider === "openrouter" ? "OpenRouter" : provider === "google" ? "Google AI" : provider === "zen" ? "Zen" : "Local"}
+                            {provider === "openai" ? "Cloud" : provider === "openrouter" ? "OpenRouter" : provider === "google" ? "Google AI" : "Local"}
                         </span>
                     )}
                 </div>
@@ -773,13 +750,7 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile, sendApiRef }: { proje
                                 className="flex-1 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded transition-all"
                                 style={providerInput === 'openai' ? { backgroundColor: 'var(--accent)', color: '#fff', boxShadow: 'var(--shadow-sm)' } : { color: 'var(--text-muted)' }}
                             >
-                                Cloud
-                            </button>
-                            <button
-                                onClick={() => handleProviderChange("zen")}
-                                className={`flex-1 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded transition-all ${providerInput === "zen" ? "bg-cyan-500 text-white shadow-lg shadow-cyan-500/20" : "text-neutral-500 hover:text-neutral-300"}`}
-                            >
-                                Zen ✨
+                                Cloud (OpenAI)
                             </button>
                             <button
                                 onClick={() => handleProviderChange("openrouter")}
@@ -807,8 +778,8 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile, sendApiRef }: { proje
                                 <div className="space-y-4 animate-in fade-in slide-in-from-top-1 duration-200">
                                     <div>
                                         <label className="text-xs text-neutral-400 mb-1 flex justify-between items-center">
-                                            <span>OpenAI-compatible API Key</span>
-                                            <a href="https://opencode.ai/zen" target="_blank" rel="noreferrer" className="text-[10px] text-violet-400 hover:underline">Get Free Key ↗</a>
+                                            <span>OpenAI API Key</span>
+                                            <a href="https://platform.openai.com/api-keys" target="_blank" rel="noreferrer" className="text-[10px] text-violet-400 hover:underline">Get Key ↗</a>
                                         </label>
                                         <input
                                             type="password"
@@ -823,21 +794,6 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile, sendApiRef }: { proje
                                             <span>Cloud Base URL</span>
                                             <span className="text-[10px] text-neutral-500 normal-case tracking-normal font-normal">ขั้นสูง — ค่า default ใช้ OpenAI ได้เลย</span>
                                         </label>
-                                        <div className="flex gap-1.5 mb-1.5 flex-wrap">
-                                            {[
-                                                { label: "OpenAI", url: "https://api.openai.com/v1" },
-                                                { label: "OpenCode Zen (ฟรี)", url: "https://opencode.ai/zen/v1" },
-                                                { label: "OpenCode Go", url: "https://opencode.ai/zen/go/v1" },
-                                            ].map((p) => (
-                                                <button
-                                                    key={p.url}
-                                                    onClick={() => setBaseUrlInput(p.url)}
-                                                    className={`text-[10px] px-2 py-1 rounded border transition-colors ${baseUrlInput === p.url ? "bg-violet-600/20 border-violet-500 text-violet-300" : "border-neutral-700 text-neutral-400 hover:border-neutral-500"}`}
-                                                >
-                                                    {p.label}
-                                                </button>
-                                            ))}
-                                        </div>
                                         <input
                                             type="text"
                                             value={baseUrlInput}
@@ -845,7 +801,6 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile, sendApiRef }: { proje
                                             placeholder="https://api.openai.com/v1"
                                             className="w-full bg-neutral-900 border border-neutral-600 rounded-lg px-3 py-2 text-xs text-neutral-200 focus:outline-none focus:border-violet-500 transition-colors font-mono"
                                         />
-                                        <p className="text-[10px] text-neutral-500 mt-1">💡 OpenCode Zen มีโมเดลฟรี เช่น hy3-free, nemotron-3.5-lightning-free (เข้ากันได้กับ OpenAI API)</p>
                                     </div>
                                     <div>
                                         <label className="text-xs text-neutral-400 mb-2 flex justify-between items-center font-bold uppercase tracking-wider">
@@ -858,14 +813,19 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile, sendApiRef }: { proje
                                             className="w-full bg-neutral-900 border border-neutral-600 rounded-lg px-3 py-2 text-sm text-neutral-200 focus:outline-none focus:border-violet-500 transition-colors appearance-none cursor-pointer"
                                             style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center" }}
                                         >
+                                            <optgroup label="⭐ GPT-4.1 Series (Latest)">
+                                                <option value="gpt-4.1">⭐ GPT-4.1 (Best Coding + Vision)</option>
+                                                <option value="gpt-4.1-mini">GPT-4.1 Mini (Fast &amp; Cheap)</option>
+                                                <option value="gpt-4.1-nano">GPT-4.1 Nano (Lightest)</option>
+                                            </optgroup>
                                             <optgroup label="🚀 GPT-4o Series">
-                                                <option value="gpt-4o">⭐ GPT-4o (Vision + Tools)</option>
-                                                <option value="gpt-4o-mini">GPT-4o Mini (Fast & Cheap)</option>
-                                                <option value="chatgpt-4o-latest">ChatGPT-4o Latest</option>
+                                                <option value="gpt-4o">GPT-4o (Vision + Tools)</option>
+                                                <option value="gpt-4o-mini">GPT-4o Mini</option>
                                             </optgroup>
                                             <optgroup label="🧠 Reasoning Series">
-                                                <option value="o1-preview">o1 Preview (Advanced Reasoning — Slow)</option>
-                                                <option value="o1-mini">o1-mini (Reasoning — Fast)</option>
+                                                <option value="o3">o3 (Best Reasoning)</option>
+                                                <option value="o4-mini">o4-mini (Reasoning — Fast)</option>
+                                                <option value="o3-mini">o3-mini (Reasoning — Economy)</option>
                                             </optgroup>
                                         </select>
                                         <input
@@ -879,69 +839,7 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile, sendApiRef }: { proje
                                 </div>
                             )}
 
-                            {providerInput === "zen" && (
-                                <div className="space-y-4 animate-in fade-in slide-in-from-top-1 duration-200">
-                                    <div>
-                                        <label className="text-xs text-neutral-400 mb-1 flex justify-between items-center">
-                                            <span>Zen API Key</span>
-                                            <a href="https://opencode.ai/zen" target="_blank" rel="noreferrer" className="text-[10px] text-cyan-400 hover:underline">Get Free Key ↗</a>
-                                        </label>
-                                        <input
-                                            type="password"
-                                            value={zenApiKeyInput}
-                                            onChange={(e) => setZenApiKeyInput(e.target.value)}
-                                            placeholder="sk-..."
-                                            className="w-full bg-neutral-900 border border-neutral-600 rounded-lg px-3 py-2 text-sm text-neutral-200 focus:outline-none focus:border-cyan-500 transition-colors"
-                                        />
-                                        <p className="text-[10px] text-neutral-500 mt-1">🌐 Gateway: <span className="font-mono">https://opencode.ai/zen/v1</span> (ตั้งค่าอัตโนมัติ)</p>
-                                    </div>
-                                    <div>
-                                        <label className="text-xs text-neutral-400 mb-2 flex justify-between items-center font-bold uppercase tracking-wider">
-                                            <span>Zen Model</span>
-                                            <a href="https://opencode.ai/docs/zen#pricing" target="_blank" rel="noreferrer" className="text-[10px] text-cyan-400 hover:underline normal-case tracking-normal font-normal">ราคาทั้งหมด ↗</a>
-                                        </label>
-                                        <select
-                                            value={zenModelInput}
-                                            onChange={(e) => setZenModelInput(e.target.value)}
-                                            className="w-full bg-neutral-900 border border-neutral-600 rounded-lg px-3 py-2 text-sm text-neutral-200 focus:outline-none focus:border-cyan-500 transition-colors appearance-none cursor-pointer"
-                                            style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center" }}
-                                        >
-                                            <optgroup label="🆓 ฟรี (Free Tier)">
-                                                <option value="nemotron-3.5-lightning-free">⚡ Nemotron 3.5 Lightning (เร็ว — แนะนำ)</option>
-                                                <option value="nemotron-3-ultra-free">🧠 Nemotron 3 Ultra</option>
-                                                <option value="hy3-free">Hy3 Free</option>
-                                                <option value="mimo-v2.5-free">MiMo-V2.5 Free</option>
-                                                <option value="big-pickle">🥒 Big Pickle (Stealth)</option>
-                                                <option value="x-preview-f-free">Ox Alpha Free (Stealth)</option>
-                                                <option value="muse-spark-1.2-contributor-free">Muse Spark 1.2 Contributor</option>
-                                            </optgroup>
-                                            <optgroup label="💰 เสียเงิน (Pay-as-you-go)">
-                                                <option value="deepseek-v4-flash">DeepSeek V4 Flash ($0.22+ /1M)</option>
-                                                <option value="deepseek-v4-pro">DeepSeek V4 Pro ($0.66+ /1M)</option>
-                                                <option value="minimax-m2.5">MiniMax M2.5 ($0.30 /1M)</option>
-                                                <option value="minimax-m2.7">MiniMax M2.7 ($0.30 /1M)</option>
-                                                <option value="minimax-m3">MiniMax M3 ($0.30 /1M)</option>
-                                                <option value="glm-5">GLM 5 ($1.00 /1M)</option>
-                                                <option value="glm-5.1">GLM 5.1 ($1.40 /1M)</option>
-                                                <option value="glm-5.2">GLM 5.2 ($1.40 /1M)</option>
-                                                <option value="kimi-k2.5">Kimi K2.5 ($0.60 /1M)</option>
-                                                <option value="kimi-k2.6">Kimi K2.6 ($0.95 /1M)</option>
-                                                <option value="kimi-k2.7-code">Kimi K2.7 Code ($0.95 /1M)</option>
-                                                <option value="kimi-k3">Kimi K3 ($3.00 /1M)</option>
-                                            </optgroup>
-                                        </select>
-                                        <input
-                                            type="text"
-                                            value={zenModelInput}
-                                            onChange={(e) => setZenModelInput(e.target.value)}
-                                            placeholder="หรือพิมพ์ Model ID เอง"
-                                            className="w-full mt-1.5 bg-neutral-900 border border-neutral-700 rounded-lg px-3 py-1.5 text-xs text-neutral-300 focus:outline-none focus:border-cyan-500 transition-colors font-mono"
-                                        />
-                                        <p className="text-[10px] text-neutral-500 mt-1">⚠️ โมเดลฟรีบางตัวอาจใช้ข้อมูลเพื่อปรับปรุงโมเดลระหว่างช่วงทดสอบ — อย่าส่งข้อมูลส่วนบุคคล</p>
-                                        <p className="text-[10px] text-neutral-600 mt-0.5">โมเดล GPT / Claude / Gemini ของ Zen ใช้ endpoint แบบอื่น จึงยังไม่รองรับในแท็บนี้</p>
-                                    </div>
-                                </div>
-                            )}
+
 
                             {providerInput === "local" && (
                                 <div className="space-y-4 animate-in fade-in slide-in-from-top-1 duration-200">
@@ -1023,42 +921,46 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile, sendApiRef }: { proje
                                         style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center" }}
                                     >
                                         <optgroup label="🆓 Free — Best for Coding">
-                                            <option value="=== เลือก Preset เอง หรือกรอก ID Models ===">=== เลือก Preset เอง หรือกรอก ID Models ===</option>
-                                            <option value="google/gemini-2.5-flash:free">⭐ Gemini 2.5 Flash (Fast & Free)</option>
+                                            <option value="google/gemini-2.5-flash:free">⭐ Gemini 2.5 Flash (Fast &amp; Free)</option>
+                                            <option value="google/gemini-2.5-flash-lite:free">Gemini 2.5 Flash Lite (Lightest — Free)</option>
                                             <option value="meta-llama/llama-3.3-70b-instruct:free">Llama 3.3 70B Instruct (Free)</option>
+                                            <option value="deepseek/deepseek-chat-v3-0324:free">DeepSeek V3 0324 (Free)</option>
+                                            <option value="deepseek/deepseek-r1:free">DeepSeek R1 (Reasoning — Free)</option>
+                                            <option value="qwen/qwen3-235b-a22b:free">Qwen3 235B A22B (Free)</option>
                                             <option value="qwen/qwen-2.5-coder-32b-instruct:free">Qwen 2.5 Coder 32B (Free)</option>
-                                            <option value="deepseek/deepseek-chat:free">DeepSeek V3 (Free)</option>
-                                            <option value="nvidia/llama-3.1-nemotron-70b-instruct:free">Nemotron 70B (Free)</option>
-                                            <option value="microsoft/phi-3-medium-128k-instruct:free">Phi-3 Medium (Free)</option>
+                                            <option value="mistralai/mistral-small-3.2:free">Mistral Small 3.2 (Free)</option>
                                         </optgroup>
                                         <optgroup label="🆓 Free — Auto Fallback">
                                             <option value="openrouter/free">🔄 Auto Free (Smart Multi-Model Fallback)</option>
                                         </optgroup>
                                         <optgroup label="🏆 Premium — Claude (Anthropic)">
-                                            <option value="anthropic/claude-3.5-sonnet">⭐ Claude 3.5 Sonnet (Best Coder)</option>
-                                            <option value="anthropic/claude-3.5-haiku">Claude 3.5 Haiku (Fast)</option>
-                                            <option value="anthropic/claude-3-opus">Claude 3 Opus (Deep Thinking)</option>
+                                            <option value="anthropic/claude-opus-4-5">⭐ Claude Opus 4.5 (Best Reasoning)</option>
+                                            <option value="anthropic/claude-sonnet-4-5">Claude Sonnet 4.5 (Best Coder)</option>
+                                            <option value="anthropic/claude-haiku-3-5">Claude Haiku 3.5 (Fast)</option>
                                         </optgroup>
                                         <optgroup label="✨ Premium — Google Gemini">
                                             <option value="google/gemini-2.5-pro">⭐ Gemini 2.5 Pro (Best Reasoning)</option>
-                                            <option value="google/gemini-2.5-flash">Gemini 2.5 Flash (Fast & Smart)</option>
-                                            <option value="google/gemini-1.5-pro">Gemini 1.5 Pro (Legacy)</option>
+                                            <option value="google/gemini-2.5-flash">Gemini 2.5 Flash (Fast &amp; Smart)</option>
+                                            <option value="google/gemini-2.5-flash-lite">Gemini 2.5 Flash Lite (Lightest)</option>
                                         </optgroup>
                                         <optgroup label="🚀 Premium — OpenAI">
-                                            <option value="openai/gpt-4o">GPT-4o (Vision + Tools)</option>
-                                            <option value="openai/gpt-4o-mini">GPT-4o Mini (Fast & Cheap)</option>
-                                            <option value="openai/o1-preview">o1 Preview (Advanced Reasoning)</option>
-                                            <option value="openai/o1-mini">o1 Mini (Reasoning Fast)</option>
+                                            <option value="openai/gpt-4.1">GPT-4.1 (Best Coding)</option>
+                                            <option value="openai/gpt-4.1-mini">GPT-4.1 Mini (Fast &amp; Cheap)</option>
+                                            <option value="openai/o3">o3 (Best Reasoning)</option>
+                                            <option value="openai/o4-mini">o4-mini (Reasoning Fast)</option>
                                         </optgroup>
                                         <optgroup label="🐉 Premium — DeepSeek">
-                                            <option value="deepseek/deepseek-coder">DeepSeek Coder (Programming)</option>
-                                            <option value="deepseek/deepseek-chat">DeepSeek V3 (Stable)</option>
+                                            <option value="deepseek/deepseek-r1">DeepSeek R1 (Reasoning)</option>
+                                            <option value="deepseek/deepseek-chat-v3-0324">DeepSeek V3 0324 (Coding)</option>
                                         </optgroup>
                                         <optgroup label="🌊 Premium — Mistral">
-                                            <option value="mistralai/mistral-large-2411">Mistral Large 2411 (Best)</option>
+                                            <option value="mistralai/mistral-medium-3">Mistral Medium 3 (Balanced)</option>
+                                            <option value="mistralai/devstral-small">Devstral Small (Best Coder)</option>
                                             <option value="mistralai/codestral-2501">Codestral 2501 (Best Coder)</option>
                                         </optgroup>
                                         <optgroup label="⚡ Premium — Qwen">
+                                            <option value="qwen/qwen3-235b-a22b">Qwen3 235B A22B (Powerful)</option>
+                                            <option value="qwen/qwen3-30b-a3b">Qwen3 30B A3B (Efficient)</option>
                                             <option value="qwen/qwen-2.5-72b-instruct">Qwen 2.5 72B (Stable)</option>
                                             <option value="qwen/qwen-2.5-coder-32b-instruct">Qwen 2.5 Coder 32B</option>
                                         </optgroup>
@@ -1111,16 +1013,15 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile, sendApiRef }: { proje
                                     >
                                         <optgroup label="🔥 Gemini 2.5 Series (Newest)">
                                             <option value="gemini-2.5-pro">⭐ Gemini 2.5 Pro (Best Coding + Reasoning)</option>
-                                            <option value="gemini-2.5-flash">Gemini 2.5 Flash (Fastest — Free tier)</option>
+                                            <option value="gemini-2.5-flash">Gemini 2.5 Flash (Fast — Free tier)</option>
+                                            <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash Lite (Lightest — Free)</option>
                                         </optgroup>
                                         <optgroup label="🚀 Gemini 2.0 Series (Stable)">
-                                            <option value="gemini-2.0-flash-exp">Gemini 2.0 Flash (Experimental)</option>
-                                            <option value="gemini-2.0-pro-exp-02-05">Gemini 2.0 Pro Exp (Thinking)</option>
+                                            <option value="gemini-2.0-flash">Gemini 2.0 Flash (Stable)</option>
                                         </optgroup>
                                         <optgroup label="📦 Gemini 1.5 Series (Legacy)">
                                             <option value="gemini-1.5-pro">Gemini 1.5 Pro (Longer Context — Paid)</option>
                                             <option value="gemini-1.5-flash">Gemini 1.5 Flash (Stable — Free)</option>
-                                            <option value="gemini-1.5-flash-8b">Gemini 1.5 Flash 8B (Lightweight)</option>
                                         </optgroup>
                                     </select>
                                     <input

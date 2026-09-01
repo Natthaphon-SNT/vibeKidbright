@@ -693,6 +693,14 @@ pub async fn build_firmware_with_toolchain(
             .env("IDF_TOOLS_PATH", &tools_path_clone)
             .env("IDF_PYTHON_ENV_PATH", &python_venv_clone)
             .env("PATH", &custom_path_clone)
+            // Always set IDF_TARGET so cmake never has to guess from sdkconfig
+            .env("IDF_TARGET", "esp32")
+            // Enable ccache — dramatically speeds up rebuild times by caching
+            // compiled objects across projects. Silently ignored if ccache is not installed.
+            .env("IDF_CCACHE_ENABLE", "1")
+            // Use all available CPU cores for parallel compilation
+            .env("NINJA_NUM_THREADS", std::thread::available_parallelism()
+                .map(|n| n.get()).unwrap_or(4).to_string())
             // Force Python to use UTF-8 regardless of Windows system locale (cp874, cp932, etc.)
             // This fixes kconfgen UnicodeDecodeError on non-English Windows machines.
             .env("PYTHONUTF8", "1")
@@ -700,6 +708,19 @@ pub async fn build_firmware_with_toolchain(
             .env("PYTHONLEGACYWINDOWSSTDIO", "0");
         if let Some(rom_elf_dir) = crate::esp_idf::find_esp_rom_elf_dir(&tools_path_clone) {
             cmd.env("ESP_ROM_ELF_DIR", rom_elf_dir);
+        }
+        // Inject ccache into PATH if available. Searches common install locations
+        // without hardcoding any version-specific path — works on any machine.
+        if let Some(ccache_dir) = find_ccache_dir() {
+            let current_path = cmd.get_envs()
+                .find(|(k, _)| *k == "PATH")
+                .and_then(|(_, v)| v)
+                .map(|v| v.to_os_string())
+                .unwrap_or_else(|| std::env::var_os("PATH").unwrap_or_default());
+            let mut new_path = ccache_dir.into_os_string();
+            new_path.push(";");
+            new_path.push(current_path);
+            cmd.env("PATH", new_path);
         }
         let mut child = cmd.stdin(Stdio::null())
             .stdout(Stdio::piped())
@@ -1055,6 +1076,119 @@ fn build_toolchain_path(tools_path: &Path) -> std::ffi::OsString {
     }
 
     std::env::join_paths(paths).unwrap_or_else(|_| std::ffi::OsString::from(""))
+}
+
+/// Find the directory containing ccache.exe on any machine, regardless of how it was installed.
+/// Checks (in priority order):
+///   1. System PATH — already in PATH (simplest, covers most cases)
+///   2. WinGet packages dir — dynamically scans, any version
+///   3. Chocolatey
+///   4. Scoop (user or system)
+///   5. Common manual install locations
+/// Returns the *directory* containing ccache.exe, or None if not found anywhere.
+fn find_ccache_dir() -> Option<PathBuf> {
+    // 1. Already in PATH — check first, zero overhead
+    if which_in_path("ccache") {
+        return None; // already findable, no need to inject
+    }
+
+    // 2. WinGet packages — scan dynamically (no hardcoded version)
+    let candidates_winget = [
+        std::env::var("LOCALAPPDATA").unwrap_or_default() + "\\Microsoft\\WinGet\\Packages",
+        std::env::var("PROGRAMFILES").unwrap_or_default() + "\\WinGet\\Packages",
+    ];
+    for base in &candidates_winget {
+        let base = PathBuf::from(base);
+        if let Ok(entries) = std::fs::read_dir(&base) {
+            for entry in entries.flatten() {
+                let name = entry.file_name().to_string_lossy().to_lowercase();
+                if name.starts_with("ccache") {
+                    // Recurse one level to find the bin dir with ccache.exe
+                    if let Some(dir) = find_exe_in_dir(&entry.path(), "ccache.exe", 2) {
+                        return Some(dir);
+                    }
+                }
+            }
+        }
+    }
+
+    // 3. Chocolatey
+    let choco = PathBuf::from(
+        std::env::var("ChocolateyInstall")
+            .unwrap_or_else(|_| "C:\\ProgramData\\chocolatey".to_string())
+    ).join("bin");
+    if choco.join("ccache.exe").exists() {
+        return Some(choco);
+    }
+
+    // 4. Scoop (user install, then system-wide)
+    let scoop_candidates = [
+        std::env::var("USERPROFILE").unwrap_or_default() + "\\scoop\\shims",
+        "C:\\ProgramData\\scoop\\shims".to_string(),
+        std::env::var("USERPROFILE").unwrap_or_default() + "\\scoop\\apps\\ccache\\current",
+    ];
+    for s in &scoop_candidates {
+        let p = PathBuf::from(s);
+        if p.join("ccache.exe").exists() {
+            return Some(p);
+        }
+    }
+
+    // 5. Common manual install locations
+    let manual = [
+        "C:\\ccache",
+        "C:\\tools\\ccache",
+        "C:\\Program Files\\ccache",
+    ];
+    for m in &manual {
+        let p = PathBuf::from(m);
+        if p.join("ccache.exe").exists() {
+            return Some(p);
+        }
+    }
+
+    None
+}
+
+/// Check if an executable is already visible in the process's PATH.
+fn which_in_path(exe: &str) -> bool {
+    let exe_name = if cfg!(windows) {
+        format!("{exe}.exe")
+    } else {
+        exe.to_string()
+    };
+    if let Some(path_var) = std::env::var_os("PATH") {
+        for dir in std::env::split_paths(&path_var) {
+            if dir.join(&exe_name).exists() {
+                return true;
+            }
+        }
+    }
+    false
+}
+
+/// Recursively search `root` up to `max_depth` levels deep for a file named `exe_name`.
+/// Returns the *parent directory* of the found executable.
+fn find_exe_in_dir(root: &Path, exe_name: &str, max_depth: usize) -> Option<PathBuf> {
+    if max_depth == 0 { return None; }
+    if let Ok(entries) = std::fs::read_dir(root) {
+        for entry in entries.flatten() {
+            let path = entry.path();
+            if path.is_file() {
+                if path.file_name()
+                    .map(|n| n.to_string_lossy().to_lowercase())
+                    .as_deref() == Some(&exe_name.to_lowercase())
+                {
+                    return path.parent().map(|p| p.to_path_buf());
+                }
+            } else if path.is_dir() {
+                if let Some(found) = find_exe_in_dir(&path, exe_name, max_depth - 1) {
+                    return Some(found);
+                }
+            }
+        }
+    }
+    None
 }
 
 /// Scan an ESP-IDF tools directory structure and collect all directories that

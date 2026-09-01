@@ -49,16 +49,17 @@ pub fn write_config(config: &Value) {
 }
 
 // ── Secure API key storage via OS keychain ───────────────────────────────────
-// Uses the system credential manager so API keys are never stored in plain-text.
-// Windows: Credential Manager  |  macOS: Keychain  |  Linux: libsecret / kwallet
-// Keys are per-service: "vibekidbright-openai", "vibekidbright-openrouter", etc.
+// Uses the system credential manager as a *best-effort* secondary store.
+// config.json is the PRIMARY reliable fallback — always written on set.
+// Windows Credential Manager can silently fail on read even after a successful
+// write, so we never rely on it exclusively.
 //
-// The keychain is the PRIMARY storage. config.json is only a last-resort
-// fallback (e.g. headless CI where the keychain is unavailable); any plaintext
-// key found there is migrated into the keychain and then erased from disk.
+// Storage strategy:
+//   set_secure_key → write to keyring (best-effort) + always write to config.json
+//   get_secure_key → try keyring first; if empty, fall back to config.json
 
 pub fn get_secure_key(service: &str, config_field: &str) -> String {
-    // 1. OS keychain (primary storage)
+    // 1. OS keychain (best-effort — may silently fail on Windows)
     if let Ok(entry) = keyring::Entry::new(service, "vibekidbright") {
         if let Ok(key) = entry.get_password() {
             if !key.is_empty() {
@@ -66,76 +67,33 @@ pub fn get_secure_key(service: &str, config_field: &str) -> String {
             }
         }
     }
-    // 2. Fallback: legacy plaintext value in config.json — migrate it into the
-    //    keychain and wipe it so no plaintext remains on disk. If the keychain
-    //    write fails, keep the legacy value as-is (reliability first).
-    let legacy = read_config()[config_field].as_str().unwrap_or("").to_string();
-    if !legacy.is_empty() {
-        if let Ok(entry) = keyring::Entry::new(service, "vibekidbright") {
-            if entry.set_password(&legacy).is_ok() {
-                let mut c = read_config();
-                c[config_field] = json!("");
-                write_config(&c);
-            }
-        }
-        return legacy;
-    }
-    String::new()
+    // 2. Reliable fallback: config.json (always kept in sync by set_secure_key)
+    let fallback = read_config()[config_field].as_str().unwrap_or("").to_string();
+    fallback
 }
 
 pub fn set_secure_key(service: &str, config_field: &str, key: &str) {
-    let keyring_ok = if key.is_empty() {
-        // Clear from the keychain
+    // Best-effort keyring store (ignore failures — config.json is the real backup)
+    if key.is_empty() {
         if let Ok(entry) = keyring::Entry::new(service, "vibekidbright") {
             let _ = entry.delete_credential();
         }
-        true
     } else {
-        matches!(
-            keyring::Entry::new(service, "vibekidbright").and_then(|e| e.set_password(key)),
-            Ok(())
-        )
-    };
-    // Only wipe the plaintext field when the keychain actually holds the secret;
-    // otherwise keep it as a last-resort fallback (e.g. headless CI environments).
-    let stored = if keyring_ok { "" } else { key };
+        if let Ok(entry) = keyring::Entry::new(service, "vibekidbright") {
+            let _ = entry.set_password(key);
+        }
+    }
+    // Always write to config.json so get_secure_key always has a reliable fallback.
     let mut c = read_config();
-    c[config_field] = json!(stored);
+    c[config_field] = json!(key);
     write_config(&c);
 }
 
-/// Auto-migrate legacy plain-text API keys from config.json into the OS Keychain
-/// on app launch, then erase them from config.json so nothing sensitive is left
-/// on disk. Safe to call on every startup — no-op when there is nothing to do.
+/// No-op: previously migrated plaintext keys from config.json into the keyring
+/// and wiped them. This is now disabled because config.json IS our reliable
+/// fallback — wiping it caused "key not set" errors when keyring read failed.
 pub fn migrate_plaintext_keys_on_startup() {
-    let mut config = read_config();
-    let services = [
-        ("vibekidbright-openai", "api_key"),
-        ("vibekidbright-openrouter", "openrouter_api_key"),
-        ("vibekidbright-google", "google_api_key"),
-        ("vibekidbright-zen", "zen_api_key"),
-        ("vibekidbright-search", "search_api_key"),
-    ];
-
-    let mut changed = false;
-    for (service, field) in services {
-        if let Some(val) = config[field].as_str() {
-            if !val.is_empty() {
-                // Copy to keychain; only erase from config.json on success.
-                let copied = keyring::Entry::new(service, "vibekidbright")
-                    .and_then(|e| e.set_password(val))
-                    .is_ok();
-                if copied {
-                    config[field] = json!("");
-                    changed = true;
-                }
-            }
-        }
-    }
-
-    if changed {
-        write_config(&config);
-    }
+    // Intentionally empty — key retention in config.json is now by design.
 }
 
 #[tauri::command]
@@ -143,7 +101,6 @@ pub async fn clear_all_api_keys() -> Result<(), String> {
     set_secure_key("vibekidbright-openai", "api_key", "");
     set_secure_key("vibekidbright-openrouter", "openrouter_api_key", "");
     set_secure_key("vibekidbright-google", "google_api_key", "");
-    set_secure_key("vibekidbright-zen", "zen_api_key", "");
     set_secure_key("vibekidbright-search", "search_api_key", "");
     Ok(())
 }
@@ -162,7 +119,7 @@ pub async fn set_api_key(key: String) -> Result<(), String> {
 }
 #[tauri::command]
 pub async fn get_model() -> Result<String, String> {
-    Ok(read_config()["model"].as_str().unwrap_or("gpt-4o").to_string())
+    Ok(read_config()["model"].as_str().unwrap_or("gpt-4.1").to_string())
 }
 #[tauri::command]
 pub async fn set_model(model: String) -> Result<(), String> {
@@ -198,29 +155,11 @@ pub async fn set_openrouter_api_key(key: String) -> Result<(), String> {
 #[tauri::command]
 pub async fn get_openrouter_model() -> Result<String, String> {
     Ok(read_config()["openrouter_model"].as_str()
-        .unwrap_or("meta-llama/llama-3.3-70b-instruct:free").to_string())
+        .unwrap_or("google/gemini-2.5-flash:free").to_string())
 }
 #[tauri::command]
 pub async fn set_openrouter_model(model: String) -> Result<(), String> {
     let mut c = read_config(); c["openrouter_model"] = json!(model); write_config(&c); Ok(())
-}
-#[tauri::command]
-pub async fn get_zen_api_key() -> Result<String, String> {
-    Ok(get_secure_key("vibekidbright-zen", "zen_api_key"))
-}
-#[tauri::command]
-pub async fn set_zen_api_key(key: String) -> Result<(), String> {
-    set_secure_key("vibekidbright-zen", "zen_api_key", &key);
-    Ok(())
-}
-#[tauri::command]
-pub async fn get_zen_model() -> Result<String, String> {
-    Ok(read_config()["zen_model"].as_str()
-        .unwrap_or("nemotron-3.5-lightning-free").to_string())
-}
-#[tauri::command]
-pub async fn set_zen_model(model: String) -> Result<(), String> {
-    let mut c = read_config(); c["zen_model"] = json!(model); write_config(&c); Ok(())
 }
 #[tauri::command]
 pub async fn get_search_api_key() -> Result<String, String> {
