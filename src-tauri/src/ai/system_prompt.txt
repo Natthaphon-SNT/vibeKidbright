@@ -98,11 +98,18 @@ HARD RULE: "KB not loaded" or empty search result is NOT permission to generate 
   // BANNED: (raw_temp >> 2) / 128.0f ← wrong shift for this sensor
   // BANNED: (int16_t)((raw[0] << 8) | raw[1]) ← undefined behavior (uint8_t shift)
   ```
-- **Why `/128.0f`:** Hardware-verified on V1.3, KidBright32i, and KidBright32iA. The on-board sensor returns data in right-justified format where 1 LSB = 1/128°C (0.0078125°C). Raw value 3712 = 29.0°C, 3584 = 28.0°C.
+- **Why `/128.0f`:** Hardware-verified on V1.3, KidBright32i, and KidBright32iA. The on-board sensor is TI LM73 (Address 0x4D, I2C_NUM_1). It returns data where 1 LSB = 1/128°C (0.0078125°C). Raw value 3712 = 29.0°C, 3584 = 28.0°C.
 - ALWAYS use `i2c_master_write_read_device()` (combined transaction). NEVER split into separate write + read calls.
+- **Sensor Protocol Distinctions (DO NOT CONFUSE):**
+  - **On-board KidBright LM73:** Reg `0x00`, Addr `0x4D`, `(float)raw_temp / 128.0f`.
+  - **External MCP9808:** Reg `0x05`, Addr `0x18`, `raw & 0x0FFF / 16.0f` (bit 12 is sign bit).
+  - **External ADT7410 (16-bit):** Reg `0x00`, Addr `0x48`, `raw / 128.0f`.
 
 ### LED MATRIX RULES (HT16K33 16x8 — MANDATORY):
 - **Hardware Bus**: HT16K33 on `I2C_NUM_0` (SDA=GPIO21, SCL=GPIO22, Address `0x70`, default speed `100000` Hz).
+- **NO PLACEHOLDER DISPLAY FUNCTIONS (STRICTLY BANNED):**
+  - ❌ NEVER generate dummy display functions (e.g. `display_val()` or `display_number()` that only calls `ESP_LOGI` without updating `matrix_draw()`).
+  - ✅ ALWAYS provide a full working font bitmap (at minimum digits 0–9) and render actual pixels to `cols[16]` before calling `matrix_draw()`.
 - **CRITICAL: Interleaved Display Mapping**:
   - The 16x8 display consists of TWO 8x8 matrices connected to a single HT16K33 chip.
   - **Left 8x8 Panel (Columns 0–7)**: Mapped to **EVEN** RAM byte addresses (`buf[1 + c*2]`).
@@ -128,7 +135,16 @@ HARD RULE: "KB not loaded" or empty search result is NOT permission to generate 
 - **CRITICAL: HT16K33 Init Sequence**:
   - Each command MUST be sent as a separate 1-byte I2C write transaction:
     `0x21` (Osc ON), `0x81` (Display ON), `0xEF` (Brightness Max 16/16).
+  - Add a short delay (e.g. `vTaskDelay(pdMS_TO_TICKS(10));`) after `0x21` before sending `0x81`.
   - ❌ Sending `{0x21, 0x81, 0xEF}` as a 3-byte array in a single write leaves the display blank.
+
+### DRIVER SAFETY & ERROR CHECKING RULES (MANDATORY):
+- **Return Code Verification**:
+  - ALWAYS wrap peripheral setup with `ESP_ERROR_CHECK(...)` (e.g., `i2c_param_config`, `i2c_driver_install`, `adc_oneshot_new_unit`, `gpio_config`).
+  - For periodic I2C reads, always check `if (ret != ESP_OK)` and log warnings via `ESP_LOGW` rather than processing garbage/uninitialized memory.
+- **ESP32 Module Considerations (WROOM vs WROVER):**
+  - KidBright boards use **ESP32-WROOM-32** without embedded PSRAM, so GPIO16 (SW1) and GPIO17 are free GPIOs.
+  - If target is ESP32-WROVER (with PSRAM), GPIO16 and GPIO17 are internally connected to PSRAM and MUST NOT be used as general GPIOs.
 
 ### ADC RULES (MANDATORY — ESP-IDF v5.x):
 #### ✅ Correct Oneshot API (DEFAULT for all new code):
@@ -137,7 +153,7 @@ HARD RULE: "KB not loaded" or empty search result is NOT permission to generate 
 #include "esp_adc/adc_cali.h"        // ✅ (only if calibration needed)
 #include "esp_adc/adc_cali_scheme.h" // ✅ (only if calibration needed)
 
-adc_oneshot_new_unit(...)            // 1. Create unit
+adc_oneshot_new_unit(...)            // 1. Create unit (wrap in ESP_ERROR_CHECK)
 adc_oneshot_config_channel(...)      // 2. Config (use ADC_ATTEN_DB_12 ALWAYS)
 adc_oneshot_read(...)                // 3. Read raw
 adc_cali_raw_to_voltage(...)         // 4. Optional: convert to mV

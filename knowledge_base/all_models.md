@@ -285,42 +285,73 @@
 
 ### Generation 2 — ESP32 V1.6 (Gravitech) — เพิ่ม MPU-6050 + RGB LED
 
-| GPIO | ฟังก์ชัน | หมายเหตุ |
-|------|----------|----------|
-| GPIO2 | LED WiFi (Active HIGH) | — |
-| GPIO4 | LED BT (Active HIGH) + LM73 SDA | ⚠️ แชร์ |
-| GPIO5 | I2C_NUM_1 SCL | — |
-| GPIO13 | Passive Buzzer (LEDC/PWM) | — |
-| **GPIO15** | **SERVO1** (LEDC/PWM) | ห้ามใช้งานอื่น |
-| GPIO16 | SW1 Button (Active LOW) | — |
-| **GPIO17** | **SW2 Button (Active LOW) / SERVO2** | ⚠️ แชร์กัน เลือกได้อย่างเดียว |
-| GPIO21 | I2C_NUM_0 SDA (HT16K33 + MPU-6050) | — |
-| GPIO22 | I2C_NUM_0 SCL (HT16K33 + MPU-6050) | — |
-| GPIO25 | USB Host Control (Active LOW) | — |
-| GPIO26 | OUT1 / 3-pin O1 (Active LOW) | — |
-| GPIO27 | OUT2 / 3-pin O2 (Active LOW) | — |
-| GPIO32 | IN1 (Digital + ADC) | ✅ รองรับ ADC |
-| GPIO33 | IN2 (Digital + ADC) | ✅ รองรับ ADC |
-| GPIO34 | IN3 (Digital Input-only + ADC) | ✅ ไม่มี pull |
-| GPIO35 | IN4 (Digital Input-only + ADC) | ✅ ไม่มี pull |
-| GPIO36 | LDR (ADC1_CH0) | — |
-| **RGB_GPIO** | **RGB LED ×6 (WS2812B/RMT)** | ⚠️ ดู silkscreen บอร์ด |
-
-**เซนเซอร์ on-board:**
-| เซนเซอร์ | Protocol | I2C Address | หมายเหตุ |
-|----------|----------|-------------|----------|
-| LDR (แสง) | ADC | GPIO36 | — |
-| LM73 (อุณหภูมิ) | I2C_NUM_1 | 0x4D | — |
-| HT16K33 (LED Matrix 16×8) | I2C_NUM_0 | 0x70 | — |
-| **MPU-6050 (Accel + Gyro 6-axis)** | I2C_NUM_0 | **0x68** | ⚠️ 6-axis เท่านั้น ไม่มี magnetometer |
-| **RGB LED ×6 (WS2812B)** | RMT/1-wire | — | ต้องใช้ RMT peripheral |
-| Passive Buzzer | PWM/LEDC | GPIO13 | — |
-| SERVO1 | PWM/LEDC | GPIO15 | — |
-| SERVO2 | PWM/LEDC | GPIO17 | แชร์กับ SW2 |
+| GPIO | ฟังก์ชั�| LED ไฟเลี้ยงบอร์ด | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | — |
+| GPIO18/19/23 breakout | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ | ❌ | ✅ | — |
+| กล้อง (Camera) | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ 2MP |
+| ไมโครโฟน | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
+| จอสี IPS | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ 1.3" |
+| Edge AI | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
 
 ---
 
-### Generation 3 — KidBright μAI (รุ่นล่าสุด 2024) — Edge AI Platform
+## ⚡ เซนเซอร์ภายนอก (External) ที่รองรับผ่าน JST Port ทุกรุ่น ESP32
+
+เชื่อมต่อผ่านพอร์ต IN1–IN4 (JST 3-pin), I2C KB Chain, หรือ OUT1–OUT2:
+
+| เซนเซอร์ | ประเภท | พอร์ตที่ใช้ |
+|----------|---------|------------|
+| PIR Motion Sensor | Digital | IN1–IN4 |
+| Reed Switch (Magnetic) | Digital | IN1–IN4 |
+| Soil Moisture | Digital / Analog (iA/V1.6/32i/32iA/32iP) | IN1–IN4 |
+| DHT11/DHT22 (Temp+Humidity) | Digital 1-wire | IN1–IN4 |
+| Ultrasonic HC-SR04 | Digital | IN1–IN4 |
+| IR Sensor | Digital | IN1–IN4 |
+| เซนเซอร์ I2C อื่นๆ | I2C | KB Chain port |
+| พัดลม / หลอดไฟ (5V) | Digital | OUT1–OUT2 / USB Host |
+
+---
+
+## 🔑 สรุปความแตกต่างหลัก INEX i-series vs V1.5 มาตรฐาน
+
+| คุณสมบัติ | V1.5 Rev 3.1 (NECTEC) | V1.5 iA (INEX) | **32i** (INEX สีเขียว) | **32iA** (INEX) | **32iP** (INEX สีชมพู) |
+|-----------|----------------------|----------------|----------------------|----------------|----------------------|
+| SW2 GPIO | GPIO14 | **GPIO14** | **GPIO14** | **GPIO14** | GPIO17 (SERVO2 shared) |
+| USB | Micro-USB | USB-C | USB-C | USB-C | USB-C |
+| เซนเซอร์แสง | LDR | LDR | **Phototransistor** | **Phototransistor** | **Phototransistor ปรับปรุง** |
+| ADC บน IN1-IN4 | ❌ | ✅ | ✅ | ✅ | ✅ |
+| Accelerometer | ❌ | KXTJ3 0x0E (I2C0) | ❌ | KXTJ3 0x0E (I2C0) | ❌ |
+| 3.3V Regulator USB | ❌ | ❌ | ✅ | ✅ | ✅ |
+| GPIO18/19/23 breakout | ❌ | ✅ | ✅ | ✅ | ✅ |
+| LED USB status | ❌ | ❌ | ✅ | ✅ | ✅ |
+| LED ไฟเลี้ยงบอร์ด | ❌ | ❌ | ❌ | ❌ | ✅ |
+| SERVO connector | ❌ | ❌ | ❌ | ❌ | ✅ (GPIO15/17) |
+| RTC EEPROM | มาตรฐาน | มาตรฐาน | **ใหญ่ขึ้น** | **ใหญ่ขึ้น** | **ใหญ่ขึ้น** |
+
+---
+
+## 🛠️ มาตรฐานและข้อกำหนดทางเทคนิคสำหรับ ESP-IDF Firmware
+
+### 1. การอ่านเซนเซอร์อุณหภูมิ On-board (Texas Instruments LM73)
+- **ตำแหน่ง:** `I2C_NUM_1` (SDA=GPIO4, SCL=GPIO5), I2C Address `0x4D`
+- **Register:** `0x00` (Temperature Register, 16-bit Two's complement)
+- **สูตรคำนวณ:**
+  ```c
+  int16_t raw_temp = (int16_t)(((uint16_t)raw[0] << 8) | (uint16_t)raw[1]);
+  float temperature = (float)raw_temp / 128.0f; // 1 LSB = 1/128°C
+  ```
+- **ข้อควรระวัง:** ห้ามสับสนกับ MCP9808 (Reg 0x05, Addr 0x18, /16.0f) หรือ ADT7410
+
+### 2. HT16K33 LED Dot Matrix 16x8
+- **ตำแหน่ง:** `I2C_NUM_0` (SDA=GPIO21, SCL=GPIO22), Address `0x70`
+- **ลำดับคำสั่ง Init:** ส่งทีละ Transaction: `0x21` (Osc ON) -> `delay 10ms` -> `0x81` (Display ON) -> `0xEF` (Brightness Max)
+- **การแมป RAM:** Interleaved mapping — Columns 0–7 (ซีกซ้าย) อยู่ Address คู่ (`buf[1 + c*2]`), Columns 8–15 (ซีกขวา) อยู่ Address คี่ (`buf[2 + c*2]`)
+- **การแสดงผลจริง:** ห้ามใช้ placeholder function ต้องแปลง Font Bitmap และส่ง payload 17 ไบต์ไปยัง Register `0x00`
+
+### 3. Driver Safety & Return Code Checks
+- ต้องใช้ `ESP_ERROR_CHECK(...)` สำหรับทุกขั้นตอนการ Init (`i2c_param_config`, `i2c_driver_install`, `adc_oneshot_new_unit`, `gpio_config`)
+- ตรวจสอบ `if (ret != ESP_OK)` สำหรับ I2C Runtime read/write เพื่อความเสถียร
+- บอร์ด KidBright เป็น **ESP32-WROOM-32** (ไม่มี Flash/PSRAM บน GPIO16/17 จึงใช้ GPIO16 เป็น SW1 ได้ปลอดภัย แต่หากรันบน ESP32-WROVER ต้องระวังห้ามใช้ GPIO16/17)
+024) — Edge AI Platform
 
 > **⚠️ ไม่ใช่ ESP32 ธรรมดา** — ใช้ SoC AllWinner V831 (ARM Cortex-A7) สำหรับ AI + ESP32-S3 สำหรับ IoT/WiFi
 > ทำงานบน **Tina Linux** (fork จาก OpenWrt, Kernel 4.9) — ไม่ใช่ ESP-IDF Framework
