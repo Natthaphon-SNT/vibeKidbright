@@ -1,7 +1,7 @@
 {
   "name": "vibe-kidbright",
   "private": true,
-  "version": "3.6.8",
+  "version": "3.6.10",
   "type": "module",
   "scripts": {
     "dev": "vite",

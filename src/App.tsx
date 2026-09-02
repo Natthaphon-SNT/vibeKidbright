@@ -266,11 +266,87 @@ interface FileTab {
 // ── AppShell: Toolchain gate wrapper ─────────────────────────────────
 function AppShell() {
   const [toolchainReady, setToolchainReady] = React.useState(false);
+  const [isRefreshing, setIsRefreshing] = React.useState(false);
+
+  /** Soft-refresh: re-check toolchain โดยที่ state ของ App ไม่หาย */
+  const refreshToolchain = React.useCallback(async () => {
+    if (isRefreshing) return;
+    setIsRefreshing(true);
+    toast("🔄 กำลังตรวจสอบ Toolchain...", "info");
+    try {
+      const result = await invoke("check_toolchain") as { status: string; version: string | null };
+      if (result.status === "ready") {
+        setToolchainReady(true);
+        toast(`✅ Toolchain v${result.version ?? ""} พร้อมใช้งาน`, "success");
+      } else {
+        // toolchain ไม่มี/ถูกลบ → แสดง ToolchainSetup อีกครั้ง
+        setToolchainReady(false);
+        toast("⚠️ Toolchain ไม่พบ — กรุณาติดตั้งใหม่", "error");
+      }
+    } catch (err) {
+      toast(`❌ ตรวจสอบ Toolchain ล้มเหลว: ${err}`, "error");
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, [isRefreshing]);
+
+  // ── ดักจับ F5 / Ctrl+R / Ctrl+Shift+R → soft-refresh แทน hard reload ──
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const isF5 = e.key === "F5";
+      const isCtrlR = (e.ctrlKey || e.metaKey) && e.key === "r";
+      const isCtrlShiftR = (e.ctrlKey || e.metaKey) && e.shiftKey && e.key === "R";
+
+      if (isF5 || isCtrlR || isCtrlShiftR) {
+        e.preventDefault();
+        e.stopPropagation();
+        refreshToolchain();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown, true); // capture phase
+    return () => window.removeEventListener("keydown", handleKeyDown, true);
+  }, [refreshToolchain]);
 
   return (
     <>
-      <App toolchainReady={toolchainReady} />
+      <App toolchainReady={toolchainReady} onRefreshToolchain={refreshToolchain} />
       <ToastHost />
+      {/* Refresh overlay indicator */}
+      {isRefreshing && (
+        <div
+          style={{
+            position: "fixed",
+            top: 12,
+            right: 16,
+            zIndex: 9999,
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            padding: "6px 14px",
+            borderRadius: 8,
+            background: "rgba(30,30,40,0.92)",
+            border: "1px solid rgba(99,102,241,0.5)",
+            color: "#a5b4fc",
+            fontSize: 12,
+            fontWeight: 600,
+            backdropFilter: "blur(8px)",
+            boxShadow: "0 4px 24px rgba(0,0,0,0.4)",
+          }}
+        >
+          <div
+            style={{
+              width: 12,
+              height: 12,
+              border: "2px solid rgba(99,102,241,0.4)",
+              borderTop: "2px solid #818cf8",
+              borderRadius: "50%",
+              animation: "spin 0.7s linear infinite",
+            }}
+          />
+          ตรวจสอบ Toolchain...
+        </div>
+      )}
       {!toolchainReady && (
         <ToolchainSetup
           onReady={() => setToolchainReady(true)}
@@ -281,7 +357,7 @@ function AppShell() {
   );
 }
 
-function App({ toolchainReady = true }: { toolchainReady?: boolean }) {
+function App({ toolchainReady = true, onRefreshToolchain }: { toolchainReady?: boolean; onRefreshToolchain?: () => void }) {
   const [darkMode, setDarkMode] = React.useState(() => {
     return localStorage.getItem("vibe-theme") === "dark";
   });
@@ -349,6 +425,7 @@ function App({ toolchainReady = true }: { toolchainReady?: boolean }) {
   const parseBuildProgressRef = useRef<(msg: string) => void>(() => {});
   const aiChatSendRef = useRef<((text: string) => void) | null>(null);
   const saveAllFilesRef = useRef<() => Promise<void>>(async () => {});
+  const buildFlashRef = useRef<() => void>(() => {});
   useEffect(() => { openFilesRef.current = openFiles; }, [openFiles]);
 
   const activeFile = openFiles.find(f => normPath(f.path) === normPath(activeFilePath));
@@ -491,6 +568,11 @@ function App({ toolchainReady = true }: { toolchainReady?: boolean }) {
       if ((e.metaKey || e.ctrlKey) && e.key === "s") {
         e.preventDefault();
         saveAllFilesRef.current();
+      }
+      // Ctrl+Shift+B → Build & Flash
+      if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key === "b") {
+        e.preventDefault();
+        buildFlashRef.current();
       }
     };
     window.addEventListener("keydown", handleKeyDown);
@@ -1143,6 +1225,8 @@ function App({ toolchainReady = true }: { toolchainReady?: boolean }) {
       setBuildCurrentTask(prev => prev === "Initializing..." ? "" : prev);
     }
   };
+  // Keep ref in sync so the keyboard shortcut (Ctrl+Shift+B) always calls the latest version
+  useEffect(() => { buildFlashRef.current = handleBuildFlash; });
 
   // Open the file from a build error (if needed) and jump to the offending line
   const jumpToError = async (err: ParsedBuildError) => {
@@ -1368,8 +1452,25 @@ function App({ toolchainReady = true }: { toolchainReady?: boolean }) {
         <div className="p-4" style={{ borderTop: '1px solid var(--border-color)', backgroundColor: 'var(--bg-hover)' }}>
           <div className="flex items-center gap-2 text-xs mb-3">
             <div className={`w-2 h-2 rounded-full ${status.includes("Ready") || status.includes("OK") ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]" : "bg-amber-500"}`}></div>
-            <span className="text-neutral-400 truncate font-medium" style={{ color: 'var(--text-muted)' }}>{status.split(":")[0]}</span>
+            <span className="text-neutral-400 truncate font-medium flex-1" style={{ color: 'var(--text-muted)' }}>{status.split(":")[0]}</span>
+            {/* Refresh toolchain button (F5) */}
+            {onRefreshToolchain && (
+              <button
+                onClick={onRefreshToolchain}
+                title="ตรวจสอบ Toolchain อีกครั้ง (F5)"
+                className="p-1 rounded transition-all active:scale-90"
+                style={{ color: 'var(--text-muted)' }}
+                onMouseEnter={e => { e.currentTarget.style.color = '#818cf8'; e.currentTarget.style.backgroundColor = 'rgba(99,102,241,0.12)'; }}
+                onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.backgroundColor = ''; }}
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </button>
+            )}
           </div>
+
           {espIdfSetupNote && (
             <div className="text-[10px] leading-relaxed mb-3 rounded p-2" style={{ color: 'var(--text-muted)', border: '1px solid var(--border-color)', backgroundColor: 'var(--bg-hover)' }}>
               {espIdfSetupNote}
@@ -1378,7 +1479,7 @@ function App({ toolchainReady = true }: { toolchainReady?: boolean }) {
           <button
             onClick={handleBuildFlash}
             disabled={isBuilding || isSettingUpEspIdf || !toolchainReady}
-            title={!toolchainReady ? "Waiting for toolchain download to complete..." : undefined}
+            title={!toolchainReady ? "Waiting for toolchain download to complete..." : "Build & Flash (Ctrl+Shift+B)"}
             className="w-full justify-center text-sm px-4 py-2 rounded-lg transition-all duration-200 font-bold flex items-center gap-2 shadow-lg active:scale-[0.98]"
             style={isBuilding || !toolchainReady
               ? { backgroundColor: 'var(--bg-hover)', color: 'var(--text-muted)', cursor: 'not-allowed' }
@@ -1395,7 +1496,14 @@ function App({ toolchainReady = true }: { toolchainReady?: boolean }) {
                 <div className="w-3 h-3 border-2 border-amber-700 border-t-amber-400 rounded-full animate-spin" />
                 Toolchain Loading...
               </>
-            ) : "Build & Flash"}
+            ) : (
+              <>
+                Build &amp; Flash
+                <span style={{ fontSize: 9, opacity: 0.65, fontWeight: 500, marginLeft: 'auto', letterSpacing: '0.02em' }}>
+                  ⌃⇧B
+                </span>
+              </>
+            )}
           </button>
         </div>
       </div>
