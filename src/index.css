@@ -1,5 +1,9 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+/* Google Fonts removed — CSP blocks external URLs in Tauri production builds.
+   The font-family stacks in body/code fall back to system fonts gracefully.
+   To restore: download Inter + JetBrains Mono woff2 files into public/fonts/
+   and add @font-face declarations here. */
 
 /* ── PMS 293 Palette ────────────────────────────────────────────────────────── */
 /* PMS 293 C = #254796 (PANTONE official)                                        */

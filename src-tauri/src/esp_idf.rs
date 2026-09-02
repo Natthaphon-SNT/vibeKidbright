@@ -881,6 +881,68 @@ pub async fn validate_idf_project(path: String) -> Result<bool, String> {
     Ok(cmake_exists)
 }
 
+/// Check if a project's `build/` directory has stale CMake cache that will cause
+/// cmake to fail (e.g. paths from another machine, or incomplete configuration).
+///
+/// Returns `true` if the build directory should be deleted and cmake reconfigured.
+pub(crate) fn is_build_dir_stale(build_dir: &Path, current_idf: &Path, _current_tools: &Path) -> bool {
+    let cmake_cache = build_dir.join("CMakeCache.txt");
+
+    // Case 1: build/ exists but CMakeCache.txt is missing → incomplete state, clean it
+    if !cmake_cache.exists() {
+        // If there are other artifacts but no cache, it's likely a partial/corrupt build
+        let has_artifacts = build_dir.join("build.ninja").exists()
+            || build_dir.join("compile_commands.json").exists();
+        return has_artifacts;
+    }
+
+    // Case 2: CMakeCache exists — check if IDF_PATH inside it matches current toolchain
+    if let Ok(cache_content) = std::fs::read_to_string(&cmake_cache) {
+        // Look for IDF_PATH:PATH= in the cache and compare to current
+        let current_idf_canon = dunce::canonicalize(current_idf)
+            .unwrap_or_else(|_| current_idf.to_path_buf());
+        let current_idf_str = current_idf_canon.to_string_lossy().to_lowercase().replace('\\', "/");
+
+        for line in cache_content.lines() {
+            if line.starts_with("IDF_PATH:") || line.starts_with("IDF_PATH=") {
+                if let Some(val) = line.split('=').nth(1) {
+                    let cached_path = val.trim().to_lowercase().replace('\\', "/");
+                    if !cached_path.is_empty() && cached_path != current_idf_str {
+                        eprintln!(
+                            "[Build] Stale CMakeCache: cached IDF_PATH={} ≠ current={}",
+                            cached_path, current_idf_str
+                        );
+                        return true;
+                    }
+                }
+            }
+            // Also check Python path — most common mismatch between machines
+            if line.starts_with("PYTHON:") || line.starts_with("PYTHON=") {
+                if let Some(val) = line.split('=').nth(1) {
+                    let cached_python = val.trim();
+                    if !cached_python.is_empty() && !Path::new(cached_python).exists() {
+                        eprintln!(
+                            "[Build] Stale CMakeCache: cached Python={} does not exist on this machine",
+                            cached_python
+                        );
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+
+    // Case 3: managed_components_list.temp.cmake missing despite having CMakeCache
+    // This happens when cmake configuration was interrupted midway
+    let managed_components = build_dir.join("managed_components_list.temp.cmake");
+    if cmake_cache.exists() && !managed_components.exists() {
+        eprintln!("[Build] Stale build: CMakeCache exists but managed_components_list.temp.cmake is missing");
+        return true;
+    }
+
+    false
+}
+
 #[tauri::command]
 pub async fn run_shell_command(
     app_handle: AppHandle,
@@ -892,6 +954,36 @@ pub async fn run_shell_command(
     let (python_bin, python_env_path) = find_idf_python(&actual_tools_path)?;
     let path_env = build_idf_path(&actual_tools_path);
     let idf_version = read_idf_version(&actual_idf_path);
+
+    // ── Auto-clean stale build directory ────────────────────────────────
+    // When a project is opened on a different machine or after a partial build,
+    // the build/ directory may contain a CMakeCache.txt with paths that don't
+    // exist on this machine, or managed_components_list.temp.cmake may be missing.
+    // This causes cryptic CMake errors. We detect and auto-clean this situation.
+    if cmd == "idf.py" && args.iter().any(|a| a == "build" || a == "flash" || a == "reconfigure") {
+        if let Some(ref c_dir) = cwd {
+            if !c_dir.is_empty() && c_dir != "." {
+                let build_dir = Path::new(c_dir).join("build");
+                if build_dir.exists() {
+                    let needs_clean = is_build_dir_stale(&build_dir, &actual_idf_path, &actual_tools_path);
+                    if needs_clean {
+                        let _ = app_handle.emit("terminal-output",
+                            "⚠️ Detected stale build directory (paths from another machine or incomplete build). Auto-cleaning...".to_string());
+                        match std::fs::remove_dir_all(&build_dir) {
+                            Ok(_) => {
+                                let _ = app_handle.emit("terminal-output",
+                                    "✅ Build directory cleaned. CMake will reconfigure from scratch.".to_string());
+                            }
+                            Err(e) => {
+                                let _ = app_handle.emit("terminal-output",
+                                    format!("⚠️ Failed to clean build directory: {}. Build may fail — try deleting the 'build' folder manually.", e));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     let mut command = if cmd == "idf.py" {
         let mut c = Command::new(&python_bin);

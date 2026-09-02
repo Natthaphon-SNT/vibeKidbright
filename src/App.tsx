@@ -8,6 +8,7 @@ import WikiView from "./WikiView";
 import { parseErrorLine, type ParsedBuildError } from "./errorHints";
 import BuildErrorList from "./BuildErrorList";
 import { toast, ToastHost } from "./Toast";
+import { normPath } from "./utils";
 
 
 interface FileEntry {
@@ -347,9 +348,9 @@ function App({ toolchainReady = true }: { toolchainReady?: boolean }) {
   const openFilesRef = useRef<FileTab[]>(openFiles);
   const parseBuildProgressRef = useRef<(msg: string) => void>(() => {});
   const aiChatSendRef = useRef<((text: string) => void) | null>(null);
+  const saveAllFilesRef = useRef<() => Promise<void>>(async () => {});
   useEffect(() => { openFilesRef.current = openFiles; }, [openFiles]);
 
-  const normPath = (p: string) => p.replace(/\\/g, '/').toLowerCase();
   const activeFile = openFiles.find(f => normPath(f.path) === normPath(activeFilePath));
 
   // Load saved custom paths on mount
@@ -442,9 +443,9 @@ function App({ toolchainReady = true }: { toolchainReady?: boolean }) {
 
     const unlistenFile = listen("file-modified", async (event) => {
       const { path } = JSON.parse(event.payload as string);
-      const normPath = path.replace(/\\/g, '/');
+      const normP = path.replace(/\\/g, '/');
       const isOpen = openFilesRef.current.find(
-        f => f.path.replace(/\\/g, '/') === normPath
+        f => f.path.replace(/\\/g, '/') === normP
       );
       if (isOpen) {
         reloadFile(isOpen.path);
@@ -489,7 +490,7 @@ function App({ toolchainReady = true }: { toolchainReady?: boolean }) {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "s") {
         e.preventDefault();
-        saveAllFiles();
+        saveAllFilesRef.current();
       }
     };
     window.addEventListener("keydown", handleKeyDown);
@@ -502,7 +503,8 @@ function App({ toolchainReady = true }: { toolchainReady?: boolean }) {
       window.removeEventListener("keydown", handleKeyDown);
       invoke("stop_serial_monitor").catch(() => null);
     };
-  }, [activeFilePath, openFiles]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const reloadFile = async (path: string) => {
     try {
@@ -545,6 +547,8 @@ function App({ toolchainReady = true }: { toolchainReady?: boolean }) {
       addLog(`❌ Failed to save files: ${err}`);
     }
   }, [openFiles]);
+  // Keep ref in sync so the keyboard shortcut always calls the latest version
+  useEffect(() => { saveAllFilesRef.current = saveAllFiles; }, [saveAllFiles]);
 
   const handleSaveProjectAs = async () => {
     if (projectDir === ".") {
@@ -1248,7 +1252,8 @@ function App({ toolchainReady = true }: { toolchainReady?: boolean }) {
                     if (e.key === "Escape") handleInlineCancel();
                   }}
                   onBlur={handleInlineCancel}
-                  className="flex-1 bg-neutral-800 text-[12px] border border-red-500 rounded px-1 outline-none relative z-10 w-full"
+                  className="flex-1 text-[12px] rounded px-1 outline-none relative z-10 w-full"
+                  style={{ backgroundColor: 'var(--bg-input)', color: 'var(--text-primary)', border: '1.5px solid var(--accent)' }}
                 />
               </div>
             )}
@@ -1269,12 +1274,12 @@ function App({ toolchainReady = true }: { toolchainReady?: boolean }) {
               />
             ))}
             {projectFiles.length === 0 && !inlineAction && (
-              <div className="text-[10px] text-neutral-700 p-2 italic">
+              <div className="text-[10px] p-2 italic" style={{ color: 'var(--text-disabled)' }}>
                 No files found
               </div>
             )}
           </div>
-          <div className="px-2 py-1 text-[10px] text-neutral-600 truncate italic">
+          <div className="px-2 py-1 text-[10px] truncate italic" style={{ color: 'var(--text-disabled)' }}>
             {projectDir === "." ? "No project selected" : projectDir}
           </div>
 
@@ -1290,7 +1295,12 @@ function App({ toolchainReady = true }: { toolchainReady?: boolean }) {
             onMouseEnter={e => { if (!isSettingUpEspIdf) e.currentTarget.style.backgroundColor = 'var(--bg-hover)'; }}
             onMouseLeave={e => { if (!isSettingUpEspIdf) e.currentTarget.style.backgroundColor = ''; }}
           >
-            <span className={`w-4 h-4 flex items-center justify-center rounded text-[10px] font-bold ${isSettingUpEspIdf ? "bg-amber-400/30 text-amber-200" : "bg-neutral-700 text-neutral-300"}`}>
+            <span className="w-4 h-4 flex items-center justify-center rounded text-[10px] font-bold"
+              style={isSettingUpEspIdf
+                ? { backgroundColor: 'rgba(245,158,11,0.2)', color: 'var(--warning)' }
+                : { backgroundColor: 'var(--bg-hover)', color: 'var(--text-muted)' }
+              }
+            >
               {isSettingUpEspIdf ? "…" : "⚙"}
             </span>
             {isSettingUpEspIdf ? "Installing ESP-IDF..." : "Setup / Repair ESP-IDF"}
@@ -1633,13 +1643,18 @@ function App({ toolchainReady = true }: { toolchainReady?: boolean }) {
               </button>
               <button
                 onClick={toggleSerialMonitor}
-                className={`text-[10px] px-2 py-1 rounded font-bold ${isSerialConnected ? "bg-amber-700 text-amber-100" : "bg-emerald-700 text-emerald-100"}`}
+                className="text-[10px] px-2 py-1 rounded font-bold"
+                style={isSerialConnected
+                  ? { backgroundColor: 'var(--warning)', color: '#fff' }
+                  : { backgroundColor: 'var(--success)', color: '#fff' }
+                }
               >
                 {isSerialConnected ? "Disconnect Serial" : "Connect Serial"}
               </button>
               <button
                 onClick={() => setLogs([])}
-                className="text-[10px] text-neutral-500 hover:text-neutral-300 transition-colors uppercase font-bold"
+                className="text-[10px] transition-colors uppercase font-bold"
+                style={{ color: 'var(--text-muted)' }}
               >
                 Clear Logs
               </button>
@@ -1650,7 +1665,7 @@ function App({ toolchainReady = true }: { toolchainReady?: boolean }) {
             className="flex-1 overflow-y-auto p-4 font-mono text-xs space-y-1 selection:bg-red-500/20"
           >
             {logs.length === 0 ? (
-              <div className="text-neutral-700 italic opacity-50">vibeKidbright Terminal Ready. Type 'idf.py --version' to test.</div>
+              <div className="italic opacity-50" style={{ color: 'var(--text-disabled)' }}>vibeKidbright Terminal Ready. Type 'idf.py --version' to test.</div>
             ) : (
               logs.map((log, i) => (
                 <div key={i} className="flex gap-2 transition-colors" style={{ color: 'var(--text-secondary)' }}>
@@ -1668,13 +1683,14 @@ function App({ toolchainReady = true }: { toolchainReady?: boolean }) {
                 value={terminalInput}
                 onChange={(e) => setTerminalInput(e.target.value)}
                 placeholder={isSerialConnected ? "Type message and press Enter to send to board..." : "Type command (e.g. idf.py) and press Enter..."}
-                className="w-full bg-transparent border-none focus:outline-none font-mono text-sm placeholder:text-neutral-600"
+                className="w-full bg-transparent border-none focus:outline-none font-mono text-sm"
                 style={{ color: 'var(--text-primary)' }}
               />
             </form>
             <button
               onClick={sendSerialText}
-              className="text-[10px] px-2 py-1 rounded bg-neutral-800 hover:bg-neutral-700 text-neutral-300"
+              className="text-[10px] px-2 py-1 rounded transition-colors"
+              style={{ backgroundColor: 'var(--bg-hover)', color: 'var(--text-secondary)', border: '1px solid var(--border-color)' }}
             >
               Send Serial
             </button>

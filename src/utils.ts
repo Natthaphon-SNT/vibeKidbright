@@ -46,6 +46,13 @@ export function getBasename(path: string): string {
 }
 
 /**
+ * Normalise a file path for comparison: backslashes → forward slashes, lower-case.
+ */
+export function normPath(path: string): string {
+  return path.replace(/\\/g, '/').toLowerCase();
+}
+
+/**
  * Truncate a string to maxLength characters, appending "…" if needed.
  */
 export function truncate(text: string, maxLength: number): string {

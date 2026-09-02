@@ -6,12 +6,6 @@ mod kb_embed;   // Local ONNX embedding (fastembed, offline)
 mod ai;         // Modular AI subsystem structure (refactoring roadmap)
 
 
-// Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-#[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
-}
-
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     use tauri::Manager;
@@ -46,7 +40,6 @@ pub fn run() {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
-            greet,
             esp_idf::check_esp_idf,
             esp_idf::setup_esp_idf,
             esp_idf::run_idf_command,

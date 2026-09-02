@@ -671,6 +671,29 @@ pub async fn build_firmware_with_toolchain(
         args.extend(extra);
     }
 
+    // ── Auto-clean stale build directory ────────────────────────────────
+    // Reuse the same detection logic from esp_idf.rs
+    {
+        let build_dir = project_path.join("build");
+        if build_dir.exists() {
+            let needs_clean = crate::esp_idf::is_build_dir_stale(&build_dir, &idf_path, &tools_path);
+            if needs_clean {
+                let _ = app_handle.emit("terminal-output",
+                    "⚠️ Detected stale build directory. Auto-cleaning...".to_string());
+                match std::fs::remove_dir_all(&build_dir) {
+                    Ok(_) => {
+                        let _ = app_handle.emit("terminal-output",
+                            "✅ Build directory cleaned. CMake will reconfigure from scratch.".to_string());
+                    }
+                    Err(e) => {
+                        let _ = app_handle.emit("terminal-output",
+                            format!("⚠️ Failed to clean build dir: {}. Try manually deleting the 'build' folder.", e));
+                    }
+                }
+            }
+        }
+    }
+
     emit_progress(&app_handle, "building", 0, "Starting build...");
 
     let app_clone = app_handle.clone();
