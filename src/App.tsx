@@ -1269,7 +1269,7 @@ function App({ toolchainReady = true, onRefreshToolchain }: { toolchainReady?: b
       <div className="w-64 flex flex-col font-sans" style={{ backgroundColor: 'var(--bg-sidebar)', borderRight: '1px solid var(--border-color)' }}>
         <div className="p-4" style={{ borderBottom: '1px solid var(--border-color)' }}>
           <div className="flex items-center justify-between">
-            <h1 className="text-xl font-bold brand-gradient">vibeKidbright</h1>
+            <h1 className="text-xl font-bold brand-gradient flex items-center gap-1.5"><img src="/app-icon.png" alt="icon" className="w-6 h-6" /> vibeKidbright</h1>
             <button
               onClick={toggleTheme}
               className="theme-toggle"
@@ -1692,6 +1692,7 @@ function App({ toolchainReady = true, onRefreshToolchain }: { toolchainReady?: b
                 onSave={saveAllFiles}
                 isDarkMode={darkMode}
                 gotoLineRequest={gotoLineRequest && normPath(gotoLineRequest.path) === normPath(activeFile.path) ? gotoLineRequest : null}
+                buildErrors={buildErrors}
               />
             ) : (
               <div className="flex-1 flex items-center justify-center" style={{ backgroundColor: 'var(--bg-editor)' }}>
@@ -1711,7 +1712,7 @@ function App({ toolchainReady = true, onRefreshToolchain }: { toolchainReady?: b
 
         {/* Console & Terminal */}
         <div className="h-80 flex flex-col" style={{ borderTop: '1px solid var(--border-color)', backgroundColor: 'var(--bg-terminal)', boxShadow: 'var(--shadow-lg)' }}>
-          <div className="h-9 flex items-center justify-between px-4" style={{ borderBottom: '1px solid var(--border-color)', backgroundColor: 'var(--bg-panel)' }}>
+          <div className="h-9 flex items-center justify-between px-4" style={{ borderBottom: '1px solid var(--border-color)', backgroundColor: 'var(--bg-terminal)' }}>
             <span className="text-[10px] font-bold uppercase tracking-[0.2em]" style={{ color: 'var(--text-muted)' }}>Interactive Terminal</span>
             <div className="flex items-center gap-2">
               <div className="flex items-center">
@@ -1783,7 +1784,7 @@ function App({ toolchainReady = true, onRefreshToolchain }: { toolchainReady?: b
             )}
           </div>
           {/* Terminal Input */}
-          <div className="p-2 flex items-center gap-2 group" style={{ borderTop: '1px solid var(--border-color)', backgroundColor: 'var(--bg-panel)' }}>
+          <div className="p-2 flex items-center gap-2 group" style={{ borderTop: '1px solid var(--border-color)', backgroundColor: 'var(--bg-terminal)' }}>
             <span className="font-bold text-sm ml-2" style={{ color: 'var(--accent)' }}>$</span>
             <form onSubmit={handleTerminalSubmit} className="flex-1">
               <input

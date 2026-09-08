@@ -5,109 +5,108 @@
    To restore: download Inter + JetBrains Mono woff2 files into public/fonts/
    and add @font-face declarations here. */
 
-/* ── PMS 293 Palette ────────────────────────────────────────────────────────── */
-/* PMS 293 C = #254796 (PANTONE official)                                        */
+/* ── Clean White + Red Accent ────────────────────────────────────────────────── */
 
 :root {
-  /* === LIGHT MODE (Default) === */
-  --pms-293:       #254796;
-  --pms-293-dark:  #1a3570;
-  --pms-293-light: #3a5db3;
-  --pms-293-pale:  #dde6f7;
-  --pms-293-ultra: #eef2fb;
+  /* === LIGHT MODE (Clean White, Red Accent) === */
+  --pms-293:       #c0392b;
+  --pms-293-dark:  #96281b;
+  --pms-293-light: #e74c3c;
+  --pms-293-pale:  #fde8e6;
+  --pms-293-ultra: #fef5f4;
 
-  --bg-app:        #f5f7fc;
+  --bg-app:        #f7f7f8;
   --bg-sidebar:    #ffffff;
-  --bg-main:       #f0f4fa;
+  --bg-main:       #f2f2f3;
   --bg-editor:     #ffffff;
   --bg-panel:      #ffffff;
-  --bg-terminal:   #f8f9fc;
+  --bg-terminal:   #f7f7f8;
   --bg-input:      #ffffff;
-  --bg-hover:      #eef2fb;
-  --bg-active:     #dde6f7;
+  --bg-hover:      #f0f0f1;
+  --bg-active:     #e8e8ea;
   --bg-modal:      #ffffff;
-  --bg-tooltip:    #1a3570;
-  --bg-tag:        #eef2fb;
-  --bg-select:     #f5f7fc;
+  --bg-tooltip:    #333338;
+  --bg-tag:        #f0f0f1;
+  --bg-select:     #f7f7f8;
 
-  --border-color:  #d0daf0;
-  --border-focus:  #254796;
+  --border-color:  #e0e0e2;
+  --border-focus:  #c0392b;
 
-  --text-primary:  #0d1a3a;
-  --text-secondary:#3d5080;
-  --text-muted:    #7a8fb8;
-  --text-disabled: #b0bcdb;
+  --text-primary:  #1a1a1a;
+  --text-secondary:#555558;
+  --text-muted:    #9a9a9e;
+  --text-disabled: #c8c8cc;
   --text-on-primary: #ffffff;
-  --text-link:     #254796;
+  --text-link:     #c0392b;
 
-  --accent:        #254796;
-  --accent-hover:  #1a3570;
-  --accent-active: #3a5db3;
-  --accent-glow:   rgba(37, 71, 150, 0.18);
+  --accent:        #c0392b;
+  --accent-hover:  #96281b;
+  --accent-active: #e74c3c;
+  --accent-glow:   rgba(192, 57, 43, 0.15);
 
   --success:       #0d7f45;
   --warning:       #b45309;
   --danger:        #b91c1c;
   --info:          #0e6eb8;
 
-  --scrollbar-thumb: #c0ceea;
-  --scrollbar-hover: #a0b4d8;
-  --shadow-sm:     0 1px 4px rgba(37,71,150,0.08);
-  --shadow-md:     0 4px 16px rgba(37,71,150,0.12);
-  --shadow-lg:     0 8px 32px rgba(37,71,150,0.16);
+  --scrollbar-thumb: #d0d0d4;
+  --scrollbar-hover: #b8b8bc;
+  --shadow-sm:     0 1px 4px rgba(0,0,0,0.06);
+  --shadow-md:     0 4px 16px rgba(0,0,0,0.08);
+  --shadow-lg:     0 8px 32px rgba(0,0,0,0.12);
 
   /* Tailwind color overrides via CSS vars */
   --background: var(--bg-app);
   --foreground: var(--text-primary);
   --primary: var(--pms-293);
-  --secondary: #eef2fb;
+  --secondary: #f0f0f1;
   --accent-color: var(--pms-293);
 }
 
 [data-theme="dark"] {
-  /* === DARK MODE === */
-  --pms-293:       #4a72c8;
-  --pms-293-dark:  #254796;
-  --pms-293-light: #6a8ed4;
-  --pms-293-pale:  #1a2a4a;
-  --pms-293-ultra: #111e36;
+  /* === DARK MODE (Clean Dark, Red Accent) === */
+  --pms-293:       #e74c3c;
+  --pms-293-dark:  #c0392b;
+  --pms-293-light: #f06858;
+  --pms-293-pale:  #2a1815;
+  --pms-293-ultra: #1e1210;
 
-  --bg-app:        #0d1220;
-  --bg-sidebar:    #0a0f1a;
-  --bg-main:       #0f1628;
-  --bg-editor:     #090d18;
-  --bg-panel:      #111827;
-  --bg-terminal:   #070c16;
-  --bg-input:      #111827;
-  --bg-hover:      #1a2540;
-  --bg-active:     #1e2d52;
-  --bg-modal:      #131d32;
-  --bg-tooltip:    #1e2d52;
-  --bg-tag:        #1a2a4a;
-  --bg-select:     #111827;
+  --bg-app:        #111114;
+  --bg-sidebar:    #0c0c0f;
+  --bg-main:       #151518;
+  --bg-editor:     #0e0e11;
+  --bg-panel:      #18181b;
+  --bg-terminal:   #0a0a0d;
+  --bg-input:      #18181b;
+  --bg-hover:      #222226;
+  --bg-active:     #2c2c30;
+  --bg-modal:      #1a1a1e;
+  --bg-tooltip:    #2c2c30;
+  --bg-tag:        #222226;
+  --bg-select:     #18181b;
 
-  --border-color:  #1e2d52;
-  --border-focus:  #4a72c8;
+  --border-color:  #2a2a2e;
+  --border-focus:  #e74c3c;
 
-  --text-primary:  #dde6f7;
-  --text-secondary:#8aabda;
-  --text-muted:    #4a6090;
-  --text-disabled: #2a3a5a;
+  --text-primary:  #e8e8ec;
+  --text-secondary:#a0a0a6;
+  --text-muted:    #5a5a60;
+  --text-disabled: #333338;
   --text-on-primary: #ffffff;
-  --text-link:     #7aa0e0;
+  --text-link:     #f08070;
 
-  --accent:        #4a72c8;
-  --accent-hover:  #6a8ed4;
-  --accent-active: #254796;
-  --accent-glow:   rgba(74, 114, 200, 0.25);
+  --accent:        #e74c3c;
+  --accent-hover:  #f06858;
+  --accent-active: #c0392b;
+  --accent-glow:   rgba(231, 76, 60, 0.25);
 
   --success:       #10b981;
   --warning:       #f59e0b;
   --danger:        #ef4444;
   --info:          #38bdf8;
 
-  --scrollbar-thumb: #1e2d52;
-  --scrollbar-hover: #2a3f6a;
+  --scrollbar-thumb: #2a2a2e;
+  --scrollbar-hover: #3a3a40;
   --shadow-sm:     0 1px 4px rgba(0,0,0,0.3);
   --shadow-md:     0 4px 16px rgba(0,0,0,0.4);
   --shadow-lg:     0 8px 32px rgba(0,0,0,0.5);
@@ -115,7 +114,7 @@
   --background: var(--bg-app);
   --foreground: var(--text-primary);
   --primary: var(--pms-293);
-  --secondary: #1a2540;
+  --secondary: #222226;
   --accent-color: var(--pms-293);
 }
 
@@ -216,13 +215,13 @@ body {
 
 /* Glass panel */
 .glass {
-  background: rgba(255, 255, 255, 0.75);
+  background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(37, 71, 150, 0.15);
+  border: 1px solid rgba(0, 0, 0, 0.08);
 }
 [data-theme="dark"] .glass {
-  background: rgba(17, 24, 39, 0.75);
-  border: 1px solid rgba(74, 114, 200, 0.2);
+  background: rgba(24, 24, 27, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 /* Inputs */

@@ -1,6 +1,9 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useCallback } from "react";
 import Editor, { OnMount, BeforeMount } from "@monaco-editor/react";
 import type { editor } from "monaco-editor";
+import type * as MonacoNS from "monaco-editor";
+import { lintCCode, isCFamilyFile } from "./syntaxLinter";
+import type { ParsedBuildError } from "./errorHints";
 
 // ── Language detection from file extension ──────────────────────────────────
 function getLanguageFromPath(filePath: string): string {
@@ -199,6 +202,8 @@ interface CodeEditorProps {
     onSave?: () => void;
     isDarkMode?: boolean;
     gotoLineRequest?: GotoLineRequest | null;
+    /** Build errors from GCC/CMake — displayed as red markers in the editor */
+    buildErrors?: ParsedBuildError[];
 }
 
 export default function CodeEditor({
@@ -208,8 +213,10 @@ export default function CodeEditor({
     onSave,
     isDarkMode = true,
     gotoLineRequest = null,
+    buildErrors = [],
 }: CodeEditorProps) {
     const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
+    const monacoRef = useRef<typeof MonacoNS | null>(null);
     const language = getLanguageFromPath(filePath);
     const monacoTheme = isDarkMode ? "vibe-dark" : "vibe-light";
     
@@ -233,6 +240,74 @@ export default function CodeEditor({
     useEffect(() => {
         onSaveRef.current = onSave;
     }, [onSave]);
+
+    // ── Real-time syntax linting (debounced) ──────────────────────────────
+    const applyLintMarkers = useCallback(() => {
+        const ed = editorRef.current;
+        const monaco = monacoRef.current;
+        if (!ed || !monaco) return;
+        const model = ed.getModel();
+        if (!model) return;
+
+        if (!isCFamilyFile(filePath)) {
+            // Clear markers for non-C files
+            monaco.editor.setModelMarkers(model, "syntax-linter", []);
+            return;
+        }
+
+        const diagnostics = lintCCode(value);
+        const markers: editor.IMarkerData[] = diagnostics.map((d) => ({
+            startLineNumber: d.line,
+            startColumn: d.startCol,
+            endLineNumber: d.line,
+            endColumn: d.endCol,
+            message: `${d.message}\n\n💡 ${d.messageHint}`,
+            severity:
+                d.severity === "error"
+                    ? monaco.MarkerSeverity.Error
+                    : monaco.MarkerSeverity.Warning,
+            source: "Vibe Linter",
+        }));
+        monaco.editor.setModelMarkers(model, "syntax-linter", markers);
+    }, [value, filePath]);
+
+    useEffect(() => {
+        const timer = setTimeout(applyLintMarkers, 500);
+        return () => clearTimeout(timer);
+    }, [applyLintMarkers]);
+
+    // ── Build errors → Monaco markers ────────────────────────────────────
+    useEffect(() => {
+        const ed = editorRef.current;
+        const monaco = monacoRef.current;
+        if (!ed || !monaco) return;
+        const model = ed.getModel();
+        if (!model) return;
+
+        // Only show build errors that belong to the currently-open file
+        const normCurrent = filePath.replace(/\\/g, "/").toLowerCase();
+        const relevantErrors = buildErrors.filter((err) => {
+            if (!err.file || !err.line) return false;
+            const normErr = err.file.replace(/\\/g, "/").toLowerCase();
+            // Match by full path, tail of path, or just basename
+            return (
+                normCurrent.endsWith(normErr) ||
+                normErr.endsWith(normCurrent) ||
+                normCurrent.split("/").pop() === normErr.split("/").pop()
+            );
+        });
+
+        const markers: editor.IMarkerData[] = relevantErrors.map((err) => ({
+            startLineNumber: err.line!,
+            startColumn: err.column ?? 1,
+            endLineNumber: err.line!,
+            endColumn: err.column ? err.column + 1 : model.getLineMaxColumn(err.line!),
+            message: `[Build] ${err.title}\n${err.message}\n\n🇹🇭 ${err.thaiHint}\n🇬🇧 ${err.englishHint}`,
+            severity: monaco.MarkerSeverity.Error,
+            source: "GCC Build",
+        }));
+        monaco.editor.setModelMarkers(model, "build-errors", markers);
+    }, [buildErrors, filePath]);
 
     // Check for pending diffs when the file changes or when AI proposes one
     useEffect(() => {
@@ -320,6 +395,7 @@ export default function CodeEditor({
 
     const handleEditorMount: OnMount = (editor, monaco) => {
         editorRef.current = editor;
+        monacoRef.current = monaco;
 
         // Register Ctrl+S keybinding for save
         editor.addAction({
@@ -337,6 +413,9 @@ export default function CodeEditor({
             editor.revealLineInCenter(pendingGoto.line);
             editor.setPosition({ lineNumber: pendingGoto.line, column: pendingGoto.column ?? 1 });
         }
+
+        // Run initial lint pass immediately after mount
+        setTimeout(applyLintMarkers, 100);
 
         // Focus the editor
         editor.focus();

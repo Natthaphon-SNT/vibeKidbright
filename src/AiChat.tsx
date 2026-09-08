@@ -637,9 +637,7 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile, sendApiRef }: { proje
             {/* Header */}
             <div className="h-10 flex items-center justify-between px-4 backdrop-blur-sm shrink-0" style={{ borderBottom: '1px solid var(--border-color)', backgroundColor: 'var(--bg-sidebar)' }}>
                 <div className="flex items-center gap-2">
-                    <div className="w-5 h-5 rounded flex items-center justify-center text-[10px] font-bold text-white shadow-lg" style={{ background: 'linear-gradient(135deg, var(--pms-293) 0%, var(--pms-293-light) 100%)' }}>
-                        AI
-                    </div>
+                    <img src="/app-icon.png" alt="icon" className="w-5 h-5" />
                     <span className="text-xs font-bold tracking-wide" style={{ color: 'var(--text-primary)' }}>
                         Vibe Coder
                     </span>
@@ -813,7 +811,12 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile, sendApiRef }: { proje
                                             className="w-full bg-neutral-900 border border-neutral-600 rounded-lg px-3 py-2 text-sm text-neutral-200 focus:outline-none focus:border-violet-500 transition-colors appearance-none cursor-pointer"
                                             style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center" }}
                                         >
-                                            <optgroup label="⭐ GPT-4.1 Series (Latest)">
+                                            <optgroup label="🌟 GPT-5.6 Series (Newest)">
+                                                <option value="gpt-5.6-astra">🌟 GPT-5.6 Astra (Most Powerful)</option>
+                                                <option value="gpt-5.6-terra">GPT-5.6 Terra (Balanced)</option>
+                                                <option value="gpt-5.6-luna">GPT-5.6 Luna (Fast &amp; Efficient)</option>
+                                            </optgroup>
+                                            <optgroup label="⭐ GPT-4.1 Series">
                                                 <option value="gpt-4.1">⭐ GPT-4.1 (Best Coding + Vision)</option>
                                                 <option value="gpt-4.1-mini">GPT-4.1 Mini (Fast &amp; Cheap)</option>
                                                 <option value="gpt-4.1-nano">GPT-4.1 Nano (Lightest)</option>

@@ -358,6 +358,24 @@ pub(crate) async fn run_conversation_loop(
             body["tools"] = tools.clone();
         }
 
+        // GPT-5.6 reasoning models (luna, terra, astra, sol) and o-series models
+        // default to reasoning_effort != "none" on /v1/chat/completions, which is
+        // incompatible with function tools. Explicitly set "none" so tool-calling
+        // works. The models remain extremely capable even without reasoning tokens.
+        {
+            let ml = model.to_lowercase();
+            let is_reasoning_model = ml.contains("luna")
+                || ml.contains("terra")
+                || ml.contains("astra")
+                || ml.contains("sol")
+                || (ml.starts_with("o1") && !ml.contains("gpt"))
+                || (ml.starts_with("o3") && !ml.contains("gpt"))
+                || (ml.starts_with("o4") && !ml.contains("gpt"));
+            if is_reasoning_model && model_supports_tools {
+                body["reasoning_effort"] = json!("none");
+            }
+        }
+
         // Qwen3 models default to thinking mode — all output goes into <think> blocks
         // and delta.content is empty, making the response appear blank in the UI.
         // Disable thinking for Qwen3 on local servers so output goes directly to delta.content.
@@ -439,11 +457,29 @@ pub(crate) async fn run_conversation_loop(
                 "Cloud/Local"
             };
             if status.as_u16() == 429 {
+                // OpenAI returns 429 for two very different reasons:
+                // 1. Actual rate limit (too many requests/tokens per minute) — retry helps
+                // 2. Insufficient quota / no credits — retry is useless
+                // Check the response body to distinguish them.
+                let body_lower = body_text.to_lowercase();
+                if body_lower.contains("insufficient_quota")
+                    || body_lower.contains("billing")
+                    || body_lower.contains("exceeded your current quota")
+                    || body_lower.contains("plan and billing")
+                {
+                    return Err(format!(
+                        "💳 {} : ไม่มีเครดิตเหลือ — ไปเติมเครดิตที่ platform.openai.com/settings/billing\n\
+                         No API credits remaining. Add credits at platform.openai.com/settings/billing or switch to a free model.",
+                        provider_name
+                    ));
+                }
+
                 retry_count += 1;
                 if retry_count >= 5 {
                     return Err(format!(
-                        "❌ Model '{}' is rate-limited on {} and all 5 retries failed.",
-                        model, provider_name
+                        "❌ Model '{}' is rate-limited on {} and all 5 retries failed.\n\
+                         Response: {}",
+                        model, provider_name, body_text.chars().take(200).collect::<String>()
                     ));
                 }
                 // Use progressive wait: 30s for first 429, 60s for subsequent
