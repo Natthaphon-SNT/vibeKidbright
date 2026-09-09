@@ -1673,14 +1673,6 @@ function App({ toolchainReady = true, onRefreshToolchain }: { toolchainReady?: b
                 </div>
               )}
 
-              {/* Friendly Build Error Helper — plain-language list of what went wrong */}
-              {buildResult === "failed" && (
-                <BuildErrorList
-                  errors={buildErrors}
-                  onJumpToError={jumpToError}
-                  onAskAiFix={askAiToFixErrors}
-                />
-              )}
             </div>
 
             {activeFile ? (
@@ -1707,6 +1699,15 @@ function App({ toolchainReady = true, onRefreshToolchain }: { toolchainReady?: b
                 </div>
               </div>
             )}
+
+              {/* Floating Build Error Panel — always on top of editor */}
+              {buildResult === "failed" && (
+                <BuildErrorList
+                  errors={buildErrors}
+                  onJumpToError={jumpToError}
+                  onAskAiFix={askAiToFixErrors}
+                />
+              )}
           </div>
         </div>
 

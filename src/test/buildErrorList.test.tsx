@@ -58,18 +58,21 @@ describe("BuildErrorList", () => {
         expect(screen.getByText("A semicolon is missing at the end of a statement.")).toBeInTheDocument();
     });
 
-    it("shows file:line button and calls onJumpToError when clicked", () => {
+    it("shows file:line label and calls onJumpToError when the error row is clicked", () => {
         const onJump = vi.fn();
         const err = makeError();
         render(<BuildErrorList errors={[err]} onJumpToError={onJump} onAskAiFix={vi.fn()} />);
 
-        const jumpBtn = screen.getByRole("button", { name: /main\.c:42/ });
-        fireEvent.click(jumpBtn);
+        // The file:line span should be visible
+        expect(screen.getByText(/main\.c:42/)).toBeInTheDocument();
+
+        // Clicking the error row should trigger onJumpToError
+        fireEvent.click(screen.getByText("Missing semicolon"));
         expect(onJump).toHaveBeenCalledOnce();
         expect(onJump).toHaveBeenCalledWith(err);
     });
 
-    it("omits the jump button when the error has no file", () => {
+    it("omits the file label when the error has no file", () => {
         render(
             <BuildErrorList
                 errors={[makeError({ file: undefined, line: undefined })]}
@@ -77,7 +80,7 @@ describe("BuildErrorList", () => {
                 onAskAiFix={vi.fn()}
             />
         );
-        expect(screen.queryByRole("button", { name: /:\d+/ })).not.toBeInTheDocument();
+        expect(screen.queryByText(/:\d+/)).not.toBeInTheDocument();
     });
 
     it("calls onAskAiFix when the fix button is clicked", () => {

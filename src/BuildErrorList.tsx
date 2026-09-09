@@ -1,8 +1,10 @@
 /**
- * BuildErrorList — friendly build error panel.
- * Extracted from App.tsx so the rendering can be unit-tested in isolation.
+ * BuildErrorList — floating, collapsible build error panel.
+ * Always stays on top of the editor so users can click through errors
+ * without losing access to the error list.
  */
 
+import { useState } from "react";
 import type { ParsedBuildError } from "./errorHints";
 
 interface BuildErrorListProps {
@@ -12,47 +14,137 @@ interface BuildErrorListProps {
 }
 
 export default function BuildErrorList({ errors, onJumpToError, onAskAiFix }: BuildErrorListProps) {
+    const [expanded, setExpanded] = useState(true);
+
     if (errors.length === 0) return null;
 
     return (
-        <div className="mx-2 mb-1 rounded-lg overflow-hidden animate-fadein" style={{ border: '1px solid var(--danger)', backgroundColor: 'rgba(185,28,28,0.05)' }}>
-            <div className="px-3 py-2 flex items-center gap-2" style={{ borderBottom: '1px solid rgba(185,28,28,0.25)' }}>
-                <span className="text-sm">⚠️</span>
-                <span className="text-[12px] font-bold" style={{ color: 'var(--danger)' }}>
-                    Build failed — {errors.length} problem{errors.length > 1 ? "s" : ""} found
-                </span>
+        <div
+            style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                zIndex: 50,
+                pointerEvents: 'none',
+            }}
+        >
+            <div
+                className="animate-fadein"
+                style={{
+                    margin: '8px 8px 0',
+                    borderRadius: '10px',
+                    border: '1px solid var(--danger)',
+                    backgroundColor: 'var(--bg-sidebar)',
+                    boxShadow: '0 8px 32px rgba(0,0,0,0.35), 0 2px 8px rgba(185,28,28,0.2)',
+                    overflow: 'hidden',
+                    pointerEvents: 'auto',
+                    backdropFilter: 'blur(12px)',
+                }}
+            >
+                {/* Header — always visible, acts as toggle */}
                 <button
-                    onClick={onAskAiFix}
-                    className="ml-auto text-[11px] font-bold px-2.5 py-1 rounded-md transition-opacity hover:opacity-80 shrink-0"
-                    style={{ backgroundColor: 'var(--accent)', color: '#ffffff' }}
-                    title="ให้ Vibe Coder ช่วยแก้ / Let Vibe Coder fix it"
+                    onClick={() => setExpanded(prev => !prev)}
+                    style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        padding: '8px 12px',
+                        border: 'none',
+                        borderBottom: expanded ? '1px solid rgba(185,28,28,0.25)' : 'none',
+                        background: 'rgba(185,28,28,0.08)',
+                        cursor: 'pointer',
+                        color: 'inherit',
+                        textAlign: 'left',
+                    }}
                 >
-                    🤖 Ask Vibe Coder to Fix
+                    {/* Chevron */}
+                    <svg
+                        width="12" height="12" viewBox="0 0 24 24" fill="none"
+                        stroke="var(--danger)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"
+                        style={{
+                            transition: 'transform 0.2s ease',
+                            transform: expanded ? 'rotate(90deg)' : 'rotate(0deg)',
+                            flexShrink: 0,
+                        }}
+                    >
+                        <path d="M9 18l6-6-6-6" />
+                    </svg>
+
+                    <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--danger)' }}>
+                        ⚠️ Build failed — {errors.length} problem{errors.length > 1 ? "s" : ""} found
+                    </span>
+
+                    {/* Ask AI button */}
+                    <span
+                        onClick={(e) => { e.stopPropagation(); onAskAiFix(); }}
+                        className="transition-opacity hover:opacity-80"
+                        style={{
+                            marginLeft: 'auto',
+                            fontSize: '11px',
+                            fontWeight: 700,
+                            padding: '3px 10px',
+                            borderRadius: '6px',
+                            backgroundColor: 'var(--accent)',
+                            color: '#ffffff',
+                            cursor: 'pointer',
+                            flexShrink: 0,
+                        }}
+                        title="ให้ Vibe Coder ช่วยแก้ / Let Vibe Coder fix it"
+                    >
+                        🤖 Ask Vibe Coder to Fix
+                    </span>
                 </button>
-            </div>
-            <div className="max-h-44 overflow-y-auto">
-                {errors.map((err, i) => (
-                    <div key={i} className="px-3 py-2 flex items-start gap-2.5" style={{ borderBottom: i < errors.length - 1 ? '1px solid var(--border-color)' : undefined }}>
-                        <span className="text-[11px] mt-0.5 shrink-0">❌</span>
-                        <div className="min-w-0 flex-1">
-                            <div className="flex items-center gap-2 flex-wrap">
-                                <span className="text-[12px] font-bold" style={{ color: 'var(--danger)' }}>{err.title}</span>
-                                {err.file && (
-                                    <button
-                                        onClick={() => onJumpToError(err)}
-                                        className="text-[10px] font-mono px-1.5 py-0.5 rounded transition-colors hover:bg-red-500/20"
-                                        style={{ color: 'var(--accent)', backgroundColor: 'var(--bg-hover)' }}
-                                        title="เปิดไฟล์ตรงบรรทัดนี้ / Open at this line"
-                                    >
-                                        {err.file.split(/[\/\\]/).pop()}{err.line ? `:${err.line}` : ""}
-                                    </button>
-                                )}
+
+                {/* Error list — collapsible */}
+                {expanded && (
+                    <div style={{ maxHeight: '220px', overflowY: 'auto' }}>
+                        {errors.map((err, i) => (
+                            <div
+                                key={i}
+                                className="transition-colors"
+                                onClick={() => onJumpToError(err)}
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'flex-start',
+                                    gap: '10px',
+                                    padding: '8px 12px',
+                                    borderBottom: i < errors.length - 1 ? '1px solid var(--border-color)' : undefined,
+                                    cursor: err.file ? 'pointer' : 'default',
+                                }}
+                                onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(185,28,28,0.08)'; }}
+                                onMouseLeave={e => { e.currentTarget.style.backgroundColor = ''; }}
+                            >
+                                <span style={{ fontSize: '11px', marginTop: '2px', flexShrink: 0 }}>❌</span>
+                                <div style={{ minWidth: 0, flex: 1 }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                                        <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--danger)' }}>
+                                            {err.title}
+                                        </span>
+                                        {err.file && (
+                                            <span
+                                                style={{
+                                                    fontSize: '10px',
+                                                    fontFamily: 'monospace',
+                                                    padding: '2px 6px',
+                                                    borderRadius: '4px',
+                                                    color: 'var(--accent)',
+                                                    backgroundColor: 'var(--bg-hover)',
+                                                }}
+                                                title="Click to jump to this line"
+                                            >
+                                                📄 {err.file.split(/[/\\]/).pop()}{err.line ? `:${err.line}` : ""}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <div style={{ fontSize: '12px', marginTop: '3px', lineHeight: 1.5 }}>🇹🇭 {err.thaiHint}</div>
+                                    <div style={{ fontSize: '10px', marginTop: '2px', opacity: 0.7 }}>{err.englishHint}</div>
+                                </div>
                             </div>
-                            <div className="text-[12px] mt-0.5 leading-relaxed">🇹🇭 {err.thaiHint}</div>
-                            <div className="text-[10px] mt-0.5 opacity-70">{err.englishHint}</div>
-                        </div>
+                        ))}
                     </div>
-                ))}
+                )}
             </div>
         </div>
     );
