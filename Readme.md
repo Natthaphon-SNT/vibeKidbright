@@ -10,7 +10,7 @@
 
 <p align="center">
   <a href="https://github.com/Natthaphon-SNT/vibeKidbright/releases">
-    <img src="https://img.shields.io/badge/version-v3.6.4-blue.svg" alt="Version"/>
+    <img src="https://img.shields.io/badge/version-v3.6.12-blue.svg" alt="Version"/>
   </a>
   <img src="https://img.shields.io/badge/platform-Windows%20%7C%20macOS-lightgrey.svg" alt="Platform"/>
   <img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License"/>
@@ -96,7 +96,7 @@ winget install Natthaphon-SNT.vibeKidbright
 ## 🛠️ การรันและพัฒนาจาก Source Code (Developer Guide)
 
 ### สิ่งที่ต้องเตรียม (Prerequisites)
-- [Node.js](https://nodejs.org/) (v20+ หรือ v22 แนะนำ)
+- [Node.js](https://nodejs.org/) (v20.19+ หรือ v22.12+ แนะนำ)
 - [Rust](https://www.rust-lang.org/) (เวอร์ชัน Stable ล่าสุด)
 - [Tauri CLI v2](https://v2.tauri.app/) (`cargo install tauri-cli --version "^2"`)
 - (สำหรับ macOS) Xcode Command Line Tools
@@ -134,6 +134,15 @@ npm run tauri build
 ```
 
 ไฟล์ Installer จะถูกสร้างไว้ที่: `src-tauri/target/release/bundle/`
+
+### การนำ repository ไปใช้บนเครื่องอื่น
+
+- Clone ผ่าน Git แล้วรัน `npm ci` เพื่อให้ได้ dependency ตาม lockfile
+- Path ของ ESP-IDF, tools, knowledge base และข้อมูลตั้งค่าจะ resolve ตอน runtime จาก Tauri App Data หรือค่าที่ผู้ใช้เลือก ไม่มี path ของเครื่องผู้พัฒนาฝังอยู่ใน build
+- ไฟล์ `.env*`, certificate (`.pfx`, `.p12`), database และ config ส่วนตัวถูกป้องกันด้วย `.gitignore` ห้ามใช้วิธี ZIP ทั้ง working directory เพื่อเผยแพร่ เพราะไฟล์ที่ Git ignore ยังอาจติดไปด้วย
+- GitHub Actions สามารถ build แบบ unsigned ได้เมื่อไม่มี signing secrets; หากต้องการ signed release ให้ตั้งค่า repository secrets ตาม workflow
+- ตรวจสอบไฟล์ที่จะเผยแพร่ด้วย `git status --short` และ `git ls-files` ก่อน push ทุกครั้ง
+- Installer แพ็กเฉพาะ resource ใน `resources/knowledge_base` ตาม allowlist และไม่รวม project, chat history, Wiki, API key, config, database, cache หรือ AppData ของเครื่อง build โดย workflow จะรัน `npm run check:bundle` หลังรวม knowledge base ทุกครั้ง
 
 ---
 

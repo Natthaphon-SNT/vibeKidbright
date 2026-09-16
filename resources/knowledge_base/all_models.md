@@ -1,6 +1,6 @@
 # 📋 KidBright — ประวัติรุ่น, GPIO Pinout & Sensor ทุกรุ่น (ตั้งแต่ V2016 ถึงรุ่นล่าสุด)
 > **จัดทำโดย:** รวบรวมจากเอกสารทางการ NECTEC/NSTDA · อัปเดต 2026
-> ครอบคลุมทุกรุ่น: **KidBright V2016 (ESP8266)** · **V1.0 (ESP8266)** · **V1.1–V1.6 (ESP32)** · **KidBright μAI (AllWinner V831/ESP32-S3)**
+> ครอบคลุมทุกรุ่น: **KidBright V2016 (ESP8266)** · **V1.0 (ESP8266)** · **V1.1–V1.6 (ESP32)** · **KidBright uAI** · **KidBright uAI Plus**
 
 ---
 
@@ -21,7 +21,8 @@
 | **KidBright32iA** | 2022 | ESP32-WROOM-32 | **USB-C** (CP2102) | INEX — เพิ่ม KXTJ3-1057 Accelerometer บน I2C0, **SW2=GPIO14**, ฐานเดียวกับ 32i |
 | **V1.6** | 2022+ | ESP32-WROOM-32 | **USB-C** (CP2102) | Gravitech, เพิ่ม MPU-6050 + RGB LED ×6, SW2=GPIO17 |
 | **KidBright32iP** | 2023–2024 | ESP32-WROOM-32 | **USB-C** (CP2102) | INEX บอร์ดสีชมพู — ปรับปรุงจาก 32i, Phototransistor ดีขึ้น, LED สถานะไฟเลี้ยง, รองรับ Servo, **SW2=GPIO14** |
-| **KidBright μAI** | 2024 | AllWinner V831 + ESP32-S3 | USB-C (OTG+UART) | รุ่นล่าสุด — Edge AI, มีกล้อง 2MP, ไมโครโฟน, จอ IPS 1.3 นิ้ว, Tina Linux |
+| **KidBright uAI** | — | ไม่ระบุในคู่มือฉบับนี้ | ไม่ระบุในคู่มือฉบับนี้ | รุ่นแรก ไม่มีจอในตัว |
+| **KidBright uAI Plus** | — | ไม่ระบุในคู่มือฉบับนี้ | USB-C (RNDIS) | รุ่นใหม่ มีจอ, S1/S2, accelerometer/gyroscope, IO2–IO8 และ I2C 2 ชุด |
 
 ---
 
@@ -320,34 +321,21 @@
 
 ---
 
-### Generation 3 — KidBright μAI (รุ่นล่าสุด 2024) — Edge AI Platform
+### Generation 3 — KidBright uAI และ KidBright uAI Plus
 
-> **⚠️ ไม่ใช่ ESP32 ธรรมดา** — ใช้ SoC AllWinner V831 (ARM Cortex-A7) สำหรับ AI + ESP32-S3 สำหรับ IoT/WiFi
-> ทำงานบน **Tina Linux** (fork จาก OpenWrt, Kernel 4.9) — ไม่ใช่ ESP-IDF Framework
-> พัฒนาด้วย **KidBright μAI IDE** (online Blockly + Python) หรือ cross-compile C/C++ บน Ubuntu 16.04
+> **ต้องถามรุ่นก่อนตอบเสมอ:** รุ่นแรกไม่มีจอในตัว ส่วน uAI Plus มีจอและปุ่ม S1/S2 ห้ามใช้สเปคของสองรุ่นปะปนกัน
 
-| คุณสมบัติ | รายละเอียด |
-|-----------|-----------|
-| AI Processor | AllWinner V831 (ARM Cortex-A7 @ ~800 MHz) |
-| IoT Module | ESP32-S3 (WiFi + BLE) |
-| Display | จอ IPS สี 1.3 นิ้ว (TFT) |
-| Camera | กล้อง 2 ล้านพิกเซล (built-in) |
-| Microphone | ไมโครโฟน built-in |
-| WiFi | 802.11 b/g/n 2.4 GHz (via ESP32-S3) |
-| USB | USB-C (OTG + UART) |
-| Input/Output | รองรับ Digital I/O + ต่ออุปกรณ์ภายนอก |
-| Storage | SD Card (Tina Linux boot) |
-| OS | Tina Linux (OpenWrt-based) |
-| IDE | KidBright μAI IDE (online Blockly/Python) |
-| AI Features | Image Classification, Object Detection, Sound Classification |
-| Released | 2024 (เปิดตัว KDC24 KidBright Developer Conference) |
+| คุณสมบัติที่ยืนยันแล้ว | KidBright uAI รุ่นแรก | KidBright uAI Plus |
+|-------------------------|-----------------------|--------------------|
+| จอในตัว | ไม่มี | มี |
+| ปุ่ม S1/S2 | ไม่มี/ไม่รองรับในขอบเขตนี้ | มี |
+| Accelerometer/Gyroscope 3 แกน | ไม่มี/ไม่รองรับในขอบเขตนี้ | มี |
+| กล้อง/บล็อกกล้อง | ไม่มี/ไม่รองรับในขอบเขตนี้ | มี |
+| พอร์ต | ไม่ระบุในคู่มือฉบับนี้ | IO2–IO8, I2C 2 ชุด |
+| การเชื่อมต่อ | ไม่ระบุในคู่มือฉบับนี้ | USB-C ผ่าน RNDIS |
+| IDE ปัจจุบัน | https://kidbright-mai.web.app | https://kidbright-mai.web.app |
 
-**เซนเซอร์ / อินพุตที่รองรับ:**
-- กล้อง 2MP (ภาพ AI)
-- ไมโครโฟน (เสียง AI)
-- จอ IPS 1.3 นิ้ว (แสดงผล)
-- WiFi (IoT, Cloud)
-- ต่อเซนเซอร์ภายนอกผ่าน I/O ports
+รายละเอียดการเลือกบอร์ด การเชื่อมต่อ และการเทรนโมเดล: ดู `kidbright_uai.md`
 
 ---
 

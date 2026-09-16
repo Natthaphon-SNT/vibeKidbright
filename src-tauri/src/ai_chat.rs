@@ -56,7 +56,27 @@ pub fn get_app_data_kb() -> Option<&'static PathBuf> {
 }
 
 pub(crate) fn normalize_project_dir(project_dir: &str) -> String {
-    project_dir.trim_start_matches("file://").trim().to_string()
+    let trimmed = project_dir.trim();
+    let Some(uri_path) = trimmed.strip_prefix("file://") else {
+        return trimmed.to_string();
+    };
+
+    let decoded = urlencoding::decode(uri_path)
+        .map(|path| path.into_owned())
+        .unwrap_or_else(|_| uri_path.to_string());
+
+    #[cfg(target_os = "windows")]
+    {
+        let bytes = decoded.as_bytes();
+        if bytes.len() >= 3 && bytes[0] == b'/' && bytes[2] == b':' {
+            return decoded[1..].to_string();
+        }
+        if !decoded.starts_with('/') {
+            return format!("//{}", decoded);
+        }
+    }
+
+    decoded
 }
 
 fn resolve_project_root(project_dir: &str) -> PathBuf {
@@ -99,7 +119,12 @@ pub(crate) fn resolve_kb_path(project_dir: &str) -> PathBuf {
 
     // Fallback 3: Manual APPDATA env var (legacy / safety net)
     if let Ok(app_data) = std::env::var("APPDATA").or_else(|_| std::env::var("HOME")) {
-        for name in &["com.cake.tauri-app", "VibeKidbright IDE", "vibekidbright-ide"] {
+        for name in &[
+            "th.nectec.vibekidbright",
+            "com.cake.tauri-app",
+            "VibeKidbright IDE",
+            "vibekidbright-ide",
+        ] {
             let appdata_kb = std::path::PathBuf::from(&app_data)
                 .join(name)
                 .join("knowledge_base");
@@ -884,6 +909,19 @@ mod tests {
     fn test_normalize_project_dir_empty() {
         let result = normalize_project_dir("   ");
         assert_eq!(result, "");
+    }
+
+    #[test]
+    fn test_normalize_project_dir_decodes_uri_characters() {
+        let result = normalize_project_dir("file:///home/user/My%20Project");
+        assert_eq!(result, "/home/user/My Project");
+    }
+
+    #[cfg(target_os = "windows")]
+    #[test]
+    fn test_normalize_project_dir_windows_drive_uri() {
+        let result = normalize_project_dir("file:///C:/Users/user/project");
+        assert_eq!(result, "C:/Users/user/project");
     }
 
     // ── resolve_kb_path ───────────────────────────────────────────────────────

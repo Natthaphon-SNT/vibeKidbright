@@ -1,6 +1,6 @@
 [package]
 name = "vibe-kidbright"
-version = "0.1.0"
+version = "3.6.12"
 description = "VibeKidbright IDE - a kid-friendly AI-assisted IDE for KidBright32 boards"
 authors = ["Natthaphon-SNT <zfrankenz123@gmail.com>"]
 edition = "2021"

@@ -791,7 +791,7 @@ export default function ToolchainSetup({ onReady, toolchainUrl, mini = false }: 
                 alignItems: "center",
                 gap: "5px",
               }}
-              title="แก้ปัญหา: No Python at 'C:\\Users\\...' — ใช้เมื่อ build ไม่ผ่านบนเครื่องใหม่"
+              title="แก้ปัญหา Python path จากเครื่องเดิม — ใช้เมื่อ build ไม่ผ่านบนเครื่องใหม่"
             >
               {isRepairing ? "⏳ Repairing..." : "🔧 Repair Python Paths (fix 'No Python' error)"}
             </button>

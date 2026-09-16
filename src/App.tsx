@@ -10,6 +10,7 @@ import BuildErrorList from "./BuildErrorList";
 import { toast, ToastHost } from "./Toast";
 import { normPath } from "./utils";
 
+const PORT_REFRESH_INTERVAL_MS = 2_000;
 
 interface FileEntry {
   name: string;
@@ -378,6 +379,8 @@ function App({ toolchainReady = true, onRefreshToolchain }: { toolchainReady?: b
   const [espIdfSetupNote, setEspIdfSetupNote] = useState("");
   const [logs, setLogs] = useState<string[]>([]);
   const [terminalInput, setTerminalInput] = useState("");
+  const terminalHistoryRef = useRef<string[]>([]);
+  const terminalHistoryIndexRef = useRef(-1);
   const [openFiles, setOpenFiles] = useState<FileTab[]>([]);
   const [activeFilePath, setActiveFilePath] = useState<string>("");
   const [showAiPanel, setShowAiPanel] = useState(() => {
@@ -400,6 +403,16 @@ function App({ toolchainReady = true, onRefreshToolchain }: { toolchainReady?: b
   const [selectedSerialPort, setSelectedSerialPort] = useState("");
   const [serialBaud, setSerialBaud] = useState("115200");
   const [isSerialConnected, setIsSerialConnected] = useState(false);
+  const serialPortRefreshInFlightRef = useRef(false);
+  const adbDeviceRefreshInFlightRef = useRef(false);
+
+  // Board type selector (KidBright32 vs MiuAiPlus)
+  type BoardType = "kidbright32" | "miuaiplus";
+  const [selectedBoard, setSelectedBoard] = useState<BoardType>(() => {
+    return (localStorage.getItem("vibe-selected-board") as BoardType) || "kidbright32";
+  });
+  const [adbDevices, setAdbDevices] = useState<string[]>([]);
+  const [selectedAdbDevice, setSelectedAdbDevice] = useState("");
   const [showNewProjectModal, setShowNewProjectModal] = useState(false);
   const [newProjectName, setNewProjectName] = useState("my_esp_project");
   const [newProjectPath, setNewProjectPath] = useState("");
@@ -505,10 +518,9 @@ function App({ toolchainReady = true, onRefreshToolchain }: { toolchainReady?: b
     }
   };
 
-  // Mount-once: ตรวจสภาพและโหลด serial ports ครั้งเดียวเท่านั้น
+  // Check the ESP-IDF environment once; port discovery is polled separately below.
   useEffect(() => {
     checkEnvironment();
-    loadSerialPorts();
   }, []);
 
   useEffect(() => {
@@ -749,7 +761,10 @@ function App({ toolchainReady = true, onRefreshToolchain }: { toolchainReady?: b
     }
   };
 
-  const loadSerialPorts = async () => {
+  const loadSerialPorts = async (reportError = true) => {
+    if (serialPortRefreshInFlightRef.current) return;
+    serialPortRefreshInFlightRef.current = true;
+
     try {
       const ports = await invoke("list_serial_ports");
       const list = ports as string[];
@@ -762,9 +777,52 @@ function App({ toolchainReady = true, onRefreshToolchain }: { toolchainReady?: b
       
       setSerialPorts(list);
     } catch (err) {
-      addLog(`❌ Failed to list serial ports: ${err}`);
+      if (reportError) {
+        addLog(`❌ Failed to list serial ports: ${err}`);
+      }
+    } finally {
+      serialPortRefreshInFlightRef.current = false;
     }
   };
+
+  const loadAdbDevices = async (reportError = true) => {
+    if (adbDeviceRefreshInFlightRef.current) return;
+    adbDeviceRefreshInFlightRef.current = true;
+
+    try {
+      const devices = await invoke("list_adb_devices");
+      const list = devices as string[];
+
+      setSelectedAdbDevice(prev => {
+        if (list.length === 0) return "";
+        if (prev && list.includes(prev)) return prev;
+        return list[0];
+      });
+
+      setAdbDevices(list);
+    } catch (err) {
+      if (reportError) {
+        addLog(`❌ Failed to list ADB devices: ${err}`);
+      }
+    } finally {
+      adbDeviceRefreshInFlightRef.current = false;
+    }
+  };
+
+  // Refresh the active board's port list automatically without overlapping scans.
+  useEffect(() => {
+    const refreshVisiblePorts = () => {
+      if (selectedBoard === "miuaiplus") {
+        void loadAdbDevices(false);
+      } else {
+        void loadSerialPorts(false);
+      }
+    };
+
+    refreshVisiblePorts();
+    const intervalId = window.setInterval(refreshVisiblePorts, PORT_REFRESH_INTERVAL_MS);
+    return () => window.clearInterval(intervalId);
+  }, [selectedBoard]);
 
   const handleFileClick = async (path: string) => {
     const np = normPath(path);
@@ -978,53 +1036,80 @@ function App({ toolchainReady = true, onRefreshToolchain }: { toolchainReady?: b
   const toggleSerialMonitor = async () => {
     if (isSerialConnected) {
       try {
-        const result = await invoke("stop_serial_monitor");
-        addLog(`${result}`);
+        // Disconnect based on board type
+        if (selectedBoard === "miuaiplus") {
+          const result = await invoke("stop_adb_monitor");
+          addLog(`${result}`);
+        } else {
+          const result = await invoke("stop_serial_monitor");
+          addLog(`${result}`);
+        }
         setIsSerialConnected(false);
       } catch (err) {
-        addLog(`❌ Failed to stop serial monitor: ${err}`);
+        addLog(`❌ Failed to stop monitor: ${err}`);
       }
       return;
     }
 
-    if (!selectedSerialPort) {
-      addLog("❌ No serial port selected");
-      return;
-    }
+    if (selectedBoard === "miuaiplus") {
+      // ADB monitor for MiuAiPlus
+      try {
+        const result = await invoke("start_adb_monitor", {
+          device: selectedAdbDevice || null
+        });
+        addLog(`${result}`);
+        setIsSerialConnected(true);
+      } catch (err) {
+        addLog(`❌ Failed to start ADB monitor: ${err}`);
+      }
+    } else {
+      // Serial monitor for KidBright32
+      if (!selectedSerialPort) {
+        addLog("❌ No serial port selected");
+        return;
+      }
 
-    try {
-      const result = await invoke("start_serial_monitor", {
-        port: selectedSerialPort,
-        baudRate: Number(serialBaud) || 115200
-      });
-      addLog(`${result}`);
-      setIsSerialConnected(true);
-    } catch (err) {
-      addLog(`❌ Failed to start serial monitor: ${err}`);
+      try {
+        const result = await invoke("start_serial_monitor", {
+          port: selectedSerialPort,
+          baudRate: Number(serialBaud) || 115200
+        });
+        addLog(`${result}`);
+        setIsSerialConnected(true);
+      } catch (err) {
+        addLog(`❌ Failed to start serial monitor: ${err}`);
+      }
     }
   };
 
   const sendSerialText = async () => {
     if (!terminalInput.trim()) return;
     if (!isSerialConnected) {
-      addLog("❌ Serial monitor is not connected");
+      addLog("❌ Monitor is not connected");
       return;
     }
 
     try {
-      let payload = terminalInput;
-      if (payload.endsWith("\r\n")) {
-      } else if (payload.endsWith("\n")) {
-        payload = payload.slice(0, -1) + "\r\n";
+      if (selectedBoard === "miuaiplus") {
+        // Send via ADB shell
+        await invoke("send_adb_input", { input: terminalInput });
+        addLog(`[ADB TX] ${terminalInput}`);
       } else {
-        payload += "\r\n";
+        // Send via serial port
+        let payload = terminalInput;
+        if (payload.endsWith("\r\n")) {
+        } else if (payload.endsWith("\n")) {
+          payload = payload.slice(0, -1) + "\r\n";
+        } else {
+          payload += "\r\n";
+        }
+
+        await invoke("send_serial_input", { input: payload });
+        addLog(`[SERIAL TX] ${terminalInput}`);
       }
-      
-      await invoke("send_serial_input", { input: payload });
-      addLog(`[SERIAL TX] ${terminalInput}`);
       setTerminalInput("");
     } catch (err) {
-      addLog(`❌ Failed to send serial input: ${err}`);
+      addLog(`❌ Failed to send input: ${err}`);
     }
   };
 
@@ -1128,6 +1213,9 @@ function App({ toolchainReady = true, onRefreshToolchain }: { toolchainReady?: b
     const args = parts.slice(1);
 
     addLog(`> ${terminalInput}`);
+    // Save to command history
+    terminalHistoryRef.current.push(terminalInput.trim());
+    terminalHistoryIndexRef.current = -1;
     setTerminalInput("");
 
     try {
@@ -1716,41 +1804,95 @@ function App({ toolchainReady = true, onRefreshToolchain }: { toolchainReady?: b
           <div className="h-9 flex items-center justify-between px-4" style={{ borderBottom: '1px solid var(--border-color)', backgroundColor: 'var(--bg-terminal)' }}>
             <span className="text-[10px] font-bold uppercase tracking-[0.2em]" style={{ color: 'var(--text-muted)' }}>Interactive Terminal</span>
             <div className="flex items-center gap-2">
-              <div className="flex items-center">
-                <select
-                  value={selectedSerialPort}
-                  onChange={(e) => setSelectedSerialPort(e.target.value)}
-                  onClick={loadSerialPorts}
-                  className="rounded px-2 py-1 text-[10px] w-[100px] focus:outline-none cursor-pointer"
-                  style={{ backgroundColor: 'var(--bg-input)', border: '1px solid var(--border-color)', color: 'var(--text-primary)' }}
-                  title="Auto-refreshing Serial Ports"
-                >
-                  {serialPorts.length === 0 ? (
-                    <option value="" disabled>No Ports</option>
-                  ) : (
-                    <>
-                      {!selectedSerialPort && <option value="" disabled>Select Port</option>}
-                      {serialPorts.map((port) => (
-                        <option key={port} value={port}>{port}</option>
-                      ))}
-                    </>
-                  )}
-                </select>
-              </div>
-              <input
-                type="text"
-                value={serialBaud}
-                onChange={(e) => setSerialBaud(e.target.value)}
-                className="w-20 rounded px-2 py-1 text-[10px]"
-                style={{ backgroundColor: 'var(--bg-input)', border: '1px solid var(--border-color)', color: 'var(--text-primary)' }}
-              />
-              <button
-                onClick={loadSerialPorts}
-                className="text-[10px] px-2 py-1 rounded"
-                style={{ backgroundColor: 'var(--bg-hover)', color: 'var(--text-secondary)', border: '1px solid var(--border-color)' }}
+              {/* Board Type Selector */}
+              <select
+                value={selectedBoard}
+                onChange={(e) => {
+                  const board = e.target.value as BoardType;
+                  setSelectedBoard(board);
+                  localStorage.setItem("vibe-selected-board", board);
+                  // Disconnect current monitor when switching boards
+                  if (isSerialConnected) {
+                    toggleSerialMonitor();
+                  }
+                }}
+                className="rounded px-2 py-1 text-[10px] w-[110px] focus:outline-none cursor-pointer font-bold"
+                style={{ backgroundColor: 'var(--bg-input)', border: '1px solid var(--accent)', color: 'var(--accent)' }}
+                title="Select Board Type"
               >
-                Refresh Ports
-              </button>
+                <option value="kidbright32">KidBright32</option>
+                <option value="miuaiplus">MiuAiPlus</option>
+              </select>
+
+              {/* Port/Device Controls — conditional based on board type */}
+              {selectedBoard === "miuaiplus" ? (
+                /* ADB Device Selector for MiuAiPlus */
+                <>
+                  <select
+                    value={selectedAdbDevice}
+                    onChange={(e) => setSelectedAdbDevice(e.target.value)}
+                    className="rounded px-2 py-1 text-[10px] w-[130px] focus:outline-none cursor-pointer"
+                    style={{ backgroundColor: 'var(--bg-input)', border: '1px solid var(--border-color)', color: 'var(--text-primary)' }}
+                    title="Auto-refreshing ADB Devices"
+                  >
+                    {adbDevices.length === 0 ? (
+                      <option value="" disabled>No ADB Devices</option>
+                    ) : (
+                      <>
+                        {!selectedAdbDevice && <option value="" disabled>Select Device</option>}
+                        {adbDevices.map((dev) => (
+                          <option key={dev} value={dev}>{dev}</option>
+                        ))}
+                      </>
+                    )}
+                  </select>
+                  <button
+                    onClick={() => void loadAdbDevices()}
+                    className="text-[10px] px-2 py-1 rounded"
+                    style={{ backgroundColor: 'var(--bg-hover)', color: 'var(--text-secondary)', border: '1px solid var(--border-color)' }}
+                  >
+                    Refresh ADB
+                  </button>
+                </>
+              ) : (
+                /* Serial Port Selector for KidBright32 */
+                <>
+                  <div className="flex items-center">
+                    <select
+                      value={selectedSerialPort}
+                      onChange={(e) => setSelectedSerialPort(e.target.value)}
+                      className="rounded px-2 py-1 text-[10px] w-[100px] focus:outline-none cursor-pointer"
+                      style={{ backgroundColor: 'var(--bg-input)', border: '1px solid var(--border-color)', color: 'var(--text-primary)' }}
+                      title="Auto-refreshing Serial Ports"
+                    >
+                      {serialPorts.length === 0 ? (
+                        <option value="" disabled>No Ports</option>
+                      ) : (
+                        <>
+                          {!selectedSerialPort && <option value="" disabled>Select Port</option>}
+                          {serialPorts.map((port) => (
+                            <option key={port} value={port}>{port}</option>
+                          ))}
+                        </>
+                      )}
+                    </select>
+                  </div>
+                  <input
+                    type="text"
+                    value={serialBaud}
+                    onChange={(e) => setSerialBaud(e.target.value)}
+                    className="w-20 rounded px-2 py-1 text-[10px]"
+                    style={{ backgroundColor: 'var(--bg-input)', border: '1px solid var(--border-color)', color: 'var(--text-primary)' }}
+                  />
+                  <button
+                    onClick={() => void loadSerialPorts()}
+                    className="text-[10px] px-2 py-1 rounded"
+                    style={{ backgroundColor: 'var(--bg-hover)', color: 'var(--text-secondary)', border: '1px solid var(--border-color)' }}
+                  >
+                    Refresh Ports
+                  </button>
+                </>
+              )}
               <button
                 onClick={toggleSerialMonitor}
                 className="text-[10px] px-2 py-1 rounded font-bold"
@@ -1759,7 +1901,10 @@ function App({ toolchainReady = true, onRefreshToolchain }: { toolchainReady?: b
                   : { backgroundColor: 'var(--success)', color: '#fff' }
                 }
               >
-                {isSerialConnected ? "Disconnect Serial" : "Connect Serial"}
+                {isSerialConnected
+                  ? (selectedBoard === "miuaiplus" ? "Disconnect ADB" : "Disconnect Serial")
+                  : (selectedBoard === "miuaiplus" ? "Connect ADB" : "Connect Serial")
+                }
               </button>
               <button
                 onClick={() => setLogs([])}
@@ -1773,6 +1918,14 @@ function App({ toolchainReady = true, onRefreshToolchain }: { toolchainReady?: b
           <div
             ref={scrollRef}
             className="flex-1 overflow-y-auto p-4 font-mono text-xs space-y-1 selection:bg-red-500/20"
+            onCopy={(e) => {
+              // Force plain-text copy — strip formatting/colors
+              const selection = window.getSelection();
+              if (selection) {
+                e.preventDefault();
+                e.clipboardData.setData("text/plain", selection.toString());
+              }
+            }}
           >
             {logs.length === 0 ? (
               <div className="italic opacity-50" style={{ color: 'var(--text-disabled)' }}>vibeKidbright Terminal Ready. Type 'idf.py --version' to test.</div>
@@ -1792,6 +1945,29 @@ function App({ toolchainReady = true, onRefreshToolchain }: { toolchainReady?: b
                 type="text"
                 value={terminalInput}
                 onChange={(e) => setTerminalInput(e.target.value)}
+                onKeyDown={(e) => {
+                  const history = terminalHistoryRef.current;
+                  if (history.length === 0) return;
+                  if (e.key === "ArrowUp") {
+                    e.preventDefault();
+                    const newIndex = terminalHistoryIndexRef.current === -1
+                      ? history.length - 1
+                      : Math.max(0, terminalHistoryIndexRef.current - 1);
+                    terminalHistoryIndexRef.current = newIndex;
+                    setTerminalInput(history[newIndex]);
+                  } else if (e.key === "ArrowDown") {
+                    e.preventDefault();
+                    if (terminalHistoryIndexRef.current === -1) return;
+                    const newIndex = terminalHistoryIndexRef.current + 1;
+                    if (newIndex >= history.length) {
+                      terminalHistoryIndexRef.current = -1;
+                      setTerminalInput("");
+                    } else {
+                      terminalHistoryIndexRef.current = newIndex;
+                      setTerminalInput(history[newIndex]);
+                    }
+                  }
+                }}
                 placeholder={isSerialConnected ? "Type message and press Enter to send to board..." : "Type command (e.g. idf.py) and press Enter..."}
                 className="w-full bg-transparent border-none focus:outline-none font-mono text-sm"
                 style={{ color: 'var(--text-primary)' }}
@@ -1918,7 +2094,7 @@ function App({ toolchainReady = true, onRefreshToolchain }: { toolchainReady?: b
                   </label>
                   <div className="flex gap-2">
                     <div className="flex-1 bg-neutral-800 border border-neutral-600 rounded-lg px-3 py-2 text-xs text-neutral-300 truncate flex items-center font-mono">
-                      {customIdfPath || <span className="text-neutral-600 italic">e.g. C:\Espressif\frameworks\esp-idf-v5.4.3</span>}
+                      {customIdfPath || <span className="text-neutral-600 italic">e.g. …/frameworks/esp-idf-v5.x</span>}
                     </div>
                     <button
                       onClick={handlePickIdfPath}
@@ -1935,7 +2111,7 @@ function App({ toolchainReady = true, onRefreshToolchain }: { toolchainReady?: b
                   </label>
                   <div className="flex gap-2">
                     <div className="flex-1 bg-neutral-800 border border-neutral-600 rounded-lg px-3 py-2 text-xs text-neutral-300 truncate flex items-center font-mono">
-                      {customToolsPath || <span className="text-neutral-600 italic">e.g. D:\Espressif</span>}
+                      {customToolsPath || <span className="text-neutral-600 italic">e.g. …/.espressif</span>}
                     </div>
                     <button
                       onClick={handlePickToolsPath}

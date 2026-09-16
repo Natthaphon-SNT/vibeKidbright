@@ -452,7 +452,7 @@ export default function CodeEditor({
         quickSuggestions: false,
         suggestOnTriggerCharacters: false,
         parameterHints: { enabled: false },
-        hover: { enabled: true, delay: 600 },
+        hover: { enabled: "on" as const, delay: 600 },
     };
 
     return (

@@ -4,9 +4,14 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: windows-latest
+    env:
+      HAS_WINDOWS_CERT: ${{ secrets.CERT_PFX_BASE64 != '' && secrets.CERT_PASSWORD != '' }}
     steps:
       - name: Checkout main repository
         uses: actions/checkout@v4
@@ -45,6 +50,10 @@ jobs:
         working-directory: main_repo
         run: npm ci
 
+      - name: Check repository public readiness
+        working-directory: main_repo
+        run: npm run check:public
+
       - name: Merge knowledge_base from both repos
         run: |
           $dst = "main_repo/resources/knowledge_base"
@@ -68,6 +77,10 @@ jobs:
           Write-Host "Merge complete -> $dst"
         shell: pwsh
 
+      - name: Verify clean installer resources
+        working-directory: main_repo
+        run: npm run check:bundle
+
       - name: Get app version from tauri.conf.json
         id: get_version
         run: |
@@ -79,8 +92,11 @@ jobs:
         shell: pwsh
 
       - name: Decode PFX Certificate
+        if: ${{ env.HAS_WINDOWS_CERT == 'true' }}
+        env:
+          CERT_PFX_BASE64: ${{ secrets.CERT_PFX_BASE64 }}
         run: |
-          $pfx_cert_byte = [System.Convert]::FromBase64String("${{ secrets.CERT_PFX_BASE64 }}")
+          $pfx_cert_byte = [System.Convert]::FromBase64String($env:CERT_PFX_BASE64)
           [IO.File]::WriteAllBytes("cert.pfx", $pfx_cert_byte)
         shell: pwsh
 
@@ -104,16 +120,36 @@ jobs:
           projectPath: main_repo
 
       - name: Sign installer
+        if: ${{ env.HAS_WINDOWS_CERT == 'true' }}
+        env:
+          CERT_PASSWORD: ${{ secrets.CERT_PASSWORD }}
         run: |
           $installer = Get-ChildItem "main_repo\src-tauri\target\release\bundle\nsis\*.exe" | Select-Object -First 1
+          if (-not $installer) { throw "NSIS installer not found" }
+
+          $signtool = (Get-Command signtool.exe -ErrorAction SilentlyContinue).Source
+          if (-not $signtool) {
+            $kitsRoot = Join-Path ([Environment]::GetFolderPath("ProgramFilesX86")) "Windows Kits\10\bin"
+            $signtool = Get-ChildItem -Path $kitsRoot -Filter signtool.exe -Recurse -File -ErrorAction SilentlyContinue |
+              Where-Object { $_.FullName -match '\\x64\\signtool\.exe$' } |
+              Sort-Object FullName -Descending |
+              Select-Object -First 1 -ExpandProperty FullName
+          }
+          if (-not $signtool) { throw "signtool.exe was not found in PATH or Windows SDK directories" }
+
           Write-Host "Signing: $($installer.FullName)"
-          & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\signtool.exe" sign `
+          & $signtool sign `
             /f cert.pfx `
-            /p "${{ secrets.CERT_PASSWORD }}" `
+            /p $env:CERT_PASSWORD `
             /fd SHA256 `
             /t "http://timestamp.digicert.com" `
             "$($installer.FullName)"
-          Remove-Item "cert.pfx"
+        shell: pwsh
+
+      - name: Remove temporary signing certificate
+        if: ${{ always() }}
+        run: |
+          if (Test-Path "cert.pfx") { Remove-Item -LiteralPath "cert.pfx" -Force }
         shell: pwsh
 
       - name: Create Release

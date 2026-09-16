@@ -33,7 +33,7 @@ pub fn run() {
                 }
             });
             // Auto-patch pyvenv.cfg every startup so Python paths match this machine
-            // (fixes "No Python at C:\Users\Acer\..." on machines other than the dev machine)
+            // Repairs stale absolute Python paths when the toolchain moves between machines.
             if let Ok(toolchain_dir) = toolchain::get_toolchain_dir(app.handle()) {
                 toolchain::auto_repair_on_startup(&toolchain_dir);
             }
@@ -60,6 +60,10 @@ pub fn run() {
             esp_idf::start_serial_monitor,
             esp_idf::send_serial_input,
             esp_idf::stop_serial_monitor,
+            esp_idf::list_adb_devices,
+            esp_idf::start_adb_monitor,
+            esp_idf::send_adb_input,
+            esp_idf::stop_adb_monitor,
             esp_idf::get_idf_custom_paths,
             esp_idf::set_idf_custom_paths,
             esp_idf::clear_idf_custom_paths,

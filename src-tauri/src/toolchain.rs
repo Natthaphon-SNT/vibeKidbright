@@ -84,7 +84,7 @@ fn emit_progress(app: &AppHandle, stage: &str, percent: u8, message: &str) {
 // ── Helper: resolve toolchain directory ──────────────────────────────────────
 
 /// คืนค่า path ของโฟลเดอร์ toolchain ใน AppData
-/// ตัวอย่าง: C:\Users\name\AppData\Roaming\com.rmutt.KidBrightVibe\toolchain
+/// ตำแหน่งจริงมาจาก Tauri `app_data_dir()` ของผู้ใช้แต่ละเครื่อง
 pub fn get_toolchain_dir(app: &AppHandle) -> Result<PathBuf, String> {
     let base = app
         .path()
@@ -212,7 +212,7 @@ pub async fn remove_toolchain(app_handle: AppHandle) -> Result<String, String> {
     ))
 }
 
-/// แก้ไข Python venv paths ที่ยังชี้ไปยังเครื่อง dev เดิม (C:\Users\Acer\...)
+/// แก้ไข Python venv paths ที่ยังชี้ไปยังเครื่องต้นทางเครื่องอื่น
 /// เรียกใช้บนเครื่องที่ติดตั้ง toolchain แล้วแต่ build ไม่ผ่านด้วย "No Python at ..." error
 #[tauri::command]
 pub async fn repair_toolchain_paths(app_handle: AppHandle) -> Result<String, String> {
@@ -525,7 +525,7 @@ fn download_and_extract(
     }
 
     // ─── Phase 4: Patch venv paths (fix machine-specific Python paths) ─────
-    // The bundled venv was created on the developer's machine (e.g. C:\Users\Acer\...).
+    // A bundled venv may have been created on a different machine.
     // We rewrite pyvenv.cfg `home =` lines to point to the bundled idf-python in
     // the actual install directory so Python can be found on any machine.
     emit_progress(app, "extracting", 99, "Patching Python venv paths for this machine...");
@@ -851,7 +851,7 @@ fn find_toolchain_python(tools_path: &Path) -> Option<(PathBuf, PathBuf)> {
                     return Some((venv_python, venv_dir));
                 }
             } else {
-                // home= is stale (C:\Users\Acer\...) — auto-patch now
+                // home= points to a path that is unavailable on this machine — auto-patch now
                 eprintln!("[Toolchain] pyvenv.cfg home= not found ({}), auto-patching...", home_dir);
                 if let Some(ref fresh_python) = idf_python_bin {
                     // Patch pyvenv.cfg inline
@@ -944,9 +944,9 @@ pub fn auto_repair_on_startup(toolchain_dir: &Path) {
 ///
 /// Background: Python venvs store an absolute `home =` path in pyvenv.cfg that
 /// references the Python interpreter used to create the venv.  When the toolchain
-/// ZIP was built on the developer's machine (e.g. C:\Users\Acer\...) that path is
+/// ZIP was built on another machine, that absolute path is
 /// baked in and will not exist on any other PC, causing:
-///   No Python at 'C:\Users\Acer\...' error.
+///   No Python at '<path-from-another-machine>' error.
 ///
 /// We fix this by:
 ///   1. Finding the bundled idf-python executable under toolchain/tools/idf-python/

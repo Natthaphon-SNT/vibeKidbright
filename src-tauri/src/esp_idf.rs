@@ -74,7 +74,7 @@ fn resolve_custom_config_paths() -> Option<(PathBuf, PathBuf)> {
     let tools_path = PathBuf::from(tools);
 
     // Validate that paths actually exist on THIS machine.
-    // If they don't exist (e.g. pointing to developer's C:\Users\Acer\...),
+    // If they don't exist (for example, after copying settings from another machine),
     // auto-clear the stale config so the installer toolchain is used instead.
     if !idf_path.exists() || !tools_path.exists() {
         eprintln!(
@@ -989,6 +989,10 @@ pub async fn run_shell_command(
         let mut c = Command::new(&python_bin);
         c.arg(actual_idf_path.join("tools/idf.py"));
         c
+    } else if cmd == "adb" || cmd == "adb.exe" {
+        // Resolve ADB path (may not be in IDF PATH)
+        let adb_path = find_adb().unwrap_or_else(|_| OsString::from(&cmd));
+        Command::new(adb_path)
     } else {
         Command::new(&cmd)
     };
@@ -1277,6 +1281,290 @@ pub async fn send_serial_input(input: String) -> Result<(), String> {
 pub async fn stop_serial_monitor() -> Result<String, String> {
     stop_serial_monitor_internal();
     Ok("Serial monitor disconnected".to_string())
+}
+
+// ── ADB Monitor (MiuAAiPlus board) ───────────────────────────────────────────
+
+struct AdbMonitorState {
+    stop: Arc<AtomicBool>,
+    tx: Sender<String>,
+}
+
+fn adb_monitor_store() -> &'static Mutex<Option<AdbMonitorState>> {
+    static ADB_MONITOR: OnceLock<Mutex<Option<AdbMonitorState>>> = OnceLock::new();
+    ADB_MONITOR.get_or_init(|| Mutex::new(None))
+}
+
+fn stop_adb_monitor_internal() {
+    if let Ok(mut guard) = adb_monitor_store().lock() {
+        if let Some(state) = guard.take() {
+            state.stop.store(true, Ordering::SeqCst);
+        }
+    }
+}
+
+/// Find the ADB executable, searching PATH and common installation locations.
+fn find_adb() -> Result<OsString, String> {
+    // 1. Try PATH first
+    if let Ok(output) = Command::new("adb").arg("version").output() {
+        if output.status.success() {
+            return Ok(OsString::from("adb"));
+        }
+    }
+
+    // 2. Search environment-provided and platform-standard SDK locations.
+    let candidates: Vec<PathBuf> = {
+        let mut paths = Vec::new();
+        let executable = if cfg!(windows) { "adb.exe" } else { "adb" };
+
+        for variable in ["ANDROID_HOME", "ANDROID_SDK_ROOT"] {
+            if let Ok(sdk_root) = std::env::var(variable) {
+                paths.push(Path::new(&sdk_root).join("platform-tools").join(executable));
+            }
+        }
+
+        #[cfg(target_os = "windows")]
+        if let Ok(local_app_data) = std::env::var("LOCALAPPDATA") {
+            // Winget installation path
+            let winget_base = Path::new(&local_app_data)
+                .join("Microsoft")
+                .join("WinGet")
+                .join("Packages");
+            if winget_base.exists() {
+                if let Ok(entries) = std::fs::read_dir(&winget_base) {
+                    for entry in entries.flatten() {
+                        let name = entry.file_name().to_string_lossy().to_string();
+                        if name.starts_with("Google.PlatformTools") {
+                            let adb = entry.path().join("platform-tools").join(executable);
+                            paths.push(adb);
+                        }
+                    }
+                }
+            }
+            // Android SDK via Android Studio
+            paths.push(Path::new(&local_app_data).join("Android").join("Sdk").join("platform-tools").join(executable));
+        }
+
+        #[cfg(target_os = "windows")]
+        if let Ok(home) = std::env::var("USERPROFILE") {
+            paths.push(Path::new(&home).join("Android").join("Sdk").join("platform-tools").join(executable));
+        }
+
+        #[cfg(target_os = "macos")]
+        if let Ok(home) = std::env::var("HOME") {
+            paths.push(Path::new(&home).join("Library").join("Android").join("sdk").join("platform-tools").join(executable));
+        }
+
+        #[cfg(all(unix, not(target_os = "macos")))]
+        if let Ok(home) = std::env::var("HOME") {
+            paths.push(Path::new(&home).join("Android").join("Sdk").join("platform-tools").join(executable));
+            paths.push(Path::new(&home).join("Android").join("sdk").join("platform-tools").join(executable));
+        }
+
+        paths
+    };
+
+    for candidate in &candidates {
+        if candidate.exists() {
+            return Ok(candidate.as_os_str().to_os_string());
+        }
+    }
+
+    Err(
+        "ADB not found. Install Android Platform Tools and add its platform-tools directory to PATH, or set ANDROID_HOME/ANDROID_SDK_ROOT."
+            .to_string(),
+    )
+}
+
+/// List ADB devices connected to the system.
+/// Returns device serial IDs (e.g. "R5CT200XXXX", "emulator-5554").
+#[tauri::command]
+pub async fn list_adb_devices() -> Result<Vec<String>, String> {
+    let adb = find_adb()?;
+    let mut cmd = Command::new(&adb);
+    cmd.args(["devices"]);
+    apply_no_window(&mut cmd);
+
+    let output = cmd
+        .output()
+        .map_err(|e| format!("Failed to run 'adb devices': {}. Make sure ADB is installed and in PATH.", e))?;
+
+    if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        return Err(format!("adb devices failed: {}", stderr));
+    }
+
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    let devices: Vec<String> = stdout
+        .lines()
+        .skip(1) // skip "List of devices attached" header
+        .filter_map(|line| {
+            let line = line.trim();
+            if line.is_empty() {
+                return None;
+            }
+            // Format: "<serial>\t<state>" — only show "device" state (not offline/unauthorized)
+            let parts: Vec<&str> = line.split('\t').collect();
+            if parts.len() >= 2 && parts[1] == "device" {
+                Some(parts[0].to_string())
+            } else {
+                None
+            }
+        })
+        .collect();
+
+    Ok(devices)
+}
+
+/// Start ADB logcat monitor in a background thread.
+/// Streams output via the "terminal-output" Tauri event.
+#[tauri::command]
+pub async fn start_adb_monitor(
+    app_handle: AppHandle,
+    device: Option<String>,
+) -> Result<String, String> {
+    // Stop any existing ADB monitor first
+    stop_adb_monitor_internal();
+
+    let adb = find_adb()?;
+    let mut cmd = Command::new(&adb);
+    if let Some(ref dev) = device {
+        cmd.args(["-s", dev]);
+    }
+    cmd.args(["logcat"]);
+    cmd.stdout(Stdio::piped());
+    cmd.stderr(Stdio::piped());
+    apply_no_window(&mut cmd);
+
+    let mut child = cmd
+        .spawn()
+        .map_err(|e| format!("Failed to start adb logcat: {}. Make sure ADB is installed and in PATH.", e))?;
+
+    let stop = Arc::new(AtomicBool::new(false));
+    let (tx, rx) = mpsc::channel::<String>();
+
+    // Store monitor state
+    {
+        let mut guard = adb_monitor_store()
+            .lock()
+            .map_err(|_| "ADB monitor lock poisoned".to_string())?;
+        *guard = Some(AdbMonitorState {
+            stop: Arc::clone(&stop),
+            tx: tx.clone(),
+        });
+    }
+
+    let device_label = device.clone().unwrap_or_else(|| "default".to_string());
+    let app = app_handle;
+
+    // Read stdout from adb logcat in a background thread
+    let stdout = child.stdout.take();
+    let stop_clone = Arc::clone(&stop);
+    let app_clone = app.clone();
+    let device_label_clone = device_label.clone();
+
+    std::thread::spawn(move || {
+        if let Some(stdout) = stdout {
+            let reader = BufReader::new(stdout);
+            for line in reader.lines() {
+                if stop_clone.load(Ordering::SeqCst) {
+                    break;
+                }
+                match line {
+                    Ok(text) => {
+                        let _ = app_clone.emit(
+                            "terminal-output",
+                            format!("[ADB {}] {}", device_label_clone, text),
+                        );
+                    }
+                    Err(e) => {
+                        let _ = app_clone.emit(
+                            "terminal-output",
+                            format!("\x1b[31m[ADB {} ERROR] {}\x1b[0m", device_label_clone, e),
+                        );
+                        break;
+                    }
+                }
+            }
+        }
+        // Kill the child process when done
+        let _ = child.kill();
+        let _ = child.wait();
+    });
+
+    // Separate thread to handle input sent to ADB shell
+    let stop_input = Arc::clone(&stop);
+    let app_input = app.clone();
+    std::thread::spawn(move || {
+        while !stop_input.load(Ordering::SeqCst) {
+            match rx.recv_timeout(Duration::from_millis(200)) {
+                Ok(input) => {
+                    // Send input via `adb shell <command>`
+                    let adb_path = find_adb().unwrap_or_else(|_| OsString::from("adb"));
+                    let mut shell_cmd = Command::new(&adb_path);
+                    if let Some(ref dev) = device {
+                        shell_cmd.args(["-s", dev]);
+                    }
+                    shell_cmd.args(["shell", &input]);
+                    apply_no_window(&mut shell_cmd);
+
+                    match shell_cmd.output() {
+                        Ok(output) => {
+                            let out = String::from_utf8_lossy(&output.stdout);
+                            if !out.is_empty() {
+                                let _ = app_input.emit(
+                                    "terminal-output",
+                                    format!("[ADB SHELL] {}", out),
+                                );
+                            }
+                            let err = String::from_utf8_lossy(&output.stderr);
+                            if !err.is_empty() {
+                                let _ = app_input.emit(
+                                    "terminal-output",
+                                    format!("\x1b[31m[ADB SHELL ERR] {}\x1b[0m", err),
+                                );
+                            }
+                        }
+                        Err(e) => {
+                            let _ = app_input.emit(
+                                "terminal-output",
+                                format!("\x1b[31m[ADB SHELL ERROR] {}\x1b[0m", e),
+                            );
+                        }
+                    }
+                }
+                Err(mpsc::RecvTimeoutError::Timeout) => continue,
+                Err(mpsc::RecvTimeoutError::Disconnected) => break,
+            }
+        }
+    });
+
+    Ok(format!("ADB monitor connected: {}", device_label))
+}
+
+/// Send input to the ADB monitor (executed as `adb shell <input>`)
+#[tauri::command]
+pub async fn send_adb_input(input: String) -> Result<(), String> {
+    let tx = {
+        let guard = adb_monitor_store()
+            .lock()
+            .map_err(|_| "ADB monitor lock poisoned".to_string())?;
+        let Some(state) = guard.as_ref() else {
+            return Err("ADB monitor is not connected".to_string());
+        };
+        state.tx.clone()
+    };
+
+    tx.send(input)
+        .map_err(|e| format!("Failed to queue ADB input: {}", e))?;
+    Ok(())
+}
+
+/// Stop the ADB monitor
+#[tauri::command]
+pub async fn stop_adb_monitor() -> Result<String, String> {
+    stop_adb_monitor_internal();
+    Ok("ADB monitor disconnected".to_string())
 }
 
 

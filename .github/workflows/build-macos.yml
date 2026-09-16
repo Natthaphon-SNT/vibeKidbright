@@ -5,9 +5,15 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: macos-latest
+    env:
+      HAS_APPLE_CERT: ${{ secrets.APPLE_CERTIFICATE != '' && secrets.APPLE_CERTIFICATE_PASSWORD != '' && secrets.KEYCHAIN_PASSWORD != '' }}
+      HAS_APPLE_NOTARY_CREDENTIALS: ${{ secrets.APPLE_ID != '' && secrets.APPLE_ID_PASSWORD != '' && secrets.APPLE_TEAM_ID != '' }}
     steps:
       - name: Checkout main repository
         uses: actions/checkout@v4
@@ -48,6 +54,10 @@ jobs:
         working-directory: main_repo
         run: npm ci
 
+      - name: Check repository public readiness
+        working-directory: main_repo
+        run: npm run check:public
+
       - name: Merge knowledge_base from both repos
         run: |
           DST="main_repo/resources/knowledge_base"
@@ -71,6 +81,10 @@ jobs:
           sync_kb "main_repo/knowledge_base"
           echo "Merge complete -> $DST"
 
+      - name: Verify clean installer resources
+        working-directory: main_repo
+        run: npm run check:bundle
+
       - name: Get app version from tauri.conf.json
         id: get_version
         run: |
@@ -82,7 +96,7 @@ jobs:
       # ─── Code Signing Setup (ต้องการ Apple Developer secrets) ────────────────
       # ถ้าไม่มี secrets เหล่านี้ step นี้จะถูกข้ามไปโดยอัตโนมัติ
       - name: Import Apple Developer Certificate
-        if: ${{ secrets.APPLE_CERTIFICATE != '' }}
+        if: ${{ env.HAS_APPLE_CERT == 'true' }}
         env:
           APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
           APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
@@ -135,7 +149,7 @@ jobs:
 
       # ─── Notarize ไฟล์ DMG (ต้องการ Apple ID secrets) ───────────────────────
       - name: Notarize DMG with Apple Notary Service
-        if: ${{ secrets.APPLE_ID != '' }}
+        if: ${{ env.HAS_APPLE_NOTARY_CREDENTIALS == 'true' }}
         run: |
           DMG=$(find main_repo/src-tauri/target/universal-apple-darwin/release/bundle/dmg -name "*.dmg" | head -1)
           if [ -z "$DMG" ]; then
