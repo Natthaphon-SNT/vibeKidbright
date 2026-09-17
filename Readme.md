@@ -68,11 +68,10 @@
 
 ## 🎯 รองรับบอร์ดและฮาร์ดแวร์
 
-- **KidBright32** (ทุกเวอร์ชัน: V1.3, V1.5, V1.6)
-- **KidBright μAI Plus**
-- **ESP32** (ESP32-WROOM, ESP32-WROVER)
-- **ESP32-S2 / ESP32-S3**
-- **ESP32-C3 / ESP32-C6**
+ปัจจุบัน Build & Flash จาก UI รองรับเฉพาะ target **ESP32** สำหรับ **KidBright32** (ทุกเวอร์ชัน: V1.3, V1.5, V1.6; รวม ESP32-WROOM/ESP32-WROVER) เท่านั้น
+
+- **KidBright μAI Plus** เลือกได้สำหรับ ADB monitor แต่ยังไม่มี deployment contract จึงยังใช้ Build & Flash จาก UI ไม่ได้
+- **ESP32-S2 / ESP32-S3 / ESP32-C3 / ESP32-C6** เป็น capability ของ ESP-IDF toolchain แต่แอปยังไม่มี target selector, target-specific build directory และ `sdkconfig` แยกตาม target จึงยังไม่รองรับการใช้งานผ่าน UI
 
 ---
 
