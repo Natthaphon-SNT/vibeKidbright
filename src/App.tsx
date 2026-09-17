@@ -9,6 +9,7 @@ import { parseErrorLine, type ParsedBuildError } from "./errorHints";
 import BuildErrorList from "./BuildErrorList";
 import { toast, ToastHost } from "./Toast";
 import { normPath } from "./utils";
+import { executeBuildLifecycle } from "./buildFlash";
 
 const PORT_REFRESH_INTERVAL_MS = 2_000;
 
@@ -1284,34 +1285,32 @@ function App({ toolchainReady = true, onRefreshToolchain }: { toolchainReady?: b
       return;
     }
 
-    setIsBuilding(true);
-    setBuildResult("building");
     setBuildStep(0);
     setBuildTotal(0);
     setBuildErrors([]);
     setBuildCurrentTask("Initializing...");
     addLog("--- Starting Build & Flash ---");
 
-    try {
-      // 🛠 ใช้ Wrapper เพื่อให้มันโหลด export.bat ก่อนสั่ง idf.py เสมอ
-      const flashArgs = ["build", "flash"];
-      if (selectedSerialPort) {
-        flashArgs.push("-p", selectedSerialPort);
-        addLog(`Using port: ${selectedSerialPort}`);
-      } else {
-        addLog("⚠️ No serial port selected — idf.py will use its default port");
-      }
-      await runIdfWrappedCommand("idf.py", flashArgs, projectDir);
-    } catch (err) {
-      addLog(`Build failed: ${err}`);
-      setBuildResult("failed");
-      setBuildCurrentTask("Build failed");
-    } finally {
-      setIsBuilding(false);
-      // If we didn't explicitly set failed, mark as success
-      setBuildResult(prev => prev === "building" ? "success" : prev);
-      setBuildCurrentTask(prev => prev === "Initializing..." ? "" : prev);
-    }
+    await executeBuildLifecycle({
+      run: async () => {
+        // 🛠 ใช้ Wrapper เพื่อให้มันโหลด export.bat ก่อนสั่ง idf.py เสมอ
+        const flashArgs = ["build", "flash"];
+        if (selectedSerialPort) {
+          flashArgs.push("-p", selectedSerialPort);
+          addLog(`Using port: ${selectedSerialPort}`);
+        } else {
+          addLog("⚠️ No serial port selected — idf.py will use its default port");
+        }
+        await runIdfWrappedCommand("idf.py", flashArgs, projectDir);
+      },
+      setResult: setBuildResult,
+      setBuilding: setIsBuilding,
+      onFailure: (err) => {
+        addLog(`Build failed: ${err}`);
+        setBuildCurrentTask("Build failed");
+      },
+    });
+    setBuildCurrentTask(prev => prev === "Initializing..." ? "" : prev);
   };
   // Keep ref in sync so the keyboard shortcut (Ctrl+Shift+B) always calls the latest version
   useEffect(() => { buildFlashRef.current = handleBuildFlash; });

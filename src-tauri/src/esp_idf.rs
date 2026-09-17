@@ -20,6 +20,32 @@ fn apply_no_window(cmd: &mut Command) {
 
 static CACHED_ESP_IDF_CONFIG: OnceLock<Mutex<Option<serde_json::Value>>> = OnceLock::new();
 
+#[derive(Clone, serde::Serialize, Debug, PartialEq, Eq)]
+pub struct CommandOutcome {
+    pub success: bool,
+    pub code: Option<i32>,
+}
+
+fn wait_for_child(mut child: std::process::Child) -> Result<CommandOutcome, String> {
+    let status = child
+        .wait()
+        .map_err(|e| format!("Failed to wait for command: {}", e))?;
+    let outcome = CommandOutcome {
+        success: status.success(),
+        code: status.code(),
+    };
+    if outcome.success {
+        Ok(outcome)
+    } else {
+        Err(format!(
+            "Command failed with exit code {}",
+            outcome
+                .code
+                .map_or_else(|| "unknown".to_string(), |code| code.to_string())
+        ))
+    }
+}
+
 const DEFAULT_ESP_IDF_VERSION: &str = "v5.5.1";
 const ESP_IDF_REPO_URL: &str = "https://github.com/espressif/esp-idf.git";
 
@@ -949,7 +975,7 @@ pub async fn run_shell_command(
     cmd: String,
     args: Vec<String>,
     cwd: Option<String>,
-) -> Result<(), String> {
+) -> Result<CommandOutcome, String> {
     let (actual_idf_path, actual_tools_path) = resolve_idf_paths(&app_handle)?;
     let (python_bin, python_env_path) = find_idf_python(&actual_tools_path)?;
     let path_env = build_idf_path(&actual_tools_path);
@@ -1049,11 +1075,9 @@ pub async fn run_shell_command(
         }
     });
 
-    std::thread::spawn(move || {
-        let _ = child.wait();
-    });
-
-    Ok(())
+    tauri::async_runtime::spawn_blocking(move || wait_for_child(child))
+        .await
+        .map_err(|e| format!("Command wait task failed: {}", e))?
 }
 
 #[tauri::command]
@@ -1575,6 +1599,43 @@ pub async fn stop_adb_monitor() -> Result<String, String> {
 mod tests {
     use super::*;
     use std::fs;
+    use std::process::Command;
+
+    fn shell_exit(code: i32) -> Command {
+        if cfg!(windows) {
+            let mut command = Command::new("cmd");
+            command.args(["/C", &format!("exit {}", code)]);
+            command
+        } else {
+            let mut command = Command::new("sh");
+            command.args(["-c", &format!("exit {}", code)]);
+            command
+        }
+    }
+
+    #[test]
+    fn command_exit_zero_returns_success_outcome() {
+        let child = shell_exit(0).spawn().unwrap();
+        assert_eq!(
+            wait_for_child(child).unwrap(),
+            CommandOutcome { success: true, code: Some(0) }
+        );
+    }
+
+    #[test]
+    fn command_nonzero_exit_reports_code() {
+        let child = shell_exit(2).spawn().unwrap();
+        let error = wait_for_child(child).unwrap_err();
+        assert!(error.contains("exit code 2"), "unexpected error: {}", error);
+    }
+
+    #[test]
+    fn missing_command_returns_spawn_error_immediately() {
+        let error = Command::new("vibekidbright-command-that-does-not-exist")
+            .spawn()
+            .unwrap_err();
+        assert_ne!(error.kind(), std::io::ErrorKind::WouldBlock);
+    }
 
     #[test]
     fn venv_bin_dir_platform_layout() {
