@@ -9,7 +9,13 @@ import { parseErrorLine, type ParsedBuildError } from "./errorHints";
 import BuildErrorList from "./BuildErrorList";
 import { toast, ToastHost } from "./Toast";
 import { normPath } from "./utils";
-import { executeBuildLifecycle } from "./buildFlash";
+import {
+  executeBuildLifecycle,
+  isBuildFlashSupported,
+  MIUAI_DEPLOYMENT_UNAVAILABLE,
+  runBuildForBoard,
+  type BoardType,
+} from "./buildFlash";
 
 const PORT_REFRESH_INTERVAL_MS = 2_000;
 
@@ -408,7 +414,6 @@ function App({ toolchainReady = true, onRefreshToolchain }: { toolchainReady?: b
   const adbDeviceRefreshInFlightRef = useRef(false);
 
   // Board type selector (KidBright32 vs MiuAiPlus)
-  type BoardType = "kidbright32" | "miuaiplus";
   const [selectedBoard, setSelectedBoard] = useState<BoardType>(() => {
     return (localStorage.getItem("vibe-selected-board") as BoardType) || "kidbright32";
   });
@@ -1278,6 +1283,12 @@ function App({ toolchainReady = true, onRefreshToolchain }: { toolchainReady?: b
 
   const handleBuildFlash = async () => {
     if (isBuilding) return;
+
+    if (!isBuildFlashSupported(selectedBoard)) {
+      addLog(`⚠️ ${MIUAI_DEPLOYMENT_UNAVAILABLE}`);
+      toast(MIUAI_DEPLOYMENT_UNAVAILABLE, "info");
+      return;
+    }
     
     if (projectDir === ".") {
       addLog("❌ Error: No project selected to build.");
@@ -1301,7 +1312,9 @@ function App({ toolchainReady = true, onRefreshToolchain }: { toolchainReady?: b
         } else {
           addLog("⚠️ No serial port selected — idf.py will use its default port");
         }
-        await runIdfWrappedCommand("idf.py", flashArgs, projectDir);
+        await runBuildForBoard(selectedBoard, () =>
+          runIdfWrappedCommand("idf.py", flashArgs, projectDir)
+        );
       },
       setResult: setBuildResult,
       setBuilding: setIsBuilding,
@@ -1565,10 +1578,14 @@ function App({ toolchainReady = true, onRefreshToolchain }: { toolchainReady?: b
           )}
           <button
             onClick={handleBuildFlash}
-            disabled={isBuilding || isSettingUpEspIdf || !toolchainReady}
-            title={!toolchainReady ? "Waiting for toolchain download to complete..." : "Build & Flash (Ctrl+Shift+B)"}
+            disabled={isBuilding || isSettingUpEspIdf || !toolchainReady || !isBuildFlashSupported(selectedBoard)}
+            title={!isBuildFlashSupported(selectedBoard)
+              ? MIUAI_DEPLOYMENT_UNAVAILABLE
+              : !toolchainReady
+                ? "Waiting for toolchain download to complete..."
+                : "Build & Flash (Ctrl+Shift+B)"}
             className="w-full justify-center text-sm px-4 py-2 rounded-lg transition-all duration-200 font-bold flex items-center gap-2 shadow-lg active:scale-[0.98]"
-            style={isBuilding || !toolchainReady
+            style={isBuilding || !toolchainReady || !isBuildFlashSupported(selectedBoard)
               ? { backgroundColor: 'var(--bg-hover)', color: 'var(--text-muted)', cursor: 'not-allowed' }
               : { backgroundColor: 'var(--accent)', color: '#fff', boxShadow: '0 4px 16px var(--accent-glow)' }
             }

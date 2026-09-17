@@ -1,5 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
-import { executeBuildLifecycle, type BuildResult } from "../buildFlash";
+import {
+  executeBuildLifecycle,
+  isBuildFlashSupported,
+  runBuildForBoard,
+  type BuildResult,
+} from "../buildFlash";
 
 function deferred<T>() {
   let resolve!: (value: T) => void;
@@ -51,5 +56,23 @@ describe("executeBuildLifecycle", () => {
 
     expect(results).toEqual(["building", "failed"]);
     expect(onFailure).toHaveBeenCalledWith(expect.objectContaining({ message: "exit code 2" }));
+  });
+});
+
+describe("board deployment routing", () => {
+  it("runs ESP-IDF build/flash for KidBright32", async () => {
+    const runEspIdf = vi.fn().mockResolvedValue(undefined);
+
+    await expect(runBuildForBoard("kidbright32", runEspIdf)).resolves.toBe(true);
+    expect(runEspIdf).toHaveBeenCalledOnce();
+    expect(isBuildFlashSupported("kidbright32")).toBe(true);
+  });
+
+  it("never runs ESP-IDF build/flash for MiuAiPlus", async () => {
+    const runEspIdf = vi.fn().mockResolvedValue(undefined);
+
+    await expect(runBuildForBoard("miuaiplus", runEspIdf)).resolves.toBe(false);
+    expect(runEspIdf).not.toHaveBeenCalled();
+    expect(isBuildFlashSupported("miuaiplus")).toBe(false);
   });
 });
