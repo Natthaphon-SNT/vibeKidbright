@@ -9,6 +9,7 @@ import { parseErrorLine, type ParsedBuildError } from "./errorHints";
 import BuildErrorList from "./BuildErrorList";
 import { toast, ToastHost } from "./Toast";
 import { normPath } from "./utils";
+import SetupRepairButton from "./SetupRepairButton";
 import {
   executeBuildLifecycle,
   isBuildFlashSupported,
@@ -275,6 +276,7 @@ interface FileTab {
 function AppShell() {
   const [toolchainReady, setToolchainReady] = React.useState(false);
   const [isRefreshing, setIsRefreshing] = React.useState(false);
+  const [isInstallingToolchain, setIsInstallingToolchain] = React.useState(false);
 
   /** Soft-refresh: re-check toolchain โดยที่ state ของ App ไม่หาย */
   const refreshToolchain = React.useCallback(async () => {
@@ -318,7 +320,12 @@ function AppShell() {
 
   return (
     <>
-      <App toolchainReady={toolchainReady} onRefreshToolchain={refreshToolchain} />
+      <App
+        toolchainReady={toolchainReady}
+        onRefreshToolchain={refreshToolchain}
+        isInstallingToolchain={isInstallingToolchain}
+        onInstallingToolchainChange={setIsInstallingToolchain}
+      />
       <ToastHost />
       {/* Refresh overlay indicator */}
       {isRefreshing && (
@@ -359,13 +366,25 @@ function AppShell() {
         <ToolchainSetup
           onReady={() => setToolchainReady(true)}
           mini={true}
+          isInstalling={isInstallingToolchain}
+          onInstallingChange={setIsInstallingToolchain}
         />
       )}
     </>
   );
 }
 
-function App({ toolchainReady = true, onRefreshToolchain }: { toolchainReady?: boolean; onRefreshToolchain?: () => void }) {
+function App({
+  toolchainReady = true,
+  onRefreshToolchain,
+  isInstallingToolchain = false,
+  onInstallingToolchainChange = () => {},
+}: {
+  toolchainReady?: boolean;
+  onRefreshToolchain?: () => void;
+  isInstallingToolchain?: boolean;
+  onInstallingToolchainChange?: (isInstalling: boolean) => void;
+}) {
   const [darkMode, setDarkMode] = React.useState(() => {
     return localStorage.getItem("vibe-theme") === "dark";
   });
@@ -382,7 +401,8 @@ function App({ toolchainReady = true, onRefreshToolchain }: { toolchainReady?: b
     document.documentElement.setAttribute("data-theme", darkMode ? "dark" : "light");
   }, [darkMode]);
   const [status, setStatus] = useState("Checking ESP-IDF...");
-  const [isSettingUpEspIdf, setIsSettingUpEspIdf] = useState(false);
+  const isSettingUpEspIdf = isInstallingToolchain;
+  const setIsSettingUpEspIdf = onInstallingToolchainChange;
   const [espIdfSetupNote, setEspIdfSetupNote] = useState("");
   const [logs, setLogs] = useState<string[]>([]);
   const [terminalInput, setTerminalInput] = useState("");
@@ -1468,27 +1488,10 @@ function App({ toolchainReady = true, onRefreshToolchain }: { toolchainReady?: b
           </div>
 
           <div className="p-2 text-sm font-medium mt-4" style={{ color: 'var(--text-muted)' }}>TOOLS</div>
-          <button
+          <SetupRepairButton
+            isInstalling={isSettingUpEspIdf}
             onClick={() => setShowSetupModal(true)}
-            disabled={isSettingUpEspIdf}
-            className="w-full text-left p-2 rounded flex items-center gap-2 text-sm transition-colors group"
-            style={isSettingUpEspIdf
-              ? { backgroundColor: 'rgba(245,158,11,0.1)', color: '#fcd34d', cursor: 'not-allowed' }
-              : { color: 'var(--text-secondary)' }
-            }
-            onMouseEnter={e => { if (!isSettingUpEspIdf) e.currentTarget.style.backgroundColor = 'var(--bg-hover)'; }}
-            onMouseLeave={e => { if (!isSettingUpEspIdf) e.currentTarget.style.backgroundColor = ''; }}
-          >
-            <span className="w-4 h-4 flex items-center justify-center rounded text-[10px] font-bold"
-              style={isSettingUpEspIdf
-                ? { backgroundColor: 'rgba(245,158,11,0.2)', color: 'var(--warning)' }
-                : { backgroundColor: 'var(--bg-hover)', color: 'var(--text-muted)' }
-              }
-            >
-              {isSettingUpEspIdf ? "…" : "⚙"}
-            </span>
-            {isSettingUpEspIdf ? "Installing ESP-IDF..." : "Setup / Repair ESP-IDF"}
-          </button>
+          />
           <button
             onClick={() => {
               const next = !showAiPanel;

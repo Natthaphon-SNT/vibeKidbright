@@ -52,11 +52,61 @@ const TOOLCHAIN_VERSION: &str = "1.0.1";
 // ── Global cancel flag ────────────────────────────────────────────────────────
 
 static CANCEL_FLAG: OnceLock<Arc<AtomicBool>> = OnceLock::new();
+static INSTALL_IN_PROGRESS: OnceLock<Arc<AtomicBool>> = OnceLock::new();
 
 fn cancel_flag() -> Arc<AtomicBool> {
     CANCEL_FLAG
         .get_or_init(|| Arc::new(AtomicBool::new(false)))
         .clone()
+}
+
+#[derive(Debug)]
+struct InstallGuard {
+    flag: Arc<AtomicBool>,
+}
+
+impl Drop for InstallGuard {
+    fn drop(&mut self) {
+        self.flag.store(false, Ordering::SeqCst);
+    }
+}
+
+fn try_acquire_install(flag: Arc<AtomicBool>) -> Result<InstallGuard, String> {
+    flag.compare_exchange(false, true, Ordering::SeqCst, Ordering::SeqCst)
+        .map(|_| InstallGuard { flag })
+        .map_err(|_| "already_in_progress".to_string())
+}
+
+fn install_flag() -> Arc<AtomicBool> {
+    INSTALL_IN_PROGRESS
+        .get_or_init(|| Arc::new(AtomicBool::new(false)))
+        .clone()
+}
+
+fn replace_install_directory(staging_dir: &Path, final_dir: &Path) -> Result<(), String> {
+    let backup_dir = final_dir.with_extension("backup");
+    if backup_dir.exists() {
+        std::fs::remove_dir_all(&backup_dir)
+            .map_err(|e| format!("Failed to remove stale toolchain backup: {}", e))?;
+    }
+
+    let had_previous = final_dir.exists();
+    if had_previous {
+        std::fs::rename(final_dir, &backup_dir)
+            .map_err(|e| format!("Failed to stage previous toolchain: {}", e))?;
+    }
+
+    if let Err(error) = std::fs::rename(staging_dir, final_dir) {
+        if had_previous {
+            let _ = std::fs::rename(&backup_dir, final_dir);
+        }
+        return Err(format!("Failed to activate downloaded toolchain: {}", error));
+    }
+
+    if had_previous {
+        let _ = std::fs::remove_dir_all(backup_dir);
+    }
+    Ok(())
 }
 
 // ── Progress event payload ────────────────────────────────────────────────────
@@ -135,6 +185,8 @@ pub async fn download_toolchain(
     app_handle: AppHandle,
     url: Option<String>,
 ) -> Result<String, String> {
+    let _install_guard = try_acquire_install(install_flag())?;
+
     // ถ้ามี custom URL ให้ใช้เป็น single-entry มิฉะนั้นใช้ค่าเริ่มต้น (GitHub Release)
     let parts: Vec<(String, String)> = url
         .filter(|u| !u.trim().is_empty())
@@ -159,9 +211,15 @@ pub async fn download_toolchain(
     // Reset cancel flag
     cancel_flag().store(false, Ordering::SeqCst);
 
-    // สร้างโฟลเดอร์ปลายทาง
-    std::fs::create_dir_all(&toolchain_dir)
-        .map_err(|e| format!("Failed to create toolchain directory: {}", e))?;
+    // Download and extract away from the live directory. Only a complete install
+    // (including its sentinel) is renamed into place.
+    let staging_dir = toolchain_dir.with_extension("installing");
+    if staging_dir.exists() {
+        std::fs::remove_dir_all(&staging_dir)
+            .map_err(|e| format!("Failed to clean stale install directory: {}", e))?;
+    }
+    std::fs::create_dir_all(&staging_dir)
+        .map_err(|e| format!("Failed to create install directory: {}", e))?;
 
     emit_progress(
         &app_handle,
@@ -174,7 +232,7 @@ pub async fn download_toolchain(
     );
 
     let app_clone = app_handle.clone();
-    let dir_clone = toolchain_dir.clone();
+    let dir_clone = staging_dir.clone();
     let cancel = cancel_flag();
 
     // รันใน blocking thread
@@ -182,9 +240,18 @@ pub async fn download_toolchain(
         download_and_extract(&app_clone, &parts, &dir_clone, cancel)
     })
     .await
-    .map_err(|e| format!("Task panicked: {}", e))??;
+    .map_err(|e| format!("Task panicked: {}", e))?;
 
-    Ok(result)
+    if let Err(error) = result {
+        let _ = std::fs::remove_dir_all(&staging_dir);
+        return Err(error);
+    }
+
+    if let Err(error) = replace_install_directory(&staging_dir, &toolchain_dir) {
+        let _ = std::fs::remove_dir_all(&staging_dir);
+        return Err(error);
+    }
+    Ok(format!("Toolchain installed at {}", toolchain_dir.display()))
 }
 
 /// ยกเลิกการดาวน์โหลดที่กำลังดำเนินอยู่
@@ -1296,6 +1363,30 @@ fn extract_gdrive_token(html: &str) -> Option<String> {
 mod tests {
     use super::*;
     use std::fs;
+
+    #[test]
+    fn install_lock_rejects_concurrent_attempt_and_releases_on_drop() {
+        let flag = Arc::new(AtomicBool::new(false));
+        let first = try_acquire_install(flag.clone()).unwrap();
+        assert_eq!(try_acquire_install(flag.clone()).unwrap_err(), "already_in_progress");
+
+        drop(first);
+        assert!(try_acquire_install(flag).is_ok());
+    }
+
+    #[test]
+    fn staged_install_is_renamed_only_when_complete() {
+        let tmp = tempfile::tempdir().unwrap();
+        let final_dir = tmp.path().join("toolchain");
+        let staging_dir = tmp.path().join("toolchain.installing");
+        fs::create_dir_all(&staging_dir).unwrap();
+        fs::write(staging_dir.join(SENTINEL_FILE), TOOLCHAIN_VERSION).unwrap();
+
+        replace_install_directory(&staging_dir, &final_dir).unwrap();
+
+        assert!(!staging_dir.exists());
+        assert!(is_toolchain_ready(&final_dir));
+    }
 
     // ── extract_gdrive_token ──────────────────────────────────────────────────
 

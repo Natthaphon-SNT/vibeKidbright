@@ -31,13 +31,27 @@ interface Props {
   toolchainUrl?: string;
   /** แสดงเป็น mini widget ซ้ายล่าง (ใช้ตอน background download) */
   mini?: boolean;
+  /** Shared by the mini widget and the setup/repair controls in App. */
+  isInstalling?: boolean;
+  onInstallingChange?: (isInstalling: boolean) => void;
 }
 
 // ── Main Component ─────────────────────────────────────────────────────────────
 
-export default function ToolchainSetup({ onReady, toolchainUrl, mini = false }: Props) {
+export default function ToolchainSetup({
+  onReady,
+  toolchainUrl,
+  mini = false,
+  isInstalling,
+  onInstallingChange,
+}: Props) {
   const [checkDone, setCheckDone] = useState(false);
-  const [isDownloading, setIsDownloading] = useState(false);
+  const [localIsDownloading, setLocalIsDownloading] = useState(false);
+  const isDownloading = isInstalling ?? localIsDownloading;
+  const setIsDownloading = (next: boolean) => {
+    setLocalIsDownloading(next);
+    onInstallingChange?.(next);
+  };
   const [progress, setProgress] = useState<ToolchainProgress>({
     stage: "downloading",
     percent: 0,
