@@ -58,11 +58,15 @@ jobs:
         run: |
           $dst = "main_repo/resources/knowledge_base"
           if (-not (Test-Path $dst)) { New-Item -ItemType Directory -Path $dst -Force }
+          # Keep this allowlist in sync with bundleExtensions in scripts/check-public.mjs.
+          $allowedExtensions = @(
+            ".c", ".h", ".jpeg", ".jpg", ".md", ".pdf", ".png", ".txt", ".webp"
+          )
 
           function Sync-KnowledgeBase($src) {
             if (-not (Test-Path $src)) { Write-Host "Skipping $src (not found)"; return }
             Get-ChildItem $src -Recurse -File | Where-Object {
-              $_.Name -ne ".embeddings.json" -and -not $_.Name.EndsWith(".backup")
+              $allowedExtensions -contains $_.Extension.ToLowerInvariant()
             } | ForEach-Object {
               $rel = $_.FullName.Substring((Resolve-Path $src).Path.Length + 1)
               $dstFile = Join-Path $dst $rel
