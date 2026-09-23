@@ -48,15 +48,67 @@ const SENTINEL_FILE: &str = ".toolchain_ready";
 /// เวอร์ชัน toolchain
 const TOOLCHAIN_VERSION: &str = "1.0.1";
 
-
 // ── Global cancel flag ────────────────────────────────────────────────────────
 
 static CANCEL_FLAG: OnceLock<Arc<AtomicBool>> = OnceLock::new();
+static INSTALL_IN_PROGRESS: OnceLock<Arc<AtomicBool>> = OnceLock::new();
 
 fn cancel_flag() -> Arc<AtomicBool> {
     CANCEL_FLAG
         .get_or_init(|| Arc::new(AtomicBool::new(false)))
         .clone()
+}
+
+#[derive(Debug)]
+struct InstallGuard {
+    flag: Arc<AtomicBool>,
+}
+
+impl Drop for InstallGuard {
+    fn drop(&mut self) {
+        self.flag.store(false, Ordering::SeqCst);
+    }
+}
+
+fn try_acquire_install(flag: Arc<AtomicBool>) -> Result<InstallGuard, String> {
+    flag.compare_exchange(false, true, Ordering::SeqCst, Ordering::SeqCst)
+        .map(|_| InstallGuard { flag })
+        .map_err(|_| "already_in_progress".to_string())
+}
+
+fn install_flag() -> Arc<AtomicBool> {
+    INSTALL_IN_PROGRESS
+        .get_or_init(|| Arc::new(AtomicBool::new(false)))
+        .clone()
+}
+
+fn replace_install_directory(staging_dir: &Path, final_dir: &Path) -> Result<(), String> {
+    let backup_dir = final_dir.with_extension("backup");
+    if backup_dir.exists() {
+        std::fs::remove_dir_all(&backup_dir)
+            .map_err(|e| format!("Failed to remove stale toolchain backup: {}", e))?;
+    }
+
+    let had_previous = final_dir.exists();
+    if had_previous {
+        std::fs::rename(final_dir, &backup_dir)
+            .map_err(|e| format!("Failed to stage previous toolchain: {}", e))?;
+    }
+
+    if let Err(error) = std::fs::rename(staging_dir, final_dir) {
+        if had_previous {
+            let _ = std::fs::rename(&backup_dir, final_dir);
+        }
+        return Err(format!(
+            "Failed to activate downloaded toolchain: {}",
+            error
+        ));
+    }
+
+    if had_previous {
+        let _ = std::fs::remove_dir_all(backup_dir);
+    }
+    Ok(())
 }
 
 // ── Progress event payload ────────────────────────────────────────────────────
@@ -135,6 +187,8 @@ pub async fn download_toolchain(
     app_handle: AppHandle,
     url: Option<String>,
 ) -> Result<String, String> {
+    let _install_guard = try_acquire_install(install_flag())?;
+
     // ถ้ามี custom URL ให้ใช้เป็น single-entry มิฉะนั้นใช้ค่าเริ่มต้น (GitHub Release)
     let parts: Vec<(String, String)> = url
         .filter(|u| !u.trim().is_empty())
@@ -159,22 +213,33 @@ pub async fn download_toolchain(
     // Reset cancel flag
     cancel_flag().store(false, Ordering::SeqCst);
 
-    // สร้างโฟลเดอร์ปลายทาง
-    std::fs::create_dir_all(&toolchain_dir)
-        .map_err(|e| format!("Failed to create toolchain directory: {}", e))?;
+    // Download and extract away from the live directory. Only a complete install
+    // (including its sentinel) is renamed into place.
+    let staging_dir = toolchain_dir.with_extension("installing");
+    if staging_dir.exists() {
+        std::fs::remove_dir_all(&staging_dir)
+            .map_err(|e| format!("Failed to clean stale install directory: {}", e))?;
+    }
+    std::fs::create_dir_all(&staging_dir)
+        .map_err(|e| format!("Failed to create install directory: {}", e))?;
 
     emit_progress(
         &app_handle,
         "downloading",
         0,
-        &format!("Starting download ({} file(s)): {}",
+        &format!(
+            "Starting download ({} file(s)): {}",
             parts.len(),
-            parts.iter().map(|(_, l)| l.as_str()).collect::<Vec<_>>().join(" + ")
+            parts
+                .iter()
+                .map(|(_, l)| l.as_str())
+                .collect::<Vec<_>>()
+                .join(" + ")
         ),
     );
 
     let app_clone = app_handle.clone();
-    let dir_clone = toolchain_dir.clone();
+    let dir_clone = staging_dir.clone();
     let cancel = cancel_flag();
 
     // รันใน blocking thread
@@ -182,9 +247,21 @@ pub async fn download_toolchain(
         download_and_extract(&app_clone, &parts, &dir_clone, cancel)
     })
     .await
-    .map_err(|e| format!("Task panicked: {}", e))??;
+    .map_err(|e| format!("Task panicked: {}", e))?;
 
-    Ok(result)
+    if let Err(error) = result {
+        let _ = std::fs::remove_dir_all(&staging_dir);
+        return Err(error);
+    }
+
+    if let Err(error) = replace_install_directory(&staging_dir, &toolchain_dir) {
+        let _ = std::fs::remove_dir_all(&staging_dir);
+        return Err(error);
+    }
+    Ok(format!(
+        "Toolchain installed at {}",
+        toolchain_dir.display()
+    ))
 }
 
 /// ยกเลิกการดาวน์โหลดที่กำลังดำเนินอยู่
@@ -235,9 +312,7 @@ pub async fn repair_toolchain_paths(app_handle: AppHandle) -> Result<String, Str
 
 /// คืนค่า path สำคัญต่างๆ ของ toolchain ให้ frontend ตรวจสอบ
 #[tauri::command]
-pub async fn get_toolchain_paths(
-    app_handle: AppHandle,
-) -> Result<serde_json::Value, String> {
+pub async fn get_toolchain_paths(app_handle: AppHandle) -> Result<serde_json::Value, String> {
     let base = get_toolchain_dir(&app_handle)?;
     let idf_path = base.join("esp-idf");
     let tools_path = base.join(".espressif");
@@ -271,12 +346,12 @@ pub async fn get_toolchain_paths(
 /// สร้าง HTTP client พร้อม cookie store (จำเป็นสำหรับ Google Drive)
 fn make_http_client() -> Result<reqwest::blocking::Client, String> {
     reqwest::blocking::Client::builder()
-        .connect_timeout(std::time::Duration::from_secs(30))  // ค้าง connect ได้สูงสุด 30s
-        .timeout(std::time::Duration::from_secs(600))         // total timeout 10 นาที
+        .connect_timeout(std::time::Duration::from_secs(30)) // ค้าง connect ได้สูงสุด 30s
+        .timeout(std::time::Duration::from_secs(600)) // total timeout 10 นาที
         .user_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
         .redirect(reqwest::redirect::Policy::limited(15))
         .cookie_store(true) // จำเป็นสำหรับ Google Drive confirmation cookie
-        .tcp_keepalive(std::time::Duration::from_secs(30))    // keepalive ป้องกัน connection drop
+        .tcp_keepalive(std::time::Duration::from_secs(30)) // keepalive ป้องกัน connection drop
         .build()
         .map_err(|e| format!("Failed to create HTTP client: {}", e))
 }
@@ -293,10 +368,19 @@ fn resolve_download_url(url: &str) -> String {
     // แยก file ID จาก URL หลายรูปแบบ
     // รูปแบบ: /file/d/{id}/
     let file_id = if let Some(part) = url.split("/file/d/").nth(1) {
-        part.split('/').next().unwrap_or("").split('?').next().unwrap_or("")
+        part.split('/')
+            .next()
+            .unwrap_or("")
+            .split('?')
+            .next()
+            .unwrap_or("")
     }
     // รูปแบบ: ?id={id}
-    else if let Some(part) = url.split("?id=").nth(1).or_else(|| url.split("&id=").nth(1)) {
+    else if let Some(part) = url
+        .split("?id=")
+        .nth(1)
+        .or_else(|| url.split("&id=").nth(1))
+    {
         part.split('&').next().unwrap_or("")
     }
     // รูปแบบ: /open?id={id}
@@ -317,7 +401,6 @@ fn resolve_download_url(url: &str) -> String {
     )
 }
 
-
 fn download_and_extract(
     app: &AppHandle,
     parts: &[(String, String)], // (url, label)
@@ -332,9 +415,11 @@ fn download_and_extract(
         let mut total = 0u64;
         for (url, _) in parts {
             let resolved = resolve_download_url(url);
-            if let Ok(resp) = client.head(&resolved)
+            if let Ok(resp) = client
+                .head(&resolved)
                 .header("Accept", "application/octet-stream,*/*")
-                .send() {
+                .send()
+            {
                 total += resp.content_length().unwrap_or(0);
             }
         }
@@ -350,8 +435,11 @@ fn download_and_extract(
         .collect();
 
     // ใช้ thread::scope ดาวน์โหลดทุกไฟล์พร้อมกัน
-    emit_progress(app, "downloading", 1,
-        &format!("เริ่มดาวน์โหลด {} ไฟล์พร้อมกัน...", total_parts)
+    emit_progress(
+        app,
+        "downloading",
+        1,
+        &format!("เริ่มดาวน์โหลด {} ไฟล์พร้อมกัน...", total_parts),
     );
 
     let download_errors: Vec<Result<(), String>> = std::thread::scope(|scope| {
@@ -448,7 +536,7 @@ fn download_and_extract(
                             // คำนวณ ETA จาก average speed ตลอดการโหลด
                             let total_elapsed = download_start.elapsed().as_secs_f64();
                             let avg_speed = if total_elapsed > 0.0 { local_done as f64 / total_elapsed } else { 1.0 };
-                            let remaining_bytes = if part_size > local_done { part_size - local_done } else { 0 };
+                            let remaining_bytes = part_size.saturating_sub(local_done);
                             let eta_secs = if avg_speed > 0.0 { remaining_bytes as f64 / avg_speed } else { 0.0 };
 
                             let eta_str = if eta_secs > 3600.0 {
@@ -490,8 +578,12 @@ fn download_and_extract(
             })
             .collect();
 
-        handles.into_iter()
-            .map(|h| h.join().unwrap_or_else(|_| Err("Thread panicked".to_string())))
+        handles
+            .into_iter()
+            .map(|h| {
+                h.join()
+                    .unwrap_or_else(|_| Err("Thread panicked".to_string()))
+            })
             .collect()
     });
 
@@ -509,17 +601,30 @@ fn download_and_extract(
     // ─── Phase 3: Extract ทีละไฟล์ (sequential) ───────────────────────────────
     for (file_idx, ((_, label), zip_path)) in parts.iter().zip(zip_paths.iter()).enumerate() {
         if cancel.load(Ordering::SeqCst) {
-            for zp in &zip_paths { let _ = std::fs::remove_file(zp); }
+            for zp in &zip_paths {
+                let _ = std::fs::remove_file(zp);
+            }
             return Err("Cancelled before extraction.".to_string());
         }
 
         let extract_base = 50u8 + (file_idx as u8 * (49 / total_parts as u8));
         let extract_range = 49u8 / total_parts as u8;
 
-        emit_progress(app, "extracting", extract_base,
-            &format!("[{}/{}] Extracting {}...", file_idx + 1, total_parts, label));
+        emit_progress(
+            app,
+            "extracting",
+            extract_base,
+            &format!("[{}/{}] Extracting {}...", file_idx + 1, total_parts, label),
+        );
 
-        let res = extract_zip_ranged(app, zip_path, dest_dir, &cancel, extract_base, extract_range);
+        let res = extract_zip_ranged(
+            app,
+            zip_path,
+            dest_dir,
+            &cancel,
+            extract_base,
+            extract_range,
+        );
         let _ = std::fs::remove_file(zip_path);
         res?;
     }
@@ -528,7 +633,12 @@ fn download_and_extract(
     // A bundled venv may have been created on a different machine.
     // We rewrite pyvenv.cfg `home =` lines to point to the bundled idf-python in
     // the actual install directory so Python can be found on any machine.
-    emit_progress(app, "extracting", 99, "Patching Python venv paths for this machine...");
+    emit_progress(
+        app,
+        "extracting",
+        99,
+        "Patching Python venv paths for this machine...",
+    );
     if let Err(e) = patch_venv_paths(dest_dir) {
         // Non-fatal — log but continue.  Build will fail with a clearer message if needed.
         eprintln!("[Toolchain] pyvenv patch warning: {}", e);
@@ -538,8 +648,12 @@ fn download_and_extract(
     std::fs::write(dest_dir.join(SENTINEL_FILE), TOOLCHAIN_VERSION)
         .map_err(|e| format!("Failed to write sentinel: {}", e))?;
 
-    emit_progress(app, "done", 100,
-        &format!("Toolchain v{} ready!", TOOLCHAIN_VERSION));
+    emit_progress(
+        app,
+        "done",
+        100,
+        &format!("Toolchain v{} ready!", TOOLCHAIN_VERSION),
+    );
 
     Ok(format!("Toolchain installed at {}", dest_dir.display()))
 }
@@ -553,11 +667,9 @@ fn extract_zip_ranged(
     base_percent: u8,
     range: u8,
 ) -> Result<(), String> {
-    let file = std::fs::File::open(zip_path)
-        .map_err(|e| format!("Cannot open ZIP file: {}", e))?;
+    let file = std::fs::File::open(zip_path).map_err(|e| format!("Cannot open ZIP file: {}", e))?;
 
-    let mut archive = zip::ZipArchive::new(file)
-        .map_err(|e| format!("Invalid ZIP file: {}", e))?;
+    let mut archive = zip::ZipArchive::new(file).map_err(|e| format!("Invalid ZIP file: {}", e))?;
 
     let total = archive.len();
 
@@ -606,10 +718,8 @@ fn extract_zip_ranged(
             {
                 use std::os::unix::fs::PermissionsExt;
                 if let Some(mode) = zip_file.unix_mode() {
-                    let _ = std::fs::set_permissions(
-                        &out_path,
-                        std::fs::Permissions::from_mode(mode),
-                    );
+                    let _ =
+                        std::fs::set_permissions(&out_path, std::fs::Permissions::from_mode(mode));
                 }
             }
         }
@@ -617,7 +727,6 @@ fn extract_zip_ranged(
 
     Ok(())
 }
-
 
 // ── Build Firmware using bundled toolchain ────────────────────────────────────
 
@@ -654,14 +763,13 @@ pub async fn build_firmware_with_toolchain(
 
     // หา Python จาก toolchain โดยตรง (ไม่พึ่ง venv launcher stub ที่มี hardcoded path)
     // Priority: 1) idf-python bundled  2) venv python (ถ้า pyvenv.cfg ถูก patch แล้ว)
-    let (python_bin, python_venv) = find_toolchain_python(&tools_path)
-        .ok_or_else(|| {
-            format!(
-                "Cannot find Python in toolchain at {}. \
+    let (python_bin, python_venv) = find_toolchain_python(&tools_path).ok_or_else(|| {
+        format!(
+            "Cannot find Python in toolchain at {}. \
                 Try clicking 'Repair Python Paths' or reinstall the toolchain.",
-                tools_path.display()
-            )
-        })?;
+            tools_path.display()
+        )
+    })?;
 
     // สร้าง PATH ที่ชี้ไปยัง toolchain ของเรา
     let custom_path = build_toolchain_path(&tools_path);
@@ -676,14 +784,20 @@ pub async fn build_firmware_with_toolchain(
     {
         let build_dir = project_path.join("build");
         if build_dir.exists() {
-            let needs_clean = crate::esp_idf::is_build_dir_stale(&build_dir, &idf_path, &tools_path);
+            let needs_clean =
+                crate::esp_idf::is_build_dir_stale(&build_dir, &idf_path, &tools_path);
             if needs_clean {
-                let _ = app_handle.emit("terminal-output",
-                    "⚠️ Detected stale build directory. Auto-cleaning...".to_string());
+                let _ = app_handle.emit(
+                    "terminal-output",
+                    "⚠️ Detected stale build directory. Auto-cleaning...".to_string(),
+                );
                 match std::fs::remove_dir_all(&build_dir) {
                     Ok(_) => {
-                        let _ = app_handle.emit("terminal-output",
-                            "✅ Build directory cleaned. CMake will reconfigure from scratch.".to_string());
+                        let _ = app_handle.emit(
+                            "terminal-output",
+                            "✅ Build directory cleaned. CMake will reconfigure from scratch."
+                                .to_string(),
+                        );
                     }
                     Err(e) => {
                         let _ = app_handle.emit("terminal-output",
@@ -705,8 +819,8 @@ pub async fn build_firmware_with_toolchain(
     let custom_path_clone = custom_path.clone();
 
     tokio::task::spawn_blocking(move || {
-        use std::process::{Command, Stdio};
         use std::io::BufRead;
+        use std::process::{Command, Stdio};
 
         let mut cmd = Command::new(&python_bin_clone);
         cmd.arg(&idf_py)
@@ -722,8 +836,13 @@ pub async fn build_firmware_with_toolchain(
             // compiled objects across projects. Silently ignored if ccache is not installed.
             .env("IDF_CCACHE_ENABLE", "1")
             // Use all available CPU cores for parallel compilation
-            .env("NINJA_NUM_THREADS", std::thread::available_parallelism()
-                .map(|n| n.get()).unwrap_or(4).to_string())
+            .env(
+                "NINJA_NUM_THREADS",
+                std::thread::available_parallelism()
+                    .map(|n| n.get())
+                    .unwrap_or(4)
+                    .to_string(),
+            )
             // Force Python to use UTF-8 regardless of Windows system locale (cp874, cp932, etc.)
             // This fixes kconfgen UnicodeDecodeError on non-English Windows machines.
             .env("PYTHONUTF8", "1")
@@ -735,7 +854,8 @@ pub async fn build_firmware_with_toolchain(
         // Inject ccache into PATH if available. Searches common install locations
         // without hardcoding any version-specific path — works on any machine.
         if let Some(ccache_dir) = find_ccache_dir() {
-            let current_path = cmd.get_envs()
+            let current_path = cmd
+                .get_envs()
                 .find(|(k, _)| *k == "PATH")
                 .and_then(|(_, v)| v)
                 .map(|v| v.to_os_string())
@@ -745,7 +865,8 @@ pub async fn build_firmware_with_toolchain(
             new_path.push(current_path);
             cmd.env("PATH", new_path);
         }
-        let mut child = cmd.stdin(Stdio::null())
+        let mut child = cmd
+            .stdin(Stdio::null())
             .stdout(Stdio::piped())
             .stderr(Stdio::piped())
             .spawn()
@@ -756,19 +877,21 @@ pub async fn build_firmware_with_toolchain(
 
         let app_out = app_clone.clone();
         std::thread::spawn(move || {
-            for line in BufReader::new(stdout).lines().flatten() {
+            for line in BufReader::new(stdout).lines().map_while(Result::ok) {
                 let _ = app_out.emit("terminal-output", &line);
             }
         });
 
         let app_err = app_clone.clone();
         std::thread::spawn(move || {
-            for line in BufReader::new(stderr).lines().flatten() {
+            for line in BufReader::new(stderr).lines().map_while(Result::ok) {
                 let _ = app_err.emit("terminal-output", format!("\x1b[31m{}\x1b[0m", line));
             }
         });
 
-        let status = child.wait().map_err(|e| format!("Build process error: {}", e))?;
+        let status = child
+            .wait()
+            .map_err(|e| format!("Build process error: {}", e))?;
 
         if status.success() {
             let _ = app_clone.emit(
@@ -826,9 +949,10 @@ fn find_toolchain_python(tools_path: &Path) -> Option<(PathBuf, PathBuf)> {
     // Read home= from pyvenv.cfg and verify that Python actually exists there.
     let cfg_path = venv_dir.join("pyvenv.cfg");
     if let Ok(cfg) = std::fs::read_to_string(&cfg_path) {
-        let home = cfg.lines()
+        let home = cfg
+            .lines()
             .find(|l| l.trim().to_lowercase().starts_with("home") && l.contains('='))
-            .and_then(|l| l.splitn(2, '=').nth(1))
+            .and_then(|l| l.split_once('=').map(|(_, value)| value))
             .map(|s| s.trim().to_string());
 
         if let Some(home_dir) = home {
@@ -847,26 +971,42 @@ fn find_toolchain_python(tools_path: &Path) -> Option<(PathBuf, PathBuf)> {
                     venv_dir.join("bin").join("python3")
                 };
                 if venv_python.exists() {
-                    eprintln!("[Toolchain] Using venv python (home= valid): {}", venv_python.display());
+                    eprintln!(
+                        "[Toolchain] Using venv python (home= valid): {}",
+                        venv_python.display()
+                    );
                     return Some((venv_python, venv_dir));
                 }
             } else {
                 // home= points to a path that is unavailable on this machine — auto-patch now
-                eprintln!("[Toolchain] pyvenv.cfg home= not found ({}), auto-patching...", home_dir);
+                eprintln!(
+                    "[Toolchain] pyvenv.cfg home= not found ({}), auto-patching...",
+                    home_dir
+                );
                 if let Some(ref fresh_python) = idf_python_bin {
                     // Patch pyvenv.cfg inline
-                    let new_home = fresh_python.parent()
+                    let new_home = fresh_python
+                        .parent()
                         .map(|p| p.to_string_lossy().into_owned())
                         .unwrap_or_default();
-                    let patched = cfg.lines().map(|line| {
-                        if line.trim().to_lowercase().starts_with("home") && line.contains('=') {
-                            format!("home = {}", new_home)
-                        } else {
-                            line.to_string()
-                        }
-                    }).collect::<Vec<_>>().join("\r\n");
+                    let patched = cfg
+                        .lines()
+                        .map(|line| {
+                            if line.trim().to_lowercase().starts_with("home") && line.contains('=')
+                            {
+                                format!("home = {}", new_home)
+                            } else {
+                                line.to_string()
+                            }
+                        })
+                        .collect::<Vec<_>>()
+                        .join("\r\n");
                     let _ = std::fs::write(&cfg_path, &patched);
-                    eprintln!("[Toolchain] Patched {} home= → {}", cfg_path.display(), new_home);
+                    eprintln!(
+                        "[Toolchain] Patched {} home= → {}",
+                        cfg_path.display(),
+                        new_home
+                    );
                     return Some((fresh_python.clone(), venv_dir));
                 }
             }
@@ -882,18 +1022,26 @@ fn find_bundled_python(tools_path: &Path) -> Option<PathBuf> {
     let idf_python_root = tools_path.join("tools").join("idf-python");
     if idf_python_root.is_dir() {
         let mut versions: Vec<PathBuf> = std::fs::read_dir(&idf_python_root)
-            .ok()?.flatten().map(|e| e.path()).filter(|p| p.is_dir()).collect();
+            .ok()?
+            .flatten()
+            .map(|e| e.path())
+            .filter(|p| p.is_dir())
+            .collect();
         versions.sort(); // highest version last
         versions.reverse();
         for ver_dir in &versions {
             // python.exe directly in version dir (e.g. idf-python/3.11.2/python.exe)
             if cfg!(windows) {
                 let candidate = ver_dir.join("python.exe");
-                if candidate.exists() { return Some(candidate); }
+                if candidate.exists() {
+                    return Some(candidate);
+                }
             } else {
                 for name in &["python3", "python"] {
                     let candidate = ver_dir.join(name);
-                    if candidate.exists() { return Some(candidate); }
+                    if candidate.exists() {
+                        return Some(candidate);
+                    }
                 }
             }
         }
@@ -905,13 +1053,21 @@ fn find_bundled_python(tools_path: &Path) -> Option<PathBuf> {
 
 /// Walk a directory tree looking for python.exe / python3 (max_depth limit).
 fn find_python_in_dir(dir: &Path, depth: u32, max_depth: u32) -> Option<PathBuf> {
-    if depth > max_depth { return None; }
-    let Ok(entries) = std::fs::read_dir(dir) else { return None; };
+    if depth > max_depth {
+        return None;
+    }
+    let Ok(entries) = std::fs::read_dir(dir) else {
+        return None;
+    };
     let mut dirs = Vec::new();
     for entry in entries.flatten() {
         let p = entry.path();
         if p.is_file() {
-            let name = p.file_name().unwrap_or_default().to_string_lossy().to_lowercase();
+            let name = p
+                .file_name()
+                .unwrap_or_default()
+                .to_string_lossy()
+                .to_lowercase();
             if name == "python.exe" || name == "python3" || name == "python" {
                 return Some(p);
             }
@@ -931,7 +1087,9 @@ fn find_python_in_dir(dir: &Path, depth: u32, max_depth: u32) -> Option<PathBuf>
 /// reflect the current machine's toolchain install location.
 /// Safe to call even if toolchain is not installed (no-op).
 pub fn auto_repair_on_startup(toolchain_dir: &Path) {
-    if !toolchain_dir.join(SENTINEL_FILE).exists() { return; }
+    if !toolchain_dir.join(SENTINEL_FILE).exists() {
+        return;
+    }
     if let Err(e) = patch_venv_paths(toolchain_dir) {
         eprintln!("[Startup] pyvenv auto-repair warning: {}", e);
     } else {
@@ -962,20 +1120,28 @@ fn patch_venv_paths(toolchain_dir: &Path) -> Result<(), String> {
     let bundled_python_bin_dir: Option<PathBuf> = (|| -> Option<PathBuf> {
         // Walk: idf-python/<version>/python.exe
         if idf_python_dir.is_dir() {
-            let versions: Vec<_> = std::fs::read_dir(&idf_python_dir).ok()?.flatten()
+            let versions: Vec<_> = std::fs::read_dir(&idf_python_dir)
+                .ok()?
+                .flatten()
                 .map(|e| e.path())
                 .filter(|p| p.is_dir())
                 .collect();
             for ver in &versions {
                 // Direct python.exe in version dir
                 if cfg!(windows) {
-                    if ver.join("python.exe").exists() { return Some(ver.clone()); }
+                    if ver.join("python.exe").exists() {
+                        return Some(ver.clone());
+                    }
                 } else {
-                    if ver.join("python3").exists() || ver.join("python").exists() { return Some(ver.clone()); }
+                    if ver.join("python3").exists() || ver.join("python").exists() {
+                        return Some(ver.clone());
+                    }
                 }
                 // python.exe inside bin/
                 let bin = ver.join("bin");
-                if bin.exists() { return Some(bin); }
+                if bin.exists() {
+                    return Some(bin);
+                }
             }
         }
         // Fallback: scan tools/ for any directory containing python.exe at depth ≤3
@@ -987,7 +1153,10 @@ fn patch_venv_paths(toolchain_dir: &Path) -> Result<(), String> {
     collect_pyvenv_cfgs(toolchain_dir, &mut cfg_files);
 
     if cfg_files.is_empty() {
-        eprintln!("[Patch] No pyvenv.cfg found under {} — skipping patch", toolchain_dir.display());
+        eprintln!(
+            "[Patch] No pyvenv.cfg found under {} — skipping patch",
+            toolchain_dir.display()
+        );
         return Ok(());
     }
 
@@ -997,7 +1166,10 @@ fn patch_venv_paths(toolchain_dir: &Path) -> Result<(), String> {
     for cfg_path in &cfg_files {
         let content = match std::fs::read_to_string(cfg_path) {
             Ok(c) => c,
-            Err(e) => { eprintln!("[Patch] Cannot read {}: {}", cfg_path.display(), e); continue; }
+            Err(e) => {
+                eprintln!("[Patch] Cannot read {}: {}", cfg_path.display(), e);
+                continue;
+            }
         };
 
         // Determine the correct `home` value:
@@ -1007,7 +1179,11 @@ fn patch_venv_paths(toolchain_dir: &Path) -> Result<(), String> {
         } else {
             // If no bundled python found, keep the venv's own Scripts/bin
             let venv_dir = cfg_path.parent().unwrap_or(cfg_path);
-            let bin = if cfg!(windows) { venv_dir.join("Scripts") } else { venv_dir.join("bin") };
+            let bin = if cfg!(windows) {
+                venv_dir.join("Scripts")
+            } else {
+                venv_dir.join("bin")
+            };
             bin.to_string_lossy().into_owned()
         };
 
@@ -1027,7 +1203,11 @@ fn patch_venv_paths(toolchain_dir: &Path) -> Result<(), String> {
         if let Err(e) = std::fs::write(cfg_path, &patched) {
             eprintln!("[Patch] Cannot write {}: {}", cfg_path.display(), e);
         } else {
-            eprintln!("[Patch] Patched {} → home = {}", cfg_path.display(), new_home);
+            eprintln!(
+                "[Patch] Patched {} → home = {}",
+                cfg_path.display(),
+                new_home
+            );
         }
     }
 
@@ -1037,8 +1217,12 @@ fn patch_venv_paths(toolchain_dir: &Path) -> Result<(), String> {
 /// Recursively collect all `pyvenv.cfg` files under `dir` (max depth 8).
 fn collect_pyvenv_cfgs(dir: &Path, out: &mut Vec<PathBuf>) {
     fn walk(dir: &Path, depth: u32, out: &mut Vec<PathBuf>) {
-        if depth > 8 { return; }
-        let Ok(entries) = std::fs::read_dir(dir) else { return; };
+        if depth > 8 {
+            return;
+        }
+        let Ok(entries) = std::fs::read_dir(dir) else {
+            return;
+        };
         for entry in entries.flatten() {
             let p = entry.path();
             if p.is_dir() {
@@ -1053,12 +1237,20 @@ fn collect_pyvenv_cfgs(dir: &Path, out: &mut Vec<PathBuf>) {
 
 /// Walk `dir` up to `max_depth` and return the first directory containing python.exe / python3.
 fn find_python_dir(dir: &Path, depth: u32, max_depth: u32) -> Option<PathBuf> {
-    if depth > max_depth { return None; }
-    let Ok(entries) = std::fs::read_dir(dir) else { return None; };
+    if depth > max_depth {
+        return None;
+    }
+    let Ok(entries) = std::fs::read_dir(dir) else {
+        return None;
+    };
     for entry in entries.flatten() {
         let p = entry.path();
         if p.is_file() {
-            let name = p.file_name().unwrap_or_default().to_string_lossy().to_lowercase();
+            let name = p
+                .file_name()
+                .unwrap_or_default()
+                .to_string_lossy()
+                .to_lowercase();
             if name == "python.exe" || name == "python3" || name == "python" {
                 return p.parent().map(|d| d.to_path_buf());
             }
@@ -1076,8 +1268,14 @@ fn build_toolchain_path(tools_path: &Path) -> std::ffi::OsString {
 
     // 1. venv Scripts/bin (Python) — must come first so idf.py picks up the right python
     if let Some(venv) = find_first_venv(&tools_path.join("python_env")) {
-        let bin = if cfg!(windows) { venv.join("Scripts") } else { venv.join("bin") };
-        if bin.exists() { paths.push(bin); }
+        let bin = if cfg!(windows) {
+            venv.join("Scripts")
+        } else {
+            venv.join("bin")
+        };
+        if bin.exists() {
+            paths.push(bin);
+        }
     }
     // Also add bundled idf-python directory
     if let Some(py) = find_bundled_python(tools_path) {
@@ -1108,6 +1306,7 @@ fn build_toolchain_path(tools_path: &Path) -> std::ffi::OsString {
 ///   3. Chocolatey
 ///   4. Scoop (user or system)
 ///   5. Common manual install locations
+///
 /// Returns the *directory* containing ccache.exe, or None if not found anywhere.
 fn find_ccache_dir() -> Option<PathBuf> {
     // 1. Already in PATH — check first, zero overhead
@@ -1138,8 +1337,9 @@ fn find_ccache_dir() -> Option<PathBuf> {
     // 3. Chocolatey
     let choco = PathBuf::from(
         std::env::var("ChocolateyInstall")
-            .unwrap_or_else(|_| "C:\\ProgramData\\chocolatey".to_string())
-    ).join("bin");
+            .unwrap_or_else(|_| "C:\\ProgramData\\chocolatey".to_string()),
+    )
+    .join("bin");
     if choco.join("ccache.exe").exists() {
         return Some(choco);
     }
@@ -1193,14 +1393,18 @@ fn which_in_path(exe: &str) -> bool {
 /// Recursively search `root` up to `max_depth` levels deep for a file named `exe_name`.
 /// Returns the *parent directory* of the found executable.
 fn find_exe_in_dir(root: &Path, exe_name: &str, max_depth: usize) -> Option<PathBuf> {
-    if max_depth == 0 { return None; }
+    if max_depth == 0 {
+        return None;
+    }
     if let Ok(entries) = std::fs::read_dir(root) {
         for entry in entries.flatten() {
             let path = entry.path();
             if path.is_file() {
-                if path.file_name()
+                if path
+                    .file_name()
                     .map(|n| n.to_string_lossy().to_lowercase())
-                    .as_deref() == Some(&exe_name.to_lowercase())
+                    .as_deref()
+                    == Some(&exe_name.to_lowercase())
                 {
                     return path.parent().map(|p| p.to_path_buf());
                 }
@@ -1220,27 +1424,47 @@ fn find_exe_in_dir(root: &Path, exe_name: &str, max_depth: usize) -> Option<Path
 ///   b) <tool>/<version>/<exe>          → adds version/ directly (ninja, idf-python)
 ///   c) <tool>/<variant>/<ver>/bin/     → adds bin/ (xtensa-esp-elf sub-variants)
 fn scan_esp_tool_dirs(tools_dir: &Path, paths: &mut Vec<PathBuf>) {
-    let Ok(tools) = std::fs::read_dir(tools_dir) else { return; };
+    let Ok(tools) = std::fs::read_dir(tools_dir) else {
+        return;
+    };
     for tool_entry in tools.flatten() {
         let tool_path = tool_entry.path();
-        if !tool_path.is_dir() { continue; }
-        let Ok(versions) = std::fs::read_dir(&tool_path) else { continue; };
+        if !tool_path.is_dir() {
+            continue;
+        }
+        let Ok(versions) = std::fs::read_dir(&tool_path) else {
+            continue;
+        };
         for ver_entry in versions.flatten() {
             let ver_path = ver_entry.path();
-            if !ver_path.is_dir() { continue; }
+            if !ver_path.is_dir() {
+                continue;
+            }
             // Layout a: bin/ subdir
             let bin_dir = ver_path.join("bin");
-            if bin_dir.is_dir() { paths.push(bin_dir); }
+            if bin_dir.is_dir() {
+                paths.push(bin_dir);
+            }
             // Layout b: executables directly in version dir
-            if dir_has_executables(&ver_path) { paths.push(ver_path.clone()); }
+            if dir_has_executables(&ver_path) {
+                paths.push(ver_path.clone());
+            }
             // Layout c: one more level deep
-            let Ok(sub_entries) = std::fs::read_dir(&ver_path) else { continue; };
+            let Ok(sub_entries) = std::fs::read_dir(&ver_path) else {
+                continue;
+            };
             for sub_entry in sub_entries.flatten() {
                 let sub = sub_entry.path();
-                if !sub.is_dir() { continue; }
+                if !sub.is_dir() {
+                    continue;
+                }
                 let sub_bin = sub.join("bin");
-                if sub_bin.is_dir() { paths.push(sub_bin); }
-                if dir_has_executables(&sub) { paths.push(sub); }
+                if sub_bin.is_dir() {
+                    paths.push(sub_bin);
+                }
+                if dir_has_executables(&sub) {
+                    paths.push(sub);
+                }
             }
         }
     }
@@ -1248,12 +1472,20 @@ fn scan_esp_tool_dirs(tools_dir: &Path, paths: &mut Vec<PathBuf>) {
 
 /// Returns true if a directory directly contains at least one executable file.
 fn dir_has_executables(dir: &Path) -> bool {
-    let Ok(entries) = std::fs::read_dir(dir) else { return false; };
+    let Ok(entries) = std::fs::read_dir(dir) else {
+        return false;
+    };
     for entry in entries.flatten() {
         let p = entry.path();
-        if !p.is_file() { continue; }
+        if !p.is_file() {
+            continue;
+        }
         if cfg!(windows) {
-            if p.extension().and_then(|e| e.to_str()).map(|e| e.eq_ignore_ascii_case("exe")).unwrap_or(false) {
+            if p.extension()
+                .and_then(|e| e.to_str())
+                .map(|e| e.eq_ignore_ascii_case("exe"))
+                .unwrap_or(false)
+            {
                 return true;
             }
         } else {
@@ -1261,7 +1493,9 @@ fn dir_has_executables(dir: &Path) -> bool {
             {
                 use std::os::unix::fs::PermissionsExt;
                 if let Ok(meta) = p.metadata() {
-                    if meta.permissions().mode() & 0o111 != 0 { return true; }
+                    if meta.permissions().mode() & 0o111 != 0 {
+                        return true;
+                    }
                 }
             }
         }
@@ -1296,6 +1530,33 @@ fn extract_gdrive_token(html: &str) -> Option<String> {
 mod tests {
     use super::*;
     use std::fs;
+
+    #[test]
+    fn install_lock_rejects_concurrent_attempt_and_releases_on_drop() {
+        let flag = Arc::new(AtomicBool::new(false));
+        let first = try_acquire_install(flag.clone()).unwrap();
+        assert_eq!(
+            try_acquire_install(flag.clone()).unwrap_err(),
+            "already_in_progress"
+        );
+
+        drop(first);
+        assert!(try_acquire_install(flag).is_ok());
+    }
+
+    #[test]
+    fn staged_install_is_renamed_only_when_complete() {
+        let tmp = tempfile::tempdir().unwrap();
+        let final_dir = tmp.path().join("toolchain");
+        let staging_dir = tmp.path().join("toolchain.installing");
+        fs::create_dir_all(&staging_dir).unwrap();
+        fs::write(staging_dir.join(SENTINEL_FILE), TOOLCHAIN_VERSION).unwrap();
+
+        replace_install_directory(&staging_dir, &final_dir).unwrap();
+
+        assert!(!staging_dir.exists());
+        assert!(is_toolchain_ready(&final_dir));
+    }
 
     // ── extract_gdrive_token ──────────────────────────────────────────────────
 

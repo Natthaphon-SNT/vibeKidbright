@@ -9,6 +9,14 @@ import { parseErrorLine, type ParsedBuildError } from "./errorHints";
 import BuildErrorList from "./BuildErrorList";
 import { toast, ToastHost } from "./Toast";
 import { normPath } from "./utils";
+import SetupRepairButton from "./SetupRepairButton";
+import {
+  executeBuildLifecycle,
+  isBuildFlashSupported,
+  MIUAI_DEPLOYMENT_UNAVAILABLE,
+  runBuildForBoard,
+  type BoardType,
+} from "./buildFlash";
 
 const PORT_REFRESH_INTERVAL_MS = 2_000;
 
@@ -268,6 +276,7 @@ interface FileTab {
 function AppShell() {
   const [toolchainReady, setToolchainReady] = React.useState(false);
   const [isRefreshing, setIsRefreshing] = React.useState(false);
+  const [isInstallingToolchain, setIsInstallingToolchain] = React.useState(false);
 
   /** Soft-refresh: re-check toolchain โดยที่ state ของ App ไม่หาย */
   const refreshToolchain = React.useCallback(async () => {
@@ -311,7 +320,12 @@ function AppShell() {
 
   return (
     <>
-      <App toolchainReady={toolchainReady} onRefreshToolchain={refreshToolchain} />
+      <App
+        toolchainReady={toolchainReady}
+        onRefreshToolchain={refreshToolchain}
+        isInstallingToolchain={isInstallingToolchain}
+        onInstallingToolchainChange={setIsInstallingToolchain}
+      />
       <ToastHost />
       {/* Refresh overlay indicator */}
       {isRefreshing && (
@@ -352,13 +366,25 @@ function AppShell() {
         <ToolchainSetup
           onReady={() => setToolchainReady(true)}
           mini={true}
+          isInstalling={isInstallingToolchain}
+          onInstallingChange={setIsInstallingToolchain}
         />
       )}
     </>
   );
 }
 
-function App({ toolchainReady = true, onRefreshToolchain }: { toolchainReady?: boolean; onRefreshToolchain?: () => void }) {
+function App({
+  toolchainReady = true,
+  onRefreshToolchain,
+  isInstallingToolchain = false,
+  onInstallingToolchainChange = () => {},
+}: {
+  toolchainReady?: boolean;
+  onRefreshToolchain?: () => void;
+  isInstallingToolchain?: boolean;
+  onInstallingToolchainChange?: (isInstalling: boolean) => void;
+}) {
   const [darkMode, setDarkMode] = React.useState(() => {
     return localStorage.getItem("vibe-theme") === "dark";
   });
@@ -375,7 +401,8 @@ function App({ toolchainReady = true, onRefreshToolchain }: { toolchainReady?: b
     document.documentElement.setAttribute("data-theme", darkMode ? "dark" : "light");
   }, [darkMode]);
   const [status, setStatus] = useState("Checking ESP-IDF...");
-  const [isSettingUpEspIdf, setIsSettingUpEspIdf] = useState(false);
+  const isSettingUpEspIdf = isInstallingToolchain;
+  const setIsSettingUpEspIdf = onInstallingToolchainChange;
   const [espIdfSetupNote, setEspIdfSetupNote] = useState("");
   const [logs, setLogs] = useState<string[]>([]);
   const [terminalInput, setTerminalInput] = useState("");
@@ -407,7 +434,6 @@ function App({ toolchainReady = true, onRefreshToolchain }: { toolchainReady?: b
   const adbDeviceRefreshInFlightRef = useRef(false);
 
   // Board type selector (KidBright32 vs MiuAiPlus)
-  type BoardType = "kidbright32" | "miuaiplus";
   const [selectedBoard, setSelectedBoard] = useState<BoardType>(() => {
     return (localStorage.getItem("vibe-selected-board") as BoardType) || "kidbright32";
   });
@@ -1277,6 +1303,12 @@ function App({ toolchainReady = true, onRefreshToolchain }: { toolchainReady?: b
 
   const handleBuildFlash = async () => {
     if (isBuilding) return;
+
+    if (!isBuildFlashSupported(selectedBoard)) {
+      addLog(`⚠️ ${MIUAI_DEPLOYMENT_UNAVAILABLE}`);
+      toast(MIUAI_DEPLOYMENT_UNAVAILABLE, "info");
+      return;
+    }
     
     if (projectDir === ".") {
       addLog("❌ Error: No project selected to build.");
@@ -1284,34 +1316,34 @@ function App({ toolchainReady = true, onRefreshToolchain }: { toolchainReady?: b
       return;
     }
 
-    setIsBuilding(true);
-    setBuildResult("building");
     setBuildStep(0);
     setBuildTotal(0);
     setBuildErrors([]);
     setBuildCurrentTask("Initializing...");
     addLog("--- Starting Build & Flash ---");
 
-    try {
-      // 🛠 ใช้ Wrapper เพื่อให้มันโหลด export.bat ก่อนสั่ง idf.py เสมอ
-      const flashArgs = ["build", "flash"];
-      if (selectedSerialPort) {
-        flashArgs.push("-p", selectedSerialPort);
-        addLog(`Using port: ${selectedSerialPort}`);
-      } else {
-        addLog("⚠️ No serial port selected — idf.py will use its default port");
-      }
-      await runIdfWrappedCommand("idf.py", flashArgs, projectDir);
-    } catch (err) {
-      addLog(`Build failed: ${err}`);
-      setBuildResult("failed");
-      setBuildCurrentTask("Build failed");
-    } finally {
-      setIsBuilding(false);
-      // If we didn't explicitly set failed, mark as success
-      setBuildResult(prev => prev === "building" ? "success" : prev);
-      setBuildCurrentTask(prev => prev === "Initializing..." ? "" : prev);
-    }
+    await executeBuildLifecycle({
+      run: async () => {
+        // 🛠 ใช้ Wrapper เพื่อให้มันโหลด export.bat ก่อนสั่ง idf.py เสมอ
+        const flashArgs = ["build", "flash"];
+        if (selectedSerialPort) {
+          flashArgs.push("-p", selectedSerialPort);
+          addLog(`Using port: ${selectedSerialPort}`);
+        } else {
+          addLog("⚠️ No serial port selected — idf.py will use its default port");
+        }
+        await runBuildForBoard(selectedBoard, () =>
+          runIdfWrappedCommand("idf.py", flashArgs, projectDir)
+        );
+      },
+      setResult: setBuildResult,
+      setBuilding: setIsBuilding,
+      onFailure: (err) => {
+        addLog(`Build failed: ${err}`);
+        setBuildCurrentTask("Build failed");
+      },
+    });
+    setBuildCurrentTask(prev => prev === "Initializing..." ? "" : prev);
   };
   // Keep ref in sync so the keyboard shortcut (Ctrl+Shift+B) always calls the latest version
   useEffect(() => { buildFlashRef.current = handleBuildFlash; });
@@ -1456,27 +1488,10 @@ function App({ toolchainReady = true, onRefreshToolchain }: { toolchainReady?: b
           </div>
 
           <div className="p-2 text-sm font-medium mt-4" style={{ color: 'var(--text-muted)' }}>TOOLS</div>
-          <button
+          <SetupRepairButton
+            isInstalling={isSettingUpEspIdf}
             onClick={() => setShowSetupModal(true)}
-            disabled={isSettingUpEspIdf}
-            className="w-full text-left p-2 rounded flex items-center gap-2 text-sm transition-colors group"
-            style={isSettingUpEspIdf
-              ? { backgroundColor: 'rgba(245,158,11,0.1)', color: '#fcd34d', cursor: 'not-allowed' }
-              : { color: 'var(--text-secondary)' }
-            }
-            onMouseEnter={e => { if (!isSettingUpEspIdf) e.currentTarget.style.backgroundColor = 'var(--bg-hover)'; }}
-            onMouseLeave={e => { if (!isSettingUpEspIdf) e.currentTarget.style.backgroundColor = ''; }}
-          >
-            <span className="w-4 h-4 flex items-center justify-center rounded text-[10px] font-bold"
-              style={isSettingUpEspIdf
-                ? { backgroundColor: 'rgba(245,158,11,0.2)', color: 'var(--warning)' }
-                : { backgroundColor: 'var(--bg-hover)', color: 'var(--text-muted)' }
-              }
-            >
-              {isSettingUpEspIdf ? "…" : "⚙"}
-            </span>
-            {isSettingUpEspIdf ? "Installing ESP-IDF..." : "Setup / Repair ESP-IDF"}
-          </button>
+          />
           <button
             onClick={() => {
               const next = !showAiPanel;
@@ -1566,10 +1581,14 @@ function App({ toolchainReady = true, onRefreshToolchain }: { toolchainReady?: b
           )}
           <button
             onClick={handleBuildFlash}
-            disabled={isBuilding || isSettingUpEspIdf || !toolchainReady}
-            title={!toolchainReady ? "Waiting for toolchain download to complete..." : "Build & Flash (Ctrl+Shift+B)"}
+            disabled={isBuilding || isSettingUpEspIdf || !toolchainReady || !isBuildFlashSupported(selectedBoard)}
+            title={!isBuildFlashSupported(selectedBoard)
+              ? MIUAI_DEPLOYMENT_UNAVAILABLE
+              : !toolchainReady
+                ? "Waiting for toolchain download to complete..."
+                : "Build & Flash (Ctrl+Shift+B)"}
             className="w-full justify-center text-sm px-4 py-2 rounded-lg transition-all duration-200 font-bold flex items-center gap-2 shadow-lg active:scale-[0.98]"
-            style={isBuilding || !toolchainReady
+            style={isBuilding || !toolchainReady || !isBuildFlashSupported(selectedBoard)
               ? { backgroundColor: 'var(--bg-hover)', color: 'var(--text-muted)', cursor: 'not-allowed' }
               : { backgroundColor: 'var(--accent)', color: '#fff', boxShadow: '0 4px 16px var(--accent-glow)' }
             }

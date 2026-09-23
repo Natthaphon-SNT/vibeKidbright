@@ -1,0 +1,880 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for errorHints.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="prettify.css" />
+    <link rel="stylesheet" href="base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="index.html">All files</a> errorHints.ts</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">99.05% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>210/212</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">91.66% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>33/36</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>4/4</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">99.05% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>210/212</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line high'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a>
+<a name='L143'></a><a href='#L143'>143</a>
+<a name='L144'></a><a href='#L144'>144</a>
+<a name='L145'></a><a href='#L145'>145</a>
+<a name='L146'></a><a href='#L146'>146</a>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a>
+<a name='L159'></a><a href='#L159'>159</a>
+<a name='L160'></a><a href='#L160'>160</a>
+<a name='L161'></a><a href='#L161'>161</a>
+<a name='L162'></a><a href='#L162'>162</a>
+<a name='L163'></a><a href='#L163'>163</a>
+<a name='L164'></a><a href='#L164'>164</a>
+<a name='L165'></a><a href='#L165'>165</a>
+<a name='L166'></a><a href='#L166'>166</a>
+<a name='L167'></a><a href='#L167'>167</a>
+<a name='L168'></a><a href='#L168'>168</a>
+<a name='L169'></a><a href='#L169'>169</a>
+<a name='L170'></a><a href='#L170'>170</a>
+<a name='L171'></a><a href='#L171'>171</a>
+<a name='L172'></a><a href='#L172'>172</a>
+<a name='L173'></a><a href='#L173'>173</a>
+<a name='L174'></a><a href='#L174'>174</a>
+<a name='L175'></a><a href='#L175'>175</a>
+<a name='L176'></a><a href='#L176'>176</a>
+<a name='L177'></a><a href='#L177'>177</a>
+<a name='L178'></a><a href='#L178'>178</a>
+<a name='L179'></a><a href='#L179'>179</a>
+<a name='L180'></a><a href='#L180'>180</a>
+<a name='L181'></a><a href='#L181'>181</a>
+<a name='L182'></a><a href='#L182'>182</a>
+<a name='L183'></a><a href='#L183'>183</a>
+<a name='L184'></a><a href='#L184'>184</a>
+<a name='L185'></a><a href='#L185'>185</a>
+<a name='L186'></a><a href='#L186'>186</a>
+<a name='L187'></a><a href='#L187'>187</a>
+<a name='L188'></a><a href='#L188'>188</a>
+<a name='L189'></a><a href='#L189'>189</a>
+<a name='L190'></a><a href='#L190'>190</a>
+<a name='L191'></a><a href='#L191'>191</a>
+<a name='L192'></a><a href='#L192'>192</a>
+<a name='L193'></a><a href='#L193'>193</a>
+<a name='L194'></a><a href='#L194'>194</a>
+<a name='L195'></a><a href='#L195'>195</a>
+<a name='L196'></a><a href='#L196'>196</a>
+<a name='L197'></a><a href='#L197'>197</a>
+<a name='L198'></a><a href='#L198'>198</a>
+<a name='L199'></a><a href='#L199'>199</a>
+<a name='L200'></a><a href='#L200'>200</a>
+<a name='L201'></a><a href='#L201'>201</a>
+<a name='L202'></a><a href='#L202'>202</a>
+<a name='L203'></a><a href='#L203'>203</a>
+<a name='L204'></a><a href='#L204'>204</a>
+<a name='L205'></a><a href='#L205'>205</a>
+<a name='L206'></a><a href='#L206'>206</a>
+<a name='L207'></a><a href='#L207'>207</a>
+<a name='L208'></a><a href='#L208'>208</a>
+<a name='L209'></a><a href='#L209'>209</a>
+<a name='L210'></a><a href='#L210'>210</a>
+<a name='L211'></a><a href='#L211'>211</a>
+<a name='L212'></a><a href='#L212'>212</a>
+<a name='L213'></a><a href='#L213'>213</a>
+<a name='L214'></a><a href='#L214'>214</a>
+<a name='L215'></a><a href='#L215'>215</a>
+<a name='L216'></a><a href='#L216'>216</a>
+<a name='L217'></a><a href='#L217'>217</a>
+<a name='L218'></a><a href='#L218'>218</a>
+<a name='L219'></a><a href='#L219'>219</a>
+<a name='L220'></a><a href='#L220'>220</a>
+<a name='L221'></a><a href='#L221'>221</a>
+<a name='L222'></a><a href='#L222'>222</a>
+<a name='L223'></a><a href='#L223'>223</a>
+<a name='L224'></a><a href='#L224'>224</a>
+<a name='L225'></a><a href='#L225'>225</a>
+<a name='L226'></a><a href='#L226'>226</a>
+<a name='L227'></a><a href='#L227'>227</a>
+<a name='L228'></a><a href='#L228'>228</a>
+<a name='L229'></a><a href='#L229'>229</a>
+<a name='L230'></a><a href='#L230'>230</a>
+<a name='L231'></a><a href='#L231'>231</a>
+<a name='L232'></a><a href='#L232'>232</a>
+<a name='L233'></a><a href='#L233'>233</a>
+<a name='L234'></a><a href='#L234'>234</a>
+<a name='L235'></a><a href='#L235'>235</a>
+<a name='L236'></a><a href='#L236'>236</a>
+<a name='L237'></a><a href='#L237'>237</a>
+<a name='L238'></a><a href='#L238'>238</a>
+<a name='L239'></a><a href='#L239'>239</a>
+<a name='L240'></a><a href='#L240'>240</a>
+<a name='L241'></a><a href='#L241'>241</a>
+<a name='L242'></a><a href='#L242'>242</a>
+<a name='L243'></a><a href='#L243'>243</a>
+<a name='L244'></a><a href='#L244'>244</a>
+<a name='L245'></a><a href='#L245'>245</a>
+<a name='L246'></a><a href='#L246'>246</a>
+<a name='L247'></a><a href='#L247'>247</a>
+<a name='L248'></a><a href='#L248'>248</a>
+<a name='L249'></a><a href='#L249'>249</a>
+<a name='L250'></a><a href='#L250'>250</a>
+<a name='L251'></a><a href='#L251'>251</a>
+<a name='L252'></a><a href='#L252'>252</a>
+<a name='L253'></a><a href='#L253'>253</a>
+<a name='L254'></a><a href='#L254'>254</a>
+<a name='L255'></a><a href='#L255'>255</a>
+<a name='L256'></a><a href='#L256'>256</a>
+<a name='L257'></a><a href='#L257'>257</a>
+<a name='L258'></a><a href='#L258'>258</a>
+<a name='L259'></a><a href='#L259'>259</a>
+<a name='L260'></a><a href='#L260'>260</a>
+<a name='L261'></a><a href='#L261'>261</a>
+<a name='L262'></a><a href='#L262'>262</a>
+<a name='L263'></a><a href='#L263'>263</a>
+<a name='L264'></a><a href='#L264'>264</a>
+<a name='L265'></a><a href='#L265'>265</a>
+<a name='L266'></a><a href='#L266'>266</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">42x</span>
+<span class="cline-any cline-yes">42x</span>
+<span class="cline-any cline-yes">142x</span>
+<span class="cline-any cline-yes">38x</span>
+<span class="cline-any cline-yes">38x</span>
+<span class="cline-any cline-yes">38x</span>
+<span class="cline-any cline-yes">38x</span>
+<span class="cline-any cline-yes">38x</span>
+<span class="cline-any cline-yes">38x</span>
+<span class="cline-any cline-yes">38x</span>
+<span class="cline-any cline-yes">38x</span>
+<span class="cline-any cline-yes">142x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">55x</span>
+<span class="cline-any cline-yes">55x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">55x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">52x</span>
+<span class="cline-any cline-yes">55x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">52x</span>
+<span class="cline-any cline-yes">52x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">56x</span>
+<span class="cline-any cline-yes">56x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">55x</span>
+<span class="cline-any cline-yes">56x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">52x</span>
+<span class="cline-any cline-yes">56x</span>
+<span class="cline-any cline-yes">40x</span>
+<span class="cline-any cline-yes">40x</span>
+<span class="cline-any cline-yes">40x</span>
+<span class="cline-any cline-yes">40x</span>
+<span class="cline-any cline-yes">40x</span>
+<span class="cline-any cline-yes">40x</span>
+<span class="cline-any cline-yes">40x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-yes">56x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">56x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">56x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">42x</span>
+<span class="cline-any cline-yes">42x</span>
+<span class="cline-any cline-yes">42x</span>
+<span class="cline-any cline-yes">42x</span>
+<span class="cline-any cline-yes">35x</span>
+<span class="cline-any cline-yes">35x</span>
+<span class="cline-any cline-yes">35x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// ── Friendly Build Error Parser &amp; Hints ────────────────────────────────────
+// Parses raw compiler / linker / esptool output lines into structured,
+// kid-friendly errors with plain-language Thai + English explanations.
+&nbsp;
+export interface ParsedBuildError {
+    /** Source file mentioned by the toolchain (if any) */
+    file?: string;
+    /** Line number in that file (if any) */
+    line?: number;
+    /** Column number (if any) */
+    column?: number;
+    /** Raw message from the toolchain */
+    message: string;
+    /** Short English title for the list UI */
+    title: string;
+    /** Plain-language Thai explanation */
+    thaiHint: string;
+    /** Plain-language English explanation */
+    englishHint: string;
+}
+&nbsp;
+// ── Hint table ──────────────────────────────────────────────────────────────
+interface ErrorHint {
+    match: RegExp;
+    title: string;
+    thai: string;
+    en: string;
+}
+&nbsp;
+const GCC_ERROR_RE = /^(.+?\.(?:c|cpp|cc|cxx|h|hpp|s|S)):(\d+):(?:(\d+):)?\s*(?:fatal\s+)?error:\s*(.*)$/i;
+const CMAKE_ERROR_RE = /^CMake Error at (.+?):(\d+)\s*(?:\(([^)]*)\))?:\s*(.*)$/i;
+&nbsp;
+const HINT_TABLE: ErrorHint[] = [
+    {
+        match: /expected\s+';'/i,
+        title: "Missing semicolon",
+        thai: "ลืมใส่เครื่องหมาย ; ท้ายคำสั่ง (ดูบรรทัดนี้และบรรทัดก่อนหน้า)",
+        en: "A semicolon ; is missing at the end of a statement. Check this line and the one above it.",
+    },
+    {
+        match: /expected declaration|expected '\}'|at end of input/i,
+        title: "Missing closing brace }",
+        thai: "มีวงเล็บปีกกา { ที่ยังไม่ปิด } — นับ { กับ } ให้ครบทุกฟังก์ชัน",
+        en: "A closing brace } is missing somewhere. Count your { and } pairs.",
+    },
+    {
+        match: /was not declared in this scope|undeclared \(first use/i,
+        title: "Unknown variable or function",
+        thai: "เรียกใช้ชื่อตัวแปร/ฟังก์ชันที่ยังไม่มี — เช็กการสะกดชื่อว่าถูกต้อง และประกาศก่อนใช้จริง",
+        en: "You used a variable or function that was never declared. Check spelling and declare it before use.",
+    },
+    {
+        match: /implicit declaration of function/i,
+        title: "Function used without its header",
+        thai: "เรียกใช้ฟังก์ชันโดยยังไม่ได้ #include header ของมัน",
+        en: "A function was called before its header was included. Add the right #include at the top.",
+    },
+    {
+        match: /No such file or directory/i,
+        title: "File or header not found",
+        thai: "หาไฟล์ที่ #include ไม่เจอ — ชื่ออาจสะกดผิด หรือยังไม่ได้เพิ่ม component ใน CMakeLists.txt (REQUIRES)",
+        en: "An #include'd file was not found. Check the spelling, or add the component to CMakeLists.txt (REQUIRES).",
+    },
+    {
+        match: /undefined reference to/i,
+        title: "Missing source file or library",
+        thai: "โค้ดถูกแต่ลิงก์ไม่เจอ — มักลืมใส่ไฟล์ .c ใน main/CMakeLists.txt หรือลืม REQUIRES ไลบรารีที่ต้องใช้",
+        en: "The code compiled but the linker can't find it. Usually a missing .c file in main/CMakeLists.txt or a missing REQUIRES library.",
+    },
+    {
+        match: /multiple definition of/i,
+        title: "Name defined twice",
+        thai: "มีการประกาศชื่อเดียวกันซ้ำ 2 ที่ — เปลี่ยนชื่อ หรือย้ายไปไว้ใน header เป็น extern",
+        en: "The same name is defined in two places. Rename it, or declare it extern in a header.",
+    },
+    {
+        match: /too few arguments|too many arguments/i,
+        title: "Wrong number of arguments",
+        thai: "ส่งค่าให้ฟังก์ชันไม่ครบ/เกิน — เทียบกับการประกาศฟังก์ชันดูว่าต้องส่งกี่ค่า",
+        en: "You passed the wrong number of values to a function. Compare with how it is declared.",
+    },
+    {
+        match: /format '%[a-z]' expects argument/i,
+        title: "printf format mismatch",
+        thai: "รูปแบบ %d %s %f ใน printf ไม่ตรงกับค่าที่ส่งเข้าไป",
+        en: "The printf placeholders (%d, %s, %f...) don't match the values you pass in.",
+    },
+    {
+        match: /incompatible types|makes (pointer|integer)/i,
+        title: "Wrong data type",
+        thai: "ชนิดข้อมูลไม่ตรงกัน เช่น ส่งข้อความให้ตัวแปร int — ตรวจชนิดตัวแปรให้ตรง",
+        en: "Data type mismatch, e.g. assigning text to an int variable. Check the variable types.",
+    },
+    {
+        match: /redefinition of/i,
+        title: "Duplicate definition",
+        thai: "ประกาศตัวแปร/ฟังก์ชันชื่อนี้ซ้ำในไฟล์เดียวกัน — ใช้ชื่ออื่นแทน",
+        en: "This variable/function is declared twice in the same file. Use a different name.",
+    },
+    {
+        match: /stray '\\\d+'/i,
+        title: "Non-English character in code",
+        thai: "มีอักขระที่ไม่ใช่ภาษาอังกฤษปนในโค้ด เช่น อัญประกาศไทย \" \" — ต้องเป็น \" ธรรมดาเท่านั้น",
+        en: "There's a non-ASCII character in the code, e.g. smart quotes. Replace them with normal ASCII quotes and letters.",
+    },
+    {
+        match: /unterminated comment/i,
+        title: "Unclosed comment",
+        thai: "มี /* ที่ยังไม่ปิดด้วย */",
+        en: "A /* comment block was never closed with */.",
+    },
+    {
+        match: /control reaches end of non-void function/i,
+        title: "Missing return value",
+        thai: "ฟังก์ชันนี้ระบุว่าต้อง return ค่า แต่บางเส้นทางไม่ได้ return — เพิ่ม return ให้ครบ",
+        en: "This function promises to return a value but some path doesn't return anything. Add a return statement.",
+    },
+    {
+        match: /(storage size|invalid application of 'sizeof') .*unknown|incomplete type/i,
+        title: "Incomplete type — missing include",
+        thai: "ยังไม่รู้จักชนิดข้อมูลนี้ — ต้อง #include header ที่ประกาศ struct/type นี้ก่อน",
+        en: "The compiler doesn't know this type yet. Include the header that declares it.",
+    },
+    {
+        match: /request for member .* not a structure|dereferencing pointer to incomplete type/i,
+        title: "Wrong access on type",
+        thai: "เข้าถึง field ของ struct ไม่ถูกต้อง — เช็กว่าตัวแปรเป็น struct จริงและ include header แล้ว",
+        en: "Invalid access to a struct member. Check the variable really is that struct and its header is included.",
+    },
+    {
+        match: /subscripted value is (neither array|not array)/i,
+        title: "Indexing a non-array",
+        thai: "ใช้ [ ] กับตัวแปรที่ไม่ใช่ array",
+        en: "You used square brackets [ ] on something that isn't an array.",
+    },
+    {
+        match: /division by zero/i,
+        title: "Division by zero",
+        thai: "หารด้วยศูนย์ไม่ได้ — เช็กว่าตัวหารไม่ใช่ 0",
+        en: "Dividing by zero is not allowed. Make sure the divisor can't be 0.",
+    },
+    {
+        match: /comparison between signed and unsigned/i,
+        title: "Signed/unsigned comparison",
+        thai: "(คำเตือน) เปรียบเทียบเลขติดลบได้กับเลขไม่ติดลบ — อาจได้ผลไม่ตรงตามคิด",
+        en: "(Warning) Comparing signed and unsigned numbers can give surprising results.",
+    },
+    {
+        match: /GPIO|pin.*not (set|configured)|invalid (gpio|peripheral)/i,
+        title: "GPIO/peripheral problem",
+        thai: "ระบุ GPIO/pin ไม่ถูกต้อง — เช็กหมายเลข pin กับคู่มือบอร์ด KidBright และว่าได้เรียก gpio_config ก่อนใช้",
+        en: "Invalid GPIO/pin usage. Check the pin number against the KidBright board docs and configure it first.",
+    },
+];
+&nbsp;
+const GENERIC_HINT: Pick&lt;ParsedBuildError, "title" | "thaiHint" | "englishHint"&gt; = {
+    title: "Build error",
+    thaiHint: "คอมไพเลอร์รายงานปัญหาที่บรรทัดนี้ — อ่านข้อความดิบด้านล่าง หรือกดปุ่ม 🤖 ให้ AI ช่วยแก้",
+    englishHint: "The compiler reported a problem here. Read the raw message below, or press 🤖 to let the AI fix it.",
+};
+&nbsp;
+function applyHint(message: string, base: Partial&lt;ParsedBuildError&gt;): ParsedBuildError {
+    for (const hint of HINT_TABLE) {
+        if (hint.match.test(message)) {
+            return {
+                message,
+                title: hint.title,
+                thaiHint: hint.thai,
+                englishHint: hint.en,
+                ...base,
+            } as ParsedBuildError;
+        }
+    }
+    return { message, ...GENERIC_HINT, ...base } as ParsedBuildError;
+}
+&nbsp;
+// ── Flash / hardware error hints ─────────────────────────────────────────────
+&nbsp;
+const FLASH_CONNECT_RE = /failed to connect to (esp32|esp32-s2|esp32-s3|esp32-c3)?|no serial data received|wrong boot mode/i;
+const FLASH_PORT_BUSY_RE = /permission denied|access is denied|could not open port|resource busy/i;
+const FATAL_ERROR_RE = /a fatal error occurred:\s*(.*)/i;
+&nbsp;
+function parseFlashError(raw: string): ParsedBuildError | null {
+    if (FLASH_CONNECT_RE.test(raw)) {
+        return {
+            message: raw,
+            title: "Can't talk to the board",
+            thaiHint: "เชื่อมต่อบอร์ดไม่ได้ — 1) กดปุ่ม BOOT ค้างไว้แล้วกด RST 1 ครั้ง 2) ปิด Serial Monitor ก่อน flash 3) เช็กว่าเลือก COM Port ของบอร์ดถูกต้อง 4) ลองถอด-เสียบสาย USB",
+            englishHint: "Couldn't reach the board — 1) Hold BOOT then tap RST once. 2) Close the Serial Monitor before flashing. 3) Check the correct COM port is selected. 4) Try unplugging/replugging USB.",
+        };
+    }
+    if (FLASH_PORT_BUSY_RE.test(raw)) {
+        return {
+            message: raw,
+            title: "COM port is busy",
+            thaiHint: "COM Port ถูกใช้งานอยู่ — กด Disconnect Serial Monitor ก่อน แล้วลอง flash ใหม่",
+            englishHint: "The COM port is being used by another program. Disconnect the Serial Monitor first, then try again.",
+        };
+    }
+    const fatal = raw.match(FATAL_ERROR_RE);
+    if (fatal) <span class="branch-0 cbranch-no" title="branch not covered" >{</span>
+<span class="cstat-no" title="statement not covered" >        return applyHint(fatal[1], { message: raw });</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+    return null;
+}
+&nbsp;
+// ── Public API ───────────────────────────────────────────────────────────────
+&nbsp;
+/** Parse a single output line into 0 or 1 friendly errors. */
+export function parseErrorLine(rawLine: string): ParsedBuildError | null {
+    const raw = rawLine.trim();
+    if (!raw) return null;
+&nbsp;
+    // esptool / flashing problems first (they don't carry file:line)
+    const flashErr = parseFlashError(raw);
+    if (flashErr) return flashErr;
+&nbsp;
+    // GCC-style: path/file.c:12:34: error: message
+    const gcc = raw.match(GCC_ERROR_RE);
+    if (gcc) {
+        return applyHint(gcc[4], {
+            file: gcc[1],
+            line: parseInt(gcc[2], 10),
+            column: gcc[3] ? parseInt(gcc[3], 10) : undefined,
+            message: gcc[4<span class="branch-0 cbranch-no" title="branch not covered" >] || raw,</span>
+        });
+    }
+&nbsp;
+    // CMake-style: CMake Error at path/CMakeLists.txt:5 (target_link_libraries): msg
+    const cmake = raw.match(CMAKE_ERROR_RE);
+    if (cmake) {
+        return applyHint(cmake[4], {
+            file: cmake[1],
+            line: parseInt(cmake[2], 10),
+            message: cmake[4<span class="branch-0 cbranch-no" title="branch not covered" >] || raw,</span>
+        });
+    }
+&nbsp;
+    // Bare linker error lines without file:line (e.g. "/usr/bin/ld: ...: undefined reference to `foo'")
+    if (/undefined reference to|ld:\s*error|relocation truncated/i.test(raw)) {
+        return applyHint(raw, { message: raw });
+    }
+&nbsp;
+    // Linker summary line (the real cause is usually the preceding line, already captured)
+    if (/collect2\.exe?:?\s*error|ld returned \d+ exit status/i.test(raw)) {
+        return null; // skip noise — the undefined-reference lines above carry the details
+    }
+&nbsp;
+    return null;
+}
+&nbsp;
+/** Parse a full log (multi-line) into a deduplicated list of friendly errors. */
+export function parseBuildErrors(log: string): ParsedBuildError[] {
+    const seen = new Set&lt;string&gt;();
+    const out: ParsedBuildError[] = [];
+    for (const line of log.split(/\r?\n/)) {
+        const err = parseErrorLine(line);
+        if (!err) continue;
+        const key = `${err.file ?? ""}:${err.line ?? 0}:${err.message}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        out.push(err);
+    }
+    return out.slice(0, 20);
+}
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-09-17T07:53:21.663Z
+            </div>
+        <script src="prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="sorter.js"></script>
+        <script src="block-navigation.js"></script>
+    </body>
+</html>
+    

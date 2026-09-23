@@ -1,14 +1,14 @@
 use std::ffi::OsString;
 use std::io::{BufRead, BufReader, Read};
+#[cfg(target_os = "windows")]
+use std::os::windows::process::CommandExt;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::mpsc::{self, Sender, TryRecvError};
 use std::sync::{Arc, Mutex, OnceLock};
 use std::time::Duration;
-use tauri::{AppHandle, Manager, Emitter};
-#[cfg(target_os = "windows")]
-use std::os::windows::process::CommandExt;
+use tauri::{AppHandle, Emitter, Manager};
 
 /// Windows: ซ่อน console window ที่โผล่ขึ้นมาระหว่าง idf.py/cmake/ninja
 const CREATE_NO_WINDOW: u32 = 0x0800_0000;
@@ -19,6 +19,32 @@ fn apply_no_window(cmd: &mut Command) {
 }
 
 static CACHED_ESP_IDF_CONFIG: OnceLock<Mutex<Option<serde_json::Value>>> = OnceLock::new();
+
+#[derive(Clone, serde::Serialize, Debug, PartialEq, Eq)]
+pub struct CommandOutcome {
+    pub success: bool,
+    pub code: Option<i32>,
+}
+
+fn wait_for_child(mut child: std::process::Child) -> Result<CommandOutcome, String> {
+    let status = child
+        .wait()
+        .map_err(|e| format!("Failed to wait for command: {}", e))?;
+    let outcome = CommandOutcome {
+        success: status.success(),
+        code: status.code(),
+    };
+    if outcome.success {
+        Ok(outcome)
+    } else {
+        Err(format!(
+            "Command failed with exit code {}",
+            outcome
+                .code
+                .map_or_else(|| "unknown".to_string(), |code| code.to_string())
+        ))
+    }
+}
 
 const DEFAULT_ESP_IDF_VERSION: &str = "v5.5.1";
 const ESP_IDF_REPO_URL: &str = "https://github.com/espressif/esp-idf.git";
@@ -58,7 +84,10 @@ fn write_esp_idf_config(config: &serde_json::Value) {
     if let Some(parent) = path.parent() {
         let _ = std::fs::create_dir_all(parent);
     }
-    let _ = std::fs::write(&path, serde_json::to_string_pretty(config).unwrap_or_default());
+    let _ = std::fs::write(
+        &path,
+        serde_json::to_string_pretty(config).unwrap_or_default(),
+    );
     *get_cached_config().lock().unwrap() = None;
 }
 
@@ -147,15 +176,22 @@ fn canonical_idf_pair(idf_path: &Path, tools_path: &Path) -> Result<(PathBuf, Pa
         ));
     }
     if !tools_path.exists() {
-        return Err(format!("ESP-IDF tools path missing at {}", tools_path.display()));
+        return Err(format!(
+            "ESP-IDF tools path missing at {}",
+            tools_path.display()
+        ));
     }
 
-    let idf_abs = strip_unc_prefix(idf_path
-        .canonicalize()
-        .map_err(|e| format!("Failed to canonicalize IDF path: {}", e))?);
-    let tools_abs = strip_unc_prefix(tools_path
-        .canonicalize()
-        .map_err(|e| format!("Failed to canonicalize tools path: {}", e))?);
+    let idf_abs = strip_unc_prefix(
+        idf_path
+            .canonicalize()
+            .map_err(|e| format!("Failed to canonicalize IDF path: {}", e))?,
+    );
+    let tools_abs = strip_unc_prefix(
+        tools_path
+            .canonicalize()
+            .map_err(|e| format!("Failed to canonicalize tools path: {}", e))?,
+    );
     Ok((idf_abs, tools_abs))
 }
 
@@ -256,7 +292,9 @@ fn resolve_idf_paths(app_handle: &AppHandle) -> Result<(PathBuf, PathBuf), Strin
         }
     }
 
-    let resource_path = app_handle.path().resource_dir()
+    let resource_path = app_handle
+        .path()
+        .resource_dir()
         .map_err(|e| format!("Failed to get resource dir: {}", e))?;
 
     let idf_path = resource_path.join("esp-idf");
@@ -283,28 +321,32 @@ fn resolve_idf_paths(app_handle: &AppHandle) -> Result<(PathBuf, PathBuf), Strin
 fn find_idf_python(tools_path: &Path) -> Result<(PathBuf, PathBuf), String> {
     let python_env_dir = tools_path.join("python_env");
     if !python_env_dir.exists() {
-        return Err(format!("ESP-IDF python_env not found at {}", python_env_dir.display()));
+        return Err(format!(
+            "ESP-IDF python_env not found at {}",
+            python_env_dir.display()
+        ));
     }
 
     // Look for any idf*_py*_env directory
     let entries = std::fs::read_dir(&python_env_dir)
         .map_err(|e| format!("Cannot read python_env dir: {}", e))?;
 
-    for entry in entries {
-        if let Ok(entry) = entry {
-            let name = entry.file_name().to_string_lossy().to_string();
-            if name.starts_with("idf") && name.contains("_py") && name.ends_with("_env") {
-                let venv_path = entry.path();
-                for python_bin in venv_python_candidates(&venv_path) {
-                    if python_bin.exists() {
-                        return Ok((python_bin, venv_path));
-                    }
+    for entry in entries.flatten() {
+        let name = entry.file_name().to_string_lossy().to_string();
+        if name.starts_with("idf") && name.contains("_py") && name.ends_with("_env") {
+            let venv_path = entry.path();
+            for python_bin in venv_python_candidates(&venv_path) {
+                if python_bin.exists() {
+                    return Ok((python_bin, venv_path));
                 }
             }
         }
     }
 
-    Err(format!("No ESP-IDF Python venv found in {}", python_env_dir.display()))
+    Err(format!(
+        "No ESP-IDF Python venv found in {}",
+        python_env_dir.display()
+    ))
 }
 
 /// Read the ESP-IDF version from version.txt to avoid git lookups.
@@ -322,15 +364,23 @@ fn read_idf_version(idf_path: &Path) -> String {
 ///   2. <tool>/<version>/<exe>            → adds version/ directly  (ninja, idf-python, ...)
 ///   3. <tool>/<variant>/<version>/bin/   → adds bin/  (xtensa-esp-elf variants)
 fn scan_esp_tool_dirs(tools_dir: &Path, paths: &mut Vec<PathBuf>) {
-    let Ok(tools) = std::fs::read_dir(tools_dir) else { return; };
+    let Ok(tools) = std::fs::read_dir(tools_dir) else {
+        return;
+    };
     for tool_entry in tools.flatten() {
         let tool_path = tool_entry.path();
-        if !tool_path.is_dir() { continue; }
+        if !tool_path.is_dir() {
+            continue;
+        }
         // Each sub-directory is a "tool name" (e.g. ninja, cmake, xtensa-esp-elf)
-        let Ok(versions) = std::fs::read_dir(&tool_path) else { continue; };
+        let Ok(versions) = std::fs::read_dir(&tool_path) else {
+            continue;
+        };
         for ver_entry in versions.flatten() {
             let ver_path = ver_entry.path();
-            if !ver_path.is_dir() { continue; }
+            if !ver_path.is_dir() {
+                continue;
+            }
             // Does version dir have a bin/ subdir?
             let bin_dir = ver_path.join("bin");
             if bin_dir.is_dir() {
@@ -341,13 +391,21 @@ fn scan_esp_tool_dirs(tools_dir: &Path, paths: &mut Vec<PathBuf>) {
                 paths.push(ver_path.clone());
             }
             // Some tools have one more level: <tool>/<variant>/<version>/bin/
-            let Ok(sub_entries) = std::fs::read_dir(&ver_path) else { continue; };
+            let Ok(sub_entries) = std::fs::read_dir(&ver_path) else {
+                continue;
+            };
             for sub_entry in sub_entries.flatten() {
                 let sub = sub_entry.path();
-                if !sub.is_dir() { continue; }
+                if !sub.is_dir() {
+                    continue;
+                }
                 let sub_bin = sub.join("bin");
-                if sub_bin.is_dir() { paths.push(sub_bin); }
-                if dir_has_executables(&sub) { paths.push(sub); }
+                if sub_bin.is_dir() {
+                    paths.push(sub_bin);
+                }
+                if dir_has_executables(&sub) {
+                    paths.push(sub);
+                }
             }
         }
     }
@@ -355,20 +413,32 @@ fn scan_esp_tool_dirs(tools_dir: &Path, paths: &mut Vec<PathBuf>) {
 
 /// Returns true if a directory directly contains at least one executable file.
 fn dir_has_executables(dir: &Path) -> bool {
-    let Ok(entries) = std::fs::read_dir(dir) else { return false; };
+    let Ok(entries) = std::fs::read_dir(dir) else {
+        return false;
+    };
     for entry in entries.flatten() {
         let p = entry.path();
-        if !p.is_file() { continue; }
-        let name = p.file_name().unwrap_or_default().to_string_lossy().to_lowercase();
+        if !p.is_file() {
+            continue;
+        }
+        let name = p
+            .file_name()
+            .unwrap_or_default()
+            .to_string_lossy()
+            .to_lowercase();
         if cfg!(windows) {
-            if name.ends_with(".exe") { return true; }
+            if name.ends_with(".exe") {
+                return true;
+            }
         } else {
             // On Unix check execute bit
             #[cfg(unix)]
             {
                 use std::os::unix::fs::PermissionsExt;
                 if let Ok(meta) = p.metadata() {
-                    if meta.permissions().mode() & 0o111 != 0 { return true; }
+                    if meta.permissions().mode() & 0o111 != 0 {
+                        return true;
+                    }
                 }
             }
         }
@@ -456,11 +526,13 @@ pub fn find_esp_rom_elf_dir(tools_path: &Path) -> Option<String> {
     None
 }
 
-
 #[tauri::command]
 pub async fn check_esp_idf(app_handle: AppHandle) -> Result<String, String> {
     let (actual_idf_path, _) = resolve_idf_paths(&app_handle)?;
-    Ok(format!("Ready: ESP-IDF found at {}", actual_idf_path.display()))
+    Ok(format!(
+        "Ready: ESP-IDF found at {}",
+        actual_idf_path.display()
+    ))
 }
 
 // ── Custom Path Commands (called from Setup/Repair button) ──────────────────
@@ -493,10 +565,16 @@ pub async fn set_idf_custom_paths(idf_path: String, tools_path: String) -> Resul
     let mut config = read_esp_idf_config();
     if let serde_json::Value::Object(ref mut map) = config {
         map.insert("custom_idf_path".to_string(), serde_json::json!(idf_path));
-        map.insert("custom_tools_path".to_string(), serde_json::json!(tools_path));
+        map.insert(
+            "custom_tools_path".to_string(),
+            serde_json::json!(tools_path),
+        );
     }
     write_esp_idf_config(&config);
-    Ok(format!("ESP-IDF paths saved: {} | {}", idf_path, tools_path))
+    Ok(format!(
+        "ESP-IDF paths saved: {} | {}",
+        idf_path, tools_path
+    ))
 }
 
 #[tauri::command]
@@ -568,7 +646,9 @@ pub async fn setup_esp_idf(
                 .arg(&idf_p)
                 .output()
                 .map_err(|e| format!("Failed to run git clone: {}", e))
-        }).await.map_err(|e| format!("Task panicked: {}", e))??;
+        })
+        .await
+        .map_err(|e| format!("Task panicked: {}", e))??;
 
         if !clone_output.status.success() {
             return Err(format!(
@@ -604,9 +684,14 @@ pub async fn setup_esp_idf(
             .env("IDF_TOOLS_PATH", &tools_p)
             .status()
             .map_err(|e| format!("Failed to run idf_tools.py install: {}", e))
-    }).await.map_err(|e| format!("Task panicked: {}", e))??;
+    })
+    .await
+    .map_err(|e| format!("Task panicked: {}", e))??;
     if !install_status.success() {
-        return Err("idf_tools.py install failed. Check network/proxy and rerun setup_esp_idf().".to_string());
+        return Err(
+            "idf_tools.py install failed. Check network/proxy and rerun setup_esp_idf()."
+                .to_string(),
+        );
     }
 
     let py_cmd = python_cmd.clone();
@@ -622,7 +707,9 @@ pub async fn setup_esp_idf(
             .env("IDF_TOOLS_PATH", &tools_p)
             .status()
             .map_err(|e| format!("Failed to run idf_tools.py install-python-env: {}", e))
-    }).await.map_err(|e| format!("Task panicked: {}", e))??;
+    })
+    .await
+    .map_err(|e| format!("Task panicked: {}", e))??;
     if !pyenv_status.success() {
         return Err("idf_tools.py install-python-env failed. Check Python/pip access and rerun setup_esp_idf().".to_string());
     }
@@ -642,7 +729,7 @@ pub async fn setup_esp_idf(
 pub async fn run_idf_command(
     app_handle: AppHandle,
     command: String,
-    args: Vec<String>
+    args: Vec<String>,
 ) -> Result<String, String> {
     let (actual_idf_path, actual_tools_path) = resolve_idf_paths(&app_handle)?;
     let (python_bin, python_env_path) = find_idf_python(&actual_tools_path)?;
@@ -668,7 +755,8 @@ pub async fn run_idf_command(
     if let Some(rom_elf_dir) = find_esp_rom_elf_dir(&actual_tools_path) {
         cmd.env("ESP_ROM_ELF_DIR", rom_elf_dir);
     }
-    let output = cmd.output()
+    let output = cmd
+        .output()
         .map_err(|e| format!("Failed to execute idf.py: {}", e))?;
 
     if output.status.success() {
@@ -685,40 +773,42 @@ pub async fn create_idf_project(
     name: String,
 ) -> Result<String, String> {
     let project_path = PathBuf::from(&path).join(&name);
-    println!("DEBUG: Creating project at path: {}", project_path.display());
-    
+    println!(
+        "DEBUG: Creating project at path: {}",
+        project_path.display()
+    );
+
     // Create project directory and main subdirectory
-    std::fs::create_dir_all(project_path.join("main"))
-        .map_err(|e| {
-            let err = format!("Failed to create project directory: {}", e);
-            println!("DEBUG ERROR: {}", err);
-            err
-        })?;
+    std::fs::create_dir_all(project_path.join("main")).map_err(|e| {
+        let err = format!("Failed to create project directory: {}", e);
+        println!("DEBUG ERROR: {}", err);
+        err
+    })?;
 
     // 1. Root CMakeLists.txt
     let root_cmake = format!(
-"cmake_minimum_required(VERSION 3.16)
+        "cmake_minimum_required(VERSION 3.16)
 
 include($ENV{{IDF_PATH}}/tools/cmake/project.cmake)
 project({})
-", name);
-    std::fs::write(project_path.join("CMakeLists.txt"), root_cmake)
-        .map_err(|e| {
-            let err = format!("Failed to write Root CMakeLists.txt: {}", e);
-            println!("DEBUG ERROR: {}", err);
-            err
-        })?;
+",
+        name
+    );
+    std::fs::write(project_path.join("CMakeLists.txt"), root_cmake).map_err(|e| {
+        let err = format!("Failed to write Root CMakeLists.txt: {}", e);
+        println!("DEBUG ERROR: {}", err);
+        err
+    })?;
 
     // 2. main/CMakeLists.txt
     let main_cmake = r#"idf_component_register(SRCS "main.c"
                        INCLUDE_DIRS ".")
 "#;
-    std::fs::write(project_path.join("main/CMakeLists.txt"), main_cmake)
-        .map_err(|e| {
-            let err = format!("Failed to write main/CMakeLists.txt: {}", e);
-            println!("DEBUG ERROR: {}", err);
-            err
-        })?;
+    std::fs::write(project_path.join("main/CMakeLists.txt"), main_cmake).map_err(|e| {
+        let err = format!("Failed to write main/CMakeLists.txt: {}", e);
+        println!("DEBUG ERROR: {}", err);
+        err
+    })?;
 
     // 3. main/main.c
     let main_c = r#"#include <stdio.h>
@@ -733,19 +823,22 @@ void app_main(void) {
     }
 }
 "#;
-    std::fs::write(project_path.join("main/main.c"), main_c)
-        .map_err(|e| {
-            let err = format!("Failed to write main/main.c: {}", e);
-            println!("DEBUG ERROR: {}", err);
-            err
-        })?;
+    std::fs::write(project_path.join("main/main.c"), main_c).map_err(|e| {
+        let err = format!("Failed to write main/main.c: {}", e);
+        println!("DEBUG ERROR: {}", err);
+        err
+    })?;
 
-    println!("DEBUG: Project created successfully at {}", project_path.display());
-    Ok(format!("Project '{}' created successfully at {}", name, project_path.display()))
+    println!(
+        "DEBUG: Project created successfully at {}",
+        project_path.display()
+    );
+    Ok(format!(
+        "Project '{}' created successfully at {}",
+        name,
+        project_path.display()
+    ))
 }
-
-
-
 
 #[derive(serde::Serialize)]
 pub struct FileEntry {
@@ -761,7 +854,7 @@ pub async fn list_project_files(path: String) -> Result<Vec<FileEntry>, String> 
     if !root.exists() {
         return Err(format!("Path does not exist: {}", path));
     }
-    
+
     fn read_dir_recursive(dir: &Path, depth: usize) -> Result<Vec<FileEntry>, String> {
         if depth > 8 {
             return Ok(vec![]);
@@ -770,13 +863,18 @@ pub async fn list_project_files(path: String) -> Result<Vec<FileEntry>, String> 
         if let Ok(read_entries) = std::fs::read_dir(dir) {
             for entry in read_entries.flatten() {
                 let path = entry.path();
-                let name = path.file_name()
+                let name = path
+                    .file_name()
                     .unwrap_or_default()
                     .to_string_lossy()
                     .to_string();
-                
+
                 // Skip hidden files and build artifacts
-                if name.starts_with('.') || name == "build" || name == "target" || name == "node_modules" {
+                if name.starts_with('.')
+                    || name == "build"
+                    || name == "target"
+                    || name == "node_modules"
+                {
                     continue;
                 }
 
@@ -795,7 +893,7 @@ pub async fn list_project_files(path: String) -> Result<Vec<FileEntry>, String> 
                 });
             }
         }
-        
+
         // Sort: directories first, then files alphabetically
         entries.sort_by(|a, b| {
             if a.is_dir != b.is_dir {
@@ -813,14 +911,12 @@ pub async fn list_project_files(path: String) -> Result<Vec<FileEntry>, String> 
 
 #[tauri::command]
 pub async fn read_project_file(path: String) -> Result<String, String> {
-    std::fs::read_to_string(path)
-        .map_err(|e| format!("Failed to read file: {}", e))
+    std::fs::read_to_string(path).map_err(|e| format!("Failed to read file: {}", e))
 }
 
 #[tauri::command]
 pub async fn write_project_file(path: String, content: String) -> Result<(), String> {
-    std::fs::write(path, content)
-        .map_err(|e| format!("Failed to write file: {}", e))
+    std::fs::write(path, content).map_err(|e| format!("Failed to write file: {}", e))
 }
 
 #[tauri::command]
@@ -832,15 +928,13 @@ pub async fn safe_write_project_file(path: String, content: String) -> Result<()
     if !path_buf.is_file() {
         return Err(format!("Path is not a file: {}", path));
     }
-    
-    std::fs::write(path, content)
-        .map_err(|e| format!("Failed to write file safely: {}", e))
+
+    std::fs::write(path, content).map_err(|e| format!("Failed to write file safely: {}", e))
 }
 
 #[tauri::command]
 pub async fn create_directory(path: String) -> Result<(), String> {
-    std::fs::create_dir_all(path)
-        .map_err(|e| format!("Failed to create directory: {}", e))
+    std::fs::create_dir_all(path).map_err(|e| format!("Failed to create directory: {}", e))
 }
 
 #[tauri::command]
@@ -849,8 +943,7 @@ pub async fn delete_file(path: String) -> Result<(), String> {
     if path_buf.is_dir() {
         return Err("Target is a directory, not a file".to_string());
     }
-    std::fs::remove_file(path)
-        .map_err(|e| format!("Failed to delete file: {}", e))
+    std::fs::remove_file(path).map_err(|e| format!("Failed to delete file: {}", e))
 }
 
 #[tauri::command]
@@ -859,14 +952,12 @@ pub async fn delete_directory(path: String) -> Result<(), String> {
     if !path_buf.is_dir() {
         return Err("Target is not a directory".to_string());
     }
-    std::fs::remove_dir_all(path)
-        .map_err(|e| format!("Failed to delete directory: {}", e))
+    std::fs::remove_dir_all(path).map_err(|e| format!("Failed to delete directory: {}", e))
 }
 
 #[tauri::command]
 pub async fn rename_item(old_path: String, new_path: String) -> Result<(), String> {
-    std::fs::rename(old_path, new_path)
-        .map_err(|e| format!("Failed to rename: {}", e))
+    std::fs::rename(old_path, new_path).map_err(|e| format!("Failed to rename: {}", e))
 }
 
 #[tauri::command]
@@ -875,7 +966,7 @@ pub async fn validate_idf_project(path: String) -> Result<bool, String> {
     if !root.exists() {
         return Ok(false);
     }
-    
+
     // Simple check: ROOT CMakeLists.txt must exist
     let cmake_exists = root.join("CMakeLists.txt").exists();
     Ok(cmake_exists)
@@ -885,7 +976,11 @@ pub async fn validate_idf_project(path: String) -> Result<bool, String> {
 /// cmake to fail (e.g. paths from another machine, or incomplete configuration).
 ///
 /// Returns `true` if the build directory should be deleted and cmake reconfigured.
-pub(crate) fn is_build_dir_stale(build_dir: &Path, current_idf: &Path, _current_tools: &Path) -> bool {
+pub(crate) fn is_build_dir_stale(
+    build_dir: &Path,
+    current_idf: &Path,
+    _current_tools: &Path,
+) -> bool {
     let cmake_cache = build_dir.join("CMakeCache.txt");
 
     // Case 1: build/ exists but CMakeCache.txt is missing → incomplete state, clean it
@@ -899,9 +994,12 @@ pub(crate) fn is_build_dir_stale(build_dir: &Path, current_idf: &Path, _current_
     // Case 2: CMakeCache exists — check if IDF_PATH inside it matches current toolchain
     if let Ok(cache_content) = std::fs::read_to_string(&cmake_cache) {
         // Look for IDF_PATH:PATH= in the cache and compare to current
-        let current_idf_canon = dunce::canonicalize(current_idf)
-            .unwrap_or_else(|_| current_idf.to_path_buf());
-        let current_idf_str = current_idf_canon.to_string_lossy().to_lowercase().replace('\\', "/");
+        let current_idf_canon =
+            dunce::canonicalize(current_idf).unwrap_or_else(|_| current_idf.to_path_buf());
+        let current_idf_str = current_idf_canon
+            .to_string_lossy()
+            .to_lowercase()
+            .replace('\\', "/");
 
         for line in cache_content.lines() {
             if line.starts_with("IDF_PATH:") || line.starts_with("IDF_PATH=") {
@@ -949,7 +1047,7 @@ pub async fn run_shell_command(
     cmd: String,
     args: Vec<String>,
     cwd: Option<String>,
-) -> Result<(), String> {
+) -> Result<CommandOutcome, String> {
     let (actual_idf_path, actual_tools_path) = resolve_idf_paths(&app_handle)?;
     let (python_bin, python_env_path) = find_idf_python(&actual_tools_path)?;
     let path_env = build_idf_path(&actual_tools_path);
@@ -960,12 +1058,17 @@ pub async fn run_shell_command(
     // the build/ directory may contain a CMakeCache.txt with paths that don't
     // exist on this machine, or managed_components_list.temp.cmake may be missing.
     // This causes cryptic CMake errors. We detect and auto-clean this situation.
-    if cmd == "idf.py" && args.iter().any(|a| a == "build" || a == "flash" || a == "reconfigure") {
+    if cmd == "idf.py"
+        && args
+            .iter()
+            .any(|a| a == "build" || a == "flash" || a == "reconfigure")
+    {
         if let Some(ref c_dir) = cwd {
             if !c_dir.is_empty() && c_dir != "." {
                 let build_dir = Path::new(c_dir).join("build");
                 if build_dir.exists() {
-                    let needs_clean = is_build_dir_stale(&build_dir, &actual_idf_path, &actual_tools_path);
+                    let needs_clean =
+                        is_build_dir_stale(&build_dir, &actual_idf_path, &actual_tools_path);
                     if needs_clean {
                         let _ = app_handle.emit("terminal-output",
                             "⚠️ Detected stale build directory (paths from another machine or incomplete build). Auto-cleaning...".to_string());
@@ -1003,7 +1106,8 @@ pub async fn run_shell_command(
         }
     }
 
-    command.args(&args)
+    command
+        .args(&args)
         .env("IDF_PATH", &actual_idf_path)
         .env("IDF_TOOLS_PATH", &actual_tools_path)
         .env("IDF_PYTHON_ENV_PATH", &python_env_path)
@@ -1021,8 +1125,7 @@ pub async fn run_shell_command(
         command.env("ESP_ROM_ELF_DIR", rom_elf_dir);
     }
 
-    command.stdout(Stdio::piped())
-        .stderr(Stdio::piped());
+    command.stdout(Stdio::piped()).stderr(Stdio::piped());
 
     apply_no_window(&mut command);
     let mut child = command.spawn().map_err(|e| e.to_string())?;
@@ -1032,28 +1135,22 @@ pub async fn run_shell_command(
     let app_handle_clone = app_handle.clone();
     std::thread::spawn(move || {
         let reader = BufReader::new(stdout);
-        for line in reader.lines() {
-            if let Ok(l) = line {
-                let _ = app_handle_clone.emit("terminal-output", l);
-            }
+        for l in reader.lines().map_while(Result::ok) {
+            let _ = app_handle_clone.emit("terminal-output", l);
         }
     });
 
     let app_handle_clone_err = app_handle;
     std::thread::spawn(move || {
         let reader = BufReader::new(stderr);
-        for line in reader.lines() {
-            if let Ok(l) = line {
-                let _ = app_handle_clone_err.emit("terminal-output", format!("\x1b[31m{}\x1b[0m", l));
-            }
+        for l in reader.lines().map_while(Result::ok) {
+            let _ = app_handle_clone_err.emit("terminal-output", format!("\x1b[31m{}\x1b[0m", l));
         }
     });
 
-    std::thread::spawn(move || {
-        let _ = child.wait();
-    });
-
-    Ok(())
+    tauri::async_runtime::spawn_blocking(move || wait_for_child(child))
+        .await
+        .map_err(|e| format!("Command wait task failed: {}", e))?
 }
 
 #[tauri::command]
@@ -1071,7 +1168,10 @@ pub async fn save_project_as(source_dir: String) -> Result<String, String> {
 
     let source = PathBuf::from(&source_dir);
     if !source.exists() || !source.is_dir() {
-        return Err(format!("Source project directory does not exist: {}", source_dir));
+        return Err(format!(
+            "Source project directory does not exist: {}",
+            source_dir
+        ));
     }
 
     // Open folder picker for the destination parent directory
@@ -1147,15 +1247,11 @@ pub async fn save_project_as(source_dir: String) -> Result<String, String> {
 
     let src = source.clone();
     let dst = dest.clone();
-    let file_count = tokio::task::spawn_blocking(move || {
-        copy_dir_recursive(&src, &dst)
-    }).await.map_err(|e| format!("Copy task panicked: {}", e))??;
+    let file_count = tokio::task::spawn_blocking(move || copy_dir_recursive(&src, &dst))
+        .await
+        .map_err(|e| format!("Copy task panicked: {}", e))??;
 
-    Ok(format!(
-        "{}|{}",
-        dest.to_string_lossy(),
-        file_count
-    ))
+    Ok(format!("{}|{}", dest.to_string_lossy(), file_count))
 }
 
 struct SerialMonitorState {
@@ -1242,7 +1338,10 @@ pub async fn start_serial_monitor(
             match serial.read(&mut buf) {
                 Ok(n) if n > 0 => {
                     let chunk = String::from_utf8_lossy(&buf[..n]).to_string();
-                    let _ = app.emit("terminal-output", format!("[SERIAL {}] {}", port_name, chunk));
+                    let _ = app.emit(
+                        "terminal-output",
+                        format!("[SERIAL {}] {}", port_name, chunk),
+                    );
                 }
                 Ok(_) => {}
                 Err(e) if e.kind() == std::io::ErrorKind::TimedOut => {}
@@ -1342,23 +1441,54 @@ fn find_adb() -> Result<OsString, String> {
                 }
             }
             // Android SDK via Android Studio
-            paths.push(Path::new(&local_app_data).join("Android").join("Sdk").join("platform-tools").join(executable));
+            paths.push(
+                Path::new(&local_app_data)
+                    .join("Android")
+                    .join("Sdk")
+                    .join("platform-tools")
+                    .join(executable),
+            );
         }
 
         #[cfg(target_os = "windows")]
         if let Ok(home) = std::env::var("USERPROFILE") {
-            paths.push(Path::new(&home).join("Android").join("Sdk").join("platform-tools").join(executable));
+            paths.push(
+                Path::new(&home)
+                    .join("Android")
+                    .join("Sdk")
+                    .join("platform-tools")
+                    .join(executable),
+            );
         }
 
         #[cfg(target_os = "macos")]
         if let Ok(home) = std::env::var("HOME") {
-            paths.push(Path::new(&home).join("Library").join("Android").join("sdk").join("platform-tools").join(executable));
+            paths.push(
+                Path::new(&home)
+                    .join("Library")
+                    .join("Android")
+                    .join("sdk")
+                    .join("platform-tools")
+                    .join(executable),
+            );
         }
 
         #[cfg(all(unix, not(target_os = "macos")))]
         if let Ok(home) = std::env::var("HOME") {
-            paths.push(Path::new(&home).join("Android").join("Sdk").join("platform-tools").join(executable));
-            paths.push(Path::new(&home).join("Android").join("sdk").join("platform-tools").join(executable));
+            paths.push(
+                Path::new(&home)
+                    .join("Android")
+                    .join("Sdk")
+                    .join("platform-tools")
+                    .join(executable),
+            );
+            paths.push(
+                Path::new(&home)
+                    .join("Android")
+                    .join("sdk")
+                    .join("platform-tools")
+                    .join(executable),
+            );
         }
 
         paths
@@ -1385,9 +1515,12 @@ pub async fn list_adb_devices() -> Result<Vec<String>, String> {
     cmd.args(["devices"]);
     apply_no_window(&mut cmd);
 
-    let output = cmd
-        .output()
-        .map_err(|e| format!("Failed to run 'adb devices': {}. Make sure ADB is installed and in PATH.", e))?;
+    let output = cmd.output().map_err(|e| {
+        format!(
+            "Failed to run 'adb devices': {}. Make sure ADB is installed and in PATH.",
+            e
+        )
+    })?;
 
     if !output.status.success() {
         let stderr = String::from_utf8_lossy(&output.stderr);
@@ -1436,9 +1569,12 @@ pub async fn start_adb_monitor(
     cmd.stderr(Stdio::piped());
     apply_no_window(&mut cmd);
 
-    let mut child = cmd
-        .spawn()
-        .map_err(|e| format!("Failed to start adb logcat: {}. Make sure ADB is installed and in PATH.", e))?;
+    let mut child = cmd.spawn().map_err(|e| {
+        format!(
+            "Failed to start adb logcat: {}. Make sure ADB is installed and in PATH.",
+            e
+        )
+    })?;
 
     let stop = Arc::new(AtomicBool::new(false));
     let (tx, rx) = mpsc::channel::<String>();
@@ -1512,10 +1648,8 @@ pub async fn start_adb_monitor(
                         Ok(output) => {
                             let out = String::from_utf8_lossy(&output.stdout);
                             if !out.is_empty() {
-                                let _ = app_input.emit(
-                                    "terminal-output",
-                                    format!("[ADB SHELL] {}", out),
-                                );
+                                let _ = app_input
+                                    .emit("terminal-output", format!("[ADB SHELL] {}", out));
                             }
                             let err = String::from_utf8_lossy(&output.stderr);
                             if !err.is_empty() {
@@ -1567,7 +1701,6 @@ pub async fn stop_adb_monitor() -> Result<String, String> {
     Ok("ADB monitor disconnected".to_string())
 }
 
-
 // ── Unit Tests ────────────────────────────────────────────────────────────────
 // Pure-logic / filesystem tests — no Tauri AppHandle or network required.
 
@@ -1575,6 +1708,46 @@ pub async fn stop_adb_monitor() -> Result<String, String> {
 mod tests {
     use super::*;
     use std::fs;
+    use std::process::Command;
+
+    fn shell_exit(code: i32) -> Command {
+        if cfg!(windows) {
+            let mut command = Command::new("cmd");
+            command.args(["/C", &format!("exit {}", code)]);
+            command
+        } else {
+            let mut command = Command::new("sh");
+            command.args(["-c", &format!("exit {}", code)]);
+            command
+        }
+    }
+
+    #[test]
+    fn command_exit_zero_returns_success_outcome() {
+        let child = shell_exit(0).spawn().unwrap();
+        assert_eq!(
+            wait_for_child(child).unwrap(),
+            CommandOutcome {
+                success: true,
+                code: Some(0)
+            }
+        );
+    }
+
+    #[test]
+    fn command_nonzero_exit_reports_code() {
+        let child = shell_exit(2).spawn().unwrap();
+        let error = wait_for_child(child).unwrap_err();
+        assert!(error.contains("exit code 2"), "unexpected error: {}", error);
+    }
+
+    #[test]
+    fn missing_command_returns_spawn_error_immediately() {
+        let error = Command::new("vibekidbright-command-that-does-not-exist")
+            .spawn()
+            .unwrap_err();
+        assert_ne!(error.kind(), std::io::ErrorKind::WouldBlock);
+    }
 
     #[test]
     fn venv_bin_dir_platform_layout() {
@@ -1593,7 +1766,10 @@ mod tests {
         assert!(!cands.is_empty(), "must produce at least one candidate");
         for c in &cands {
             assert!(
-                c.file_name().unwrap().to_string_lossy().starts_with("python"),
+                c.file_name()
+                    .unwrap()
+                    .to_string_lossy()
+                    .starts_with("python"),
                 "unexpected candidate: {}",
                 c.display()
             );
@@ -1603,7 +1779,11 @@ mod tests {
     #[test]
     fn read_idf_version_trims_and_missing_ok() {
         let tmp = tempfile::tempdir().unwrap();
-        assert_eq!(read_idf_version(tmp.path()), "", "missing version.txt → empty string");
+        assert_eq!(
+            read_idf_version(tmp.path()),
+            "",
+            "missing version.txt → empty string"
+        );
         fs::write(tmp.path().join("version.txt"), "v5.2.1\n").unwrap();
         assert_eq!(read_idf_version(tmp.path()), "v5.2.1");
     }
