@@ -66,10 +66,12 @@ jobs:
           sync_kb() {
             SRC="$1"
             if [ ! -d "$SRC" ]; then echo "Skipping $SRC (not found)"; return; fi
-            find "$SRC" -type f \
-              ! -name ".embeddings.json" \
-              ! -name "*.backup" \
-            | while read FILE; do
+            # Keep this allowlist in sync with bundleExtensions in scripts/check-public.mjs.
+            find "$SRC" -type f | while IFS= read -r FILE; do
+              case "${FILE##*.}" in
+                c|h|jpeg|jpg|md|pdf|png|txt|webp) ;;
+                *) continue ;;
+              esac
               REL="${FILE#$SRC/}"
               DST_FILE="$DST/$REL"
               mkdir -p "$(dirname "$DST_FILE")"
