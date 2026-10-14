@@ -49,3 +49,8 @@ cert_base64*.txt
 
 
 
+# Claude AI skills (not part of this project)
+.claude/
+
+# Winget PR working copies
+winget-pkgs-pr-*/
