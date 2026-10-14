@@ -387,7 +387,7 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile, sendApiRef }: { proje
             userContent = `[CRITICAL SYSTEM ENFORCEMENT: NO WORKSPACE IS CURRENTLY OPEN! If the user asks to create a project from scratch and there is no active workspace, you MUST call 'create_project_workspace' FIRST. You are FORBIDDEN from using 'run_command' (e.g., mkdir) or 'write_file' to create initial folders. Wait for the tool to return the selected path before writing files.]\n\n${userContent}`;
         } else {
             let systemContext = `[CURRENT PROJECT STATE: You are working in '${projectDir}'. `;
-            systemContext += `Always rely on explicitly declared variables. DO NOT invent macros.]\n\n`;
+            systemContext += `Always rely on explicitly declared variables. DO NOT invent macros. PROJECT RULE: A workspace is ALREADY OPEN. Edit files in this current project directly (read_file -> write_file on main/main.c etc.). Do NOT call 'create_project_workspace' and do NOT create a new project UNLESS the user explicitly asks to create/start a new project. If the user explicitly asks for a new project, call 'create_project_workspace' FIRST, then write the code.]\n\n`;
             userContent = `${systemContext}${userContent}\n\n[CRITICAL REMINDER: If the user asks you to fix, check, or write code, you MUST use the \`read_file\` or \`write_file\` tool IMMEDIATELY. DO NOT just apologize or explain what you will do. Execute the tool NOW.]`;
         }
         const newUserApiMsg = { role: "user", content: userContent };

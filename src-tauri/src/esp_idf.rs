@@ -1030,13 +1030,12 @@ pub(crate) fn is_build_dir_stale(
         }
     }
 
-    // Case 3: managed_components_list.temp.cmake missing despite having CMakeCache
-    // This happens when cmake configuration was interrupted midway
-    let managed_components = build_dir.join("managed_components_list.temp.cmake");
-    if cmake_cache.exists() && !managed_components.exists() {
-        eprintln!("[Build] Stale build: CMakeCache exists but managed_components_list.temp.cmake is missing");
-        return true;
-    }
+    // NOTE: Do NOT treat a missing `managed_components_list.temp.cmake` as stale.
+    // ESP-IDF itself deletes that file at the end of every successful configure
+    // (tools/cmake/build.cmake: `file(REMOVE ${managed_components_list_file})`),
+    // so checking for it wiped build/ after every good build and forced a full
+    // rebuild (~all of ESP-IDF recompiled) on every Build & Flash.
+    // An interrupted configure is handled fine by CMake re-running on its own.
 
     false
 }

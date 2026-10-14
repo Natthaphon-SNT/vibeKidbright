@@ -147,6 +147,46 @@ static void rows_to_columns_16x8(const uint16_t row_data[8], uint8_t out_cols[16
 }
 ```
 
+### 6.2.1 — Alternative: Column-Major 5×7 Font with `reverse_bits()` (HARDWARE-VERIFIED CORRECT ORIENTATION)
+
+> ⚠️ **ใช้วิธีนี้เมื่อแสดงตัวอักษร/ข้อความ** จะได้ตัวอักษรหันหน้าถูกต้อง ไม่กลับซ้าย-ขวา ไม่กลับหัว
+> วิธีนี้ไม่ต้องผ่าน `rows_to_columns_16x8()` เพราะ font data เป็น column-major อยู่แล้ว
+
+```c
+// reverse_bits() — จำเป็นเพื่อแก้ bit order ให้ตรงกับ hardware wiring
+static uint8_t reverse_bits(uint8_t value) {
+    value = (uint8_t)(((value & 0xF0U) >> 4) | ((value & 0x0FU) << 4));
+    value = (uint8_t)(((value & 0xCCU) >> 2) | ((value & 0x33U) << 2));
+    value = (uint8_t)(((value & 0xAAU) >> 1) | ((value & 0x55U) << 1));
+    return value;
+}
+
+// ตัวอย่างประกาศ font — แต่ละตัวอักษรเป็น 5 bytes (5 columns × 7 rows)
+// แต่ละ byte = 1 column, bit 0 = row 0 (top), bit 6 = row 6 (bottom)
+// ค่า hex ออกแบบให้ตัวอักษรหันหน้าปกติ (อ่านจากซ้ายไปขวา)
+static const uint8_t FONT_A[5] = {0x7E, 0x09, 0x09, 0x09, 0x7E};
+
+// สร้าง cols[16] จาก font data — reverse_bits ทุก column
+static void build_text_columns(uint8_t cols[16]) {
+    memset(cols, 0, 16);
+    // วาง font ที่ตำแหน่ง column ที่ต้องการใน cols[0..15]
+    for (int c = 0; c < 5; c++) {
+        cols[c] = reverse_bits(FONT_X[c]);  // reverse_bits สำคัญมาก!
+    }
+    // ตัวอักษรหลายตัว: เลื่อน column offset
+    // cols[0..4] = ตัวแรก, cols[5..9] = ตัวที่สอง, cols[10..14] = ตัวที่สาม
+}
+```
+
+**หลักการสำคัญ:**
+- Font data เป็น **column-major**: แต่ละ byte = 1 column ของตัวอักษร (ไม่ใช่ row)
+- **MUST** ใช้ `reverse_bits()` กับทุก column byte ก่อนใส่ `cols[]` เพื่อแก้ bit order ที่ hardware ต่อสายกลับ
+- เขียนลง `cols[0..15]` ตรงๆ ได้เลย **ไม่ต้องผ่าน `rows_to_columns_16x8()`**
+- ❌ ห้ามลืม `reverse_bits()` — ถ้าไม่ reverse จะได้ตัวอักษรกลับหัว
+- ❌ ห้ามใช้ `rows_to_columns_16x8()` กับวิธีนี้ — เพราะ data เป็น column-major อยู่แล้ว
+
+---
+
 ### 6.3 — Draw Frame (matrix_draw)
 
 ```c
@@ -456,3 +496,246 @@ void app_main(void) {
 | 5 | ประดิษฐ์ค่า hex pattern เอง | Pixel garbled |
 | 6 | `ESP_ERROR_CHECK` บน data transfer | Board รีบูทถ้า I2C glitch |
 | 7 | ใช้ `FONT_4x7` แทน `DIGIT_0–9` | ตัวเลขผิดตำแหน่ง (ไม่ผ่าน hardware test) |
+
+
+---
+
+## 12. VERIFIED HARDWARE RECIPES — KidBright32 iA (USER-CONFIRMED CORRECT ON REAL HARDWARE)
+
+> Reuse these patterns EXACTLY. Change only what the user asks (values, text, timing).
+> Remember the PATTERN, not a specific project name.
+> If the user asks to create a NEW project → create the project workspace first, then write code.
+> If the user does NOT ask for a new project → edit the CURRENT project directly (read_file → write_file).
+
+**Shared helpers in every LED-matrix recipe (same as Section 6.2.1 / Method 3):**
+`i2c_init_bus0()` (I2C_NUM_0, SDA=GPIO21, SCL=GPIO22, 100 kHz, pull-ups enabled, `clk_flags = 0`),
+`matrix_command()`, `matrix_init()` (0x21 → delay 10 ms → 0x81 → 0xEF; failures only `ESP_LOGW`, never `ESP_ERROR_CHECK`),
+`matrix_draw(cols[16])` (interleaved 17-byte buffer), `reverse_bits()`.
+All I2C helpers use `i2c_master_write_to_device(..., pdMS_TO_TICKS(100))`.
+
+### 12.1 Temperature (LM73) → 2 digits on LED Matrix every 2 s
+
+- Matrix on `I2C_NUM_0` (21/22). LM73 on a **second bus** `I2C_NUM_1` (SDA=GPIO4, SCL=GPIO5, 100 kHz, address `0x4D`, register `0x00`).
+- Write a separate `i2c_init_bus1()` and call `i2c_init_bus0(); i2c_init_bus1(); matrix_init();`.
+- Read with ONE combined transaction (`i2c_master_write_read_device`), then convert `raw / 128.0f`:
+
+```c
+#define TEMP_I2C_PORT I2C_NUM_1
+#define TEMP_I2C_SDA_GPIO GPIO_NUM_4
+#define TEMP_I2C_SCL_GPIO GPIO_NUM_5
+#define LM73_ADDR 0x4D
+#define LM73_TEMP_REG 0x00
+
+static esp_err_t lm73_read_temperature(float *temperature)
+{
+    uint8_t reg = LM73_TEMP_REG;
+    uint8_t raw[2] = {0};
+    esp_err_t ret = i2c_master_write_read_device(
+        TEMP_I2C_PORT, LM73_ADDR, &reg, 1, raw, sizeof(raw), pdMS_TO_TICKS(100));
+    if (ret != ESP_OK) return ret;
+    int16_t raw_temp = (int16_t)(((uint16_t)raw[0] << 8) | (uint16_t)raw[1]);
+    *temperature = (float)raw_temp / 128.0f;
+    return ESP_OK;
+}
+```
+
+- Round `(int)(t + (t >= 0.0f ? 0.5f : -0.5f))`, clamp 0..99, then `display_two_digits(v / 10, v % 10)`
+  (DIGIT_0..9 `uint16_t[8]` arrays + `rows_to_columns_16x8()` + `matrix_draw()` — Section 7).
+- Log `ESP_LOGI(TAG, "Temperature: %.2f C", (double)temperature);` on error `ESP_LOGW(TAG, "LM73 read failed: %s", esp_err_to_name(ret));`
+- Loop delay `vTaskDelay(pdMS_TO_TICKS(2000))`.
+
+### 12.2 LDR light level 0–100 % on LED Matrix (3 digits, `"%03d"`) every 2 s
+
+- Includes: `"esp_adc/adc_oneshot.h"`, `"esp_rom_sys.h"`.
+- `LDR_ADC_UNIT ADC_UNIT_1`, `LDR_ADC_CHANNEL ADC_CHANNEL_0`, `LDR_SAMPLE_COUNT 16`, `LDR_EMA_ALPHA 0.25f`, `LDR_ADC_MIN_VAL 100`, `LDR_ADC_MAX_VAL 900`.
+- Init: `adc_oneshot_new_unit()` (`ADC_ULP_MODE_DISABLE`) + `adc_oneshot_config_channel()` with `.atten = ADC_ATTEN_DB_12`, `.bitwidth = ADC_BITWIDTH_DEFAULT`.
+- Read: 16 × `adc_oneshot_read()` with `esp_rom_delay_us(500)` between samples → average → EMA (first sample seeds it) → `(int)(ema + 0.5f)`.
+- Percent (inverted LDR), clamp **0..100**: `(int)(((float)(MAX - raw) / (float)(MAX - MIN)) * 100.0f)`.
+- 4×7 font at column offsets 0, 5, 10 (each row = 4-bit nibble, bit 3 = leftmost):
+
+```c
+static const uint8_t FONT_4X7[10][7] = {
+    {0x6,0x9,0x9,0x9,0x9,0x9,0x6}, {0x2,0x6,0x2,0x2,0x2,0x2,0x7},
+    {0x6,0x9,0x1,0x2,0x4,0x8,0xF}, {0xE,0x1,0x1,0x6,0x1,0x1,0xE},
+    {0x2,0x6,0xA,0xA,0xF,0x2,0x2}, {0xF,0x8,0xE,0x1,0x1,0x9,0x6},
+    {0x6,0x8,0x8,0xE,0x9,0x9,0x6}, {0xF,0x1,0x2,0x2,0x4,0x4,0x4},
+    {0x6,0x9,0x9,0x6,0x9,0x9,0x6}, {0x6,0x9,0x9,0x7,0x1,0x1,0x6},
+};
+
+static void draw_digit(int digit, int col_offset, uint8_t cols[16])
+{
+    for (int row = 0; row < 7; row++) {
+        for (int col = 0; col < 4; col++) {
+            if ((FONT_4X7[digit][row] & (1U << (3 - col))) != 0) {
+                cols[col_offset + col] |= (uint8_t)(1U << (7 - row));
+            }
+        }
+    }
+}
+
+static void display_light_percent(int percent)
+{
+    char text[16];
+    uint8_t cols[16] = {0};
+    if (percent < 0) percent = 0;
+    if (percent > 100) percent = 100;
+    snprintf(text, sizeof(text), "%03d", percent);
+    draw_digit(text[0] - '0', 0, cols);
+    draw_digit(text[1] - '0', 5, cols);
+    draw_digit(text[2] - '0', 10, cols);
+    matrix_draw(cols);
+}
+```
+
+- Log `ESP_LOGI(TAG, "LDR raw ADC: %d, brightness: %d%%", raw_value, light_percent);`
+
+### 12.3 Buzzer: 3 beeps (200 ms each), pause 1 s, repeat (GPIO13, LEDC)
+
+- `BUZZER_GPIO GPIO_NUM_13`, `BUZZER_FREQUENCY_HZ 2000`, `BUZZER_DUTY 512`, `BEEP_DURATION_MS 200`, `BEEP_GAP_MS 200`, `CYCLE_PAUSE_MS 1000`.
+- LEDC: `LEDC_LOW_SPEED_MODE`, `LEDC_TIMER_10_BIT`, `LEDC_TIMER_0`, `LEDC_AUTO_CLK`, channel `LEDC_CHANNEL_0`, `LEDC_INTR_DISABLE`, duty 0, hpoint 0.
+- `buzzer_on()` = `ledc_set_duty(BUZZER_DUTY)` + `ledc_update_duty()`; `buzzer_off()` = duty 0 + update.
+
+```c
+while (1) {
+    for (int beep = 0; beep < 3; beep++) {
+        buzzer_on();
+        vTaskDelay(pdMS_TO_TICKS(BEEP_DURATION_MS));
+        buzzer_off();
+        if (beep < 2) vTaskDelay(pdMS_TO_TICKS(BEEP_GAP_MS));   // no gap after the 3rd beep
+    }
+    vTaskDelay(pdMS_TO_TICKS(CYCLE_PAUSE_MS));
+}
+```
+
+### 12.4 Button SW1 / SW2 → `ESP_LOGI` "SW1 Pressed" + scrolling text on LED Matrix
+
+- SW1 = `GPIO_NUM_16`, SW2 = `GPIO_NUM_14` (Rev 3.1 / 3.1G / iA). Input, `GPIO_PULLUP_ENABLE`, `GPIO_INTR_DISABLE`; pressed = level 0.
+- Edge detection with `bool was_pressed`; `POLL_INTERVAL_MS 20`, `DEBOUNCE_MS 30`; `SCROLL_DELAY_MS 60`.
+- On new press: delay 30 ms, re-check level, then `ESP_LOGI(TAG, "SW1 Pressed")` and `matrix_scroll_text("SW1 PRESSED")` (SW2 → `"SW2 Pressed"` / `"SW2 PRESSED"`).
+- Draw a blank `uint8_t blank[16] = {0}` once after `matrix_init()`.
+- Needs BOTH fonts from 12.5 (digits + uppercase) because the text contains digits.
+
+```c
+void app_main(void)
+{
+    bool was_pressed = false;
+    uint8_t blank[16] = {0};
+    i2c_init_bus0();
+    matrix_init();
+    matrix_draw(blank);
+    sw1_init();
+    while (1) {
+        bool is_pressed = gpio_get_level(SW1_GPIO) == 0;
+        if (is_pressed && !was_pressed) {
+            vTaskDelay(pdMS_TO_TICKS(DEBOUNCE_MS));
+            if (gpio_get_level(SW1_GPIO) == 0) {
+                ESP_LOGI(TAG, "SW1 Pressed");
+                matrix_scroll_text("SW1 PRESSED");
+            }
+        }
+        was_pressed = is_pressed;
+        vTaskDelay(pdMS_TO_TICKS(POLL_INTERVAL_MS));
+    }
+}
+```
+
+### 12.5 Scroll text right → left (A–Z) — column-major 5×7 fonts
+
+```c
+static const uint8_t FONT_5X7_DIGITS[10][5] = {
+    {0x3E,0x51,0x49,0x45,0x3E},{0x00,0x42,0x7F,0x40,0x00},{0x42,0x61,0x51,0x49,0x46},{0x21,0x41,0x45,0x4B,0x31},
+    {0x18,0x14,0x12,0x7F,0x10},{0x27,0x45,0x45,0x45,0x39},{0x3C,0x4A,0x49,0x49,0x30},{0x01,0x71,0x09,0x05,0x03},
+    {0x36,0x49,0x49,0x49,0x36},{0x06,0x49,0x49,0x29,0x1E},
+};
+
+static const uint8_t FONT_5X7_UPPERCASE[26][5] = {  // A..Z
+    {0x7E,0x11,0x11,0x11,0x7E},{0x7F,0x49,0x49,0x49,0x36},{0x3E,0x41,0x41,0x41,0x22},{0x7F,0x41,0x41,0x22,0x1C},
+    {0x7F,0x49,0x49,0x49,0x41},{0x7F,0x09,0x09,0x09,0x01},{0x3E,0x41,0x49,0x49,0x7A},{0x7F,0x08,0x08,0x08,0x7F},
+    {0x00,0x41,0x7F,0x41,0x00},{0x20,0x40,0x41,0x3F,0x01},{0x7F,0x08,0x14,0x22,0x41},{0x7F,0x40,0x40,0x40,0x40},
+    {0x7F,0x02,0x0C,0x02,0x7F},{0x7F,0x04,0x08,0x10,0x7F},{0x3E,0x41,0x41,0x41,0x3E},{0x7F,0x09,0x09,0x09,0x06},
+    {0x3E,0x41,0x51,0x21,0x5E},{0x7F,0x09,0x19,0x29,0x46},{0x46,0x49,0x49,0x49,0x31},{0x01,0x01,0x7F,0x01,0x01},
+    {0x3F,0x40,0x40,0x40,0x3F},{0x1F,0x20,0x40,0x20,0x1F},{0x3F,0x40,0x38,0x40,0x3F},{0x63,0x14,0x08,0x14,0x63},
+    {0x07,0x08,0x70,0x08,0x07},{0x61,0x51,0x49,0x45,0x43},
+};
+
+static uint8_t get_font_column(char character, int column)
+{
+    if (column < 0 || column >= 5) return 0x00;                  // column 5 = 1-column gap
+    if (character >= 'A' && character <= 'Z') return reverse_bits(FONT_5X7_UPPERCASE[character - 'A'][column]);
+    if (character >= '0' && character <= '9') return reverse_bits(FONT_5X7_DIGITS[character - '0'][column]);
+    return 0x00;                                                 // space / unknown
+}
+
+static void matrix_scroll_text(const char *text)
+{
+    int total_width = (int)strlen(text) * 6;                     // 5 cols + 1 gap per character
+    for (int x = 16; x > -total_width; x--) {                    // starts off-screen RIGHT, moves LEFT
+        uint8_t cols[16] = {0};
+        for (int col = 0; col < 16; col++) {
+            int text_x = col - x;
+            if (text_x >= 0 && text_x < total_width) {
+                cols[col] = get_font_column(text[text_x / 6], text_x % 6);
+            }
+        }
+        matrix_draw(cols);
+        vTaskDelay(pdMS_TO_TICKS(SCROLL_DELAY_MS));              // 60–80 ms
+    }
+}
+```
+
+**"Clear all code and show only A–Z":** keep only `i2c_init_bus0`, `matrix_command`, `matrix_init`, `matrix_draw`,
+`reverse_bits`, the uppercase font, `get_font_column`, `matrix_scroll_text`.
+`app_main` = `i2c_init_bus0(); matrix_init(); while (1) { matrix_scroll_text("ABCDEFGHIJKLMNOPQRSTUVWXYZ"); }` with `SCROLL_DELAY_MS 80`.
+Remove every unused `static const` (ESP-IDF treats it as a build error).
+
+### 12.6 Scrolling text + melody on the buzzer at the same time (FreeRTOS task)
+
+- The melody runs in its own task: `xTaskCreate(melody_task, "abc_melody", 2048, NULL, 5, NULL)` (check `pdPASS`, else `ESP_LOGE`), while `app_main` loops `matrix_scroll_text("ABCDEFGHIJKLMNOPQRSTUVWXYZ")`.
+- Buzzer: GPIO13, LEDC 10-bit, TIMER_0 / CHANNEL_0, `BUZZER_DUTY 512`, initial timer frequency `NOTE_C4_HZ`.
+  Change pitch with `ledc_set_freq(LEDC_LOW_SPEED_MODE, LEDC_TIMER_0, hz)` then set/update duty. Stop = duty 0 + update.
+- Notes: `C4 262, D4 294, E4 330, F4 349, G4 392, A4 440, B4 494, C5 523`, `NOTE_HOLD_HZ 0` (= "-" sustain).
+  `NOTE_DURATION_MS 400` (1 beat), `NOTE_GAP_MS 40`, `MELODY_PAUSE_MS 500`.
+
+**CORRECT MELODY** (32 beats, 1 note per beat, `-` = hold the previous note, `C5` = high C):
+
+```
+| C  D  E  G  | G  E  D  C  |
+| E  F  G  A  | G  F  E  D  |
+| C  E  G  C5 | B  A  G  E  |
+| F  E  D  B  | C  -  -  -  |
+```
+
+```c
+static const uint16_t ABC_MELODY_HZ[32] = {
+    NOTE_C4_HZ, NOTE_D4_HZ, NOTE_E4_HZ, NOTE_G4_HZ,  NOTE_G4_HZ, NOTE_E4_HZ, NOTE_D4_HZ, NOTE_C4_HZ,
+    NOTE_E4_HZ, NOTE_F4_HZ, NOTE_G4_HZ, NOTE_A4_HZ,  NOTE_G4_HZ, NOTE_F4_HZ, NOTE_E4_HZ, NOTE_D4_HZ,
+    NOTE_C4_HZ, NOTE_E4_HZ, NOTE_G4_HZ, NOTE_C5_HZ,  NOTE_B4_HZ, NOTE_A4_HZ, NOTE_G4_HZ, NOTE_E4_HZ,
+    NOTE_F4_HZ, NOTE_E4_HZ, NOTE_D4_HZ, NOTE_B4_HZ,  NOTE_C4_HZ, NOTE_HOLD_HZ, NOTE_HOLD_HZ, NOTE_HOLD_HZ,
+};
+
+static void play_abc_melody(void)
+{
+    for (int note = 0; note < 32; note++) {
+        uint16_t frequency_hz = ABC_MELODY_HZ[note];
+        if (frequency_hz == NOTE_HOLD_HZ) {                      // keep the previous tone sounding
+            vTaskDelay(pdMS_TO_TICKS(NOTE_DURATION_MS));
+            continue;
+        }
+        buzzer_start_tone(frequency_hz);
+        vTaskDelay(pdMS_TO_TICKS(NOTE_DURATION_MS));
+        bool next_is_hold = (note + 1 < 32) && (ABC_MELODY_HZ[note + 1] == NOTE_HOLD_HZ);
+        if (!next_is_hold) {                                     // gap only between separate notes
+            buzzer_stop_tone();
+            vTaskDelay(pdMS_TO_TICKS(NOTE_GAP_MS));
+        }
+    }
+    buzzer_stop_tone();
+}
+```
+
+- NEVER invent notes or reorder them. A `-` lengthens the previous note (no gap, tone keeps playing); it is NOT a silent rest.
+
+### 12.7 Flashing tips (Windows)
+
+- `PermissionError(13, 'Access is denied.')` on COM port while flashing = the serial monitor is still connected. Disconnect the serial monitor, then Build & Flash again.
+- Do not run `idf.py set-target`, `fullclean` or delete `build/` between normal edits — incremental builds only recompile the changed file.
