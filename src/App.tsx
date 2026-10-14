@@ -418,7 +418,10 @@ function App({
     return (localStorage.getItem("vibe-active-view") as "editor" | "wiki") || "editor";
   });
 
-  const [projectDir, setProjectDir] = useState(".");
+  // Persist the active project across F5 / webview reloads (restored + validated on startup).
+  const [projectDir, setProjectDir] = useState<string>(() => {
+    return localStorage.getItem("vibe-project-dir") || ".";
+  });
   const [isBuilding, setIsBuilding] = useState(false);
   const [buildStep, setBuildStep] = useState(0);
   const [buildTotal, setBuildTotal] = useState(0);
@@ -639,10 +642,27 @@ function App({
   };
 
   useEffect(() => {
+    if (projectDir === ".") {
+      localStorage.removeItem("vibe-project-dir");
+    } else {
+      localStorage.setItem("vibe-project-dir", projectDir);
+    }
     if (projectDir !== ".") {
       loadProjectFiles();
     }
   }, [projectDir]);
+
+  // On startup: if the restored project no longer exists / is invalid, fall back to "no project".
+  useEffect(() => {
+    if (projectDir === ".") return;
+    invoke("validate_idf_project", { path: projectDir })
+      .then((ok) => {
+        if (!ok) setProjectDir(".");
+        else addLog(`Restored project: ${projectDir}`);
+      })
+      .catch(() => setProjectDir("."));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -1321,6 +1341,18 @@ function App({
     setBuildErrors([]);
     setBuildCurrentTask("Initializing...");
     addLog("--- Starting Build & Flash ---");
+    // Free the COM port: an open serial monitor makes esptool fail with
+    // "PermissionError(13, 'Access is denied.')" on Windows.
+    if (isSerialConnected && selectedBoard !== "miuaiplus") {
+      try {
+        await invoke("stop_serial_monitor");
+        setIsSerialConnected(false);
+        addLog("🔌 Serial monitor disconnected automatically to free the COM port for flashing.");
+        await new Promise((r) => setTimeout(r, 500));
+      } catch (err) {
+        addLog(`⚠️ Could not stop serial monitor before flashing: ${err}`);
+      }
+    }
 
     await executeBuildLifecycle({
       run: async () => {
