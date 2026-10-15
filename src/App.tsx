@@ -422,6 +422,9 @@ function App({
   const [projectDir, setProjectDir] = useState<string>(() => {
     return localStorage.getItem("vibe-project-dir") || ".";
   });
+  // Always-current project dir for listeners registered once (avoids stale closures).
+  const projectDirRef = useRef(projectDir);
+  projectDirRef.current = projectDir;
   const [isBuilding, setIsBuilding] = useState(false);
   const [buildStep, setBuildStep] = useState(0);
   const [buildTotal, setBuildTotal] = useState(0);
@@ -798,8 +801,14 @@ function App({
   const handleInlineCancel = () => setInlineAction(null);
 
   const loadProjectFiles = async () => {
+    const dir = projectDirRef.current;
+    if (dir === ".") {
+      setProjectFiles([]);
+      return;
+    }
     try {
-      const files = await invoke("list_project_files", { path: projectDir });
+      const files = await invoke("list_project_files", { path: dir });
+      if (dir !== projectDirRef.current) return; // project changed while loading
       setProjectFiles(files as FileEntry[]);
     } catch (err) {
       console.error("Failed to load project files:", err);

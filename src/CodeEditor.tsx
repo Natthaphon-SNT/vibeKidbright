@@ -109,6 +109,14 @@ const defineVibeDarkTheme: BeforeMount = (monaco) => {
             "editor.wordHighlightBackground": "#61afef20",
             "editor.wordHighlightStrongBackground": "#61afef30",
             "editor.overviewRulerBorder": "#1e2d52",
+            "diffEditor.insertedLineBackground": "#2ea04326",
+            "diffEditor.insertedTextBackground": "#2ea04366",
+            "diffEditor.removedLineBackground": "#f8514926",
+            "diffEditor.removedTextBackground": "#f8514966",
+            "diffEditorGutter.insertedLineBackground": "#2ea04350",
+            "diffEditorGutter.removedLineBackground": "#f8514950",
+            "diffEditorOverview.insertedForeground": "#2ea043",
+            "diffEditorOverview.removedForeground": "#f85149",
         },
     });
 
@@ -179,6 +187,14 @@ const defineVibeDarkTheme: BeforeMount = (monaco) => {
             "editor.wordHighlightBackground": "#dde6f760",
             "editor.wordHighlightStrongBackground": "#dde6f7a0",
             "editor.overviewRulerBorder": "#d0daf0",
+            "diffEditor.insertedLineBackground": "#2da44e22",
+            "diffEditor.insertedTextBackground": "#2da44e55",
+            "diffEditor.removedLineBackground": "#cf222e1f",
+            "diffEditor.removedTextBackground": "#cf222e4d",
+            "diffEditorGutter.insertedLineBackground": "#2da44e55",
+            "diffEditorGutter.removedLineBackground": "#cf222e55",
+            "diffEditorOverview.insertedForeground": "#2da44e",
+            "diffEditorOverview.removedForeground": "#cf222e",
         },
     });
 };
@@ -491,7 +507,10 @@ export default function CodeEditor({
                         ...editorOptions,
                         readOnly: false,
                         originalEditable: false,
-                        renderSideBySide: true,
+                        renderSideBySide: false, // inline: red = removed line, green = added line
+                        enableSplitViewResizing: false,
+                        renderIndicators: true,
+                        ignoreTrimWhitespace: false,
                         diffWordWrap: "off",
                     }}
                 />

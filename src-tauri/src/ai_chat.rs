@@ -631,7 +631,8 @@ pub async fn send_ai_message(
             .unwrap_or(true)                   // true if can't read
     };
 
-    tokio::spawn(async move {
+    let watcher_app = app_handle.clone();
+    let work = tokio::spawn(async move {
         let mut try_queue: Vec<(String, String, String, String, String)> = vec![];
         let (config_google_key, config_google_model, config_or_key, config_or_model) = {
             let config = read_config();
@@ -859,6 +860,9 @@ pub async fn send_ai_message(
                             .insert(mod_name.clone(), Instant::now());
                         final_error = err_msg_str;
                         continue;
+                    } else if err_msg_str.contains("stopped by user") {
+                        // The watchdog emits ai-chat-done; just end quietly.
+                        return;
                     } else {
                         let _ = app_handle.emit("ai-chat-error", err_msg_str.clone());
                         let _ = app_handle.emit("terminal-output", format!("[AI ERROR] {}", err_msg_str));
@@ -877,6 +881,31 @@ pub async fn send_ai_message(
             ),
         );
         let _ = app_handle.emit("terminal-output", "[AI FATAL] Exhausted all fallback models.");
+    });
+
+    // Watchdog: the stop flag was previously only polled between stream chunks, so Stop
+    // did nothing while waiting for the first response, during retries, or in tool calls.
+    // Abort the whole task as soon as the flag is raised.
+    tokio::spawn(async move {
+        loop {
+            let stopped = watcher_app
+                .try_state::<AiAbortState>()
+                .map(|s| s.0.load(Ordering::SeqCst))
+                .unwrap_or(false);
+            if work.is_finished() {
+                if stopped {
+                    let _ = watcher_app.emit("ai-chat-done", "{}");
+                }
+                return;
+            }
+            if stopped {
+                work.abort();
+                let _ = watcher_app.emit("terminal-output", "[AI] Generation stopped by user.");
+                let _ = watcher_app.emit("ai-chat-done", "{}");
+                return;
+            }
+            tokio::time::sleep(std::time::Duration::from_millis(100)).await;
+        }
     });
 
     Ok(())
