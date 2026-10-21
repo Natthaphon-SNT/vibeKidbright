@@ -11,6 +11,7 @@ jobs:
   build:
     runs-on: windows-latest
     env:
+      NODE_OPTIONS: --max-old-space-size=4096
       HAS_WINDOWS_CERT: ${{ secrets.CERT_PFX_BASE64 != '' && secrets.CERT_PASSWORD != '' }}
     steps:
       - name: Checkout main repository

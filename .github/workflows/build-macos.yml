@@ -12,6 +12,7 @@ jobs:
   build:
     runs-on: macos-latest
     env:
+      NODE_OPTIONS: --max-old-space-size=4096
       HAS_APPLE_CERT: ${{ secrets.APPLE_CERTIFICATE != '' && secrets.APPLE_CERTIFICATE_PASSWORD != '' && secrets.KEYCHAIN_PASSWORD != '' }}
       HAS_APPLE_NOTARY_CREDENTIALS: ${{ secrets.APPLE_ID != '' && secrets.APPLE_ID_PASSWORD != '' && secrets.APPLE_TEAM_ID != '' }}
     steps:
