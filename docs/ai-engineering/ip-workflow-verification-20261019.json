@@ -1,0 +1,203 @@
+{
+  "date": "2026-10-19",
+  "scope": "Unreleased task-scoped iP custom drafting, public SDK fallback and public creation-time starters. No new hardware recipe or live-model evidence.",
+  "baseline_verified_before_changes": true,
+  "baseline_files_matched": 287,
+  "baseline": {
+    "path": "src-tauri/target/ip-workflow-baseline-20261019.json",
+    "sha256": "47ce9fd8ea1b296a5d5c64536ea1847e37f075f9ef93392836d39d22d338ecb8",
+    "bytes": 65354
+  },
+  "commands": [
+    {
+      "command": "node scripts/sync-knowledge-base.mjs --write",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/ip-workflow-kb-sync-20261019.log",
+        "sha256": "e604ef381d6c33563668e08de3e2f7c6ba8abdb5ca7e1d3b8f8a1097406d7fc9",
+        "bytes": 96
+      }
+    },
+    {
+      "command": "cargo test --manifest-path src-tauri/Cargo.toml --offline --locked --all-targets --quiet",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/ip-workflow-rust-final-20261019.log",
+        "sha256": "604f33264645fb9410d67ca5ff73826f86a277778a6dc6a42aeb56801927fe48",
+        "bytes": 12820
+      }
+    },
+    {
+      "command": "npm test -- --reporter=dot",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/ip-workflow-frontend-20261019.log",
+        "sha256": "8641b0abf3144b8becb0f9b493feb82d7b3d7518167197354647c1bec02b9027",
+        "bytes": 2036
+      }
+    },
+    {
+      "command": "python -m unittest discover -s scripts/tests -v",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/ip-workflow-python-20261019.log",
+        "sha256": "b60d980abca5c1e9ca40db23f98ec44381bca29b6bf33d039ab328561d190931",
+        "bytes": 8178
+      }
+    },
+    {
+      "command": "node --test scripts/tests/*.test.mjs",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/ip-workflow-node-20261019.log",
+        "sha256": "64463cc4265450816225a69d3dd56787cb416237a6131293fb4f4a0ee21a84f2",
+        "bytes": 2592
+      }
+    },
+    {
+      "command": "npm run test:compat",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/ip-workflow-host-c-20261019.log",
+        "sha256": "23675fdfb3bacdad7e82546db841e8085cc573e65fd5f4f301c1f85c7b0b5eff",
+        "bytes": 560
+      }
+    },
+    {
+      "command": "node scripts/audit-kidbright-coverage.mjs",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/ip-workflow-coverage-inventory-20261019.log",
+        "sha256": "d069f5b66fd5038d69c42ce9dfe0478bf09e08b454ce9312a6002d45cf566652",
+        "bytes": 656
+      }
+    },
+    {
+      "command": "node scripts/audit-rule-documents.mjs",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/ip-workflow-rules-final-20261019.log",
+        "sha256": "3e74e178454b477b63bc3d01a3755e93f2c8caf0f8cb2882478dd3b13c42198a",
+        "bytes": 574
+      }
+    },
+    {
+      "command": "npm run tauri -- build --no-bundle --config src-tauri/tauri.windows.conf.json -- --offline --locked",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/ip-workflow-desktop-build-final-20261019.log",
+        "sha256": "7dc71ae9e458ff9e9df89ac91b32a7a7af572cf6155b03a5c3efdbd70b85fc9b",
+        "bytes": 31470
+      }
+    },
+    {
+      "command": "node scripts/check-production-workflows.mjs --report docs/ai-engineering/ip-workflow-production-ui-20261019.json",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/ip-workflow-production-ui-20261019.log",
+        "sha256": "38aebbf37702f1027a1214b8be2db956c07507c49bf85324c5dd721ccadf7663",
+        "bytes": 3668
+      }
+    },
+    {
+      "command": "npm run check:rules",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/ip-workflow-final-rules-20261019.log",
+        "sha256": "2e2f370797fb055893803dec69a04a2533bdfaf5340b5bac4e9baa72cc578e5a",
+        "bytes": 752
+      }
+    },
+    {
+      "command": "npm run check:public",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/ip-workflow-final-public-20261019.log",
+        "sha256": "807db5ab941150b709407cc1b89cf5f7587cd4decee56dff752fbd6e66b2f629",
+        "bytes": 290
+      }
+    },
+    {
+      "command": "npm run check:standalone",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/ip-workflow-final-standalone-20261019.log",
+        "sha256": "882c2e7160084ebbe400f85ba9a7ffab8782405d187430e2100945c8fca53fc8",
+        "bytes": 408
+      }
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/ip-workflow-final-diff-20261019.log",
+        "sha256": "0ede4126289fee89f5e321a7575071599d08a67608922062bbb90a4f0edba527",
+        "bytes": 8724
+      }
+    }
+  ],
+  "counts": {
+    "rust_library": 199,
+    "rust_example": 10,
+    "rust_total": 209,
+    "frontend": 183,
+    "frontend_files": 19,
+    "python": 22,
+    "node": 12,
+    "host_c": 490
+  },
+  "failed_build_retained": {
+    "exit_code": 1,
+    "log": {
+      "path": "src-tauri/target/ip-workflow-desktop-build-20261019.log",
+      "sha256": "ded12b065e98160ed986b70700b62fc85bc02df3b4923ceb1fe54526b6954810",
+      "bytes": 5534
+    },
+    "reason": "Stale coverage inventory after deliberate system-prompt change; regenerated coverage and rule inventories, then rebuilt successfully."
+  },
+  "manufacturer_schematic": {
+    "path": "src-tauri/target/inex-ip-schematic.png",
+    "sha256": "5c2b28ef0f8523d25881ea4dc90a5cf1fb75f90bec98afa3590f6a2937460e8e",
+    "bytes": 291147,
+    "url": "https://doc.inex.co.th/wp-content/uploads/2023/02/020966_0636_KidBrigh3.png",
+    "visually_inspected": true,
+    "scope": "Published Rev.2021.04.01 design; not identification/testing of user PCB"
+  },
+  "local_application": {
+    "path": "src-tauri/target/release/vibe-kidbright.exe",
+    "sha256": "952f2cd66e4b48d336965106036619b143780c59fba2f2a8aa9cf75538f29d05",
+    "bytes": 47442944
+  },
+  "historical_nsis": {
+    "path": "src-tauri/target/release/bundle/nsis/VibeKidbright IDE_3.7.3_x64-setup.exe",
+    "sha256": "d09d0f9418d94059e801fc43a38241314757c686e5060e26596a806ba56ae7c1",
+    "bytes": 316758944
+  },
+  "new_installer": false,
+  "installed_app_replaced": false,
+  "public_sdk_fallback": {
+    "installed_sdk_inspected": false,
+    "paths_or_config_read": false,
+    "subprocesses_run": false,
+    "reference_sdk_series": "5.5"
+  },
+  "private_source_and_build_guard_tests": "PASS",
+  "new_starter_excludes_concurrent_private_edits_test": "PASS",
+  "live_model_conversation": "NOT_EXECUTED",
+  "generated_scroll_firmware_build": "NOT_EXECUTED",
+  "physical_board": "NOT_EXECUTED",
+  "installed_desktop_clicks": "NOT_EXECUTED",
+  "retrieval_metrics_rerun": false,
+  "production_ranker_model_frozen_dataset_changed": false,
+  "eight_original_requirements": {
+    "system_architecture": "PARTIAL",
+    "hybrid_rag": "PARTIAL",
+    "knowledge_base_data": "PARTIAL",
+    "code_aware_chunking": "PARTIAL",
+    "compiler_validation_auto_fix": "PARTIAL",
+    "technology_integration": "PARTIAL",
+    "development_phases": "PARTIAL",
+    "evaluation_quality": "PARTIAL"
+  },
+  "published_committed_pushed": false
+}

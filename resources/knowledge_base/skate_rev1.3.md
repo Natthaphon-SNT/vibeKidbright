@@ -360,7 +360,7 @@ if (PWM > 0) {
 
 - KidBright ใช้แรงดัน **3.3V** ซึ่ง L298N รองรับ แต่ควรตรวจสอบ Logic Threshold ของโมดูล L298N ที่ใช้
 - Block `PWM BDC Motor Drive` ใช้ขา IN/PWM ของ SKATE Board ได้โดยตรงผ่าน KB CHAIN
-- **MS Delay ที่ใช้ใน Main Loop ต้องสั้นมาก** — ในโค้ดจริงใช้ `MS Delay 0.02` (20µs) เพื่อให้ PID loop เร็วพอ
+- **หน่วย MS Delay ของ generator ต้นฉบับคือวินาที** — `MS Delay 0.02` เท่ากับ 20 ms ไม่ใช่ 20µs ต้องรักษาคาบตามโปรแกรมต้นฉบับและตรวจเวลาทำงานจริงของ loop
 
 ---
 
@@ -500,14 +500,14 @@ Task
 |--------|-----|---------|
 | `Kp / Ki / Kd` | 0.008 / 0.00001 / 0.0001 | PID gain สำหรับ Position (ค่าน้อยมาก ป้องกัน overshoot) |
 | Dead zone | ±20 pulses | ถ้า error น้อยกว่านี้ไม่สั่ง PID (ประหยัด CPU) |
-| `MS Delay` | 0.05ms | รอบ Loop ของ Position task ช้ากว่า Balance task |
+| `MS Delay` | 0.05 วินาที = 50 ms | รอบ Loop ของ Position task ช้ากว่า Balance task |
 
 ---
 
 ### กฎเพิ่มเติมสำหรับ KidBright Block
 
 26. **Encoder ขา Phase A/B ต้องสลับกัน** — ในโค้ด KidBright ใช้ `PhaseA=IN2, PhaseB=IN1` ซึ่งสลับจากการต่อปกติ ต้องตรวจสอบให้ตรงกับ Hardware จริง มิเช่นนั้นค่า Position จะนับถอยหลัง
-27. **MS Delay ใน Loop ต้องไม่เกิน 1ms** — ถ้าใส่ Delay นานเกินใน Balancing Loop หุ่นจะล้มก่อนที่ PID จะทำงาน
+27. **คงหน่วยเวลาและ sample period ตามต้นฉบับ** — generator รับวินาที; ตรวจ execution time และเสถียรภาพจริงก่อนปรับคาบ ไม่สมมติว่าทุก balancing loop ต้องไม่เกิน 1 ms
 28. **Position PID ต้องมี Dead Zone** — ถ้าไม่มี `if err_pos >= 20` หุ่นจะสั่นอยู่ที่จุดเดิมตลอดเวลา เพราะ Encoder มี noise
 29. **Calibrate MPU6050 ขณะหุ่นอยู่นิ่งสมดุลเท่านั้น** — Block `MPU6050 calibrate` จะเซ็ต zero point ณ เวลาที่เรียก ถ้าหุ่นเอียงอยู่จะ calibrate ผิด
 30. **รอกด Switch ก่อน Start เสมอ** — Block `Wait Switch 1 pressed` ช่วยให้ผู้ใช้วางหุ่นให้สมดุลก่อนที่ระบบจะเริ่ม Calibrate และ Lock Position

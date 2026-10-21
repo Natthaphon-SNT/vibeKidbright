@@ -1,0 +1,86 @@
+{
+  "version": "23.1.0",
+  "binary_sha256": "dbd52c13d21ef9d284f4f0627efe76c81adf2fe0998f230127f554a54fc9dde7",
+  "official_archive_sha256": "23412a240756a162e7b98a282f36aa2a23a88db5ce16a0cbc4fef7253768c810",
+  "source_url": "https://github.com/clangd/clangd/releases/download/23.1.0/clangd-windows-23.1.0.zip",
+  "project": "src-tauri/target/block-c-evaluation-20261018/repeat_delay",
+  "database_entries": 917,
+  "database_sha256": "2dcf65e17e5595a509fef4e1d27f89a87477c0d59962279a4f91afe65cd3d5c7",
+  "main_sha256": "ace975b65bbe205264e118b80d1c0da08a56088e9bf661a68a7c10eb9e4f961e",
+  "unmodified_compile_commands": true,
+  "query_driver": "verified configured xtensa-esp32-elf-gcc.exe only",
+  "remote_index": false,
+  "project_configs_enabled": false,
+  "exit_code": 3,
+  "diagnostic_excerpt": [
+    "E[03:29:05.233]     tweak: SwapBinaryOperands ==> FAIL: The new replacement overlaps with an existing replacement.",
+    "E[03:29:05.238]     tweak: SwapBinaryOperands ==> FAIL: The new replacement overlaps with an existing replacement.",
+    "I[03:29:05.239] All checks completed, 2 errors"
+  ],
+  "semantic_references_integrated": false,
+  "reference_accuracy_measured": false,
+  "conclusion": "Check reports errors; classify them separately from compiler parsing and the LSP probe",
+  "lsp": {
+    "method": "actual local LSP initialize/didOpen/definition/references against unmodified SDK CDB; background index off",
+    "symbol": "kb_delay_ms",
+    "opened_files": 2,
+    "diagnostic_errors": [],
+    "definitions": [
+      {
+        "file": "components/kb_reference/kb_core.c",
+        "range": {
+          "end": {
+            "character": 16,
+            "line": 14
+          },
+          "start": {
+            "character": 5,
+            "line": 14
+          }
+        }
+      }
+    ],
+    "references": [
+      {
+        "file": "main/main.c",
+        "range": {
+          "end": {
+            "character": 18,
+            "line": 8
+          },
+          "start": {
+            "character": 7,
+            "line": 8
+          }
+        }
+      },
+      {
+        "file": "main/main.c",
+        "range": {
+          "end": {
+            "character": 18,
+            "line": 11
+          },
+          "start": {
+            "character": 7,
+            "line": 11
+          }
+        }
+      },
+      {
+        "file": "components/kb_reference/kb_core.c",
+        "range": {
+          "end": {
+            "character": 16,
+            "line": 14
+          },
+          "start": {
+            "character": 5,
+            "line": 14
+          }
+        }
+      }
+    ],
+    "scope": "two opened generated fixture translation units only; no all-project reference completeness claim"
+  }
+}

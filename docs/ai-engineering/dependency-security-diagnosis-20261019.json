@@ -1,0 +1,761 @@
+{
+  "date": "2026-10-19",
+  "rust": {
+    "date": "2026-10-19",
+    "source": "https://osv.dev/",
+    "lock_packages_queried": 753,
+    "network_payload": "Public crates.io names and versions only",
+    "scope": "Entire Cargo.lock including build/development/inactive platform entries. Advisory presence alone does not establish exploitable reachability.",
+    "affected_packages": [
+      {
+        "name": "fxhash",
+        "version": "0.2.1",
+        "advisories": [
+          "RUSTSEC-2025-0057"
+        ]
+      },
+      {
+        "name": "glib",
+        "version": "0.18.5",
+        "advisories": [
+          "GHSA-wrw7-89jp-8q8g",
+          "RUSTSEC-2024-0429"
+        ]
+      },
+      {
+        "name": "paste",
+        "version": "1.0.15",
+        "advisories": [
+          "RUSTSEC-2024-0436"
+        ]
+      },
+      {
+        "name": "proc-macro-error",
+        "version": "1.0.4",
+        "advisories": [
+          "RUSTSEC-2024-0370"
+        ]
+      },
+      {
+        "name": "quick-xml",
+        "version": "0.38.4",
+        "advisories": [
+          "RUSTSEC-2026-0194",
+          "RUSTSEC-2026-0195"
+        ]
+      },
+      {
+        "name": "zbus_names",
+        "version": "4.3.1",
+        "advisories": [
+          "RUSTSEC-2026-0371"
+        ]
+      },
+      {
+        "name": "zvariant",
+        "version": "5.10.0",
+        "advisories": [
+          "RUSTSEC-2026-0370"
+        ]
+      },
+      {
+        "name": "zvariant_derive",
+        "version": "5.10.0",
+        "advisories": [
+          "RUSTSEC-2026-0372"
+        ]
+      }
+    ],
+    "advisories": {
+      "RUSTSEC-2025-0057": {
+        "id": "RUSTSEC-2025-0057",
+        "summary": "fxhash - no longer maintained",
+        "details": "The fxhash crate is no longer maintained.\n\nThe repository is stale and owner is no longer active on GitHub.\n\nPlease take a look at [rustc-hash](https://github.com/rust-lang/rustc-hash) instead.\n```",
+        "modified": "2025-09-05T19:09:01Z",
+        "published": "2025-09-05T12:00:00Z",
+        "database_specific": {
+          "license": "CC0-1.0"
+        },
+        "references": [
+          {
+            "type": "PACKAGE",
+            "url": "https://crates.io/crates/fxhash"
+          },
+          {
+            "type": "ADVISORY",
+            "url": "https://rustsec.org/advisories/RUSTSEC-2025-0057.html"
+          },
+          {
+            "type": "REPORT",
+            "url": "https://github.com/cbreeden/fxhash/issues/20"
+          }
+        ],
+        "affected": [
+          {
+            "package": {
+              "name": "fxhash",
+              "ecosystem": "crates.io",
+              "purl": "pkg:cargo/fxhash"
+            },
+            "ranges": [
+              {
+                "type": "SEMVER",
+                "events": [
+                  {
+                    "introduced": "0.0.0-0"
+                  }
+                ]
+              }
+            ],
+            "ecosystem_specific": {
+              "affected_functions": null,
+              "affects": {
+                "arch": [],
+                "functions": [],
+                "os": []
+              }
+            },
+            "database_specific": {
+              "cvss": null,
+              "informational": "unmaintained",
+              "source": "https://github.com/rustsec/advisory-db/blob/osv/crates/RUSTSEC-2025-0057.json",
+              "categories": []
+            }
+          }
+        ],
+        "schema_version": "1.7.3"
+      },
+      "GHSA-wrw7-89jp-8q8g": {
+        "id": "GHSA-wrw7-89jp-8q8g",
+        "summary": "Unsoundness in `Iterator` and `DoubleEndedIterator` impls for `glib::VariantStrIter`",
+        "details": "The `VariantStrIter::impl_get` function (called internally by implementations of the `Iterator` and `DoubleEndedIterator` traits for this type) was unsound, resulting in undefined behaviour.\n\nAn immutable reference `&p` to a `*mut libc::c_char` pointer initialized to `NULL` was passed as an argument to a C function that that mutates the pointer behind `&p` in-place (i.e. as an out-argument), which was unsound. After changes in recent versions of the Rust compiler, these unsound writes through `&p` now seem to be completely disregarded when building the `glib` crate with optimizations.\n\nThis subsequently caused all calls of `VariantStrIter::impl_get` to violate the safety requirements of the `std::ffi::CStr::from_ptr` function - which requires its argument to be a valid pointer to a C-style string - resulting in crashes due to `NULL` pointer dereferences.\n\nThis was fixed by passing the out-argument pointer explitly as `&mut p` instead of `&p`.\n\nThis issue has been present since this code was initially added in `glib` v0.15.0. The mismatch in mutability was likely missed (and not raised as an error by the compiler) because the C function wrapped by `VariantStrIter::impl_get` is variadic (`glib_sys::g_variant_get_child`), and the pointer in question is one of the variadic arguments.\n\n",
+        "aliases": [
+          "RUSTSEC-2024-0429"
+        ],
+        "modified": "2025-10-28T06:29:26.473225Z",
+        "published": "2024-12-23T20:19:24Z",
+        "database_specific": {
+          "severity": "MODERATE",
+          "github_reviewed": true,
+          "github_reviewed_at": "2024-12-23T20:19:24Z",
+          "nvd_published_at": null,
+          "cwe_ids": []
+        },
+        "references": [
+          {
+            "type": "WEB",
+            "url": "https://github.com/gtk-rs/gtk-rs-core/pull/1343"
+          },
+          {
+            "type": "PACKAGE",
+            "url": "https://github.com/gtk-rs/gtk-rs-core"
+          },
+          {
+            "type": "WEB",
+            "url": "https://rustsec.org/advisories/RUSTSEC-2024-0429.html"
+          }
+        ],
+        "affected": [
+          {
+            "package": {
+              "name": "glib",
+              "ecosystem": "crates.io",
+              "purl": "pkg:cargo/glib"
+            },
+            "ranges": [
+              {
+                "type": "SEMVER",
+                "events": [
+                  {
+                    "introduced": "0.15.0"
+                  },
+                  {
+                    "fixed": "0.20.0"
+                  }
+                ]
+              }
+            ],
+            "database_specific": {
+              "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2024/12/GHSA-wrw7-89jp-8q8g/GHSA-wrw7-89jp-8q8g.json"
+            }
+          }
+        ],
+        "schema_version": "1.9.0",
+        "severity": [
+          {
+            "type": "CVSS_V4",
+            "score": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N"
+          }
+        ]
+      },
+      "RUSTSEC-2024-0429": {
+        "id": "RUSTSEC-2024-0429",
+        "summary": "Unsoundness in `Iterator` and `DoubleEndedIterator` impls for `glib::VariantStrIter`",
+        "details": "The `VariantStrIter::impl_get` function (called internally by implementations of the `Iterator` and `DoubleEndedIterator` traits for this type) was unsound, resulting in undefined behaviour.\n\nAn immutable reference `&p` to a `*mut libc::c_char` pointer initialized to `NULL` was passed as an argument to a C function that that mutates the pointer behind `&p` in-place (i.e. as an out-argument), which was unsound. After changes in recent versions of the Rust compiler, these unsound writes through `&p` now seem to be completely disregarded when building the `glib` crate with optimizations.\n\nThis subsequently caused all calls of `VariantStrIter::impl_get` to violate the safety requirements of the `std::ffi::CStr::from_ptr` function - which requires its argument to be a valid pointer to a C-style string - resulting in crashes due to `NULL` pointer dereferences.\n\nThis was fixed by passing the out-argument pointer explitly as `&mut p` instead of `&p`.\n\nThis issue has been present since this code was initially added in `glib` v0.15.0. The mismatch in mutability was likely missed (and not raised as an error by the compiler) because the C function wrapped by `VariantStrIter::impl_get` is variadic (`glib_sys::g_variant_get_child`), and the pointer in question is one of the variadic arguments.",
+        "aliases": [
+          "GHSA-wrw7-89jp-8q8g"
+        ],
+        "modified": "2025-10-28T06:29:26.473225Z",
+        "published": "2024-03-30T12:00:00Z",
+        "database_specific": {
+          "license": "CC0-1.0"
+        },
+        "references": [
+          {
+            "type": "PACKAGE",
+            "url": "https://crates.io/crates/glib"
+          },
+          {
+            "type": "ADVISORY",
+            "url": "https://rustsec.org/advisories/RUSTSEC-2024-0429.html"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/gtk-rs/gtk-rs-core/pull/1343"
+          }
+        ],
+        "affected": [
+          {
+            "package": {
+              "name": "glib",
+              "ecosystem": "crates.io",
+              "purl": "pkg:cargo/glib"
+            },
+            "ranges": [
+              {
+                "type": "SEMVER",
+                "events": [
+                  {
+                    "introduced": "0.15.0"
+                  },
+                  {
+                    "fixed": "0.20.0"
+                  }
+                ]
+              }
+            ],
+            "ecosystem_specific": {
+              "affects": {
+                "os": [],
+                "arch": [],
+                "functions": [
+                  "glib::VariantStrIter::last",
+                  "glib::VariantStrIter::next",
+                  "glib::VariantStrIter::next_back",
+                  "glib::VariantStrIter::nth",
+                  "glib::VariantStrIter::nth_back"
+                ]
+              },
+              "affected_functions": null
+            },
+            "database_specific": {
+              "source": "https://github.com/rustsec/advisory-db/blob/osv/crates/RUSTSEC-2024-0429.json",
+              "categories": [],
+              "cvss": null,
+              "informational": "unsound"
+            }
+          }
+        ],
+        "schema_version": "1.7.3"
+      },
+      "RUSTSEC-2024-0436": {
+        "id": "RUSTSEC-2024-0436",
+        "summary": "paste - no longer maintained",
+        "details": "The creator of the crate `paste` has stated in the [`README.md`](https://github.com/dtolnay/paste/blob/master/README.md) \nthat this project is not longer maintained as well as archived the repository\n\n## Possible Alternative(s)\n\n- [`pastey`]: a fork of paste and is aimed to be a drop-in replacement with additional features for paste crate\n- [`with_builtin_macros`]: crate providing a [superset of `paste`'s functionality including general `macro_rules!` eager expansions](https://docs.rs/with_builtin_macros/0.1.0/with_builtin_macros/macro.with_eager_expansions.html)  and `concat!`/`concat_idents!` macros\n\n[`pastey`]: https://crates.io/crates/pastey\n[`with_builtin_macros`]: https://crates.io/crates/with_builtin_macros",
+        "modified": "2026-01-27T22:03:15.694766Z",
+        "published": "2024-10-07T12:00:00Z",
+        "database_specific": {
+          "license": "CC0-1.0"
+        },
+        "references": [
+          {
+            "type": "PACKAGE",
+            "url": "https://crates.io/crates/paste"
+          },
+          {
+            "type": "ADVISORY",
+            "url": "https://rustsec.org/advisories/RUSTSEC-2024-0436.html"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/dtolnay/paste"
+          }
+        ],
+        "affected": [
+          {
+            "package": {
+              "name": "paste",
+              "ecosystem": "crates.io",
+              "purl": "pkg:cargo/paste"
+            },
+            "ranges": [
+              {
+                "type": "SEMVER",
+                "events": [
+                  {
+                    "introduced": "0.0.0-0"
+                  }
+                ]
+              }
+            ],
+            "ecosystem_specific": {
+              "affected_functions": null,
+              "affects": {
+                "functions": [],
+                "os": [],
+                "arch": []
+              }
+            },
+            "database_specific": {
+              "categories": [],
+              "cvss": null,
+              "informational": "unmaintained",
+              "source": "https://github.com/rustsec/advisory-db/blob/osv/crates/RUSTSEC-2024-0436.json"
+            }
+          }
+        ],
+        "schema_version": "1.7.3"
+      },
+      "RUSTSEC-2024-0370": {
+        "id": "RUSTSEC-2024-0370",
+        "summary": "proc-macro-error is unmaintained",
+        "details": "proc-macro-error's maintainer seems to be unreachable, with no commits for 2 years, no releases pushed for 4 years, and no activity on the GitLab repo or response to email.\n\nproc-macro-error also depends on `syn 1.x`, which may be bringing duplicate dependencies into dependant build trees.\n\n## Possible Alternative(s)\n\n- [manyhow](https://crates.io/crates/manyhow)\n- [proc-macro2-diagnostics](https://github.com/SergioBenitez/proc-macro2-diagnostics)",
+        "modified": "2026-06-07T20:00:03.923932350Z",
+        "published": "2024-09-01T12:00:00Z",
+        "database_specific": {
+          "license": "CC0-1.0"
+        },
+        "references": [
+          {
+            "type": "PACKAGE",
+            "url": "https://crates.io/crates/proc-macro-error"
+          },
+          {
+            "type": "ADVISORY",
+            "url": "https://rustsec.org/advisories/RUSTSEC-2024-0370.html"
+          },
+          {
+            "type": "REPORT",
+            "url": "https://gitlab.com/CreepySkeleton/proc-macro-error/-/issues/20"
+          }
+        ],
+        "affected": [
+          {
+            "package": {
+              "name": "proc-macro-error",
+              "ecosystem": "crates.io",
+              "purl": "pkg:cargo/proc-macro-error"
+            },
+            "ranges": [
+              {
+                "type": "SEMVER",
+                "events": [
+                  {
+                    "introduced": "0.0.0-0"
+                  }
+                ]
+              }
+            ],
+            "ecosystem_specific": {
+              "affects": {
+                "arch": [],
+                "os": [],
+                "functions": []
+              },
+              "affected_functions": null
+            },
+            "database_specific": {
+              "cvss": null,
+              "informational": "unmaintained",
+              "source": "https://github.com/rustsec/advisory-db/blob/osv/crates/RUSTSEC-2024-0370.json",
+              "categories": []
+            }
+          }
+        ],
+        "schema_version": "1.7.5"
+      },
+      "RUSTSEC-2026-0194": {
+        "id": "RUSTSEC-2026-0194",
+        "summary": "Quadratic run time when checking a start tag for duplicate attribute names",
+        "details": "`BytesStart::attributes()` returns an `Attributes` iterator which, by default\n(`with_checks(true)`), rejects a start tag that repeats an attribute name. For\neach attribute yielded, the iterator compared the new name against every name\nseen so far in the same tag using a linear scan, so a start tag with `N`\ndistinct attribute names cost `O(N²)` byte comparisons. There was no bound on\n`N` other than the size of the buffered start tag.\n\n## Impact\n\nAny code that parses untrusted XML and iterates a start tag's attributes with\nthe default duplicate check enabled can be made to spend CPU time quadratic in\nthe number of attributes on a single tag. Because the check is pure computation\nwith no `.await`/I/O, an I/O-based timeout on the consumer (for example a read\nor request timeout) cannot interrupt it while it runs.\n\nMeasured cost of a single start tag, release build:\n\n| Attributes on one tag | Time |\n|---|---|\n| 80,000  | ~6 s   |\n| 800,000 | ~10 min |\n\nThe cost grows with the square of the attribute count, so a start tag of a few\ntens of megabytes can stall a parsing thread for hours. No memory is exhausted\nand the parser does not crash; the effect is CPU exhaustion on the thread doing\nthe parsing: a single crafted start tag can pin a CPU core for minutes to hours,\ndenying service to that worker. A deployment that places a wall-clock bound on\nparsing, or confines it to a non-critical thread, may consider the availability\nimpact lower.\n\n## Affected code paths\n\n* `BytesStart::attributes()` / `Attributes` iterated with checks enabled (the\n  default), and `BytesStart::try_get_attribute`.\n* `NsReader`, which resolves namespaces by iterating a tag's attributes and so\n  reaches the same check internally.\n\nConsumers that iterate attributes with `.attributes().with_checks(false)` and do\nnot use `NsReader` are not affected.\n\nThis was reported as reachable by a remote, unauthenticated attacker in a\nreal-world RPKI relying party (NLnet Labs Routinator) via a crafted RRDP\n`snapshot.xml`.\n\n## Remediation\n\nUpgrade to `quick-xml >= 0.41.0`, where the duplicate check keeps the linear\nscan for start tags with a small number of attributes and switches to an `O(1)`\nhash pre-filter above a threshold, making the whole tag `O(N)`. The reported\n`AttrError::Duplicated` positions are unchanged.\n\nIf upgrading is not possible and duplicate-name detection is not required,\ndisable it with `.attributes().with_checks(false)` (this does not help\n`NsReader` consumers, which have no equivalent opt-out before 0.41.0).",
+        "modified": "2026-07-02T08:00:03.849273679Z",
+        "published": "2026-06-29T12:00:00Z",
+        "database_specific": {
+          "license": "CC0-1.0"
+        },
+        "references": [
+          {
+            "type": "PACKAGE",
+            "url": "https://crates.io/crates/quick-xml"
+          },
+          {
+            "type": "ADVISORY",
+            "url": "https://rustsec.org/advisories/RUSTSEC-2026-0194.html"
+          },
+          {
+            "type": "REPORT",
+            "url": "https://github.com/tafia/quick-xml/issues/969"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/tafia/quick-xml/pull/971"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/tafia/quick-xml/commit/07f3db8343cf152f5bc3483ef5b3164582489bea"
+          }
+        ],
+        "affected": [
+          {
+            "package": {
+              "name": "quick-xml",
+              "ecosystem": "crates.io",
+              "purl": "pkg:cargo/quick-xml"
+            },
+            "ranges": [
+              {
+                "type": "SEMVER",
+                "events": [
+                  {
+                    "introduced": "0.0.0-0"
+                  },
+                  {
+                    "fixed": "0.41.0"
+                  }
+                ]
+              }
+            ],
+            "ecosystem_specific": {
+              "affects": {
+                "os": [],
+                "functions": [],
+                "arch": []
+              },
+              "affected_functions": null
+            },
+            "database_specific": {
+              "categories": [
+                "denial-of-service"
+              ],
+              "cvss": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "informational": null,
+              "source": "https://github.com/rustsec/advisory-db/blob/osv/crates/RUSTSEC-2026-0194.json"
+            }
+          }
+        ],
+        "schema_version": "1.7.5",
+        "severity": [
+          {
+            "type": "CVSS_V3",
+            "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          }
+        ]
+      },
+      "RUSTSEC-2026-0195": {
+        "id": "RUSTSEC-2026-0195",
+        "summary": "Unbounded namespace-declaration allocation in `NsReader` enables memory-exhaustion denial of service",
+        "details": "`NsReader` resolves namespaces by calling `NamespaceResolver::push` for every\n`Start`/`Empty` event *before* the event is returned to the caller. `push`\niterated all `xmlns` / `xmlns:*` attributes on the start tag and, for each one,\nappended the prefix bytes to an internal buffer and pushed a `NamespaceBinding`\n(32 bytes on 64-bit) to an internal `Vec`, with no upper bound on the number of\ndeclarations.\n\n## Impact\n\nA start tag with `N` namespace declarations drove roughly `3×` the tag's byte\nsize in `NamespaceResolver` heap, allocated *inside* `quick-xml` before the\n`NsReader` consumer ever received the event and could inspect or reject it. A\nconsumer that bounds its *input* size therefore still cannot bound this\nallocation: an `M`-byte start tag yields on the order of `3 × M` bytes of\nresolver heap the caller never sees.\n\nOn untrusted XML this lets a remote, unauthenticated attacker force large heap\nallocations with a single start tag. With several `NsReader`s running\nconcurrently on independent inputs (a common server pattern), the allocations\nstack and can exhaust process memory, causing the operating system to kill the\nprocess (OOM). This was confirmed against a real-world RPKI relying party (NLnet\nLabs Routinator), where concurrent RRDP validation workers parsing a crafted\n`snapshot.xml` exceeded the memory limit and the process was OOM-killed.\n\n## Affected code paths\n\nConsumers using `NsReader` (which always calls `NamespaceResolver::push` before\nyielding `Start`/`Empty`), or calling `NamespaceResolver::push` directly. A plain\n`Reader` that does not perform namespace resolution is not affected.\n\n## Remediation\n\nUpgrade to `quick-xml >= 0.41.0`. `NamespaceResolver::push` now rejects a start\ntag that declares more than `DEFAULT_MAX_DECLARATIONS_PER_ELEMENT` (256)\nnamespace bindings, returning the new `NamespaceError::TooManyDeclarations`\ninstead of allocating without limit. The limit is configurable via\n`NamespaceResolver::set_max_declarations_per_element` (use `usize::MAX` to\nrestore the previous unbounded behavior), and `NsReader::resolver_mut()` is\nprovided to reach it.\n\nThere is no clean workaround for `NsReader` consumers before 0.41.0, as the\nallocation happens inside the reader with no configuration knob to cap it.",
+        "modified": "2026-07-02T09:00:04.037478193Z",
+        "published": "2026-06-29T12:00:00Z",
+        "database_specific": {
+          "license": "CC0-1.0"
+        },
+        "references": [
+          {
+            "type": "PACKAGE",
+            "url": "https://crates.io/crates/quick-xml"
+          },
+          {
+            "type": "ADVISORY",
+            "url": "https://rustsec.org/advisories/RUSTSEC-2026-0195.html"
+          },
+          {
+            "type": "REPORT",
+            "url": "https://github.com/tafia/quick-xml/issues/970"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/tafia/quick-xml/commit/7ca25266e94987210daa864889ab15c9332c8a2a"
+          }
+        ],
+        "affected": [
+          {
+            "package": {
+              "name": "quick-xml",
+              "ecosystem": "crates.io",
+              "purl": "pkg:cargo/quick-xml"
+            },
+            "ranges": [
+              {
+                "type": "SEMVER",
+                "events": [
+                  {
+                    "introduced": "0.0.0-0"
+                  },
+                  {
+                    "fixed": "0.41.0"
+                  }
+                ]
+              }
+            ],
+            "ecosystem_specific": {
+              "affects": {
+                "arch": [],
+                "os": [],
+                "functions": []
+              },
+              "affected_functions": null
+            },
+            "database_specific": {
+              "informational": null,
+              "categories": [
+                "denial-of-service"
+              ],
+              "source": "https://github.com/rustsec/advisory-db/blob/osv/crates/RUSTSEC-2026-0195.json",
+              "cvss": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+            }
+          }
+        ],
+        "schema_version": "1.7.5",
+        "severity": [
+          {
+            "type": "CVSS_V3",
+            "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          }
+        ]
+      },
+      "RUSTSEC-2026-0371": {
+        "id": "RUSTSEC-2026-0371",
+        "summary": "`zbus_names` is unmaintained",
+        "details": "The `zbus_names` crate is no longer maintained as a standalone crate.\n\nIt has been merged into [`zbus`](https://crates.io/crates/zbus) starting with version `6.0.0`, as its `names` module.\n\nUsers should migrate to [`zbus`](https://crates.io/crates/zbus), with its default features disabled if they only need the D-Bus name types.",
+        "modified": "2026-10-17T15:30:02.407875527Z",
+        "published": "2026-10-16T12:00:00Z",
+        "database_specific": {
+          "license": "CC0-1.0"
+        },
+        "references": [
+          {
+            "type": "PACKAGE",
+            "url": "https://crates.io/crates/zbus_names"
+          },
+          {
+            "type": "ADVISORY",
+            "url": "https://rustsec.org/advisories/RUSTSEC-2026-0371.html"
+          },
+          {
+            "type": "REPORT",
+            "url": "https://github.com/z-galaxy/zbus/issues/2043"
+          }
+        ],
+        "affected": [
+          {
+            "package": {
+              "name": "zbus_names",
+              "ecosystem": "crates.io",
+              "purl": "pkg:cargo/zbus_names"
+            },
+            "ranges": [
+              {
+                "type": "SEMVER",
+                "events": [
+                  {
+                    "introduced": "0.0.0-0"
+                  }
+                ]
+              }
+            ],
+            "ecosystem_specific": {
+              "affected_functions": null,
+              "affects": {
+                "functions": [],
+                "arch": [],
+                "os": []
+              }
+            },
+            "database_specific": {
+              "cvss": null,
+              "informational": "unmaintained",
+              "source": "https://github.com/rustsec/advisory-db/blob/osv/crates/RUSTSEC-2026-0371.json",
+              "categories": []
+            }
+          }
+        ],
+        "schema_version": "1.9.0"
+      },
+      "RUSTSEC-2026-0370": {
+        "id": "RUSTSEC-2026-0370",
+        "summary": "`zvariant` is unmaintained",
+        "details": "The `zvariant` crate is no longer maintained as a standalone crate.\n\nIt has been merged into [`zbus`](https://crates.io/crates/zbus) starting with version `6.0.0`, as its `wire` module.\n\nUsers should migrate to [`zbus`](https://crates.io/crates/zbus), with its default features disabled if they only need the D-Bus wire format. Users of the GVariant format should migrate to [`zgvariant`](https://crates.io/crates/zgvariant).",
+        "modified": "2026-10-17T15:30:02.390032532Z",
+        "published": "2026-10-16T12:00:00Z",
+        "database_specific": {
+          "license": "CC0-1.0"
+        },
+        "references": [
+          {
+            "type": "PACKAGE",
+            "url": "https://crates.io/crates/zvariant"
+          },
+          {
+            "type": "ADVISORY",
+            "url": "https://rustsec.org/advisories/RUSTSEC-2026-0370.html"
+          },
+          {
+            "type": "REPORT",
+            "url": "https://github.com/z-galaxy/zbus/issues/2043"
+          }
+        ],
+        "affected": [
+          {
+            "package": {
+              "name": "zvariant",
+              "ecosystem": "crates.io",
+              "purl": "pkg:cargo/zvariant"
+            },
+            "ranges": [
+              {
+                "type": "SEMVER",
+                "events": [
+                  {
+                    "introduced": "0.0.0-0"
+                  }
+                ]
+              }
+            ],
+            "ecosystem_specific": {
+              "affected_functions": null,
+              "affects": {
+                "arch": [],
+                "os": [],
+                "functions": []
+              }
+            },
+            "database_specific": {
+              "cvss": null,
+              "informational": "unmaintained",
+              "categories": [],
+              "source": "https://github.com/rustsec/advisory-db/blob/osv/crates/RUSTSEC-2026-0370.json"
+            }
+          }
+        ],
+        "schema_version": "1.9.0"
+      },
+      "RUSTSEC-2026-0372": {
+        "id": "RUSTSEC-2026-0372",
+        "summary": "`zvariant_derive` is unmaintained",
+        "details": "The `zvariant_derive` crate is no longer maintained as a standalone crate.\n\nIts derive macros are provided by [`zbus`](https://crates.io/crates/zbus) starting with version `6.0.0`.\n\nUsers should migrate to [`zbus`](https://crates.io/crates/zbus), with its default features disabled if they only need the D-Bus wire format.",
+        "modified": "2026-10-17T15:30:02.394812511Z",
+        "published": "2026-10-16T12:00:00Z",
+        "database_specific": {
+          "license": "CC0-1.0"
+        },
+        "references": [
+          {
+            "type": "PACKAGE",
+            "url": "https://crates.io/crates/zvariant_derive"
+          },
+          {
+            "type": "ADVISORY",
+            "url": "https://rustsec.org/advisories/RUSTSEC-2026-0372.html"
+          },
+          {
+            "type": "REPORT",
+            "url": "https://github.com/z-galaxy/zbus/issues/2043"
+          }
+        ],
+        "affected": [
+          {
+            "package": {
+              "name": "zvariant_derive",
+              "ecosystem": "crates.io",
+              "purl": "pkg:cargo/zvariant_derive"
+            },
+            "ranges": [
+              {
+                "type": "SEMVER",
+                "events": [
+                  {
+                    "introduced": "0.0.0-0"
+                  }
+                ]
+              }
+            ],
+            "ecosystem_specific": {
+              "affects": {
+                "arch": [],
+                "os": [],
+                "functions": []
+              },
+              "affected_functions": null
+            },
+            "database_specific": {
+              "informational": "unmaintained",
+              "categories": [],
+              "cvss": null,
+              "source": "https://github.com/rustsec/advisory-db/blob/osv/crates/RUSTSEC-2026-0372.json"
+            }
+          }
+        ],
+        "schema_version": "1.9.0"
+      }
+    },
+    "windows_selected_graph_findings": [
+      {
+        "name": "fxhash",
+        "version": "0.2.1",
+        "advisories": [
+          "RUSTSEC-2025-0057"
+        ]
+      },
+      {
+        "name": "paste",
+        "version": "1.0.15",
+        "advisories": [
+          "RUSTSEC-2024-0436"
+        ]
+      }
+    ],
+    "windows_selected_graph_nonmaintenance_advisories": [],
+    "lock_sha256": "eb87460f9044180f98ac7f761a446bdef2579e1f2be8c6e16f9ba07d04f34a1b",
+    "query_succeeded": true,
+    "all_lockfile_clean": false
+  },
+  "npm": {
+    "auditReportVersion": 2,
+    "vulnerabilities": {},
+    "metadata": {
+      "vulnerabilities": {
+        "info": 0,
+        "low": 0,
+        "moderate": 0,
+        "high": 0,
+        "critical": 0,
+        "total": 0
+      },
+      "dependencies": {
+        "prod": 12,
+        "dev": 267,
+        "optional": 93,
+        "peer": 8,
+        "peerOptional": 0,
+        "total": 279
+      }
+    }
+  },
+  "raw_sha256": {
+    "rust": "f9dd4214b5a0e0a34cc978ad51b2fd3f7f4e40594a8491e1a397e3b3159e9f05",
+    "npm": "c3b453706c80a7c88955194204c2a391d36a0896c3a8e82fcba3be5d74404909"
+  },
+  "lock_sha256": {
+    "Cargo.lock": "eb87460f9044180f98ac7f761a446bdef2579e1f2be8c6e16f9ba07d04f34a1b",
+    "package-lock.json": "26a6de9ec117de7cb2a7b10a19c295a9a85689bfa143f1323ee7b217fc3fe5d6"
+  },
+  "initial_sandbox_requests_failed": true,
+  "network_permitted_retry_succeeded": true,
+  "dependency_versions_changed": false,
+  "limits": [
+    "Entire lock advisory matches are not individually established exploitable application defects",
+    "Windows selected graph classification is separate from inactive platform/build dependencies",
+    "No clean-platform, penetration-test or prompt-injection-immunity certification"
+  ]
+}

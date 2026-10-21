@@ -1,0 +1,218 @@
+{
+  "date": "2026-10-19",
+  "scope": "Unreleased prompt dropdown/composer handoff and WinGet preflight; no provider/remote Actions/installer qualification",
+  "commands": [
+    {
+      "command": "npm test -- --reporter=dot",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/prompt-ui-tests-final-20261019.log",
+        "sha256": "aa87693753b63d63e8b41ef8659eb96763be6bc6cf3c06e3519617472bd9c94a",
+        "bytes": 2042
+      },
+      "passed": 183,
+      "files": 19
+    },
+    {
+      "command": "npx tsc --noEmit",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/prompt-ui-types-20261019.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "command": "npm run build:release",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/prompt-ui-build-final-20261019.log",
+        "sha256": "7c2571a74af056befb5f9c21f22f7a3794ed65659f156e328ef2670a63a411a0",
+        "bytes": 21626
+      },
+      "new_installer": false
+    },
+    {
+      "command": "powershell -NoProfile -File scripts/tests/winget-token.tests.ps1",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/prompt-ui-winget-tests-20261019.log",
+        "sha256": "e676666dda493245ce03a6a964f9d1f0752b946d9800b5d33f8a683b5a6cd030",
+        "bytes": 168
+      },
+      "passed": 7,
+      "offline": true
+    },
+    {
+      "command": "python src-tauri/target/check-prompt-winget-workflow.py",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/prompt-ui-workflow-yaml-20261019.log",
+        "sha256": "ec63c2a8374639b52e4547b637c7a40e2905a6a607e5677b71f792806a027d6b",
+        "bytes": 178
+      },
+      "scope": "Local PyYAML BaseLoader structure assertions; not hosted Actions"
+    },
+    {
+      "command": "node scripts/check-production-workflows.mjs --report docs/ai-engineering/prompt-ui-production-20261019.json",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/prompt-ui-production-final-20261019.log",
+        "sha256": "38aebbf37702f1027a1214b8be2db956c07507c49bf85324c5dd721ccadf7663",
+        "bytes": 3668
+      },
+      "scope": "Compiled React/CSP, native and provider fixtures"
+    },
+    {
+      "command": "node scripts/audit-rule-documents.mjs",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/prompt-ui-rule-inventory-20261019.log",
+        "sha256": "91863c3a2085df69f4a01b045a5ec9a481562435b3b5824b34af9be52f3cc907",
+        "bytes": 574
+      }
+    },
+    {
+      "command": "npm run check:rules",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/prompt-ui-final-rules-20261019.log",
+        "sha256": "78ec4c3536a1f6721d5ff69f7b7c6191734a9c763a7e51ff7708331cdd68fee2",
+        "bytes": 752
+      }
+    },
+    {
+      "command": "npm run check:public",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/prompt-ui-final-public-20261019.log",
+        "sha256": "58d4cc27594416386e0952c47902615ee40dcaa57e7d0042d4d14a0282b9a6a9",
+        "bytes": 290
+      }
+    },
+    {
+      "command": "npm run check:bundle",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/prompt-ui-final-bundle-20261019.log",
+        "sha256": "0ef3f834497dca1f2dfbcdcceda7a93ba7d741b13be09619c80ecb8912e09b98",
+        "bytes": 302
+      }
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/prompt-ui-final-diff-20261019.log",
+        "sha256": "8f9b58e2bd31c59149f94ec14692d87d5522155878be0933c7f28d7c0a20c1ea",
+        "bytes": 8724
+      }
+    }
+  ],
+  "initial_failures_retained": [
+    {
+      "log": {
+        "path": "src-tauri/target/prompt-ui-tests-20261019.log",
+        "sha256": "19a44db79bd1e19b87540d510ddb310171fc19eec08b4bc3b3a3c3703deeed64",
+        "bytes": 32228
+      },
+      "exit_code": 1,
+      "reason": "Incomplete native review mock and unsupported matcher in new tests; corrected"
+    },
+    {
+      "log": {
+        "path": "src-tauri/target/prompt-ui-tests-fixed-20261019.log",
+        "sha256": "05813fe1e4d8901f9c3ef534b0cd3435c8b00efa6bd5ab2c6877c3cb50973513",
+        "bytes": 4434
+      },
+      "exit_code": 1,
+      "reason": "Remaining unsupported textarea matcher; corrected"
+    },
+    {
+      "log": {
+        "path": "src-tauri/target/prompt-ui-production-20261019.log",
+        "sha256": "1a330e27e19894641d42a9d9bb3499c7602b7a8e31c4e90efa4cd31f1843bdf4",
+        "bytes": 5124
+      },
+      "exit_code": 1,
+      "reason": "Monaco mount stole composer focus; fixed in CodeEditor"
+    }
+  ],
+  "other_failed_attempt": "An inline YAML assertion command was rejected by PowerShell parsing before execution; assertions were moved to the recorded Python file.",
+  "reported_baseline": {
+    "path": "src-tauri/target/prompt-ui-reported-baseline-20261019.json",
+    "sha256": "9a81878b1d61ed04d73f9d9085ac149ccd1e68fde189ffbd09e5731298ac2e95",
+    "bytes": 62697
+  },
+  "baseline_verified_before_changes": false,
+  "baseline_manifest_files": 274,
+  "currently_unchanged_from_reported_baseline": 263,
+  "historical_installer": {
+    "path": "src-tauri/target/release/bundle/nsis/VibeKidbright IDE_3.7.3_x64-setup.exe",
+    "sha256": "d09d0f9418d94059e801fc43a38241314757c686e5060e26596a806ba56ae7c1",
+    "bytes": 316758944
+  },
+  "embedding_assets_equal_historical_extraction": [
+    {
+      "path": "resources/embedding/LICENSE.txt",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "bytes": 11358
+    },
+    {
+      "path": "resources/embedding/manifest.json",
+      "sha256": "6e2c396405d9b56abefe09dfe375bc8396b7df95ddb13df5faf726ed0dfbadc4",
+      "bytes": 1160
+    },
+    {
+      "path": "resources/embedding/model-config.json",
+      "sha256": "1b4d8e2a3988377ed8b519a31d8d31025a25f1c5f8606998e8014111438efcd7",
+      "bytes": 650
+    },
+    {
+      "path": "resources/embedding/model.onnx",
+      "sha256": "bbd7b466f6d58e646fdc2bd5fd67b2f5e93c0b687011bd4548c420f7bd46f0c5",
+      "bytes": 90387630
+    },
+    {
+      "path": "resources/embedding/special_tokens_map.json",
+      "sha256": "5d5b662e421ea9fac075174bb0688ee0d9431699900b90662acd44b2a350503a",
+      "bytes": 695
+    },
+    {
+      "path": "resources/embedding/tokenizer.json",
+      "sha256": "851ca67100d372ca3ae031a6abd168f53489eebfd7d89523f35c5c9b4d372c3c",
+      "bytes": 711649
+    },
+    {
+      "path": "resources/embedding/tokenizer_config.json",
+      "sha256": "abda01c8c14c5151ae498aceb30db406d6b91242c394fd88d3b6fd5a63a101e6",
+      "bytes": 1412
+    },
+    {
+      "path": "resources/embedding/UPSTREAM.txt",
+      "sha256": "2c47a70b94fe29e24841acf0e177949f1c9aa543e450d43af7e872ea81e43501",
+      "bytes": 945
+    }
+  ],
+  "ranker_dataset_block_mapping_changes": false,
+  "not_executed_this_increment": [
+    "Real LLM inference",
+    "Actual GitHub Actions / WinGet submission",
+    "Installed desktop native IPC",
+    "Rust tests",
+    "Firmware builds",
+    "Hardware tests",
+    "Clean Windows VM lifecycle"
+  ],
+  "all_eight_requirement_statuses": {
+    "system_architecture": "PARTIAL",
+    "hybrid_rag": "PARTIAL",
+    "knowledge_base_data": "PARTIAL",
+    "code_aware_chunking": "PARTIAL",
+    "compiler_validation_auto_fix": "PARTIAL",
+    "technology_integration": "PARTIAL",
+    "development_phases": "PARTIAL",
+    "evaluation_quality": "PARTIAL"
+  },
+  "model_quality_status_changed": false
+}

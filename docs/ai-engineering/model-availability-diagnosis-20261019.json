@@ -1,0 +1,26 @@
+{
+  "date": "2026-10-19",
+  "method": "Read-only loopback GET discovery in network-permitted session; no authorization headers, keys or inference",
+  "endpoints": [
+    {
+      "url": "http://localhost:11434/api/tags",
+      "outcome": "UNAVAILABLE",
+      "error_name": "TypeError"
+    },
+    {
+      "url": "http://localhost:1234/v1/models",
+      "outcome": "UNAVAILABLE",
+      "error_name": "TypeError"
+    },
+    {
+      "url": "http://localhost:8080/v1/models",
+      "outcome": "UNAVAILABLE",
+      "error_name": "TypeError"
+    }
+  ],
+  "inference_requests": 0,
+  "paid_credential_reads": 0,
+  "charges": 0,
+  "exhaustive_discovery": false,
+  "endpoint_model_authorization_received": false
+}

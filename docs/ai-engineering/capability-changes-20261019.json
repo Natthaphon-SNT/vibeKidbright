@@ -1,0 +1,209 @@
+{
+  "date": "2026-10-19",
+  "baseline": {
+    "path": "src-tauri/target/verification-capability-start-20261019.json",
+    "sha256": "d14683ba9ffe5eb8cfbf52c212591c33b39992e57503993d9130dd1676c1bb09",
+    "bytes": 58837
+  },
+  "scope": "Only the 253-file starting manifest plus current framework/evidence files. Pre-existing Git changes not attributed. Current board-guide previews refreshed by fixture browser; historical reports/artifacts preserved. verification.json/this manifest exclude themselves.",
+  "files": [
+    {
+      "path": "docs/ai-engineering/04-code-intelligence.md",
+      "before_sha256": "02c29dd1720bc65a18cccaff04b54691571cda0b5a5ffde649d3df983495c412",
+      "after_sha256": "65207da122c1e2c30f0f7ea37af06571533fd897b4c3d15f343544be823076a2",
+      "comparison": "changed_from_baseline"
+    },
+    {
+      "path": "docs/ai-engineering/05-compiler-validation.md",
+      "before_sha256": "6dec57e67c32cf5ce0bd45fb5370a5d0223f7399ad7b0575a11b73ac9e29969d",
+      "after_sha256": "54ab0f6274737f06962b2a26649fade802679097035ee23d3bcbe1224a698d69",
+      "comparison": "changed_from_baseline"
+    },
+    {
+      "path": "docs/ai-engineering/07-implementation-progress.md",
+      "before_sha256": "f5dd08a4525e2918b45ea3e4bfd8c0175f73c77fce067beb80b0fe8256c4ed15",
+      "after_sha256": "ca769834094ed411be66fb07b84ae99f110f7dddf853c2ad36210bfe7267c6f8",
+      "comparison": "changed_from_baseline"
+    },
+    {
+      "path": "docs/ai-engineering/08-evaluation.md",
+      "before_sha256": "1c7cbbdc7d56ce50a37f9b020f19e928d4e651b1dd86ba72ab643c0f4135a247",
+      "after_sha256": "49fe8e53a5bb99b9316c1cab94a018e21fd0364758e4a3b599263b4d13a64af4",
+      "comparison": "changed_from_baseline"
+    },
+    {
+      "path": "docs/ai-engineering/09-known-limitations.md",
+      "before_sha256": "79a2d76c3ed5f0dd07b610de3327b076757d2f9ffd91e57b7dc6d47801fec108",
+      "after_sha256": "f50cb12199ea21f35b6a93bdf1062e039d94613ba5dcea92690927fcf1c4b9f0",
+      "comparison": "changed_from_baseline"
+    },
+    {
+      "path": "docs/ai-engineering/23-capability-validation-protocol.md",
+      "before_sha256": null,
+      "after_sha256": "48914aa2dc03f7a76e5c4103568842bdbace09eebac156d13b62a37dfe3a3f1c",
+      "comparison": "newly_recorded_not_creation_proof"
+    },
+    {
+      "path": "docs/ai-engineering/24-capability-validation-report.md",
+      "before_sha256": null,
+      "after_sha256": "f5679119a9da2af7f98d73ea1bd4e203a2a8633ea58084b7944f51ef5354b6e0",
+      "comparison": "newly_recorded_not_creation_proof"
+    },
+    {
+      "path": "docs/ai-engineering/capability-assets-20261019.json",
+      "before_sha256": null,
+      "after_sha256": "99ea922f6acc168694b108451c2a430aea54e8e18b9249cb32e85da50e956ff3",
+      "comparison": "newly_recorded_not_creation_proof"
+    },
+    {
+      "path": "docs/ai-engineering/capability-desktop-20261019.json",
+      "before_sha256": null,
+      "after_sha256": "e975704c14b7f43bd5698c34b2e1a95d2ca0ce5dc7144d460db8520fce527a87",
+      "comparison": "newly_recorded_not_creation_proof"
+    },
+    {
+      "path": "docs/ai-engineering/capability-firmware-20261019.json",
+      "before_sha256": null,
+      "after_sha256": "7b047f7087324e6c39fd66f3f6f0a728d3d25f103b64af1f18c578092b8d1c2a",
+      "comparison": "newly_recorded_not_creation_proof"
+    },
+    {
+      "path": "docs/ai-engineering/capability-matrix-20261019.json",
+      "before_sha256": null,
+      "after_sha256": "b13c4a82e6e8b04d61eff03a60e311524d96bfa7c179c226f6e32d67438436bb",
+      "comparison": "newly_recorded_not_creation_proof"
+    },
+    {
+      "path": "docs/ai-engineering/capability-matrix-current-20261019.json",
+      "before_sha256": null,
+      "after_sha256": "11f1741229a734cfd9009aa8a5360288d364f2c94a39551d4a9063af94ac221c",
+      "comparison": "newly_recorded_not_creation_proof"
+    },
+    {
+      "path": "docs/ai-engineering/capability-mechanical-20261019.json",
+      "before_sha256": null,
+      "after_sha256": "49116011007a8395cb6eb22e0948e3da1b0bba42acaa2756cbffc0e52ae8db78",
+      "comparison": "newly_recorded_not_creation_proof"
+    },
+    {
+      "path": "docs/ai-engineering/capability-mechanical-complete-20261019.json",
+      "before_sha256": null,
+      "after_sha256": "e102072ae637fd5edb172647a38dde4eb36683dab70bb54cc044de76d8db53a5",
+      "comparison": "newly_recorded_not_creation_proof"
+    },
+    {
+      "path": "docs/ai-engineering/capability-prepared-20261019.json",
+      "before_sha256": null,
+      "after_sha256": "2abe0c3313ff4e63dbfcfcfb477ba388898626e24e39a0739ccd4adc9b6ea709",
+      "comparison": "newly_recorded_not_creation_proof"
+    },
+    {
+      "path": "docs/ai-engineering/capability-production-ui-20261019.json",
+      "before_sha256": null,
+      "after_sha256": "53ae86338c8d22eba72265d031c376f9965c8b4bfdcaccb9302c45a2efb015de",
+      "comparison": "newly_recorded_not_creation_proof"
+    },
+    {
+      "path": "docs/ai-engineering/capability-release-readiness-20261019.json",
+      "before_sha256": null,
+      "after_sha256": "3a45384c2642cb87e33077cb621957263fc211a01802fdab7fb4d39ea9e73ec5",
+      "comparison": "newly_recorded_not_creation_proof"
+    },
+    {
+      "path": "docs/ai-engineering/capability-retrieval-readiness-20261019.json",
+      "before_sha256": null,
+      "after_sha256": "fcd096c8492726e16808f5f2671770fe06486b3a0c9fec7af78b5d283348ccb8",
+      "comparison": "newly_recorded_not_creation_proof"
+    },
+    {
+      "path": "docs/ai-engineering/capability-review-draft-20261019.json",
+      "before_sha256": null,
+      "after_sha256": "392a1973c862edbd35b935ddf66ceb297170486a5cb4bcf58c5c235cb8f5753a",
+      "comparison": "newly_recorded_not_creation_proof"
+    },
+    {
+      "path": "docs/ai-engineering/capability-security-20261019.json",
+      "before_sha256": null,
+      "after_sha256": "a4a7d8519a230d4f5e5f906cea214ed93fa4ab0b8b92f2af3b2aa4a0b73378b0",
+      "comparison": "newly_recorded_not_creation_proof"
+    },
+    {
+      "path": "docs/ai-engineering/capability-verification-20261019.json",
+      "before_sha256": null,
+      "after_sha256": "817b100460c5d5f74530cca2fe57d22c447dceaf2bd6d0fa78f8d2a67dc5c486",
+      "comparison": "newly_recorded_not_creation_proof"
+    },
+    {
+      "path": "docs/previews/board-guide-compact-dark.png",
+      "before_sha256": "d832a8ce761fd40028959e0df4826a7d91da515dcfcdb57d38f37f0d0508f433",
+      "after_sha256": "16e86e6b2cb9786eb40ef94cd5ebd563c27fe213e32c485d0b6a0b1cfbc4bfde",
+      "comparison": "changed_from_baseline"
+    },
+    {
+      "path": "docs/previews/board-guide-en-mai.png",
+      "before_sha256": "e4e7772552bfbbd5e1cd00849718e9cbbb0aad702c478f6ef6fd86a2c46c669f",
+      "after_sha256": "345112fc2f24720ab2d7b303aeafa0ec818b904164c97ae1e804ee84dcdbbc4e",
+      "comparison": "changed_from_baseline"
+    },
+    {
+      "path": "docs/previews/board-guide-th-plus.png",
+      "before_sha256": "975792654e29da5de21dd3e7c5fbf39c585de1e3f4e69c9ea63a3b7d047c9770",
+      "after_sha256": "5530f25fb93ba2d598b046ffb33d3c1a7e13d7423c3d81827fe49665a274476a",
+      "comparison": "changed_from_baseline"
+    },
+    {
+      "path": "docs/research/rule-documents-2026-10-16.json",
+      "before_sha256": "7cd99217e9a091b7cd664cb7d1fc9de4d49bbec579b11cd74008a1a8f91d5d24",
+      "after_sha256": "dffa9d48ff270d81bfbf7437ab9aeb065bd1b86911bda03f50dcf5f63522c55d",
+      "comparison": "changed_from_baseline"
+    },
+    {
+      "path": "scripts/evaluate-capabilities.mjs",
+      "before_sha256": null,
+      "after_sha256": "0c5f3cab21ebda19f1537ccae1fb74170a25644b37d9efc3fbaa9139c5468ec7",
+      "comparison": "newly_recorded_not_creation_proof"
+    },
+    {
+      "path": "scripts/evaluate-vibe-coder-real.mjs",
+      "before_sha256": "2cee9485d215c511e109f9011440c4f904b46d6e005e607b0b0a0d63a97c7173",
+      "after_sha256": "4d7343556c0c29ed99c4a415477f5a8e993b6901d469efb0ab5260b50b4943eb",
+      "comparison": "changed_from_baseline"
+    },
+    {
+      "path": "scripts/lib/capability-matrix.mjs",
+      "before_sha256": null,
+      "after_sha256": "97de40378c3832226138c037875e18be66b5c5bf6c32a203b10c78da2a6a60be",
+      "comparison": "newly_recorded_not_creation_proof"
+    },
+    {
+      "path": "scripts/lib/vibe-evidence.mjs",
+      "before_sha256": "d9675ce9bd0cddfdfd864e4fa1533e190499b5af7b8bb33a5fe69f78d7bdb10f",
+      "after_sha256": "ff023f4646c0d75a7a40d51733397dedcaeb4774d439a677d81854cb98a32b1b",
+      "comparison": "changed_from_baseline"
+    },
+    {
+      "path": "scripts/probe-desktop-semantic.mjs",
+      "before_sha256": "607d52972aa113804c2bca8524e99b708e6ec07bce13adfa8e4004fad41b1c66",
+      "after_sha256": "46d23e093046d3240f2f589768c6319af4c4a495076c8acf381f42ffe803fe72",
+      "comparison": "changed_from_baseline"
+    },
+    {
+      "path": "scripts/tests/capability-matrix.test.mjs",
+      "before_sha256": null,
+      "after_sha256": "999382c580142249c5a116368004a7381178f7ce043f8ea18edaa5b8bea82002",
+      "comparison": "newly_recorded_not_creation_proof"
+    },
+    {
+      "path": "src-tauri/examples/range_lsp_fixture.rs",
+      "before_sha256": null,
+      "after_sha256": "c23dd4c58b473729ad993a50731f636f960a854b564c884ad5472e94d17faa04",
+      "comparison": "newly_recorded_not_creation_proof"
+    },
+    {
+      "path": "src-tauri/src/ai/repair.rs",
+      "before_sha256": "f40398cd8383b6ef47a6533b9fffe10db59b64ff213bf33fa6b504a9d8e93a7b",
+      "after_sha256": "92706b8148eba7f29be9d0e07b06b2668d1a7c8c85204f2088f2facc4b8535bc",
+      "comparison": "changed_from_baseline"
+    }
+  ]
+}

@@ -1,0 +1,171 @@
+{
+  "schema_version": 1,
+  "status": "draft",
+  "evaluation_sha256": "2abe0c3313ff4e63dbfcfcfb477ba388898626e24e39a0739ccd4adc9b6ea709",
+  "reviewer": "",
+  "reviewed_at": "",
+  "reviewer_attests_independence": false,
+  "note": "Blank assistant-prepared form, not an independent review. File hashes bind evidence but do not authenticate reviewer identity or actual execution.",
+  "judgments": [
+    {
+      "criterion_id": "retrieval_relevance",
+      "case_id": "grounding-th",
+      "status": null,
+      "notes": "",
+      "evidence_refs": []
+    },
+    {
+      "criterion_id": "citation_existence",
+      "case_id": "grounding-th",
+      "status": null,
+      "notes": "",
+      "evidence_refs": []
+    },
+    {
+      "criterion_id": "citation_existence",
+      "case_id": "generation-th",
+      "status": null,
+      "notes": "",
+      "evidence_refs": []
+    },
+    {
+      "criterion_id": "citation_support",
+      "case_id": "grounding-th",
+      "status": null,
+      "notes": "",
+      "evidence_refs": []
+    },
+    {
+      "criterion_id": "citation_support",
+      "case_id": "generation-th",
+      "status": null,
+      "notes": "",
+      "evidence_refs": []
+    },
+    {
+      "criterion_id": "api_version_correctness",
+      "case_id": "grounding-th",
+      "status": null,
+      "notes": "",
+      "evidence_refs": []
+    },
+    {
+      "criterion_id": "api_version_correctness",
+      "case_id": "generation-th",
+      "status": null,
+      "notes": "",
+      "evidence_refs": []
+    },
+    {
+      "criterion_id": "hardware_metadata",
+      "case_id": "generation-th",
+      "status": null,
+      "notes": "",
+      "evidence_refs": []
+    },
+    {
+      "criterion_id": "project_identity",
+      "case_id": "project-th",
+      "status": null,
+      "notes": "",
+      "evidence_refs": []
+    },
+    {
+      "criterion_id": "file_symbol_selection",
+      "case_id": "project-th",
+      "status": null,
+      "notes": "",
+      "evidence_refs": []
+    },
+    {
+      "criterion_id": "dependency_understanding",
+      "case_id": "project-th",
+      "status": null,
+      "notes": "",
+      "evidence_refs": []
+    },
+    {
+      "criterion_id": "dependency_understanding",
+      "case_id": "generation-th",
+      "status": null,
+      "notes": "",
+      "evidence_refs": []
+    },
+    {
+      "criterion_id": "patch_scope",
+      "case_id": "generation-th",
+      "status": null,
+      "notes": "",
+      "evidence_refs": []
+    },
+    {
+      "criterion_id": "unrelated_code_preserved",
+      "case_id": "generation-th",
+      "status": null,
+      "notes": "",
+      "evidence_refs": []
+    },
+    {
+      "criterion_id": "unrelated_code_preserved",
+      "case_id": "rollback",
+      "status": null,
+      "notes": "",
+      "evidence_refs": []
+    },
+    {
+      "criterion_id": "compiler_classification",
+      "case_id": "diagnostics",
+      "status": null,
+      "notes": "",
+      "evidence_refs": []
+    },
+    {
+      "criterion_id": "focused_repair",
+      "case_id": "bounded-repair",
+      "status": null,
+      "notes": "",
+      "evidence_refs": []
+    },
+    {
+      "criterion_id": "per_attempt_approval",
+      "case_id": "bounded-repair",
+      "status": null,
+      "notes": "",
+      "evidence_refs": []
+    },
+    {
+      "criterion_id": "compilation_success",
+      "case_id": "compile",
+      "status": null,
+      "notes": "",
+      "evidence_refs": []
+    },
+    {
+      "criterion_id": "compilation_success",
+      "case_id": "bounded-repair",
+      "status": null,
+      "notes": "",
+      "evidence_refs": []
+    },
+    {
+      "criterion_id": "rollback_correctness",
+      "case_id": "rollback",
+      "status": null,
+      "notes": "",
+      "evidence_refs": []
+    },
+    {
+      "criterion_id": "bounded_attempts",
+      "case_id": "bounded-repair",
+      "status": null,
+      "notes": "",
+      "evidence_refs": []
+    }
+  ],
+  "inputs": [
+    {
+      "path": "docs/ai-engineering/capability-prepared-20261019.json",
+      "sha256": "2abe0c3313ff4e63dbfcfcfb477ba388898626e24e39a0739ccd4adc9b6ea709"
+    }
+  ]
+}

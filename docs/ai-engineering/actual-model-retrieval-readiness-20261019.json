@@ -1,0 +1,335 @@
+{
+  "date": "2026-10-19",
+  "scope": "Offline identity and blind-review preparation only; no inference, ranking run, new labels or provider configuration.",
+  "frozen_dataset": {
+    "path": "docs/ai-engineering/evaluation-heldout-v1.json",
+    "sha256": "c75de0d838a5f0e6670c48776c67d3b5c0a98ca755f02ba09c2d548c28b55c43",
+    "bytes": 17542
+  },
+  "frozen_freeze_file": {
+    "path": "docs/ai-engineering/evaluation-heldout-v1-freeze.json",
+    "sha256": "12e71c090f81c7a064dd3a1110d11e84768891bd82a5c1e0fc158c91e4baf690",
+    "bytes": 5499
+  },
+  "frozen_queries": 69,
+  "frozen_sources_verified": 37,
+  "frozen_qrel_paths_exist_in_archived_snapshot": true,
+  "relevance_validated": false,
+  "development_packet": {
+    "path": "docs/ai-engineering/retrieval-development-review-20261019.json",
+    "sha256": "7b149e399b143f2b7a552d4a09f46162478c820a4f05ae7879bb765ad1844a36",
+    "bytes": 44449
+  },
+  "copied_packet": {
+    "path": "src-tauri/target/actual-model-blind-review-20261019/development-review.json",
+    "sha256": "7b149e399b143f2b7a552d4a09f46162478c820a4f05ae7879bb765ad1844a36",
+    "bytes": 44449
+  },
+  "query_ids": [
+    "dev2-symbol-ascii-parse",
+    "dev2-symbol-lm73-celsius",
+    "dev2-symbol-matrix-get",
+    "dev2-symbol-joystick-read",
+    "dev2-natural-ascii",
+    "dev2-natural-joystick",
+    "dev2-natural-duration",
+    "dev2-natural-matrix",
+    "dev2-mixed-ascii",
+    "dev2-mixed-pid",
+    "dev2-mixed-sma",
+    "dev2-mixed-duration",
+    "dev2-error-pid",
+    "dev2-error-ascii",
+    "dev2-error-matrix",
+    "dev2-error-joystick",
+    "dev2-hardware-rev31",
+    "dev2-hardware-microai",
+    "dev2-hardware-pinout",
+    "dev2-hardware-font"
+  ],
+  "query_kinds": {
+    "exact_symbol": 4,
+    "natural_language": 4,
+    "mixed_language": 4,
+    "compiler_error": 4,
+    "hardware": 4
+  },
+  "languages": {
+    "technical": 4,
+    "th": 4,
+    "en": 6,
+    "mixed": 6
+  },
+  "judgments_all_null": true,
+  "independent_reviewers": 0,
+  "blind_review_sources": [
+    {
+      "path": "src-tauri/target/actual-model-blind-review-20261019/corpus/all_models.md",
+      "sha256": "76bc33cd72bf6c29fe396368f34a167db556edba337154dbb7c3cb20c18ff120",
+      "bytes": 6068
+    },
+    {
+      "path": "src-tauri/target/actual-model-blind-review-20261019/corpus/formula_kid_controller.md",
+      "sha256": "6a89d84cb57400618170903b4ffdbdc1670b0741ef63a9ecb6a6316574506252",
+      "bytes": 31960
+    },
+    {
+      "path": "src-tauri/target/actual-model-blind-review-20261019/corpus/hardware_schematics_rules.md",
+      "sha256": "d061dca09f95fbfea9ec4dfa9bea0f398031f84ba023ee209892c5025e1a3829",
+      "bytes": 6955
+    },
+    {
+      "path": "src-tauri/target/actual-model-blind-review-20261019/corpus/iKB-1.md",
+      "sha256": "fe11a41c5ab368f8cf201ebb77211104c3bd6f8832357f31f33dbe9445fda437",
+      "bytes": 5719
+    },
+    {
+      "path": "src-tauri/target/actual-model-blind-review-20261019/corpus/inex_ia_ip.md",
+      "sha256": "6f6fba77ae277582ba84d6d55200c43e4b43f3e29d697e193fec68f2018525d7",
+      "bytes": 7065
+    },
+    {
+      "path": "src-tauri/target/actual-model-blind-review-20261019/corpus/kidbright32iA.md",
+      "sha256": "b127926bde6e19c9e1e3ea6c9e056bcd3f3c74ccd9bf2959780c24b4703c78b1",
+      "bytes": 123319
+    },
+    {
+      "path": "src-tauri/target/actual-model-blind-review-20261019/corpus/kidbright_uai.md",
+      "sha256": "6e1c6ef51e541a8e5588b3de6e35a17099c2eeca699b76767e9d003b81d0b0a5",
+      "bytes": 30376
+    },
+    {
+      "path": "src-tauri/target/actual-model-blind-review-20261019/corpus/led_16x8_matrix_mapping.md",
+      "sha256": "897012b9c929c9a921f0301e0f0d7b7bf227ca4799bf8f96e443875deb861d67",
+      "bytes": 32140
+    },
+    {
+      "path": "src-tauri/target/actual-model-blind-review-20261019/corpus/minibike.md",
+      "sha256": "6654b5061069c6cbd0523c1b28a2d8f0014580f2bcedbab79050d34e797cbe35",
+      "bytes": 19217
+    },
+    {
+      "path": "src-tauri/target/actual-model-blind-review-20261019/corpus/oled_ssd1306.md",
+      "sha256": "012ed1ab1039332d3fedd507837e85228643c37e545defe300c454e9e16b1c79",
+      "bytes": 11658
+    },
+    {
+      "path": "src-tauri/target/actual-model-blind-review-20261019/corpus/README.md",
+      "sha256": "c0443aadcc7cd17d38c3da83e70030c857d6a8663db3c290aa73e4cdaa38ff63",
+      "bytes": 13978
+    },
+    {
+      "path": "src-tauri/target/actual-model-blind-review-20261019/corpus/skate_rev1.3.md",
+      "sha256": "a7367323ccbd3849ffc7afd6eb7ec796f375b04e28fed6bbd134fec026fe05e8",
+      "bytes": 27315
+    },
+    {
+      "path": "src-tauri/target/actual-model-blind-review-20261019/corpus/support_scope.md",
+      "sha256": "ad4a2fe4b1785d957fc84b2ebcfce4e2f23aed1f143247b0dbd0f7041c4a6054",
+      "bytes": 7605
+    },
+    {
+      "path": "src-tauri/target/actual-model-blind-review-20261019/corpus/compatibility/button_buzzer.c",
+      "sha256": "9ee6db8976f6996218d7e881be1504a273e80dc4d80ba077a9a3a89d03939c2b",
+      "bytes": 1639
+    },
+    {
+      "path": "src-tauri/target/actual-model-blind-review-20261019/corpus/compatibility/kb_basic.c",
+      "sha256": "f9132c141a0e7f1bb94c3f0051d071184b20aed00596241fbae70f210282fb84",
+      "bytes": 3051
+    },
+    {
+      "path": "src-tauri/target/actual-model-blind-review-20261019/corpus/compatibility/kb_basic.h",
+      "sha256": "d1ccee626c2c3581bf7ded5e05b4bceb452fc73582cae75e06bf9598ba0b7742",
+      "bytes": 1076
+    },
+    {
+      "path": "src-tauri/target/actual-model-blind-review-20261019/corpus/compatibility/kb_core.c",
+      "sha256": "05359f6f1dc8a402a4420bc9549230cb20a04900c2b8544a5143fe34c5409c89",
+      "bytes": 4512
+    },
+    {
+      "path": "src-tauri/target/actual-model-blind-review-20261019/corpus/compatibility/kb_core.h",
+      "sha256": "752afe78294d71ecd68cb3054f572a15a769f240fd124f1d49bc844aa60d8398",
+      "bytes": 1584
+    },
+    {
+      "path": "src-tauri/target/actual-model-blind-review-20261019/corpus/compatibility/kb_display_idf.c",
+      "sha256": "328347ff7007138e375a7ad8455e4c00c21d6566ff0776a0943286ecf5c9bc1c",
+      "bytes": 1533
+    },
+    {
+      "path": "src-tauri/target/actual-model-blind-review-20261019/corpus/compatibility/kb_display_idf.h",
+      "sha256": "49a48a6f24ec79d031ba3887a4dd191fe10458f3c7230db2fd30b5c6785f526c",
+      "bytes": 647
+    },
+    {
+      "path": "src-tauri/target/actual-model-blind-review-20261019/corpus/compatibility/matrix_counter.c",
+      "sha256": "ab8355a593346f7a6bd70e1b12ef92cd404605303b02b181190ad43e4469de86",
+      "bytes": 1251
+    },
+    {
+      "path": "src-tauri/target/actual-model-blind-review-20261019/corpus/compatibility/music_scale.c",
+      "sha256": "7f8bcaf0a33e94e9e017eabe3cde9315134a8c215152ee4a8e63335c2331a41a",
+      "bytes": 1921
+    },
+    {
+      "path": "src-tauri/target/actual-model-blind-review-20261019/corpus/compatibility/README.md",
+      "sha256": "e527c0dc8e9748525937f121d7e7690fa5dcb5070aecd4d1fd43f94c73fa2935",
+      "bytes": 7256
+    },
+    {
+      "path": "src-tauri/target/actual-model-blind-review-20261019/corpus/compatibility/temperature_serial.c",
+      "sha256": "57cfb940c7038b478ebbdccb8466e08888baf0ed266ab58535f0a9596c61b1f3",
+      "bytes": 1530
+    },
+    {
+      "path": "src-tauri/target/actual-model-blind-review-20261019/corpus/sensor_examples/accel_kxtj3.c",
+      "sha256": "6064a198d3f6ba660cd922f57f06cd36fb35dce982e12748976fac11f8e48653",
+      "bytes": 7852
+    },
+    {
+      "path": "src-tauri/target/actual-model-blind-review-20261019/corpus/sensor_examples/accel_mc3479.c",
+      "sha256": "48490e8761f26f856ae4f9160de72ec7af1f2f3160128f89eb5b4705cfcd3e8b",
+      "bytes": 3516
+    },
+    {
+      "path": "src-tauri/target/actual-model-blind-review-20261019/corpus/sensor_examples/adc_ldr_external.c",
+      "sha256": "89023830397cabda51fa04f25367d897dc9b5f3cddbc2d3237dde0e2978edcfe",
+      "bytes": 9777
+    },
+    {
+      "path": "src-tauri/target/actual-model-blind-review-20261019/corpus/sensor_examples/all_sensors_demo.c",
+      "sha256": "b94f740ed0f50d225d0f5edcb0197916f5c9fbdce854c4ef54cbee7428ac6604",
+      "bytes": 27829
+    },
+    {
+      "path": "src-tauri/target/actual-model-blind-review-20261019/corpus/sensor_examples/balanced_robot.c",
+      "sha256": "01a2e241038d0e712a7de3a2d839de93cdd96aeb16ba52939a8ab00c5d95c8bd",
+      "bytes": 4609
+    },
+    {
+      "path": "src-tauri/target/actual-model-blind-review-20261019/corpus/sensor_examples/calibrate_balancing_bike.c",
+      "sha256": "fa1fa4b91e8ac59ee426b8a79407d3140839a9f5b15b44446a37825cd6699872",
+      "bytes": 7397
+    },
+    {
+      "path": "src-tauri/target/actual-model-blind-review-20261019/corpus/sensor_examples/calibrate_balancing_joystick.c",
+      "sha256": "8c6dcfb33ffb08b10b1af6f82fdacc7b41d5b1a6cee7ef65c6f06ba66046cb11",
+      "bytes": 12406
+    },
+    {
+      "path": "src-tauri/target/actual-model-blind-review-20261019/corpus/sensor_examples/fomulakid_receiver.c",
+      "sha256": "8d5f6c35f5ec71d8da7a330ef4c00b2d14bd65950c21ba8f176a18e7ced0a84d",
+      "bytes": 15016
+    },
+    {
+      "path": "src-tauri/target/actual-model-blind-review-20261019/corpus/sensor_examples/formulakid_sender.c",
+      "sha256": "cbc621207c2b63604140c4f1a2049ca1416f2449bfc5dcbdb92967feeb765c68",
+      "bytes": 12228
+    },
+    {
+      "path": "src-tauri/target/actual-model-blind-review-20261019/corpus/sensor_examples/kidbright_full_system_demo.c",
+      "sha256": "c17c410e30e320974b504c8ed6de02313c566c386cdfd3a3fba1f6cfd4a3fa79",
+      "bytes": 12220
+    },
+    {
+      "path": "src-tauri/target/actual-model-blind-review-20261019/corpus/sensor_examples/minibike_receiver.c",
+      "sha256": "9e796518a77dfd5f0bd5c1dad0e37c0127d2e13f26aa284c9f7933340ab6a7ca",
+      "bytes": 12102
+    },
+    {
+      "path": "src-tauri/target/actual-model-blind-review-20261019/corpus/sensor_examples/minibike_sender.c",
+      "sha256": "abc438ada59ff124678bef4f9f9e1200869a24311f37737fa9020b0b5b7edd3c",
+      "bytes": 17453
+    },
+    {
+      "path": "src-tauri/target/actual-model-blind-review-20261019/corpus/sensor_examples/temp_lm73.c",
+      "sha256": "1733bcc2fcb1ffcbd3065279d70a0ecd7fc9d28bd4c80946b8f63223cc2476e6",
+      "bytes": 6893
+    }
+  ],
+  "draft_annotation_gate": {
+    "status": "REJECTED_AS_EXPECTED",
+    "reason": "A draft/unreviewed packet cannot become independent evaluation evidence"
+  },
+  "current_as_frozen_gate": {
+    "status": "REJECTED_AS_EXPECTED",
+    "reason": "Current source bytes no longer match the reviewed frozen corpus"
+  },
+  "current_bundled_corpus_sha256": {
+    "all_models.md": "c408745c35c3455added1766e54b53d99ed1a072f20bd0c6afcba027d4aacc25",
+    "compatibility/button_buzzer.c": "9ee6db8976f6996218d7e881be1504a273e80dc4d80ba077a9a3a89d03939c2b",
+    "compatibility/kb_basic.c": "f9132c141a0e7f1bb94c3f0051d071184b20aed00596241fbae70f210282fb84",
+    "compatibility/kb_basic.h": "d1ccee626c2c3581bf7ded5e05b4bceb452fc73582cae75e06bf9598ba0b7742",
+    "compatibility/kb_core.c": "05359f6f1dc8a402a4420bc9549230cb20a04900c2b8544a5143fe34c5409c89",
+    "compatibility/kb_core.h": "752afe78294d71ecd68cb3054f572a15a769f240fd124f1d49bc844aa60d8398",
+    "compatibility/kb_display_idf.c": "328347ff7007138e375a7ad8455e4c00c21d6566ff0776a0943286ecf5c9bc1c",
+    "compatibility/kb_display_idf.h": "49a48a6f24ec79d031ba3887a4dd191fe10458f3c7230db2fd30b5c6785f526c",
+    "compatibility/matrix_counter.c": "ab8355a593346f7a6bd70e1b12ef92cd404605303b02b181190ad43e4469de86",
+    "compatibility/music_scale.c": "7f8bcaf0a33e94e9e017eabe3cde9315134a8c215152ee4a8e63335c2331a41a",
+    "compatibility/README.md": "02b74e3b3a9aeec6ee4ed3a100adb4e8ec92096dcda32bdc86819570c9d8ad51",
+    "compatibility/temperature_serial.c": "57cfb940c7038b478ebbdccb8466e08888baf0ed266ab58535f0a9596c61b1f3",
+    "formula_kid_controller.md": "6a89d84cb57400618170903b4ffdbdc1670b0741ef63a9ecb6a6316574506252",
+    "hardware_schematics_rules.md": "d061dca09f95fbfea9ec4dfa9bea0f398031f84ba023ee209892c5025e1a3829",
+    "iKB-1.md": "fe11a41c5ab368f8cf201ebb77211104c3bd6f8832357f31f33dbe9445fda437",
+    "inex_ia_ip.md": "f6836b75e4f4a04ad764b6c3098838afe7cfa7dd782306d8e2693779f598ed00",
+    "kidbright32iA.md": "b127926bde6e19c9e1e3ea6c9e056bcd3f3c74ccd9bf2959780c24b4703c78b1",
+    "kidbright_uai.md": "6e1c6ef51e541a8e5588b3de6e35a17099c2eeca699b76767e9d003b81d0b0a5",
+    "led_16x8_matrix_mapping.md": "897012b9c929c9a921f0301e0f0d7b7bf227ca4799bf8f96e443875deb861d67",
+    "minibike.md": "6654b5061069c6cbd0523c1b28a2d8f0014580f2bcedbab79050d34e797cbe35",
+    "oled_ssd1306.md": "012ed1ab1039332d3fedd507837e85228643c37e545defe300c454e9e16b1c79",
+    "README.md": "c0443aadcc7cd17d38c3da83e70030c857d6a8663db3c290aa73e4cdaa38ff63",
+    "sensor_examples/20190924134407-20181127211734-Sch_KidBright32_updated.pdf": "10c9ae1c637e2ee75aaa1a9335db941f0bbd6b9f7f73fcc7301e045d722beb15",
+    "sensor_examples/accel_kxtj3.c": "6064a198d3f6ba660cd922f57f06cd36fb35dce982e12748976fac11f8e48653",
+    "sensor_examples/accel_mc3479.c": "48490e8761f26f856ae4f9160de72ec7af1f2f3160128f89eb5b4705cfcd3e8b",
+    "sensor_examples/adc_ldr_external.c": "89023830397cabda51fa04f25367d897dc9b5f3cddbc2d3237dde0e2978edcfe",
+    "sensor_examples/all_sensors_demo.c": "b94f740ed0f50d225d0f5edcb0197916f5c9fbdce854c4ef54cbee7428ac6604",
+    "sensor_examples/balanced_robot.c": "01a2e241038d0e712a7de3a2d839de93cdd96aeb16ba52939a8ab00c5d95c8bd",
+    "sensor_examples/Bike_Controller_V1_20240627.pdf": "46d816e57913d0b927f6577712216329598c3c5a5b629d4ba8016a7fd8c5c2bc",
+    "sensor_examples/calibrate_balancing_bike.c": "fa1fa4b91e8ac59ee426b8a79407d3140839a9f5b15b44446a37825cd6699872",
+    "sensor_examples/calibrate_balancing_joystick.c": "8c6dcfb33ffb08b10b1af6f82fdacc7b41d5b1a6cee7ef65c6f06ba66046cb11",
+    "sensor_examples/fomulakid_receiver.c": "8d5f6c35f5ec71d8da7a330ef4c00b2d14bd65950c21ba8f176a18e7ced0a84d",
+    "sensor_examples/formulakid_sender.c": "cbc621207c2b63604140c4f1a2049ca1416f2449bfc5dcbdb92967feeb765c68",
+    "sensor_examples/KBminibike_Ext_V0_3.pdf": "2dca29b5a29da5d027ab6efa5172377bc43dedd4cf606dbb34fa28ad067e1875",
+    "sensor_examples/kidbright32ip_matrix_az_user_passed.c": "571963f3bf8b174a344de48d67fd613648790f659e3215b85c48d6a571fbf2b8",
+    "sensor_examples/kidbright_full_system_demo.c": "c17c410e30e320974b504c8ed6de02313c566c386cdfd3a3fba1f6cfd4a3fa79",
+    "sensor_examples/minibike_receiver.c": "9e796518a77dfd5f0bd5c1dad0e37c0127d2e13f26aa284c9f7933340ab6a7ca",
+    "sensor_examples/minibike_sender.c": "abc438ada59ff124678bef4f9f9e1200869a24311f37737fa9020b0b5b7edd3c",
+    "sensor_examples/PCB_KIDBRIGHT32_V1_5_Rev3_1.pdf": "d00d3a666f223856c4ddd2fbdf1151b5332097327a090c33d0a3043d755bda0d",
+    "sensor_examples/temp_lm73.c": "1733bcc2fcb1ffcbd3065279d70a0ecd7fc9d28bd4c80946b8f63223cc2476e6",
+    "skate_rev1.3.md": "a7367323ccbd3849ffc7afd6eb7ec796f375b04e28fed6bbd134fec026fe05e8",
+    "support_scope.md": "2303a4b4b3604d9a2c60cc3492c670c2214b09cc30953b3574a361266bd317b1"
+  },
+  "current_vs_frozen_changed_files": [
+    {
+      "file": "all_models.md",
+      "frozen_sha256": "76bc33cd72bf6c29fe396368f34a167db556edba337154dbb7c3cb20c18ff120",
+      "current_sha256": "c408745c35c3455added1766e54b53d99ed1a072f20bd0c6afcba027d4aacc25"
+    },
+    {
+      "file": "inex_ia_ip.md",
+      "frozen_sha256": "6f6fba77ae277582ba84d6d55200c43e4b43f3e29d697e193fec68f2018525d7",
+      "current_sha256": "f6836b75e4f4a04ad764b6c3098838afe7cfa7dd782306d8e2693779f598ed00"
+    },
+    {
+      "file": "support_scope.md",
+      "frozen_sha256": "ad4a2fe4b1785d957fc84b2ebcfce4e2f23aed1f143247b0dbd0f7041c4a6054",
+      "current_sha256": "2303a4b4b3604d9a2c60cc3492c670c2214b09cc30953b3574a361266bd317b1"
+    },
+    {
+      "file": "compatibility/README.md",
+      "frozen_sha256": "e527c0dc8e9748525937f121d7e7690fa5dcb5070aecd4d1fd43f94c73fa2935",
+      "current_sha256": "02b74e3b3a9aeec6ee4ed3a100adb4e8ec92096dcda32bdc86819570c9d8ad51"
+    }
+  ],
+  "current_files_outside_frozen_snapshot": [
+    "sensor_examples/20190924134407-20181127211734-Sch_KidBright32_updated.pdf",
+    "sensor_examples/Bike_Controller_V1_20240627.pdf",
+    "sensor_examples/KBminibike_Ext_V0_3.pdf",
+    "sensor_examples/PCB_KIDBRIGHT32_V1_5_Rev3_1.pdf",
+    "sensor_examples/kidbright32ip_matrix_az_user_passed.c"
+  ],
+  "review_scope": "The 20-query packet is bound to its original frozen 37-source corpus. Current production differs; no current-corpus relevance or accuracy is inferred. Rankings, answers and frozen qrels are not copied into the blind review folder.",
+  "export_caveat": "The existing review CLI verifies current knowledge_base. Its corpus-drift rejection is correct. Use exact frozen sources for historical blind review; do not export labels for current production as if the corpus were unchanged."
+}

@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-18",
+  "status": "NOT_EXECUTED",
+  "reason": "No local model was reachable at the tested standard loopback endpoints; user confirmed no local model is available. Paid provider authorization was not given.",
+  "availability_checks": [
+    {"endpoint": "http://127.0.0.1:11434/api/tags", "available": false},
+    {"endpoint": "http://127.0.0.1:1234/v1/models", "available": false},
+    {"endpoint": "http://127.0.0.1:8080/v1/models", "available": false}
+  ],
+  "inference_requests": 0,
+  "paid_provider_credentials_read": false,
+  "private_source_exported": false,
+  "llm_patches_applied": 0,
+  "documentation_retrieval_answer_accuracy": null,
+  "citation_correctness": null,
+  "generated_c_compile_success_rate": null,
+  "editing_success_rate": null,
+  "repair_success_rate": null,
+  "planned_case_groups": ["Thai/English/mixed documentation questions", "exact API and hardware citations", "generation on confirmed profiles", "focused existing-C edits", "configured ESP-IDF compilation", "approval-gated compiler repair", "adversarial documents/comments/build logs"],
+  "protocol": "13-independent-evaluation.md",
+  "not_substitutes_for_real_llm_evaluation": ["browser/provider fixtures", "native unit tests", "local embedding inference", "deterministic Block conversion", "clangd semantic queries"]
+}

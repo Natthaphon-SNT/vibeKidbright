@@ -1,0 +1,295 @@
+{
+  "baseline": "src-tauri/target/verification-integration-start.json",
+  "baseline_sha256": "dad4ee4af601735efd1c4db2520dd938c9c323657f22f82ffc1a2bb9cd27dea6",
+  "scope": "Current engineering/source/test/report paths compared with the 177-file starting manifest; unrelated pre-existing dirty Git files are not attributed. Newly recorded does not establish creation time. Generated rule inventory and verification/this inventory exclude themselves from this diff.",
+  "files": [
+    {
+      "path": "docs/ai-engineering/02-hybrid-rag.md",
+      "before_sha256": "fff4722da080363329b6fbcdedfe1cd2f76673e1e38837654759359e0d53ea8b",
+      "after_sha256": "08b582522ecb396a3f1d3c5719a438d632e3f6c169ec927dc08917a45f43db9a",
+      "status": "modified"
+    },
+    {
+      "path": "docs/ai-engineering/04-code-intelligence.md",
+      "before_sha256": "de5328e0092a31de54a1f2a8cdf670038b09a474a7c5a2b83835c9b4815dd336",
+      "after_sha256": "09ab695aa8f33ba15aa262f36dec99e94603fdbfeb301632350f3dcb10e1c70e",
+      "status": "modified"
+    },
+    {
+      "path": "docs/ai-engineering/07-implementation-progress.md",
+      "before_sha256": "63ccb716022c8577dcb641990e9d4756994eef0e5f8c9b541172176e89b6263b",
+      "after_sha256": "c0cdb602b11fed70f3c57c9b56ffc6c772e9337b015fc6fc6672a431e6e972bc",
+      "status": "modified"
+    },
+    {
+      "path": "docs/ai-engineering/08-evaluation.md",
+      "before_sha256": "085863a7180c169eb6ba86a3cea1f305eeffd4469851474a138676e7dce20b7c",
+      "after_sha256": "1ab36b18f677c2928becb8b9ab2f1fa0f4a29f46f4e99d3f1dd820fba1078e4e",
+      "status": "modified"
+    },
+    {
+      "path": "docs/ai-engineering/09-known-limitations.md",
+      "before_sha256": "4c900c8962c9b8e6981cabe093ea9a14990305b6e16158499f93115a453e78cc",
+      "after_sha256": "21e35b76a96d38896277dc5afdf7c199521045d0f485adf6fcabda42c03c83ff",
+      "status": "modified"
+    },
+    {
+      "path": "docs/ai-engineering/10-block-to-c.md",
+      "before_sha256": "f26a53c7ba5a8d93559ea5ed483fdd16f7f650ccd43fcddc57277a4f1d02ff43",
+      "after_sha256": "14095f05b86daf21d37b4a65cfe56d45119be9a6027a81d8fac2943cb01df41d",
+      "status": "modified"
+    },
+    {
+      "path": "docs/ai-engineering/13-independent-evaluation.md",
+      "before_sha256": "450adc8f93d89e5fdbcdf72b5992e36189a76c821fc76e4523a04ac66539e337",
+      "after_sha256": "857fabd1bd01dad1265a453d7c01ed1cc7942d6dec61994aebdfeff8803b4f4a",
+      "status": "modified"
+    },
+    {
+      "path": "docs/ai-engineering/16-integration-evaluation-plan.md",
+      "before_sha256": null,
+      "after_sha256": "d41ac88b7015a10f222e0ea4dfa638508bf392afc2c209bb5a7812b3c50ca242",
+      "status": "newly_recorded_in_engineering_scope"
+    },
+    {
+      "path": "docs/ai-engineering/17-integration-report.md",
+      "before_sha256": null,
+      "after_sha256": "9b59f17b697cdea9b9359af66c3e8ddacd69b8b974831558f427f973c4467f67",
+      "status": "newly_recorded_in_engineering_scope"
+    },
+    {
+      "path": "docs/ai-engineering/block-integration-regression.json",
+      "before_sha256": null,
+      "after_sha256": "81427ce15ee50b76b2f8b05320424ce0f0618a45a5b9f2fabbab64cb0e658490",
+      "status": "newly_recorded_in_engineering_scope"
+    },
+    {
+      "path": "docs/ai-engineering/desktop-semantic-integration.json",
+      "before_sha256": null,
+      "after_sha256": "b2b3bec676afd2f7f36c9793f9549ea6cf03a1a964ef2c3423ba53568ae3fb0d",
+      "status": "newly_recorded_in_engineering_scope"
+    },
+    {
+      "path": "docs/ai-engineering/evaluation-expansion-dev-v1.json",
+      "before_sha256": null,
+      "after_sha256": "97ac80f710385d0998e51ae27c886142db5e4802f8d18b809a42a16bbe336292",
+      "status": "newly_recorded_in_engineering_scope"
+    },
+    {
+      "path": "docs/ai-engineering/expansion-development-baseline.json",
+      "before_sha256": null,
+      "after_sha256": "bd06e17229c63e8cecf595392479bfd3dce746842506b18954ebda1a6ce36548",
+      "status": "newly_recorded_in_engineering_scope"
+    },
+    {
+      "path": "docs/ai-engineering/expansion-development-decision.json",
+      "before_sha256": null,
+      "after_sha256": "d9b0d03a54dfad26e2de99ae41b9c0fdb431154716ec4331d3ba236eb9b6bcc1",
+      "status": "newly_recorded_in_engineering_scope"
+    },
+    {
+      "path": "docs/ai-engineering/expansion-development-expanded.json",
+      "before_sha256": null,
+      "after_sha256": "6fe6218b9b60c824890ef155e93257cb507ba19fb448fefa4be54e92ff0cb09a",
+      "status": "newly_recorded_in_engineering_scope"
+    },
+    {
+      "path": "docs/ai-engineering/expansion-heldout-baseline.json",
+      "before_sha256": null,
+      "after_sha256": "69875f2e24586d56ea40bb5fe5359e0391922047aa27fbe9f6a733570e2f0fd9",
+      "status": "newly_recorded_in_engineering_scope"
+    },
+    {
+      "path": "docs/ai-engineering/expansion-heldout-expanded.json",
+      "before_sha256": null,
+      "after_sha256": "d3c391dead6f63296236de099621102760a0a024afda3bea68b3f8e3a2937de0",
+      "status": "newly_recorded_in_engineering_scope"
+    },
+    {
+      "path": "docs/ai-engineering/integration-verification.json",
+      "before_sha256": null,
+      "after_sha256": "dab14c7c4a79a1edc157e09c4f1db6d4eb7ed377b1fd724fe0f1a0bf29dc1f66",
+      "status": "newly_recorded_in_engineering_scope"
+    },
+    {
+      "path": "docs/ai-engineering/model-availability-integration.json",
+      "before_sha256": null,
+      "after_sha256": "89e26d0c9fc947b58d40d294ab69c4a9d6aedceb888fb98d45491895b227bf20",
+      "status": "newly_recorded_in_engineering_scope"
+    },
+    {
+      "path": "docs/ai-engineering/production-integration-ui.json",
+      "before_sha256": null,
+      "after_sha256": "3df663993b368d10ed25de1dd2c2afbb575ab88ce28437baecf0a082fd2de9be",
+      "status": "newly_recorded_in_engineering_scope"
+    },
+    {
+      "path": "docs/ai-engineering/query-expansion-comparison.json",
+      "before_sha256": null,
+      "after_sha256": "4011cb735ff540db70faca572bb07b489df971df969e4a7741e9f3a52289957f",
+      "status": "newly_recorded_in_engineering_scope"
+    },
+    {
+      "path": "docs/ai-engineering/real-vibe-coder-cases.json",
+      "before_sha256": null,
+      "after_sha256": "1335b6ae125c517ce1f099343c9d14be58b99b827ef9d4894a7a8d8084a0e9ca",
+      "status": "newly_recorded_in_engineering_scope"
+    },
+    {
+      "path": "docs/ai-engineering/real-vibe-coder-prepared.json",
+      "before_sha256": null,
+      "after_sha256": "b8c79043cce40096e6728a8e1a5045e9ec2bb61adf15621990809bd8711367d2",
+      "status": "newly_recorded_in_engineering_scope"
+    },
+    {
+      "path": "docs/ai-engineering/semantic-integration-adapter.json",
+      "before_sha256": null,
+      "after_sha256": "cdfeac5b2a50ecde924be5c428c2b347b6c8cf4d4485038db837c516dca1e2ec",
+      "status": "newly_recorded_in_engineering_scope"
+    },
+    {
+      "path": "docs/previews/board-guide-compact-dark.png",
+      "before_sha256": "5a79761013d82bfcec27d98c60b91470abb2f126b59e39799680c3b9d6ef851a",
+      "after_sha256": "0c98ea5459a9674d37c1752da295e23119e128abf176ad0dab9994529450c035",
+      "status": "modified"
+    },
+    {
+      "path": "docs/previews/board-guide-en-mai.png",
+      "before_sha256": "345112fc2f24720ab2d7b303aeafa0ec818b904164c97ae1e804ee84dcdbbc4e",
+      "after_sha256": "e4e7772552bfbbd5e1cd00849718e9cbbb0aad702c478f6ef6fd86a2c46c669f",
+      "status": "modified"
+    },
+    {
+      "path": "docs/previews/board-guide-th-plus.png",
+      "before_sha256": "82801d0c1d8cb6fcd4f8de76b638eeb3b8379356e0ecda1444caa16adf57e63d",
+      "after_sha256": "33d1947dfcda51893cc142f4fd189ae581cab79210b6f898e6637b442854c767",
+      "status": "modified"
+    },
+    {
+      "path": "docs/previews/desktop-semantic-integration.png",
+      "before_sha256": null,
+      "after_sha256": "dacb47588f482f1e1581e6222b4cbb97a6d4b7c49940e1ae0910223b754663d4",
+      "status": "newly_recorded_in_engineering_scope"
+    },
+    {
+      "path": "scripts/evaluate-vibe-coder-real.mjs",
+      "before_sha256": null,
+      "after_sha256": "7ecd727a02239746846c4b329713d5147380a88374f929307532dc6e31b7a14d",
+      "status": "newly_recorded_in_engineering_scope"
+    },
+    {
+      "path": "scripts/probe-desktop-semantic.mjs",
+      "before_sha256": null,
+      "after_sha256": "fef3eb81c956efbadf0561d55e2606ff831f5da6149e84d2baa001392c90f8aa",
+      "status": "newly_recorded_in_engineering_scope"
+    },
+    {
+      "path": "scripts/summarize-query-expansion.py",
+      "before_sha256": null,
+      "after_sha256": "b7a746214c5cb42377644245caed335d318caa1a0e9971df7d2dd6461e8659a1",
+      "status": "newly_recorded_in_engineering_scope"
+    },
+    {
+      "path": "scripts/tests/requirements.txt",
+      "before_sha256": null,
+      "after_sha256": "e0d645218a6449b4e50beb8c62f80fa25c481e76e7785ecb52f5b3983d10a38d",
+      "status": "newly_recorded_in_engineering_scope"
+    },
+    {
+      "path": "scripts/tests/test_block_contract.py",
+      "before_sha256": null,
+      "after_sha256": "8c61fe7e9dbf508e62a50fabba82275e655e49421da5c8973d556c0125785542",
+      "status": "newly_recorded_in_engineering_scope"
+    },
+    {
+      "path": "scripts/tests/test_real_vibe_harness.py",
+      "before_sha256": null,
+      "after_sha256": "6a75bf858c1c29f7bde5ad964d7cfcd64f890bff286d0d631cb25dad6b1618b4",
+      "status": "newly_recorded_in_engineering_scope"
+    },
+    {
+      "path": "src-tauri/build.rs",
+      "before_sha256": null,
+      "after_sha256": "10653c53fdefb7e3dee3654ab791f5e2146e734955ed0671172cd8f506cfa69f",
+      "status": "newly_recorded_in_engineering_scope"
+    },
+    {
+      "path": "src-tauri/examples/desktop-evaluation.manifest",
+      "before_sha256": null,
+      "after_sha256": "708bff8872b2502137891dcbb140f403c3e98977661dd15f818c760b881723f2",
+      "status": "newly_recorded_in_engineering_scope"
+    },
+    {
+      "path": "src-tauri/examples/desktop_evaluation.rs",
+      "before_sha256": null,
+      "after_sha256": "6780ef718fc211f43e4a7c68cdf7147caa2def6514998061290cd133e801e3b0",
+      "status": "newly_recorded_in_engineering_scope"
+    },
+    {
+      "path": "src-tauri/examples/knowledge_eval.rs",
+      "before_sha256": "6460c670e34b9bdaa0d6dba6da7244fa60efb9e0876ef3a6be0bb10f2bcd3464",
+      "after_sha256": "0a90cc6d15f8aa556f18df05a061e6ecd42e9c42c31d995e9544e9d5d01b2cb1",
+      "status": "modified"
+    },
+    {
+      "path": "src-tauri/examples/stalling_lsp_fixture.rs",
+      "before_sha256": null,
+      "after_sha256": "582f68d74eaa8d65ff2307c66eef777588319320c81ff01e762f0c34c9d3a64d",
+      "status": "newly_recorded_in_engineering_scope"
+    },
+    {
+      "path": "src-tauri/src/ai/config.rs",
+      "before_sha256": "22bffda4d1833c655a2dc2cd8a37c5430d630bd54648e48cd8110668b313f2bf",
+      "after_sha256": "ae0c19d990bcf82a5fea3a5673b320d9186478b254da2171cd85937ce35bf595",
+      "status": "modified"
+    },
+    {
+      "path": "src-tauri/src/esp_idf.rs",
+      "before_sha256": "72ea1d75c5770ce75ee738b314f2e82b18fc509683a849ec90087af555044f51",
+      "after_sha256": "62728b30693db31b4e17da2ce159ff74bba8f812a58a9dd1fdced193e9573a5c",
+      "status": "modified"
+    },
+    {
+      "path": "src-tauri/src/intelligence/block_to_c.rs",
+      "before_sha256": "ee4a6040859b40f142bbf87a6da670acae5dae9b8164503d2f406eba621d0a54",
+      "after_sha256": "927bf9f89a491fd1f1c0dc9fd457a579d89484d97208529651b3ad1f6620ca77",
+      "status": "modified"
+    },
+    {
+      "path": "src-tauri/src/intelligence/mod.rs",
+      "before_sha256": "47f7c25e98c6e9cc4bc841219918880e9c4fcf3314d75a754d8eed45ed1fa9e6",
+      "after_sha256": "a28e5f6f752009660ec1b8bd03484f12a3eec45667f034a2a82130f5a0ef1d42",
+      "status": "modified"
+    },
+    {
+      "path": "src-tauri/src/intelligence/project.rs",
+      "before_sha256": "13f54d21247bf1d846cac2cc80cb928855a402580a2eb7c04afab65d210751df",
+      "after_sha256": "5b060468f797eee875849f05465d648e3f177ff2a7edf92f20c899e2b00b8827",
+      "status": "modified"
+    },
+    {
+      "path": "src-tauri/src/intelligence/query_expansion.rs",
+      "before_sha256": null,
+      "after_sha256": "d4624a41ae62ac2a6f67c224806244d9c0cb2f7233692023896d035579e0019d",
+      "status": "newly_recorded_in_engineering_scope"
+    },
+    {
+      "path": "src-tauri/src/intelligence/retrieval.rs",
+      "before_sha256": "e71d3917f004f05128819baf084feaf0a045d19a6a1c67098b4fe15493f3a405",
+      "after_sha256": "cf3b96f951a93b1f2ac261cde4c0852a1ce624bf2fd9d46ff9952d7e43622406",
+      "status": "modified"
+    },
+    {
+      "path": "src-tauri/src/lib.rs",
+      "before_sha256": "f7b2b9ce3713ea63cd179f1deef207449eefacf9c45fba759381ac4dc39e5452",
+      "after_sha256": "1b51d9a3b39e8e15119fffa436731f84e1d05127c4060d8de5f89e05ab412dc8",
+      "status": "modified"
+    },
+    {
+      "path": "src-tauri/src/toolchain.rs",
+      "before_sha256": "1092ebe6bc8a3e183dedbd58112e4110b3717e9cf2b383aa2309ae95807b5118",
+      "after_sha256": "a6e8b8935c774a2b9b274176a3398a807bb8c1be2ff8bc59257377b733325e80",
+      "status": "modified"
+    }
+  ]
+}

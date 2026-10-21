@@ -1,0 +1,46 @@
+{
+  "date": "2026-10-19",
+  "provenance": "Assistant record of the latest user reply; not a signed credential/authorization artifact",
+  "permission_received": true,
+  "activation": "BLOCKED_MISSING_TARGET_AND_UNVERIFIED_ENFORCEMENT",
+  "supplied_target": {
+    "provider": "[ชื่อผู้ให้บริการ]",
+    "endpoint": "[URL ของ API]",
+    "model_version": "[ชื่อโมเดลที่ต้องการใช้]"
+  },
+  "concrete_provider": null,
+  "concrete_endpoint": null,
+  "concrete_model_version": null,
+  "designated_test_credential_channel": null,
+  "allowed_data": [
+    "public evaluation-fixture source",
+    "nonprivate bundled KB"
+  ],
+  "private_projects_and_secrets_allowed": false,
+  "ceilings": {
+    "http_requests_including_metadata_and_retries": 10,
+    "usd": 1
+  },
+  "actual_usage": {
+    "metadata_requests": 0,
+    "inference_requests": 0,
+    "http_requests": 0,
+    "pilot_api_cost_usd": 0
+  },
+  "credentials_or_secret_stores_accessed": false,
+  "endpoint_probes": 0,
+  "native_http_and_usd_enforcement_implemented": false,
+  "request_scope_redaction_verified": false,
+  "run_mode_fail_closed_before_network": true,
+  "cli_or_environment_bypass": false,
+  "per_attempt_project_revision_approval_required": true,
+  "flash_commit_push_publish_deploy_allowed": false,
+  "missing_information": [
+    "actual provider",
+    "actual endpoint URL",
+    "actual model/version",
+    "designated test credential channel or explicit keyless local service",
+    "paid-provider hard-spend mechanism if applicable"
+  ],
+  "existing_data_permission_and_ceilings_retained": true
+}

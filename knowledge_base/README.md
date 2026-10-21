@@ -1,12 +1,13 @@
 # KidBright32 iA — Sensor Code Examples (ESP-IDF v5.x)
 
-> ⚠️ **ไฟล์ทั้งหมดในโฟลเดอร์นี้เขียนด้วย ESP-IDF v5.x เท่านั้น**
-> ห้ามใช้ API Legacy (`driver/adc.h`, `esp_adc_cal.h`) เด็ดขาด
+> **สถานะ:** ฐานข้อมูลอ้างอิงประกอบด้วย ESP-IDF C, Arduino ต้นฉบับ และเอกสารประวัติ ไม่ใช่โค้ดที่รับรองว่า build ได้ทุกไฟล์
+> อ่าน [support_scope.md](support_scope.md) ก่อนเลือกบอร์ดหรือใช้ snippet และใช้ API ที่ตรงกับ SDK ปัจจุบัน
 >
-> **Board Coverage:** V1.5 Rev 3.1 (NECTEC Standard) · V1.5 Rev 3.1G (Gravitech OEM) · V1.5 iA (INEX) · V1.6 (Gravitech)
+> **รุ่นที่กล่าวถึงในเอกสาร:** V1.5 Rev 3.1 · Rev 3.1G · V1.5 iA · V1.6 — ไม่ใช่รายการ runtime profiles ที่ทดสอบครบ
 >
-> ⚠️ **SW2 = GPIO14 ทั้ง Rev 3.1 และ Rev 3.1G** — ยืนยันจาก hardware scan Apr 17 2026
-> ตรวจสอบ PCB silkscreen ก่อนเสมอ
+> ใช้ [ตารางรุ่นที่มีแหล่งอ้างอิง](compatibility/board_catalog.json) และตรวจ PCB silkscreen ก่อนกำหนดขา
+> ตารางประวัติด้านล่างยังมีข้อมูลต่าง revision; ไม่ใช้เป็นหลักฐานขยายโปรไฟล์โดยอัตโนมัติ
+> μAI และ μAI Plus เป็นแผนอนาคต หลังพัฒนา KidBright เสร็จตามคำขอของผู้ใช้
 
 ---
 
@@ -18,7 +19,9 @@
 | `temp_lm73.c` | LM73 (I2C) | อ่านอุณหภูมิจาก LM73 บน I2C_NUM_1 |
 | `accel_kxtj3.c` | KXTJ3-1057 (I2C) | อ่านความเร่งจาก KXTJ3 บน I2C_NUM_0 |
 | `all_sensors_demo.c` | ทุกเซ็นเซอร์ | Demo รวมทุกเซ็นเซอร์ใน task เดียว |
-| `all_models.md` | — | Reference ครบทุกรุ่น: sensor map, GPIO, ports, KB Chain |
+| `all_models.md` | — | รายการรุ่นและตารางประวัติที่ยังมีความขัดแย้ง ต้องตรวจ PCB |
+| `inex_ia_ip.md` | LDR/โฟโต้ทรานซิสเตอร์, MC3479 | ข้อมูล INEX iA/iP แยกรุ่นและขอบเขตผลทดสอบผู้ใช้ |
+| `kidbright_uai.md` | กล้อง/เสียง/accelerometer ของ μAI V831 | เอกสารอนาคตสำหรับ Linux/Allwinner; μAI และ Plus ยังไม่เปิด deployment |
 
 ---
 
@@ -36,20 +39,20 @@ digitalWrite(...)          // ❌
 analogRead(...)            // ❌
 ```
 
-> **กฎเหล็ก:** โค้ดทุกไฟล์ต้องเป็น C/C++ บน ESP-IDF components เท่านั้น ไม่มีข้อยกเว้น
+> **กฎสำหรับ firmware ที่สร้างใหม่:** ใช้ ESP-IDF C และ SDK ที่เลือก ส่วน `balanced_robot.c` เป็น Arduino reference ต้องพอร์ตก่อน build ไม่ใช่ตัวอย่างที่ผ่าน ESP-IDF แล้ว
 
 ---
 
-### ❌ ADC Legacy API (ถูกลบใน ESP-IDF v5)
+### ADC Legacy — ห้ามสรุปว่า API ถูกลบเหมือนกันทุก SDK
 
 ```c
-// ห้ามใช้โดยเด็ดขาด — ทุกอย่างด้านล่างถูกลบแล้ว
+// Historical API names; availability/deprecation depends on the installed SDK.
 #include "driver/adc.h"           // ❌ BANNED
 #include "esp_adc_cal.h"          // ❌ BANNED
-adc1_config_width(...)            // ❌ ถูกลบ
-adc1_config_channel_atten(...)    // ❌ ถูกลบ
-adc1_get_raw(...)                 // ❌ ถูกลบ
-esp_adc_cal_characterize(...)     // ❌ ถูกลบ
+adc1_config_width(...)            // inspect SDK headers before porting
+adc1_config_channel_atten(...)    // prefer supported oneshot API for new code
+adc1_get_raw(...)                 // preserve source mapping during migration
+esp_adc_cal_characterize(...)     // calibration API is SDK-specific
 ADC_ATTEN_DB_11                   // ❌ Deprecated → ใช้ ADC_ATTEN_DB_12 แทน
 ```
 
@@ -251,7 +254,7 @@ Button config:
 - SW2 = GPIO14  ← ยืนยัน hardware scan Apr 17 2026 (เหมือน Rev 3.1)
 ```
 
-### V1.5 iA (INEX) — SW2=GPIO17
+### V1.5 iA (INEX) — ต้องยืนยัน SW2 และรุ่นเซนเซอร์จาก PCB
 
 ```
 I2C init order (ต้องทำก่อนเสมอ):
@@ -261,7 +264,7 @@ I2C init order (ต้องทำก่อนเสมอ):
 
 Button config:
 - SW1 = GPIO16
-- SW2 = GPIO17
+- SW2 = ต้องตรวจ schematic ของรุ่นจริง; ตารางเก่าในชุดนี้ขัดกันระหว่าง GPIO14/17
 ```
 
 ### V1.6 (Gravitech)
@@ -284,4 +287,4 @@ Button config:
 ## อ้างอิงเพิ่มเติม
 
 - `kidbright32iA.md` — Full developer reference: MCU specs, HT16K33 register map, code examples, peripheral wiring
-- `all_models.md` — ข้อมูลครบทุกรุ่น (Gen 1 ถึง V1.6) รวม sensor map, KB Chain, schematic links
+- `all_models.md` — รายการรุ่นหลายยุคพร้อมข้อจำกัด; ไม่ใช่ข้อยืนยันว่าทุก profile มี implementation

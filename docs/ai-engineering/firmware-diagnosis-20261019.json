@@ -1,0 +1,120 @@
+{
+  "date": "2026-10-19",
+  "status": "COMPILED_NOT_PHYSICALLY_VERIFIED",
+  "schema_version": 1,
+  "verified_block_ids": 9,
+  "examples": [
+    {
+      "example": "repeat_delay",
+      "board_profile": "kidbright32_v13",
+      "exit_code": 0,
+      "command": [
+        "${APPDATA}\\th.nectec.vibekidbright\\toolchain\\tools\\python_env\\idf5.5_py3.11_env\\Scripts\\python.exe",
+        "${APPDATA}\\th.nectec.vibekidbright\\toolchain\\frameworks\\esp-idf-v5.5.4\\tools\\idf.py",
+        "-C",
+        "D:\\Internship-NECTEC\\vibeKidbright\\src-tauri\\target\\block-c-evaluation-20261018\\repeat_delay",
+        "-DCCACHE_ENABLE=0",
+        "build"
+      ],
+      "log": "repeat_delay-build.log",
+      "log_sha256": "f343c5e3fd81916126673212342e21a9a55774663f82e40d85731c4603f9f250",
+      "flashed": false,
+      "sdk_version": "5.5.4",
+      "source_sha256": "ace975b65bbe205264e118b80d1c0da08a56088e9bf661a68a7c10eb9e4f961e",
+      "source_unchanged": true,
+      "firmware_sha256": "dd006555fb2f9fd08e87f247cacae65eb973f52bad1e6f1dfdf65b9d17ed7edd",
+      "compile_commands_sha256": "2dcf65e17e5595a509fef4e1d27f89a87477c0d59962279a4f91afe65cd3d5c7",
+      "target": "esp32",
+      "actual_main_object_compile_observed": true,
+      "elf_link_observed": true,
+      "raw_result_sha256": "0c30b1fc4195e21b95295000fdb4a7e7509d04e68cf46ca05b13dfd35def5a96",
+      "raw_log": "src-tauri/target/firmware-base-diagnosis-20261019/repeat_delay-build.log"
+    },
+    {
+      "example": "forever_delay",
+      "board_profile": "kidbright32_rev31",
+      "exit_code": 0,
+      "command": [
+        "${APPDATA}\\th.nectec.vibekidbright\\toolchain\\tools\\python_env\\idf5.5_py3.11_env\\Scripts\\python.exe",
+        "${APPDATA}\\th.nectec.vibekidbright\\toolchain\\frameworks\\esp-idf-v5.5.4\\tools\\idf.py",
+        "-C",
+        "D:\\Internship-NECTEC\\vibeKidbright\\src-tauri\\target\\block-c-evaluation-20261018\\forever_delay",
+        "-DCCACHE_ENABLE=0",
+        "build"
+      ],
+      "log": "forever_delay-build.log",
+      "log_sha256": "d4f4b6322a97f3556b5a6ef2e8b62a2925f71e23134e902e354a4bb7da53c3c1",
+      "flashed": false,
+      "sdk_version": "5.5.4",
+      "source_sha256": "513c690c3b412a1a24918256f7f423cf5f9e2ed4b7493969792b33678010a435",
+      "source_unchanged": true,
+      "firmware_sha256": "b9cb407f0bc71f89eb242e279d50617158bfd5194e7b17849ddec5025c77d46a",
+      "compile_commands_sha256": "5965109f84635465829d5da6c6743ca94608cac3f0618ee36ff8b27561c22eb9",
+      "target": "esp32",
+      "actual_main_object_compile_observed": true,
+      "elf_link_observed": true,
+      "raw_result_sha256": "0c30b1fc4195e21b95295000fdb4a7e7509d04e68cf46ca05b13dfd35def5a96",
+      "raw_log": "src-tauri/target/firmware-base-diagnosis-20261019/forever_delay-build.log"
+    },
+    {
+      "example": "arithmetic_if",
+      "board_profile": "kidbright32_v13",
+      "exit_code": 0,
+      "command": [
+        "${APPDATA}\\th.nectec.vibekidbright\\toolchain\\tools\\python_env\\idf5.5_py3.11_env\\Scripts\\python.exe",
+        "${APPDATA}\\th.nectec.vibekidbright\\toolchain\\frameworks\\esp-idf-v5.5.4\\tools\\idf.py",
+        "-C",
+        "D:\\Internship-NECTEC\\vibeKidbright\\src-tauri\\target\\block-expansion-20261018\\arithmetic_if",
+        "-DCCACHE_ENABLE=0",
+        "build"
+      ],
+      "log": "arithmetic_if-build.log",
+      "log_sha256": "952474f4f28edf1d974bf343f3ef8e85f6bd37154942550e77478c897048fd31",
+      "flashed": false,
+      "sdk_version": "5.5.4",
+      "source_sha256": "96bb97fc1a0a575edf1ac8b85a16b231b415c1837b3bd2b4a7883121f0c26f5f",
+      "source_unchanged": true,
+      "firmware_sha256": "796f0c8cae8fa2ea2494c8dd8b831b61a9ed8329b6d5b11ae68e1394c917f1b0",
+      "compile_commands_sha256": "f1162bb353afdd1295b75e1cc309a55e1a2a2e8448a31235387c226b35212fdd",
+      "target": "esp32",
+      "actual_main_object_compile_observed": true,
+      "elf_link_observed": true,
+      "raw_result_sha256": "95644df7520dbbb2c738053678b066c4bd4c23d96c49f94ebfeff5edbe4d355f",
+      "raw_log": "src-tauri/target/firmware-nested-diagnosis-20261019/arithmetic_if-build.log"
+    },
+    {
+      "example": "nested_conditions",
+      "board_profile": "kidbright32_rev31",
+      "exit_code": 0,
+      "command": [
+        "${APPDATA}\\th.nectec.vibekidbright\\toolchain\\tools\\python_env\\idf5.5_py3.11_env\\Scripts\\python.exe",
+        "${APPDATA}\\th.nectec.vibekidbright\\toolchain\\frameworks\\esp-idf-v5.5.4\\tools\\idf.py",
+        "-C",
+        "D:\\Internship-NECTEC\\vibeKidbright\\src-tauri\\target\\block-expansion-20261018\\nested_conditions",
+        "-DCCACHE_ENABLE=0",
+        "build"
+      ],
+      "log": "nested_conditions-build.log",
+      "log_sha256": "7a48127b841915a337c13bbeef4f360105f9285a52e738d8826ae43b25b6ba84",
+      "flashed": false,
+      "sdk_version": "5.5.4",
+      "source_sha256": "b973f1353bc81ca5744ba49b9a12139d4221874e469bda867338f8cc14e5e78c",
+      "source_unchanged": true,
+      "firmware_sha256": "c04d304689c2eaa8beae159966ef7f37be3d5706b0bc76e0bdf4e2f68496306f",
+      "compile_commands_sha256": "0be7eabe8a59cd735fa751a7698a00d644c0cf15efd6c3133cca9e2f53fcea34",
+      "target": "esp32",
+      "actual_main_object_compile_observed": true,
+      "elf_link_observed": true,
+      "raw_result_sha256": "95644df7520dbbb2c738053678b066c4bd4c23d96c49f94ebfeff5edbe4d355f",
+      "raw_log": "src-tauri/target/firmware-nested-diagnosis-20261019/nested_conditions-build.log"
+    }
+  ],
+  "model_generated_code": false,
+  "physical_tests": 0,
+  "flashed": false,
+  "limits": [
+    "Deterministic existing fixtures only, not model-output correctness",
+    "Configured ESP-IDF 5.5.4 esp32 only; exact profiles retained",
+    "Fresh source object compilation and ELF relink observed; source bytes unchanged"
+  ]
+}

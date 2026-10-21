@@ -1,0 +1,182 @@
+{
+  "schema_version": 1,
+  "started": "2026-10-17",
+  "verified_local_date": "2026-10-18",
+  "timezone": "Asia/Bangkok",
+  "os": "Windows",
+  "architecture": "AMD64",
+  "overall_status": "PARTIAL",
+  "scope": "Verified local knowledge/retrieval subset; remaining master-prompt phases explicitly recorded",
+  "tests": {
+    "frontend": {
+      "command": "npm test -- --reporter=dot",
+      "files": 16,
+      "passed": 156,
+      "failed": 0,
+      "exit_code": 0
+    },
+    "rust": {
+      "command": "cargo test --manifest-path src-tauri/Cargo.toml --offline --all-targets --quiet",
+      "library_passed": 134,
+      "example_passed": 9,
+      "passed": 143,
+      "failed": 0,
+      "exit_code": 0
+    }
+  },
+  "checks": {
+    "build_release": {
+      "command": "npm run build:release",
+      "exit_code": 0,
+      "includes": [
+        "runtime",
+        "standalone",
+        "KB sync",
+        "board catalog",
+        "block inventory",
+        "rule inventory",
+        "public",
+        "bundle",
+        "TypeScript",
+        "Vite"
+      ]
+    },
+    "final_standalone_policy": {
+      "exit_code": 0,
+      "includes_normalized_public_provenance": true
+    },
+    "final_rules": {
+      "exit_code": 0,
+      "documents": 63,
+      "invalid_utf8": 0,
+      "unclosed_fences": 0
+    },
+    "git_diff_check": {
+      "exit_code": 0
+    }
+  },
+  "retrieval": {
+    "lexical": {
+      "dataset_queries": 12,
+      "model": null,
+      "metrics": {
+        "mrr": 0.673611111111111,
+        "ndcg_at_5": 0.7186752468075553,
+        "precision_at_5": 0.3,
+        "recall_at_5": 0.8333333333333334
+      },
+      "index": {
+        "cached_embeddings": 0,
+        "chunks": 1839,
+        "embedded_chunks": 0,
+        "files_deleted": 0,
+        "files_seen": 37,
+        "files_unchanged": 0,
+        "files_updated": 37,
+        "warnings": []
+      },
+      "unchanged_index": {
+        "latency_ms": 43.873799999999996,
+        "report": {
+          "cached_embeddings": 0,
+          "chunks": 1839,
+          "embedded_chunks": 0,
+          "files_deleted": 0,
+          "files_seen": 37,
+          "files_unchanged": 37,
+          "files_updated": 0,
+          "warnings": []
+        }
+      }
+    },
+    "hybrid": {
+      "dataset_queries": 12,
+      "model": "Qdrant/all-MiniLM-L6-v2-onnx@d13954661f83248295ba75c1ed411eef3b7b936e:384:mean",
+      "metrics": {
+        "mrr": 0.7111111111111111,
+        "ndcg_at_5": 0.7083333333333334,
+        "precision_at_5": 0.2833333333333334,
+        "recall_at_5": 0.7916666666666666
+      },
+      "index": {
+        "cached_embeddings": 276,
+        "chunks": 1839,
+        "embedded_chunks": 1563,
+        "files_deleted": 0,
+        "files_seen": 37,
+        "files_unchanged": 0,
+        "files_updated": 37,
+        "warnings": []
+      },
+      "unchanged_index": {
+        "latency_ms": 98.8272,
+        "report": {
+          "cached_embeddings": 0,
+          "chunks": 1839,
+          "embedded_chunks": 0,
+          "files_deleted": 0,
+          "files_seen": 37,
+          "files_unchanged": 37,
+          "files_updated": 0,
+          "warnings": []
+        }
+      }
+    }
+  },
+  "resolved_during_verification": [
+    "Incorrect relative path to recipe metadata include corrected",
+    "Missing command-policy import in test module corrected",
+    "Generated coverage/rule inventory refreshed after prompt/document changes"
+  ],
+  "warnings": [
+    "Legacy store/embedding helpers now have Rust dead-code warnings",
+    "Vite reports existing mixed event-module imports and large editor bundle",
+    "Hybrid Recall@5 remains below both the provisional 90% target and lexical baseline on this development set"
+  ],
+  "not_executed": [
+    "New NSIS/MSI/DMG packaging",
+    "Clean-machine installation/uninstallation",
+    "Actual remote/local LLM conversation",
+    "Provider API requests or private credential inspection",
+    "Firmware build of newly LLM-generated code",
+    "Auto-fix workflow evaluation",
+    "Flash or physical-board runtime verification",
+    "Push/deploy/publish"
+  ],
+  "requirements": {
+    "system_architecture": "PARTIAL",
+    "hybrid_rag": "PARTIAL",
+    "knowledge_base_data": "PARTIAL",
+    "code_aware_chunking": "PARTIAL",
+    "compiler_validation_auto_fix": "PARTIAL",
+    "technology_integration": "PARTIAL",
+    "development_phases": "PARTIAL",
+    "evaluation_quality": "PARTIAL"
+  },
+  "phase_f_generic_block_conversion": "NOT STARTED",
+  "source_sha256": {
+    "Readme.md": "ec9fef427f044299ade52bd59349227ce90f9668f4a80ef713b5a91c574f7f91",
+    "scripts/check-standalone.mjs": "77ca1c7cc8dc1ec0d9453d9bff2818cea3ce1f03c33ad6222292c9926d6291ee",
+    "src-tauri/Cargo.lock": "f5e9c3bb4227aef57335a109b4bfc629e864f28ff42aca4906b5f6a50300ce39",
+    "src-tauri/Cargo.toml": "b5502fccc8e4948fa75816ba15d51b029d2b189593dab510a52c9433b1d3af85",
+    "src-tauri/examples/knowledge_eval.rs": "e5f9f42b3803966888b9e274c25d07a29415e908343f43a17ea5a820c94311aa",
+    "src-tauri/src/ai/kb.rs": "d6e038a5daaa10c4875762146bccdde518fc04c8dcb950a4c0e6868abd9c3f5a",
+    "src-tauri/src/ai/language.rs": "15f99fd08dd035b7b80124a22b03c1b234a653664cef2c8a156eaac91b0ff2d4",
+    "src-tauri/src/ai/mod.rs": "c2b734b49664369edb768cde4b2a9ad0f50d2d841a415c54e464e8b2b7fe637f",
+    "src-tauri/src/ai/orchestration.rs": "6e9b0bc430c18ed598b6f6bfb02ea379aabcb3cb74ce5f6cde959067527b4b32",
+    "src-tauri/src/ai/privacy.rs": "86bc604bd5df21e38d89e975295f02c25004c8ea307497c4355d7c5d11c85c30",
+    "src-tauri/src/ai/providers.rs": "6bf3f55d1ea825c42dc954655f1448124a3afa72cb2eb3904b3466db57dc26c9",
+    "src-tauri/src/ai/system_prompt.txt": "97cac876c799424b1cb58ef5c9ac277aa062886d71a784572abefc6176246c9d",
+    "src-tauri/src/ai/tools.rs": "9aeab057b227d359b90ff1f1182467a15cb237bc370244d53ca5ecc7b2fa8ea4",
+    "src-tauri/src/ai_chat.rs": "e210cec972432c69578cb82306399e74cb948502bd50195d76b081ed5641f4fd",
+    "src-tauri/src/intelligence/chunking.rs": "c9137e14f34d616c7694afb1886e8a1748b4866c832c066e8721bd55a800e380",
+    "src-tauri/src/intelligence/evaluation.rs": "610ea85c64a551a13d620e6a4601b06457c6afa768cfb952fba0c8096287df6f",
+    "src-tauri/src/intelligence/mod.rs": "216c03edfe0403b53378e7c9ffeb83cb2ce8fc31d35d8c33dd642084b11cf180",
+    "src-tauri/src/intelligence/retrieval.rs": "74bf5c402d1fdddc2bfb086e15cc70b2f3199cf1c7f77b45b0dcf49da2104649",
+    "src-tauri/src/kb_store.rs": "65da19701073a4ac8aa89c065a69071853bdff66238165be0c7919530c3e6c8f",
+    "src-tauri/src/lib.rs": "f01cc099d16bbd60678a82e2a81119562fa861ac8f0d2d6fe62ab22f43caed34",
+    "src/AiChat.tsx": "ec057cf158dc994083d515414db1ab11890ee089308e403d7c3c78e8290c3a39",
+    "src/PrivateContextConsent.tsx": "2871cce6150f10fd53711e86abfcd66921a49e8ef6af8d2b828ec43881f7c91c",
+    "src/test/privateContextConsent.test.tsx": "c440d2b99e0833ea280ed55914b58f5b3618767ded7ae8695da7c8579f5bbce6"
+  }
+}

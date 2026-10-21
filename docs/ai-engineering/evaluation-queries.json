@@ -1,0 +1,14 @@
+[
+  {"id":"api-ledc","query":"ledc_timer_config","language":"technical","relevant_files":["compatibility/button_buzzer.c","compatibility/music_scale.c"]},
+  {"id":"api-lm73","query":"kb_lm73_celsius","language":"technical","relevant_files":["compatibility/kb_core.c","compatibility/kb_core.h","compatibility/temperature_serial.c"]},
+  {"id":"api-pid","query":"kb_pid_step","language":"technical","relevant_files":["compatibility/kb_core.c","compatibility/kb_core.h"]},
+  {"id":"api-sma","query":"kb_sma_step","language":"technical","relevant_files":["compatibility/kb_core.c","compatibility/kb_core.h"]},
+  {"id":"api-joystick","query":"kb_joystick_read","language":"technical","relevant_files":["compatibility/kb_core.c","compatibility/kb_core.h"]},
+  {"id":"api-packet","query":"kb_ascii_parse","language":"technical","relevant_files":["compatibility/kb_core.c","compatibility/kb_core.h"]},
+  {"id":"en-temperature","query":"signed temperature LM73","language":"en","relevant_files":["compatibility/temperature_serial.c"]},
+  {"id":"en-button","query":"wait S1 released 440","language":"en","relevant_files":["compatibility/button_buzzer.c"]},
+  {"id":"th-temperature","query":"อุณหภูมิ","language":"th","relevant_files":["inex_ia_ip.md"]},
+  {"id":"th-servo","query":"เซอร์โว","language":"th","relevant_files":["inex_ia_ip.md"]},
+  {"id":"mixed-i2c","query":"อุณหภูมิ LM73","language":"mixed","relevant_files":["compatibility/temperature_serial.c","inex_ia_ip.md"]},
+  {"id":"hardware-ia","query":"MC3479","language":"technical","relevant_files":["inex_ia_ip.md","support_scope.md"]}
+]

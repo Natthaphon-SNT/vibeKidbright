@@ -1,0 +1,676 @@
+{
+  "date": "2026-10-19",
+  "status": "MEASURED_NOT_INDEPENDENTLY_REVIEWED",
+  "dataset_sha256": "c75de0d838a5f0e6670c48776c67d3b5c0a98ca755f02ba09c2d548c28b55c43",
+  "query_count": 69,
+  "plan": "19-diagnosis-plan.md",
+  "plan_sha256": "e1d4daff7e30e72b3dc4065cb73ea9559bffd45cc9750a2ad35251e966550da4",
+  "modes_predeclared": [
+    "lexical",
+    "bundled",
+    "bundled-expanded",
+    "multilingual-e5-small",
+    "multilingual-minilm"
+  ],
+  "runner_sha256": "42e6d9630d1175bc7900b1652051e09c3cd7e9bb0b398b50e1785af2081dc7cf",
+  "binary_sha256": "3226fcd18d23da50b7d134a48e989c61b3bbe3c1c95561a72948fc6d4a6105bb",
+  "evaluation_source_sha256": "2397cd061ee30afe065711796d7ad14926cf6a5aae98bc7df7eb9c26267acbac",
+  "runs": [
+    {
+      "mode": "lexical",
+      "command": [
+        "D:\\Internship-NECTEC\\vibeKidbright\\src-tauri\\target\\debug\\examples\\knowledge_eval.exe",
+        "--dataset",
+        "D:\\Internship-NECTEC\\vibeKidbright\\docs\\ai-engineering\\evaluation-heldout-v1.json",
+        "--output",
+        "D:\\Internship-NECTEC\\vibeKidbright\\src-tauri\\target\\retrieval-fixed-diagnosis-20261019\\lexical.json",
+        "--date",
+        "2026-10-19"
+      ],
+      "exit_code": 0,
+      "resources": {
+        "peak_working_set_bytes": 20635648,
+        "peak_sampled_private_bytes": 8310784,
+        "wall_seconds": 3.2228570000006584,
+        "sampling_interval_ms": 100,
+        "method": "Windows GetProcessMemoryInfo; single process and fixed-policy run; host load not experimentally controlled"
+      },
+      "report": "lexical.json",
+      "report_sha256": "ce0f63b5b40cbce6dcb966c509b2307f1be05c92dbe6d7b1345189cb8f1497d5",
+      "metrics": {
+        "mrr": 0.322463768115942,
+        "ndcg_at_5": 0.3027054878445835,
+        "precision_at_5": 0.11304347826086962,
+        "recall_at_5": 0.34782608695652173
+      },
+      "latency_ms": {
+        "median": 6.409599999999999,
+        "p95": 14.872200000000001
+      },
+      "index_ms": 1588.3644000000002,
+      "model_bytes": 0,
+      "language": {
+        "en": {
+          "queries": 20,
+          "metrics": {
+            "mrr": 0.2375,
+            "ndcg_at_5": 0.19087646826539673,
+            "precision_at_5": 0.07,
+            "recall_at_5": 0.225
+          },
+          "latency_median_ms": 6.72075,
+          "latency_p95_ms": 9.487300000000001
+        },
+        "mixed": {
+          "queries": 20,
+          "metrics": {
+            "mrr": 0.5666666666666667,
+            "ndcg_at_5": 0.4923793323602941,
+            "precision_at_5": 0.14,
+            "recall_at_5": 0.525
+          },
+          "latency_median_ms": 12.433150000000001,
+          "latency_p95_ms": 19.2833
+        },
+        "technical": {
+          "queries": 9,
+          "metrics": {
+            "mrr": 0.6851851851851852,
+            "ndcg_at_5": 0.8023958498624948,
+            "precision_at_5": 0.4,
+            "recall_at_5": 1.0
+          },
+          "latency_median_ms": 1.6098,
+          "latency_p95_ms": 2.4242999999999997
+        },
+        "th": {
+          "queries": 20,
+          "metrics": {
+            "mrr": 0.0,
+            "ndcg_at_5": 0.0,
+            "precision_at_5": 0.0,
+            "recall_at_5": 0.0
+          },
+          "latency_median_ms": 1.25095,
+          "latency_p95_ms": 1.8316999999999999
+        }
+      },
+      "raw_report": "src-tauri/target/retrieval-fixed-diagnosis-20261019/lexical.json",
+      "model_identity": null,
+      "model_load_ms": 0.0109,
+      "unchanged_index_ms": 37.4542,
+      "query_kinds": {
+        "exact_symbol": {
+          "queries": 9,
+          "metrics": {
+            "recall_at_5": 1.0,
+            "mrr": 0.6851851851851852,
+            "ndcg_at_5": 0.8023958498624948,
+            "precision_at_5": 0.4
+          }
+        },
+        "natural_language": {
+          "queries": 40,
+          "metrics": {
+            "recall_at_5": 0.1125,
+            "mrr": 0.11875,
+            "ndcg_at_5": 0.09543823413269836,
+            "precision_at_5": 0.035
+          }
+        },
+        "mixed_language": {
+          "queries": 20,
+          "metrics": {
+            "recall_at_5": 0.525,
+            "mrr": 0.5666666666666667,
+            "ndcg_at_5": 0.4923793323602941,
+            "precision_at_5": 0.14
+          }
+        },
+        "compiler_error": {
+          "queries": 0,
+          "metrics": null
+        },
+        "hardware": {
+          "queries": 33,
+          "metrics": {
+            "recall_at_5": 0.2727272727272727,
+            "mrr": 0.21464646464646464,
+            "ndcg_at_5": 0.2291395852013591,
+            "precision_at_5": 0.05454545454545455
+          }
+        }
+      }
+    },
+    {
+      "mode": "bundled",
+      "command": [
+        "D:\\Internship-NECTEC\\vibeKidbright\\src-tauri\\target\\debug\\examples\\knowledge_eval.exe",
+        "--dataset",
+        "D:\\Internship-NECTEC\\vibeKidbright\\docs\\ai-engineering\\evaluation-heldout-v1.json",
+        "--output",
+        "D:\\Internship-NECTEC\\vibeKidbright\\src-tauri\\target\\retrieval-fixed-diagnosis-20261019\\bundled.json",
+        "--date",
+        "2026-10-19",
+        "--dense"
+      ],
+      "exit_code": 0,
+      "resources": {
+        "peak_working_set_bytes": 391274496,
+        "peak_sampled_private_bytes": 407764992,
+        "wall_seconds": 121.30142499999783,
+        "sampling_interval_ms": 100,
+        "method": "Windows GetProcessMemoryInfo; single process and fixed-policy run; host load not experimentally controlled"
+      },
+      "report": "bundled.json",
+      "report_sha256": "d920269f083c7ca85b2d10501ef8965cc0e6bf94ab212937330d789a6a792d59",
+      "metrics": {
+        "mrr": 0.38888888888888895,
+        "ndcg_at_5": 0.34875715276580155,
+        "precision_at_5": 0.11594202898550732,
+        "recall_at_5": 0.36231884057971014
+      },
+      "latency_ms": {
+        "median": 220.1941,
+        "p95": 281.70410000000004
+      },
+      "index_ms": 102805.4663,
+      "model_bytes": 91115499,
+      "language": {
+        "en": {
+          "queries": 20,
+          "metrics": {
+            "mrr": 0.24166666666666667,
+            "ndcg_at_5": 0.2100785736263389,
+            "precision_at_5": 0.08,
+            "recall_at_5": 0.25
+          },
+          "latency_median_ms": 219.94844999999998,
+          "latency_p95_ms": 253.272
+        },
+        "mixed": {
+          "queries": 20,
+          "metrics": {
+            "mrr": 0.625,
+            "ndcg_at_5": 0.5226294385530916,
+            "precision_at_5": 0.13,
+            "recall_at_5": 0.5
+          },
+          "latency_median_ms": 231.97125,
+          "latency_p95_ms": 281.70410000000004
+        },
+        "technical": {
+          "queries": 9,
+          "metrics": {
+            "mrr": 0.9444444444444444,
+            "ndcg_at_5": 0.9344536996946328,
+            "precision_at_5": 0.4,
+            "recall_at_5": 1.0
+          },
+          "latency_median_ms": 262.5181,
+          "latency_p95_ms": 295.8478
+        },
+        "th": {
+          "queries": 20,
+          "metrics": {
+            "mrr": 0.05,
+            "ndcg_at_5": 0.05,
+            "precision_at_5": 0.01,
+            "recall_at_5": 0.05
+          },
+          "latency_median_ms": 199.14159999999998,
+          "latency_p95_ms": 217.2812
+        }
+      },
+      "raw_report": "src-tauri/target/retrieval-fixed-diagnosis-20261019/bundled.json",
+      "model_identity": "Qdrant/all-MiniLM-L6-v2-onnx@d13954661f83248295ba75c1ed411eef3b7b936e:384:mean",
+      "model_load_ms": 382.0453,
+      "unchanged_index_ms": 90.9444,
+      "query_kinds": {
+        "exact_symbol": {
+          "queries": 9,
+          "metrics": {
+            "recall_at_5": 1.0,
+            "mrr": 0.9444444444444444,
+            "ndcg_at_5": 0.9344536996946328,
+            "precision_at_5": 0.4
+          }
+        },
+        "natural_language": {
+          "queries": 40,
+          "metrics": {
+            "recall_at_5": 0.15,
+            "mrr": 0.14583333333333334,
+            "ndcg_at_5": 0.13003928681316945,
+            "precision_at_5": 0.045000000000000005
+          }
+        },
+        "mixed_language": {
+          "queries": 20,
+          "metrics": {
+            "recall_at_5": 0.5,
+            "mrr": 0.625,
+            "ndcg_at_5": 0.5226294385530916,
+            "precision_at_5": 0.13
+          }
+        },
+        "compiler_error": {
+          "queries": 0,
+          "metrics": null
+        },
+        "hardware": {
+          "queries": 33,
+          "metrics": {
+            "recall_at_5": 0.30303030303030304,
+            "mrr": 0.2878787878787879,
+            "ndcg_at_5": 0.29184635616883203,
+            "precision_at_5": 0.06060606060606061
+          }
+        }
+      }
+    },
+    {
+      "mode": "bundled-expanded",
+      "command": [
+        "D:\\Internship-NECTEC\\vibeKidbright\\src-tauri\\target\\debug\\examples\\knowledge_eval.exe",
+        "--dataset",
+        "D:\\Internship-NECTEC\\vibeKidbright\\docs\\ai-engineering\\evaluation-heldout-v1.json",
+        "--output",
+        "D:\\Internship-NECTEC\\vibeKidbright\\src-tauri\\target\\retrieval-fixed-diagnosis-20261019\\bundled-expanded.json",
+        "--date",
+        "2026-10-19",
+        "--dense",
+        "--expand"
+      ],
+      "exit_code": 0,
+      "resources": {
+        "peak_working_set_bytes": 391208960,
+        "peak_sampled_private_bytes": 651051008,
+        "wall_seconds": 163.9415282000009,
+        "sampling_interval_ms": 100,
+        "method": "Windows GetProcessMemoryInfo; single process and fixed-policy run; host load not experimentally controlled"
+      },
+      "report": "bundled-expanded.json",
+      "report_sha256": "449f5352ce322157a34c248d50409467fab3874e1c988e9191b849041121bd1a",
+      "metrics": {
+        "mrr": 0.40096618357487923,
+        "ndcg_at_5": 0.36161009200108474,
+        "precision_at_5": 0.12173913043478267,
+        "recall_at_5": 0.38405797101449274
+      },
+      "latency_ms": {
+        "median": 195.4974,
+        "p95": 239.9577
+      },
+      "index_ms": 147582.0088,
+      "model_bytes": 91115499,
+      "language": {
+        "en": {
+          "queries": 20,
+          "metrics": {
+            "mrr": 0.21666666666666667,
+            "ndcg_at_5": 0.19876385434979305,
+            "precision_at_5": 0.08,
+            "recall_at_5": 0.25
+          },
+          "latency_median_ms": 203.75135,
+          "latency_p95_ms": 242.74599999999998
+        },
+        "mixed": {
+          "queries": 20,
+          "metrics": {
+            "mrr": 0.625,
+            "ndcg_at_5": 0.5226294385530916,
+            "precision_at_5": 0.13,
+            "recall_at_5": 0.5
+          },
+          "latency_median_ms": 212.44355,
+          "latency_p95_ms": 241.4067
+        },
+        "technical": {
+          "queries": 9,
+          "metrics": {
+            "mrr": 0.9444444444444444,
+            "ndcg_at_5": 0.9344536996946328,
+            "precision_at_5": 0.4,
+            "recall_at_5": 1.0
+          },
+          "latency_median_ms": 187.7511,
+          "latency_p95_ms": 195.737
+        },
+        "th": {
+          "queries": 20,
+          "metrics": {
+            "mrr": 0.11666666666666667,
+            "ndcg_at_5": 0.10565735963827291,
+            "precision_at_5": 0.030000000000000002,
+            "recall_at_5": 0.125
+          },
+          "latency_median_ms": 173.70114999999998,
+          "latency_p95_ms": 202.71020000000001
+        }
+      },
+      "raw_report": "src-tauri/target/retrieval-fixed-diagnosis-20261019/bundled-expanded.json",
+      "model_identity": "Qdrant/all-MiniLM-L6-v2-onnx@d13954661f83248295ba75c1ed411eef3b7b936e:384:mean",
+      "model_load_ms": 362.9001,
+      "unchanged_index_ms": 92.027,
+      "query_kinds": {
+        "exact_symbol": {
+          "queries": 9,
+          "metrics": {
+            "recall_at_5": 1.0,
+            "mrr": 0.9444444444444444,
+            "ndcg_at_5": 0.9344536996946328,
+            "precision_at_5": 0.4
+          }
+        },
+        "natural_language": {
+          "queries": 40,
+          "metrics": {
+            "recall_at_5": 0.1875,
+            "mrr": 0.16666666666666666,
+            "ndcg_at_5": 0.152210606994033,
+            "precision_at_5": 0.055
+          }
+        },
+        "mixed_language": {
+          "queries": 20,
+          "metrics": {
+            "recall_at_5": 0.5,
+            "mrr": 0.625,
+            "ndcg_at_5": 0.5226294385530916,
+            "precision_at_5": 0.13
+          }
+        },
+        "compiler_error": {
+          "queries": 0,
+          "metrics": null
+        },
+        "hardware": {
+          "queries": 33,
+          "metrics": {
+            "recall_at_5": 0.3333333333333333,
+            "mrr": 0.29797979797979796,
+            "ndcg_at_5": 0.30699787132034717,
+            "precision_at_5": 0.06666666666666667
+          }
+        }
+      }
+    },
+    {
+      "mode": "multilingual-e5-small",
+      "command": [
+        "D:\\Internship-NECTEC\\vibeKidbright\\src-tauri\\target\\debug\\examples\\knowledge_eval.exe",
+        "--dataset",
+        "D:\\Internship-NECTEC\\vibeKidbright\\docs\\ai-engineering\\evaluation-heldout-v1.json",
+        "--output",
+        "D:\\Internship-NECTEC\\vibeKidbright\\src-tauri\\target\\retrieval-fixed-diagnosis-20261019\\multilingual-e5-small.json",
+        "--date",
+        "2026-10-19",
+        "--dense",
+        "--model-directory",
+        "D:\\Internship-NECTEC\\vibeKidbright\\src-tauri\\target\\retrieval-candidates\\multilingual-e5-small"
+      ],
+      "exit_code": 0,
+      "resources": {
+        "peak_working_set_bytes": 1451986944,
+        "peak_sampled_private_bytes": 1569828864,
+        "wall_seconds": 226.22894259999885,
+        "sampling_interval_ms": 100,
+        "method": "Windows GetProcessMemoryInfo; single process and fixed-policy run; host load not experimentally controlled"
+      },
+      "report": "multilingual-e5-small.json",
+      "report_sha256": "0f14adec590be9423abeb517532c04d4d616b37fccfb1dc786ae645a375007b6",
+      "metrics": {
+        "mrr": 0.38768115942028986,
+        "ndcg_at_5": 0.3670720430132047,
+        "precision_at_5": 0.13043478260869573,
+        "recall_at_5": 0.427536231884058
+      },
+      "latency_ms": {
+        "median": 223.4503,
+        "p95": 258.3514
+      },
+      "index_ms": 201998.1755,
+      "model_bytes": 135394008,
+      "language": {
+        "en": {
+          "queries": 20,
+          "metrics": {
+            "mrr": 0.2791666666666667,
+            "ndcg_at_5": 0.23775163576310607,
+            "precision_at_5": 0.09000000000000001,
+            "recall_at_5": 0.3
+          },
+          "latency_median_ms": 223.98505,
+          "latency_p95_ms": 252.76149999999998
+        },
+        "mixed": {
+          "queries": 20,
+          "metrics": {
+            "mrr": 0.5916666666666667,
+            "ndcg_at_5": 0.51916064437242,
+            "precision_at_5": 0.14,
+            "recall_at_5": 0.525
+          },
+          "latency_median_ms": 235.76815,
+          "latency_p95_ms": 264.75739999999996
+        },
+        "technical": {
+          "queries": 9,
+          "metrics": {
+            "mrr": 0.8333333333333334,
+            "ndcg_at_5": 0.8663262338318041,
+            "precision_at_5": 0.4,
+            "recall_at_5": 1.0
+          },
+          "latency_median_ms": 198.4536,
+          "latency_p95_ms": 204.8517
+        },
+        "th": {
+          "queries": 20,
+          "metrics": {
+            "mrr": 0.09166666666666666,
+            "ndcg_at_5": 0.11963946303571862,
+            "precision_at_5": 0.04,
+            "recall_at_5": 0.2
+          },
+          "latency_median_ms": 217.64100000000002,
+          "latency_p95_ms": 240.20420000000001
+        }
+      },
+      "raw_report": "src-tauri/target/retrieval-fixed-diagnosis-20261019/multilingual-e5-small.json",
+      "model_identity": "Xenova/multilingual-e5-small@761b726dd34fb83930e26aab4e9ac3899aa1fa78:384:mean:quantized",
+      "model_load_ms": 5917.233300000001,
+      "unchanged_index_ms": 92.11840000000001,
+      "query_kinds": {
+        "exact_symbol": {
+          "queries": 9,
+          "metrics": {
+            "recall_at_5": 1.0,
+            "mrr": 0.8333333333333334,
+            "ndcg_at_5": 0.8663262338318041,
+            "precision_at_5": 0.4
+          }
+        },
+        "natural_language": {
+          "queries": 40,
+          "metrics": {
+            "recall_at_5": 0.25,
+            "mrr": 0.18541666666666667,
+            "ndcg_at_5": 0.17869554939941235,
+            "precision_at_5": 0.065
+          }
+        },
+        "mixed_language": {
+          "queries": 20,
+          "metrics": {
+            "recall_at_5": 0.525,
+            "mrr": 0.5916666666666667,
+            "ndcg_at_5": 0.51916064437242,
+            "precision_at_5": 0.14
+          }
+        },
+        "compiler_error": {
+          "queries": 0,
+          "metrics": null
+        },
+        "hardware": {
+          "queries": 33,
+          "metrics": {
+            "recall_at_5": 0.3939393939393939,
+            "mrr": 0.31313131313131315,
+            "ndcg_at_5": 0.3340520913419949,
+            "precision_at_5": 0.0787878787878788
+          }
+        }
+      }
+    },
+    {
+      "mode": "multilingual-minilm",
+      "command": [
+        "D:\\Internship-NECTEC\\vibeKidbright\\src-tauri\\target\\debug\\examples\\knowledge_eval.exe",
+        "--dataset",
+        "D:\\Internship-NECTEC\\vibeKidbright\\docs\\ai-engineering\\evaluation-heldout-v1.json",
+        "--output",
+        "D:\\Internship-NECTEC\\vibeKidbright\\src-tauri\\target\\retrieval-fixed-diagnosis-20261019\\multilingual-minilm.json",
+        "--date",
+        "2026-10-19",
+        "--dense",
+        "--model-directory",
+        "D:\\Internship-NECTEC\\vibeKidbright\\src-tauri\\target\\retrieval-candidates\\multilingual-minilm"
+      ],
+      "exit_code": 0,
+      "resources": {
+        "peak_working_set_bytes": 1418240000,
+        "peak_sampled_private_bytes": 1538994176,
+        "wall_seconds": 332.4339770000006,
+        "sampling_interval_ms": 100,
+        "method": "Windows GetProcessMemoryInfo; single process and fixed-policy run; host load not experimentally controlled"
+      },
+      "report": "multilingual-minilm.json",
+      "report_sha256": "1770271c5a82e66fcfe9d1335bd0b5757992b41c46e3c3c5478a4325060de2ee",
+      "metrics": {
+        "mrr": 0.3635265700483092,
+        "ndcg_at_5": 0.3342913524175959,
+        "precision_at_5": 0.12173913043478267,
+        "recall_at_5": 0.391304347826087
+      },
+      "latency_ms": {
+        "median": 227.0615,
+        "p95": 252.73760000000001
+      },
+      "index_ms": 306884.93799999997,
+      "model_bytes": 135394365,
+      "language": {
+        "en": {
+          "queries": 20,
+          "metrics": {
+            "mrr": 0.18333333333333332,
+            "ndcg_at_5": 0.17372501544561222,
+            "precision_at_5": 0.07,
+            "recall_at_5": 0.25
+          },
+          "latency_median_ms": 225.1826,
+          "latency_p95_ms": 249.3904
+        },
+        "mixed": {
+          "queries": 20,
+          "metrics": {
+            "mrr": 0.5583333333333333,
+            "ndcg_at_5": 0.49769535240452734,
+            "precision_at_5": 0.14,
+            "recall_at_5": 0.55
+          },
+          "latency_median_ms": 237.58769999999998,
+          "latency_p95_ms": 273.80989999999997
+        },
+        "technical": {
+          "queries": 9,
+          "metrics": {
+            "mrr": 0.8888888888888888,
+            "ndcg_at_5": 0.8867472240230017,
+            "precision_at_5": 0.4,
+            "recall_at_5": 1.0
+          },
+          "latency_median_ms": 213.8241,
+          "latency_p95_ms": 223.7468
+        },
+        "th": {
+          "queries": 20,
+          "metrics": {
+            "mrr": 0.1125,
+            "ndcg_at_5": 0.08284854718021549,
+            "precision_at_5": 0.030000000000000002,
+            "recall_at_5": 0.1
+          },
+          "latency_median_ms": 225.28969999999998,
+          "latency_p95_ms": 252.73760000000001
+        }
+      },
+      "raw_report": "src-tauri/target/retrieval-fixed-diagnosis-20261019/multilingual-minilm.json",
+      "model_identity": "Xenova/paraphrase-multilingual-MiniLM-L12-v2@2c4055b12046f11709e9df2c122e59ffbdc2f900:384:mean:quantized",
+      "model_load_ms": 7059.799499999999,
+      "unchanged_index_ms": 89.91109999999999,
+      "query_kinds": {
+        "exact_symbol": {
+          "queries": 9,
+          "metrics": {
+            "recall_at_5": 1.0,
+            "mrr": 0.8888888888888888,
+            "ndcg_at_5": 0.8867472240230017,
+            "precision_at_5": 0.4
+          }
+        },
+        "natural_language": {
+          "queries": 40,
+          "metrics": {
+            "recall_at_5": 0.175,
+            "mrr": 0.14791666666666667,
+            "ndcg_at_5": 0.12828678131291385,
+            "precision_at_5": 0.05
+          }
+        },
+        "mixed_language": {
+          "queries": 20,
+          "metrics": {
+            "recall_at_5": 0.55,
+            "mrr": 0.5583333333333333,
+            "ndcg_at_5": 0.49769535240452734,
+            "precision_at_5": 0.14
+          }
+        },
+        "compiler_error": {
+          "queries": 0,
+          "metrics": null
+        },
+        "hardware": {
+          "queries": 33,
+          "metrics": {
+            "recall_at_5": 0.30303030303030304,
+            "mrr": 0.23737373737373738,
+            "ndcg_at_5": 0.2533743368529329,
+            "precision_at_5": 0.06060606060606061
+          }
+        }
+      }
+    }
+  ],
+  "exact_api_expansion_rankings_unchanged": true,
+  "production_vs_historical_ranking_drift_ids": [],
+  "production_model_or_ranker_changed": false,
+  "development_cases_reviewed": 0,
+  "candidate_promotion": "NOT_ELIGIBLE_NO_REVIEW; user explicitly requires existing ranking/model",
+  "model_generated_answers_evaluated": false,
+  "raw_comparison_sha256": "f0d44c981a911f86b1dcde770a39875d96408b94d002915879601aa373a222dc",
+  "limits": [
+    "Fixed historical evaluation labels; no tuning or candidate acceptance from this run",
+    "No LLM, hardware, firmware build or installer-size qualification",
+    "Subprocess timeout/cancellation terminates this owned embedding process; no SDK child tree is involved",
+    "Private bytes are sampled; peak working set is process-wide, not per-language incremental RAM",
+    "Labels are not human independently reviewed; fixed results cannot justify tuning or model promotion",
+    "No compiler-error queries in frozen set; category metrics remain null",
+    "One process/index per fixed mode; host load and cache state are not experimentally controlled",
+    "Routing comparison remains historical; no route candidate adopted"
+  ]
+}

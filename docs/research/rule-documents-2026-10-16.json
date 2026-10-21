@@ -1,0 +1,3678 @@
+{
+  "schema_version": 1,
+  "audit_date": "2026-10-16",
+  "method": "Read-only UTF-8 and fenced-code inventory over Git tracked/unignored Markdown plus system_prompt; no snippets executed.",
+  "limits": [
+    "Code fences are examples; compilation and behavioral equivalence require separate evidence.",
+    "Historical reports and bundled copies are counted separately, not as additional implemented features."
+  ],
+  "summary": {
+    "documents": 85,
+    "source_knowledge_documents": 14,
+    "bundled_knowledge_documents": 14,
+    "code_fences": 334,
+    "fences_by_language": {
+      "c": 233,
+      "cmake": 8,
+      "cpp": 10,
+      "json": 3,
+      "mermaid": 4,
+      "powershell": 16,
+      "rust": 1,
+      "sh": 10,
+      "text": 14,
+      "ts": 1,
+      "unspecified": 34
+    },
+    "invalid_utf8_documents": 0,
+    "unclosed_fences": 0
+  },
+  "markdown_bundle_mismatches": [],
+  "documents": [
+    {
+      "path": "DEFECT_ESCALATION_REPORT_AFTER_ROUND_5.md",
+      "category": "repository_document",
+      "bytes": 16057,
+      "sha256": "9bdf37073f15fbd21fa7906a74a2591f69579d356b9bcbb6ce6f82db66eed5e0",
+      "line_count": 219,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": [
+        {
+          "start_line": 172,
+          "end_line": 188,
+          "language": "text",
+          "content_sha256": "1592a941d7674c61cdd7bca643d640588e089558a9b7b0239adf99f1d49a155e",
+          "lines": 15,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 207,
+          "end_line": 217,
+          "language": "powershell",
+          "content_sha256": "9f514e4e9c1bb29ee064718c87fe1f742fcffb94f7d147880046b49af37407ec",
+          "lines": 9,
+          "validation": "document_snippet_not_independently_compiled"
+        }
+      ]
+    },
+    {
+      "path": "HANDS_ON_INVESTIGATION_REPORT_2026-09-16.md",
+      "category": "repository_document",
+      "bytes": 15894,
+      "sha256": "56e2ac4a4fdc02e418510465c87ed963e06402b8cc9bf46f9a1423f3f6e49694",
+      "line_count": 152,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": []
+    },
+    {
+      "path": "Readme.md",
+      "category": "repository_document",
+      "bytes": 28368,
+      "sha256": "b9dc7e223a5652b901a657f5fc39f3cd1c3710e609ffc3afafec91a1db316d15",
+      "line_count": 186,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": [
+        {
+          "start_line": 76,
+          "end_line": 83,
+          "language": "sh",
+          "content_sha256": "3b707985ea91662be39c907e2f9d0897bfaafddc1a461fd0ba73f92d3e4ebdcb",
+          "lines": 6,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 91,
+          "end_line": 96,
+          "language": "sh",
+          "content_sha256": "5114d18a4edec7afbd5e91692847fef30a77d19a2ab0ec8e702a4bb6b7d8b3e5",
+          "lines": 4,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 102,
+          "end_line": 104,
+          "language": "sh",
+          "content_sha256": "eb5a0f89ca4eae4446c1d796296b74d941da2c7b69e1d399bbf04bf8a767e7dd",
+          "lines": 1,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 110,
+          "end_line": 112,
+          "language": "sh",
+          "content_sha256": "d04ba36fb8f7224356b64060c5d2a29e63922397418e100f34f9c766fc84b969",
+          "lines": 1,
+          "validation": "document_snippet_not_independently_compiled"
+        }
+      ]
+    },
+    {
+      "path": "TEST_REPORT_ROUND_1.md",
+      "category": "repository_document",
+      "bytes": 22075,
+      "sha256": "9300edfeedabcc404896a7215157099b60ed46661e5c79fb9170cff00242ee05",
+      "line_count": 388,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": [
+        {
+          "start_line": 66,
+          "end_line": 77,
+          "language": "powershell",
+          "content_sha256": "c82b70098c3a856bb2614646381213567df6df333e3709e38ad3a88ae14cff42",
+          "lines": 10,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 165,
+          "end_line": 168,
+          "language": "c",
+          "content_sha256": "b7a731c87dbb53fb23d635972221c18f36fb6ec33f1e5e74faa3832ee883241d",
+          "lines": 2,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 239,
+          "end_line": 243,
+          "language": "text",
+          "content_sha256": "a1e61a5aded393abd07e227151f605908e225702cc7c4d509431fbe32d2d19a5",
+          "lines": 3,
+          "validation": "document_snippet_not_independently_compiled"
+        }
+      ]
+    },
+    {
+      "path": "TEST_REPORT_ROUND_2.md",
+      "category": "repository_document",
+      "bytes": 20929,
+      "sha256": "41315fb5c79c1be3459e8897ced26fb6f44a2e55b549bd4e954e398b73a62262",
+      "line_count": 229,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": [
+        {
+          "start_line": 138,
+          "end_line": 141,
+          "language": "text",
+          "content_sha256": "77a343ecc3c7e3f86d88d5c1ada7162ed4a6280e2007e2a5204e821682f2afe9",
+          "lines": 2,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 176,
+          "end_line": 178,
+          "language": "text",
+          "content_sha256": "d08f1e0462d03b46eb421a8e17bf6a33c42d9fc5537b46e3928d08384a144abe",
+          "lines": 1,
+          "validation": "document_snippet_not_independently_compiled"
+        }
+      ]
+    },
+    {
+      "path": "TEST_REPORT_ROUND_3.md",
+      "category": "repository_document",
+      "bytes": 29459,
+      "sha256": "d381d175264367bad1fe0b834cbb58d62633fdba56886f8bc88366cbc1795d42",
+      "line_count": 332,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": [
+        {
+          "start_line": 103,
+          "end_line": 123,
+          "language": "rust",
+          "content_sha256": "1945ffb8ef79af59b05e925dfd775c7f340bf8c0d0b819c66e4ceeadb56452f8",
+          "lines": 19,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 148,
+          "end_line": 155,
+          "language": "ts",
+          "content_sha256": "6103196053bb0cc024d18f7f47033bc46c753c4e2489ce6977bc89a2c9e81737",
+          "lines": 6,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 224,
+          "end_line": 230,
+          "language": "text",
+          "content_sha256": "c12d88a6af57676f469c074b272ce58b0027e94223f45018653afc23c080ee48",
+          "lines": 5,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 297,
+          "end_line": 312,
+          "language": "powershell",
+          "content_sha256": "f6af200c6df689844ebe350b16e5c9d47586dbafef49e54ca550f6bf818b7b84",
+          "lines": 14,
+          "validation": "document_snippet_not_independently_compiled"
+        }
+      ]
+    },
+    {
+      "path": "TEST_REPORT_ROUND_4.md",
+      "category": "repository_document",
+      "bytes": 16648,
+      "sha256": "04515f81747364e8dac4692bc1499a317659cb1b7d176adc3c6d23f801d7868a",
+      "line_count": 253,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": [
+        {
+          "start_line": 107,
+          "end_line": 121,
+          "language": "text",
+          "content_sha256": "7fb5f61afd959801d98c2428eca6e5cabe1e962f59c9529a421a9d179b7d5e9a",
+          "lines": 13,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 151,
+          "end_line": 162,
+          "language": "text",
+          "content_sha256": "8351b54e4f0c16b556f3d42728c95f65a05c5547a090089228ffdb88b7278a84",
+          "lines": 10,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 217,
+          "end_line": 236,
+          "language": "powershell",
+          "content_sha256": "0e64a382f47467dffd3eb08988b61b2a63bdc7d9468d6d2c0eac0af24dcc0c37",
+          "lines": 18,
+          "validation": "document_snippet_not_independently_compiled"
+        }
+      ]
+    },
+    {
+      "path": "TEST_REPORT_ROUND_5.md",
+      "category": "repository_document",
+      "bytes": 28944,
+      "sha256": "962314cf76e6e24baae3c6c707b6bc2b52b568b25b566e343e9f961db175f741",
+      "line_count": 373,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": [
+        {
+          "start_line": 30,
+          "end_line": 59,
+          "language": "text",
+          "content_sha256": "ee81df39e666f6066ab324e5c275e40583ddb1f0726e81145ef87e72c13fc735",
+          "lines": 28,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 206,
+          "end_line": 217,
+          "language": "text",
+          "content_sha256": "8351b54e4f0c16b556f3d42728c95f65a05c5547a090089228ffdb88b7278a84",
+          "lines": 10,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 273,
+          "end_line": 289,
+          "language": "powershell",
+          "content_sha256": "793b4115fbb048b1bfaac0f38b17939073f706999c50c8e933a5b1dce75c6cd1",
+          "lines": 15,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 293,
+          "end_line": 306,
+          "language": "powershell",
+          "content_sha256": "0d290b1b6d4af812879718f28daf51b823d822426b81160d14ffa1296663734d",
+          "lines": 12,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 310,
+          "end_line": 330,
+          "language": "powershell",
+          "content_sha256": "4de935e0f681f25af513e8b8ac5349317d8c178968b6faecb5c27bc2cfd42ee3",
+          "lines": 19,
+          "validation": "document_snippet_not_independently_compiled"
+        }
+      ]
+    },
+    {
+      "path": "docs/ESP_IDF_REFERENCE_AUDIT_2026-10-15.md",
+      "category": "repository_document",
+      "bytes": 23844,
+      "sha256": "f7156451e1b614a087efe2bc25daa3e588bd0570d3ad8dbd2eac83f5dbc0bbb6",
+      "line_count": 82,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": []
+    },
+    {
+      "path": "docs/KIDBRIGHT_BLOCK_COVERAGE_2026-10-16.md",
+      "category": "repository_document",
+      "bytes": 101487,
+      "sha256": "4e66d5f4ec59f729d29e4d8ddce0c57cb60eafdf9926272ee77d603b3ae63063",
+      "line_count": 868,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": [
+        {
+          "start_line": 861,
+          "end_line": 866,
+          "language": "powershell",
+          "content_sha256": "1f7e197721e1851b895399f8c2e79c5456699ab743e5ed145a905cd1cd875e32",
+          "lines": 4,
+          "validation": "document_snippet_not_independently_compiled"
+        }
+      ]
+    },
+    {
+      "path": "docs/KIDBRIGHT_BLUEPRINT_RESEARCH_2026-10-15.md",
+      "category": "repository_document",
+      "bytes": 84374,
+      "sha256": "4546c853fa65180b522954c4860879f0a493197bfa0d1340e4178e5d8ef41483",
+      "line_count": 689,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": [
+        {
+          "start_line": 72,
+          "end_line": 74,
+          "language": "text",
+          "content_sha256": "3fb981a3341c641a54603bb88cae4d5f78e40f73cc0a36b13c115d20271811cf",
+          "lines": 1,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 78,
+          "end_line": 94,
+          "language": "text",
+          "content_sha256": "ee4aee394d276be1f7ac9170eacbedf9cf2f10a42c7645a7b438734280bdeee2",
+          "lines": 15,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 100,
+          "end_line": 112,
+          "language": "mermaid",
+          "content_sha256": "ed2a504f0bc30b6f760c79c0da178e0d8f09bb06d16e116c196b8b1e394e5f6e",
+          "lines": 11,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 441,
+          "end_line": 452,
+          "language": "mermaid",
+          "content_sha256": "65b5fef8b093789e9d8c04ff361c98667a55768ac1681cd925d6bda4fb131bef",
+          "lines": 10,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 480,
+          "end_line": 491,
+          "language": "text",
+          "content_sha256": "f3f11e5c3fff2e795e4e69e1fe73f1527ccd0d6737b1a6cb8fc459db0ac98022",
+          "lines": 10,
+          "validation": "document_snippet_not_independently_compiled"
+        }
+      ]
+    },
+    {
+      "path": "docs/KIDBRIGHT_BOARD_MATRIX_2026-10-17.md",
+      "category": "repository_document",
+      "bytes": 34645,
+      "sha256": "05ad0e6a4135bdd8506fc0e294f99a87d4995b2fffdb5e96a1b2d102dc489ee4",
+      "line_count": 145,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": []
+    },
+    {
+      "path": "docs/KIDBRIGHT_COMPATIBILITY_PILOT.md",
+      "category": "repository_document",
+      "bytes": 19082,
+      "sha256": "7832f91a5ce0ef02008dd6d879c27ec947c57df9289b1d9d9103d67bfa950834",
+      "line_count": 169,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": [
+        {
+          "start_line": 16,
+          "end_line": 18,
+          "language": "powershell",
+          "content_sha256": "078638ca769323828b4e93d90346e30d94904a4acb0b6adc264005540e7ff09f",
+          "lines": 1,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 129,
+          "end_line": 134,
+          "language": "powershell",
+          "content_sha256": "82b7abf8d408bab55a91e849e9e5bb8b72225852b7b245c722054ae0ae1896fc",
+          "lines": 4,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 140,
+          "end_line": 152,
+          "language": "powershell",
+          "content_sha256": "51206e7e07f31cb880a4c419812e2e063ad603edeb86530f7f8439dabbd70bc1",
+          "lines": 11,
+          "validation": "document_snippet_not_independently_compiled"
+        }
+      ]
+    },
+    {
+      "path": "docs/KIDBRIGHT_FUNCTION_COVERAGE_2026-10-16.md",
+      "category": "repository_document",
+      "bytes": 9268,
+      "sha256": "f8c981a1b72dc99b15ad53c73a324a86e3fc03cc2c108028c9c209b921a9d32b",
+      "line_count": 73,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": [
+        {
+          "start_line": 69,
+          "end_line": 71,
+          "language": "powershell",
+          "content_sha256": "056b5e2a86f9b9de242b7f493c6c9d14bb5272de6bdfcb983c32f1466791b725",
+          "lines": 1,
+          "validation": "document_snippet_not_independently_compiled"
+        }
+      ]
+    },
+    {
+      "path": "docs/KIDBRIGHT_IMPLEMENTATION_STATUS_2026-10-17.md",
+      "category": "repository_document",
+      "bytes": 11193,
+      "sha256": "3a9616072e250c66a0bd1b3cec619b8f5a94079304116778960219552bdcb106",
+      "line_count": 62,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": []
+    },
+    {
+      "path": "docs/KIDBRIGHT_MAI_GITHUB_RESEARCH_2026-10-17.md",
+      "category": "repository_document",
+      "bytes": 17504,
+      "sha256": "cc7446cb40fa2ff5a8090a76c564249d69c7437c64a9be18df822ab9f60828a2",
+      "line_count": 91,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": []
+    },
+    {
+      "path": "docs/KIDBRIGHT_MAI_SUPPLIED_FILES_AUDIT_2026-10-17.md",
+      "category": "repository_document",
+      "bytes": 22157,
+      "sha256": "df160a03fd4c2523e50ec7a7e156565f985b25f9b55d4d40955f0f7a68b6f295",
+      "line_count": 121,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": []
+    },
+    {
+      "path": "docs/KIDBRIGHT_RULES_COMPLETENESS_AUDIT_2026-10-16.md",
+      "category": "repository_document",
+      "bytes": 17203,
+      "sha256": "61a94bd3a43d2fcf2fc185f01e4c12be02dc8d9752520ee9b6bd8e5056a84d79",
+      "line_count": 140,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": [
+        {
+          "start_line": 123,
+          "end_line": 132,
+          "language": "powershell",
+          "content_sha256": "8b6e9a6abfaa076d2d63d4e47aafa1fa41ee9bbb0513bfbb57d06c433196bb4d",
+          "lines": 8,
+          "validation": "document_snippet_not_independently_compiled"
+        }
+      ]
+    },
+    {
+      "path": "docs/MAI_PLUS_WORKSPACE_UI_2026-10-17.md",
+      "category": "repository_document",
+      "bytes": 7106,
+      "sha256": "9dfe742b83e1cc541743eba101fc23d5de016361311049ca4106b61d3600fdd2",
+      "line_count": 37,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": []
+    },
+    {
+      "path": "docs/PROJECT_AUDIT_2026-10-17.md",
+      "category": "repository_document",
+      "bytes": 15372,
+      "sha256": "96abb668dcbd90c5d86c2aaa8efde5a6c88c04507f42cca4b34bb0ffb9383843",
+      "line_count": 62,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": []
+    },
+    {
+      "path": "docs/PROJECT_FILE_VISIBILITY_2026-10-16.md",
+      "category": "repository_document",
+      "bytes": 8220,
+      "sha256": "699ef75abe9e43dab40202bb18532c2bbb2ef31920cd02d0621416c6812d65c1",
+      "line_count": 70,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": [
+        {
+          "start_line": 7,
+          "end_line": 10,
+          "language": "text",
+          "content_sha256": "60f987a7dd9ef6bcc280891374c40c364146e03d2f00c5cbb31324441a70c048",
+          "lines": 2,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 14,
+          "end_line": 25,
+          "language": "text",
+          "content_sha256": "adf84eba9110b91684fd170ec8518cb0669949fe96e75e15a2ca2312b91766ea",
+          "lines": 10,
+          "validation": "document_snippet_not_independently_compiled"
+        }
+      ]
+    },
+    {
+      "path": "docs/STANDALONE_INSTALLATION_2026-10-17.md",
+      "category": "repository_document",
+      "bytes": 8575,
+      "sha256": "f6b6dd53584da47f554049a5480bead7c810db18c9e60606df109c56d69b7c42",
+      "line_count": 42,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": []
+    },
+    {
+      "path": "docs/VIBEKIDBRIGHT_UNIFIED_BOARD_ARCHITECTURE_2026-10-17.md",
+      "category": "repository_document",
+      "bytes": 35872,
+      "sha256": "09e91790841141a7aa42929714fa415f1bba7bf382c1bab42bb837274b24764c",
+      "line_count": 202,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": [
+        {
+          "start_line": 64,
+          "end_line": 79,
+          "language": "mermaid",
+          "content_sha256": "c6b85ce6a28671342ab923561823f152b6edc9002c88ae3474a95e997ac42b49",
+          "lines": 14,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 107,
+          "end_line": 117,
+          "language": "json",
+          "content_sha256": "6538ec2b955a2978bc2259b6c972542c7532ed11f0549a9402e564ebdb48ff42",
+          "lines": 9,
+          "validation": "document_snippet_not_independently_compiled"
+        }
+      ]
+    },
+    {
+      "path": "docs/WINGET_RELEASE_SETUP.md",
+      "category": "repository_document",
+      "bytes": 1757,
+      "sha256": "4635fa1819252b8e9d4c6a2f853ab503e90b65eaf5c0420da7a309b859fdfe01",
+      "line_count": 14,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": []
+    },
+    {
+      "path": "docs/ai-engineering/00-repository-audit.md",
+      "category": "repository_document",
+      "bytes": 4756,
+      "sha256": "d632fc08eca15f09e4f034a75ebbc0b630191cad1fb163994e84a5c5492d4431",
+      "line_count": 40,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": []
+    },
+    {
+      "path": "docs/ai-engineering/01-architecture.md",
+      "category": "repository_document",
+      "bytes": 4158,
+      "sha256": "fa29b3fa2d7de934096a4a17d163776f4dcccc8f90bfcd3d9dfe07cdc1e229a8",
+      "line_count": 48,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": [
+        {
+          "start_line": 5,
+          "end_line": 24,
+          "language": "mermaid",
+          "content_sha256": "800f850294491b662129784eea2fb494ec5ebc0959b7df71ea194862e78c419d",
+          "lines": 18,
+          "validation": "document_snippet_not_independently_compiled"
+        }
+      ]
+    },
+    {
+      "path": "docs/ai-engineering/02-hybrid-rag.md",
+      "category": "repository_document",
+      "bytes": 5922,
+      "sha256": "08b582522ecb396a3f1d3c5719a438d632e3f6c169ec927dc08917a45f43db9a",
+      "line_count": 40,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": []
+    },
+    {
+      "path": "docs/ai-engineering/03-knowledge-base.md",
+      "category": "repository_document",
+      "bytes": 4636,
+      "sha256": "d30f0961bbfdd150bf52bee5d77c15d62a2baa55452ef2abf0e9c1905d6e8299",
+      "line_count": 52,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": [
+        {
+          "start_line": 33,
+          "end_line": 44,
+          "language": "json",
+          "content_sha256": "dd69554cbdcc58d982b1de356df348ed9d8bf16b566e31e5b972af4d9ba17b06",
+          "lines": 10,
+          "validation": "document_snippet_not_independently_compiled"
+        }
+      ]
+    },
+    {
+      "path": "docs/ai-engineering/04-code-intelligence.md",
+      "category": "repository_document",
+      "bytes": 11063,
+      "sha256": "65207da122c1e2c30f0f7ea37af06571533fd897b4c3d15f343544be823076a2",
+      "line_count": 64,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": []
+    },
+    {
+      "path": "docs/ai-engineering/05-compiler-validation.md",
+      "category": "repository_document",
+      "bytes": 5775,
+      "sha256": "54ab0f6274737f06962b2a26649fade802679097035ee23d3bcbe1224a698d69",
+      "line_count": 39,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": []
+    },
+    {
+      "path": "docs/ai-engineering/06-technology-decisions.md",
+      "category": "repository_document",
+      "bytes": 5456,
+      "sha256": "99bd97473486f23bdabfa5917a15cf8e34e7bff8d696fe757f21d26103b40cd2",
+      "line_count": 54,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": [
+        {
+          "start_line": 25,
+          "end_line": 38,
+          "language": "json",
+          "content_sha256": "74914f9a72b889bb9053b92e7aadc02131deabd94633d1acef4eaaa8ff6f1e4d",
+          "lines": 12,
+          "validation": "document_snippet_not_independently_compiled"
+        }
+      ]
+    },
+    {
+      "path": "docs/ai-engineering/07-implementation-progress.md",
+      "category": "repository_document",
+      "bytes": 11554,
+      "sha256": "4aec287d7b091e349838ece72b81d33f5bdcde8571ee89a5ea755b08b0953b9d",
+      "line_count": 78,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": []
+    },
+    {
+      "path": "docs/ai-engineering/08-evaluation.md",
+      "category": "repository_document",
+      "bytes": 16603,
+      "sha256": "49fe8e53a5bb99b9316c1cab94a018e21fd0364758e4a3b599263b4d13a64af4",
+      "line_count": 135,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": [
+        {
+          "start_line": 9,
+          "end_line": 12,
+          "language": "sh",
+          "content_sha256": "f5e0ed392ee70fb993057537a897a6e42baeefb98ceb7c82ed659d0960a3877a",
+          "lines": 2,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 73,
+          "end_line": 76,
+          "language": "sh",
+          "content_sha256": "b018f0f159ebf206270e3a9d56102a6fa0e0f7de44166080ea14d2735185d444",
+          "lines": 2,
+          "validation": "document_snippet_not_independently_compiled"
+        }
+      ]
+    },
+    {
+      "path": "docs/ai-engineering/09-known-limitations.md",
+      "category": "repository_document",
+      "bytes": 10395,
+      "sha256": "99f2ec0ab4e25063868352c9ac130f4642b7834e9270a26d99b1ab7bc7130b0f",
+      "line_count": 69,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": []
+    },
+    {
+      "path": "docs/ai-engineering/10-block-to-c.md",
+      "category": "repository_document",
+      "bytes": 5884,
+      "sha256": "3f66ad72c0354ae51c781615e814cdc8ddde4957259d55e8b6f0d87d3f21c623",
+      "line_count": 36,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": []
+    },
+    {
+      "path": "docs/ai-engineering/11-safety-recovery.md",
+      "category": "repository_document",
+      "bytes": 5143,
+      "sha256": "df6415695e5446008256eca8015db9dc0e053a33395d980577bcc98e3b1de729",
+      "line_count": 25,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": []
+    },
+    {
+      "path": "docs/ai-engineering/12-dependency-security.md",
+      "category": "repository_document",
+      "bytes": 6815,
+      "sha256": "ab0de676b55716ab9292b644ab9809f025786a1d6383e9f52ec8e1cc1b549bad",
+      "line_count": 36,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": []
+    },
+    {
+      "path": "docs/ai-engineering/13-independent-evaluation.md",
+      "category": "repository_document",
+      "bytes": 9275,
+      "sha256": "2d6729a13e83df8d4f9b43ad217d903729a8617e2d504826cd85b05908b3e67f",
+      "line_count": 51,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": [
+        {
+          "start_line": 13,
+          "end_line": 17,
+          "language": "sh",
+          "content_sha256": "8dc313528af34de528577fd5dd125c20ef5dc993b881c4a24fb3b26b4e6c2f4a",
+          "lines": 3,
+          "validation": "document_snippet_not_independently_compiled"
+        }
+      ]
+    },
+    {
+      "path": "docs/ai-engineering/14-continuation-report.md",
+      "category": "repository_document",
+      "bytes": 8437,
+      "sha256": "fbda5100f9ec43dbfbe3064ae36166d4104d9ccd095f3080a699311b61215d6b",
+      "line_count": 36,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": []
+    },
+    {
+      "path": "docs/ai-engineering/15-board-guide-ui.md",
+      "category": "repository_document",
+      "bytes": 3341,
+      "sha256": "73cd72caab9170ab99a22089ee021abaf712d3241dd95490f82643dc6c76bd9f",
+      "line_count": 19,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": []
+    },
+    {
+      "path": "docs/ai-engineering/16-integration-evaluation-plan.md",
+      "category": "repository_document",
+      "bytes": 3687,
+      "sha256": "d41ac88b7015a10f222e0ea4dfa638508bf392afc2c209bb5a7812b3c50ca242",
+      "line_count": 21,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": []
+    },
+    {
+      "path": "docs/ai-engineering/17-integration-report.md",
+      "category": "repository_document",
+      "bytes": 11086,
+      "sha256": "9b59f17b697cdea9b9359af66c3e8ddacd69b8b974831558f427f973c4467f67",
+      "line_count": 45,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": []
+    },
+    {
+      "path": "docs/ai-engineering/18-capability-milestone.md",
+      "category": "repository_document",
+      "bytes": 9689,
+      "sha256": "f3cb351c4ae4ca1fe7e0f2b5fd4624235ba2803fc8b7e1579995866bde775bb4",
+      "line_count": 57,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": [
+        {
+          "start_line": 40,
+          "end_line": 43,
+          "language": "sh",
+          "content_sha256": "c07db596d3f9fe4fc0154052d74c8f672f5288e1b3db43e278ac88b3ab94ac7d",
+          "lines": 2,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 47,
+          "end_line": 49,
+          "language": "sh",
+          "content_sha256": "a0eb5ba0207b1fb2a0af60c16cf6eb642197c527ad86e2376e126314676fa125",
+          "lines": 1,
+          "validation": "document_snippet_not_independently_compiled"
+        }
+      ]
+    },
+    {
+      "path": "docs/ai-engineering/19-diagnosis-plan.md",
+      "category": "repository_document",
+      "bytes": 4914,
+      "sha256": "e1d4daff7e30e72b3dc4065cb73ea9559bffd45cc9750a2ad35251e966550da4",
+      "line_count": 27,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": []
+    },
+    {
+      "path": "docs/ai-engineering/20-diagnosis-and-hardening-report.md",
+      "category": "repository_document",
+      "bytes": 12317,
+      "sha256": "f9f8a60f66333d7cec53b58c68d3369a4c7f75fa69a2a58d190a5e4bad3380de",
+      "line_count": 83,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": []
+    },
+    {
+      "path": "docs/ai-engineering/21-evidence-integrity-plan.md",
+      "category": "repository_document",
+      "bytes": 2724,
+      "sha256": "dd28af4c5ad41c23abfa7a921209e45e6f4656881dbca62a4159820ff04cfd21",
+      "line_count": 15,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": []
+    },
+    {
+      "path": "docs/ai-engineering/22-evidence-integrity-report.md",
+      "category": "repository_document",
+      "bytes": 7526,
+      "sha256": "4bc7f9dbe1d5b586ec9f8eb192eb8f01618e7523717d41221d50ab0afeb1e927",
+      "line_count": 56,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": []
+    },
+    {
+      "path": "docs/ai-engineering/23-capability-validation-protocol.md",
+      "category": "repository_document",
+      "bytes": 5975,
+      "sha256": "48914aa2dc03f7a76e5c4103568842bdbace09eebac156d13b62a37dfe3a3f1c",
+      "line_count": 38,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": [
+        {
+          "start_line": 20,
+          "end_line": 24,
+          "language": "sh",
+          "content_sha256": "1e4e524991cdc12b0089372e79c30d9bf58139b922c4aaca37bc7b5c9ecacca4",
+          "lines": 3,
+          "validation": "document_snippet_not_independently_compiled"
+        }
+      ]
+    },
+    {
+      "path": "docs/ai-engineering/24-capability-validation-report.md",
+      "category": "repository_document",
+      "bytes": 9452,
+      "sha256": "f5679119a9da2af7f98d73ea1bd4e203a2a8633ea58084b7944f51ef5354b6e0",
+      "line_count": 49,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": []
+    },
+    {
+      "path": "docs/ai-engineering/25-prompt-examples-and-winget.md",
+      "category": "repository_document",
+      "bytes": 5622,
+      "sha256": "92f8ab3dff4b4a86d8ddfb75d2bf62c8dd5d7b0a9fea211b523c5f2b0102b24b",
+      "line_count": 38,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": []
+    },
+    {
+      "path": "docs/ai-engineering/26-ip-custom-draft-workflow.md",
+      "category": "repository_document",
+      "bytes": 3861,
+      "sha256": "87e4a1ee6f34b7a07894883ffe9692f503b8a433d98d48857b84c69615bfd117",
+      "line_count": 24,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": []
+    },
+    {
+      "path": "docs/ai-engineering/27-ip-matrix-user-evidence.md",
+      "category": "repository_document",
+      "bytes": 2257,
+      "sha256": "9fd66066a22009a4292a953ec6b79dbd573b478fbfc9275a766635bdbd8d7534",
+      "line_count": 38,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": []
+    },
+    {
+      "path": "docs/ai-engineering/28-actual-model-readiness-and-evidence.md",
+      "category": "repository_document",
+      "bytes": 9994,
+      "sha256": "f27c06cf03374697faea66d897ba76b257d139a384424e81a024205388b1d2c3",
+      "line_count": 145,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": []
+    },
+    {
+      "path": "docs/ai-engineering/29-bounded-authorization-target-pending.md",
+      "category": "repository_document",
+      "bytes": 5665,
+      "sha256": "02f6ee3739e6efaecd7184c8ed6c5991660f85707579c1b23ddbaaa9e86a46a3",
+      "line_count": 71,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": []
+    },
+    {
+      "path": "docs/ai-engineering/30-offline-closeout-and-runbook.md",
+      "category": "repository_document",
+      "bytes": 18947,
+      "sha256": "9d49e2a8b15fc870a7b16fa1cf5d6b95289063a02252e619b6d22e3245952b4b",
+      "line_count": 184,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": [
+        {
+          "start_line": 40,
+          "end_line": 63,
+          "language": "powershell",
+          "content_sha256": "e42fdbf299a40e116447cb061e9588cff18da03f9162a32237936ed2b1e1bf89",
+          "lines": 22,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 129,
+          "end_line": 132,
+          "language": "powershell",
+          "content_sha256": "a652205d28ddc7a4c8416cd7ea53ede06e7d5492f561d037dd24b58d990d3bac",
+          "lines": 2,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 152,
+          "end_line": 157,
+          "language": "powershell",
+          "content_sha256": "76682fceab375c10a43b59410a1b1d3e5d078bb8bf5de08e184f52812e2d5ffc",
+          "lines": 4,
+          "validation": "document_snippet_not_independently_compiled"
+        }
+      ]
+    },
+    {
+      "path": "docs/macos-installer-setup.md",
+      "category": "repository_document",
+      "bytes": 2956,
+      "sha256": "096ba0eaf09bae0621269d0f2fa3d71518e4c195765f9b901fa4bedc87ca7800",
+      "line_count": 69,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": [
+        {
+          "start_line": 10,
+          "end_line": 22,
+          "language": "unspecified",
+          "content_sha256": "e1f8ccaeb2a5e46bdabbe58fde06dc62db46262e8c1783eb49650130294b806e",
+          "lines": 11,
+          "validation": "document_snippet_not_independently_compiled"
+        }
+      ]
+    },
+    {
+      "path": "knowledge_base/README.md",
+      "category": "source_knowledge",
+      "bytes": 13978,
+      "sha256": "c0443aadcc7cd17d38c3da83e70030c857d6a8663db3c290aa73e4cdaa38ff63",
+      "line_count": 290,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": [
+        {
+          "start_line": 32,
+          "end_line": 40,
+          "language": "c",
+          "content_sha256": "65326bbe56020ca20cd917ec2d5e45576745304c636b7f090c635b81f0dfaa3d",
+          "lines": 7,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 48,
+          "end_line": 57,
+          "language": "c",
+          "content_sha256": "20de576f92b5001defff62f411cc42bb15840c941b546105489922dbee891d2c",
+          "lines": 8,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 61,
+          "end_line": 71,
+          "language": "c",
+          "content_sha256": "d063241d8894a91bb4beb0929c50e9b7504391b861039026c97cd80ec50543e4",
+          "lines": 9,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 77,
+          "end_line": 84,
+          "language": "c",
+          "content_sha256": "450004f4848fe47054086d68cd620e085bfb2779acff19978c02bb88948104ec",
+          "lines": 6,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 90,
+          "end_line": 96,
+          "language": "c",
+          "content_sha256": "10ecf9a7b4e5a69d5aebd07009b2673930494a2afae00566011aa3bcf896548f",
+          "lines": 5,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 220,
+          "end_line": 227,
+          "language": "c",
+          "content_sha256": "7ab32c474908e9b2eecf17055ac0e435ff546c9c31c674609567b3271a3feaad",
+          "lines": 6,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 233,
+          "end_line": 242,
+          "language": "unspecified",
+          "content_sha256": "86e07084ac4ffd776ae076f67e989fa11b4385e040e1ff4d12f731ae4f109518",
+          "lines": 8,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 246,
+          "end_line": 255,
+          "language": "unspecified",
+          "content_sha256": "77d96f219d9a0b0531c10a5dc08025aa175f6878a7f0f14fe3b80a95a1dfbea1",
+          "lines": 8,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 259,
+          "end_line": 268,
+          "language": "unspecified",
+          "content_sha256": "4d58c38fe95711a12d0e9dd38e34ab4b5951659dcadea1a1170c0b7d4245121b",
+          "lines": 8,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 272,
+          "end_line": 280,
+          "language": "unspecified",
+          "content_sha256": "b6ddcc384d82529a91ae81851e1f1cee47ef48cc86105fb76b69119258db46a4",
+          "lines": 7,
+          "validation": "document_snippet_not_independently_compiled"
+        }
+      ]
+    },
+    {
+      "path": "knowledge_base/all_models.md",
+      "category": "source_knowledge",
+      "bytes": 6146,
+      "sha256": "c408745c35c3455added1766e54b53d99ed1a072f20bd0c6afcba027d4aacc25",
+      "line_count": 45,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": []
+    },
+    {
+      "path": "knowledge_base/compatibility/README.md",
+      "category": "source_knowledge",
+      "bytes": 7741,
+      "sha256": "02b74e3b3a9aeec6ee4ed3a100adb4e8ec92096dcda32bdc86819570c9d8ad51",
+      "line_count": 116,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": []
+    },
+    {
+      "path": "knowledge_base/formula_kid_controller.md",
+      "category": "source_knowledge",
+      "bytes": 31960,
+      "sha256": "6a89d84cb57400618170903b4ffdbdc1670b0741ef63a9ecb6a6316574506252",
+      "line_count": 738,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": [
+        {
+          "start_line": 32,
+          "end_line": 41,
+          "language": "unspecified",
+          "content_sha256": "4dfde29abd9129964b6d4219eb8d781b23816f559be8ac6dbff3d52991731e64",
+          "lines": 8,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 49,
+          "end_line": 345,
+          "language": "c",
+          "content_sha256": "622bcce6d3c5d665c04e15cff1bcfe782914b0d7e6780ff5c5cb43aad8cf9b7a",
+          "lines": 295,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 393,
+          "end_line": 407,
+          "language": "c",
+          "content_sha256": "31d325a301bc83d3ae9e38ab11aec00d441a3b2f47d4ad9893a06c6bb39aba11",
+          "lines": 13,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 426,
+          "end_line": 436,
+          "language": "c",
+          "content_sha256": "f3e70d4678cdac7329d009fbda85214f43085f6213ee1ba1b13f4a2c8bcab7d4",
+          "lines": 9,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 481,
+          "end_line": 502,
+          "language": "c",
+          "content_sha256": "e1e550506e9d48dacd5f199b4c97c484ec974f73b720c40c148e430f6a529360",
+          "lines": 20,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 512,
+          "end_line": 526,
+          "language": "c",
+          "content_sha256": "a029bf4510e2f06e4e5a46dd830568d38a5ee2c82dcdf043043040517829295a",
+          "lines": 13,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 530,
+          "end_line": 540,
+          "language": "c",
+          "content_sha256": "28bbafddcebb02c4020db0bb79ad0e849576b4e356162bb451f3a2711110b4c2",
+          "lines": 9,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 544,
+          "end_line": 554,
+          "language": "c",
+          "content_sha256": "3756a2e4e18abb67dcd687db38259fa51e79cc0ad22f14ac82ca35ecd426564f",
+          "lines": 9,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 558,
+          "end_line": 569,
+          "language": "c",
+          "content_sha256": "ef5037811a2fad06f767da30d47bc8e3dfcfc2f40328805ab26165132a768bfe",
+          "lines": 10,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 573,
+          "end_line": 592,
+          "language": "c",
+          "content_sha256": "98ab5d39ae802b2d6be413d0664022019878cf81e3e650d258cfe9aaa36b8311",
+          "lines": 18,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 596,
+          "end_line": 618,
+          "language": "c",
+          "content_sha256": "0c5d8b3f9a3aa18f2f1e3ed49714a8f027b534514b142675ea0e8053a8da4166",
+          "lines": 21,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 626,
+          "end_line": 650,
+          "language": "c",
+          "content_sha256": "c61138ed73ba150c294454cbd4e545759310139f5587003343a1fcd0e06e322a",
+          "lines": 23,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 658,
+          "end_line": 716,
+          "language": "c",
+          "content_sha256": "7a955fa7f5771bb331f24197fe9e5ff77bddb70e4be59db1ce27d9706123dbd5",
+          "lines": 57,
+          "validation": "document_snippet_not_independently_compiled"
+        }
+      ]
+    },
+    {
+      "path": "knowledge_base/hardware_schematics_rules.md",
+      "category": "source_knowledge",
+      "bytes": 6955,
+      "sha256": "d061dca09f95fbfea9ec4dfa9bea0f398031f84ba023ee209892c5025e1a3829",
+      "line_count": 71,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": []
+    },
+    {
+      "path": "knowledge_base/iKB-1.md",
+      "category": "source_knowledge",
+      "bytes": 5719,
+      "sha256": "fe11a41c5ab368f8cf201ebb77211104c3bd6f8832357f31f33dbe9445fda437",
+      "line_count": 50,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": []
+    },
+    {
+      "path": "knowledge_base/inex_ia_ip.md",
+      "category": "source_knowledge",
+      "bytes": 12322,
+      "sha256": "f6836b75e4f4a04ad764b6c3098838afe7cfa7dd782306d8e2693779f598ed00",
+      "line_count": 64,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": []
+    },
+    {
+      "path": "knowledge_base/kidbright32iA.md",
+      "category": "source_knowledge",
+      "bytes": 123319,
+      "sha256": "b127926bde6e19c9e1e3ea6c9e056bcd3f3c74ccd9bf2959780c24b4703c78b1",
+      "line_count": 2428,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": [
+        {
+          "start_line": 150,
+          "end_line": 159,
+          "language": "unspecified",
+          "content_sha256": "1f41089aa92520312246226698fed90be3ffc8c262a163a942d0fd7c362882bb",
+          "lines": 8,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 164,
+          "end_line": 177,
+          "language": "c",
+          "content_sha256": "da6e9b58cce91483a24b359f3ce0766ea18cc5159f4d1a78bcd57b09bdcc2a54",
+          "lines": 12,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 181,
+          "end_line": 225,
+          "language": "c",
+          "content_sha256": "554cad0952437cfd844b3d2b8e80caf189fa968dd42b3c0e86421e52c058aec2",
+          "lines": 43,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 234,
+          "end_line": 237,
+          "language": "c",
+          "content_sha256": "1afd44012d360c5105453d85907db5814db72a9ad22f0694c93c014960513bce",
+          "lines": 2,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 240,
+          "end_line": 243,
+          "language": "c",
+          "content_sha256": "3c17fb9c76f2582c85dc642a457448bae0440b36fc5bf2aa92c1e9d484fbd182",
+          "lines": 2,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 247,
+          "end_line": 273,
+          "language": "c",
+          "content_sha256": "f9675db7d7b87c5d328bbe4eda7e205c964a2486dd5a351fd3ee78e38b7b2258",
+          "lines": 25,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 281,
+          "end_line": 305,
+          "language": "c",
+          "content_sha256": "c69d4d64a6156b8bfc0fb31f484d43b70b78ce5c06e74c0280631c087ad07b85",
+          "lines": 23,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 333,
+          "end_line": 377,
+          "language": "c",
+          "content_sha256": "5320efdc5db710c46bce34bda4ab22a73444224c471bc31d9bc4628d6ef3de37",
+          "lines": 43,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 466,
+          "end_line": 480,
+          "language": "c",
+          "content_sha256": "d8671e7e401e18781dfe399c7b39e50019a59b82c963e46ef0a3a5e256294de7",
+          "lines": 13,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 485,
+          "end_line": 519,
+          "language": "c",
+          "content_sha256": "067c2c7be98c3aa8ae23b2038743d95c90cc054a8fd5c36f80e2faf70f236b7d",
+          "lines": 33,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 523,
+          "end_line": 560,
+          "language": "c",
+          "content_sha256": "2e83c94f19b5884a78ed9b3c72c46f48846c75f7e5fc13fa5e1e15bf6ff1aed0",
+          "lines": 36,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 564,
+          "end_line": 572,
+          "language": "c",
+          "content_sha256": "ffee61474cecb8edbac78684247a7d70682034b9503638c3a0875cdebcc23845",
+          "lines": 7,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 577,
+          "end_line": 589,
+          "language": "c",
+          "content_sha256": "176550abe77974d5f36f90a3a27e149c85d178d7de805529263f345b965ebb42",
+          "lines": 11,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 597,
+          "end_line": 606,
+          "language": "c",
+          "content_sha256": "37116b5f716448f11412c4da428197af1ad13196ce480610e37b20434e4da7f8",
+          "lines": 8,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 615,
+          "end_line": 623,
+          "language": "c",
+          "content_sha256": "8e89f16042ac5c32439a47a6a97cf4cf3730eb9103b5804fa247feb4a064fc56",
+          "lines": 7,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 628,
+          "end_line": 657,
+          "language": "c",
+          "content_sha256": "cdb0ea1cb90202304104c0212036e572507f3c4af8ca1cdea1a259f379771dfe",
+          "lines": 28,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 672,
+          "end_line": 686,
+          "language": "c",
+          "content_sha256": "4dfb91ce8f78403e8c8cb2741546643f7360d46a34c63cc91cf12271a5653be6",
+          "lines": 13,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 709,
+          "end_line": 723,
+          "language": "c",
+          "content_sha256": "7c20333bea5e0b452fe5f6e247c84ab6f7891a37f65ca0386c1c20e855429dc6",
+          "lines": 13,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 728,
+          "end_line": 739,
+          "language": "c",
+          "content_sha256": "67f2453f53b2005d59bde0f8426d9e3cfe483c01e55e2f00b8b5d8bc6a801a90",
+          "lines": 10,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 744,
+          "end_line": 788,
+          "language": "c",
+          "content_sha256": "451ed1c158bc3dbfe46d4ee44bdb6386b81d534bb24da531990c986e98b3010e",
+          "lines": 43,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 793,
+          "end_line": 802,
+          "language": "c",
+          "content_sha256": "932f59e44adff630fcee443b66529c3ef245d6a8add3e1f8ad0721f2f48468c7",
+          "lines": 8,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 810,
+          "end_line": 836,
+          "language": "c",
+          "content_sha256": "66d2efe51870118366992a7ba04191d151b6f55f0ea9e15d51f6f78b4b9d514a",
+          "lines": 25,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 844,
+          "end_line": 879,
+          "language": "c",
+          "content_sha256": "8b1073882ce348ed76727b8bc8d259b3f3690ce37d848d226a6522f6c50f7e78",
+          "lines": 34,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 901,
+          "end_line": 944,
+          "language": "c",
+          "content_sha256": "f305e60c03e72f209da89bccb3ec682afe9e3dbc29073bbbe73a9c065057f810",
+          "lines": 42,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 953,
+          "end_line": 983,
+          "language": "c",
+          "content_sha256": "6ca0907b8311e405630ea341d786781f7c75c6d12f75beab99bba8681651f62f",
+          "lines": 29,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 1029,
+          "end_line": 1107,
+          "language": "c",
+          "content_sha256": "b3f98f9c55cbf48c3d87104183feebc138eae3331301b95970b3f9b98a098095",
+          "lines": 77,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 1111,
+          "end_line": 1125,
+          "language": "c",
+          "content_sha256": "c246fd64ac65480ebdf043624ba551554a1b22aecac084295dee696cd828303d",
+          "lines": 13,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 1141,
+          "end_line": 1147,
+          "language": "cmake",
+          "content_sha256": "1bed94a7c827ab79dfff83a3dbef53d28b90c20b811fa0e9f0037f1a5e377bc9",
+          "lines": 5,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 1200,
+          "end_line": 1287,
+          "language": "c",
+          "content_sha256": "bef9aaf3163311dbf55cef2d49867236dca0c20d2f16bc7cdd313496a2b1f80f",
+          "lines": 86,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 1382,
+          "end_line": 1425,
+          "language": "c",
+          "content_sha256": "e1c0b5afb777bfc65bcf7d96aee209fca92be5f375d4c9d2d38521a04a501472",
+          "lines": 42,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 1453,
+          "end_line": 1486,
+          "language": "c",
+          "content_sha256": "b2cf8ca303bb5d0461e833a10419ec3b30c404178f0fb3906b4eddce7d60be57",
+          "lines": 32,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 1508,
+          "end_line": 1535,
+          "language": "c",
+          "content_sha256": "e1876d59c8f3c7dcf1463b10babf8cab1d226c16669fc3155a39a3fff5f078e0",
+          "lines": 26,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 1553,
+          "end_line": 1575,
+          "language": "c",
+          "content_sha256": "57c0bafabc3f1bbaedd5e410ada1ebd1fde6d0bb86017c86dd3afbef0362ddb0",
+          "lines": 21,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 1578,
+          "end_line": 1600,
+          "language": "c",
+          "content_sha256": "e7290b9520d53198b5e891bd391d2f6bf0131bf32834e3323285e1ca166a7882",
+          "lines": 21,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 1605,
+          "end_line": 1667,
+          "language": "c",
+          "content_sha256": "b1c24509101a0e1b538dff6e3972ebe5db998b0e6c4a616329db15e8de752523",
+          "lines": 61,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 1726,
+          "end_line": 1742,
+          "language": "c",
+          "content_sha256": "26d39a5dab227d8de1f88719757ecf64c6d6a7cb42b342c739e20011740b4cda",
+          "lines": 15,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 1791,
+          "end_line": 1812,
+          "language": "c",
+          "content_sha256": "051f4e1a830a2c811eb2b053f95e538da317f153d8b1a167684de09a87f72afc",
+          "lines": 20,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 1825,
+          "end_line": 1830,
+          "language": "c",
+          "content_sha256": "aa3213a0fd9c1ea1b5c4bab020b05522c0bd1e707eda718b0b6770809eee2da1",
+          "lines": 4,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 1842,
+          "end_line": 1846,
+          "language": "c",
+          "content_sha256": "1a17f37ab1e54fcebf27e3372ded569c952a6bdebbec9ebedb12e8e885c8aa89",
+          "lines": 3,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 1864,
+          "end_line": 1871,
+          "language": "c",
+          "content_sha256": "1a6b1ffe88e5a576e36886df086c1d0398cba3262d897b6fca32d7f92a25a565",
+          "lines": 6,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 1883,
+          "end_line": 1895,
+          "language": "c",
+          "content_sha256": "33bb3a60595621693d7ed52c4fe7f3ca240b3fda6bad257994b1d11fe4c2176f",
+          "lines": 11,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 1921,
+          "end_line": 1940,
+          "language": "c",
+          "content_sha256": "71cd64cad5b2b496ed851a3b31a62de1077adca02e33f12bf09eb3df5a065511",
+          "lines": 18,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 1947,
+          "end_line": 1951,
+          "language": "c",
+          "content_sha256": "c5d0ad7cd4b23d5c14858379ac914189757ce1f8ba85ab395aec051205cd24eb",
+          "lines": 3,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 1971,
+          "end_line": 1983,
+          "language": "c",
+          "content_sha256": "0e84f39cb8c2dadceb7ffaaa0b7621e9ae5fb223105c63bb652a1fbe19ade393",
+          "lines": 11,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 1995,
+          "end_line": 2000,
+          "language": "unspecified",
+          "content_sha256": "202ace959ed16c0fabe28152ec6c2574d76ca0e13797559b5abeffd5f6ed8f5c",
+          "lines": 4,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 2227,
+          "end_line": 2294,
+          "language": "cpp",
+          "content_sha256": "aec037f6c1b6e5437c83a7ca1a5197c085b73796c827a5de19ac8f71b3612fa6",
+          "lines": 66,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 2300,
+          "end_line": 2399,
+          "language": "cpp",
+          "content_sha256": "1e63fe628eacab6092e1de649aaaae5660ce26e2f3e28218e1a420a0c8697af2",
+          "lines": 98,
+          "validation": "document_snippet_not_independently_compiled"
+        }
+      ]
+    },
+    {
+      "path": "knowledge_base/kidbright_uai.md",
+      "category": "source_knowledge",
+      "bytes": 30376,
+      "sha256": "6e1c6ef51e541a8e5588b3de6e35a17099c2eeca699b76767e9d003b81d0b0a5",
+      "line_count": 191,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": []
+    },
+    {
+      "path": "knowledge_base/led_16x8_matrix_mapping.md",
+      "category": "source_knowledge",
+      "bytes": 32140,
+      "sha256": "897012b9c929c9a921f0301e0f0d7b7bf227ca4799bf8f96e443875deb861d67",
+      "line_count": 741,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": [
+        {
+          "start_line": 37,
+          "end_line": 46,
+          "language": "unspecified",
+          "content_sha256": "1f41089aa92520312246226698fed90be3ffc8c262a163a942d0fd7c362882bb",
+          "lines": 8,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 55,
+          "end_line": 59,
+          "language": "c",
+          "content_sha256": "7e9404e55d1a4c2052ea27507998231c29e3299f9b89d021eb3a3cbf1631af5c",
+          "lines": 3,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 62,
+          "end_line": 70,
+          "language": "c",
+          "content_sha256": "1129507970111c5c8c3f267466282787a36988459b0334674c79b8a116757882",
+          "lines": 7,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 77,
+          "end_line": 79,
+          "language": "c",
+          "content_sha256": "93bc8e9cde26f7b0112f7631cf6934b813868846084744c762daa045cd15172b",
+          "lines": 1,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 82,
+          "end_line": 87,
+          "language": "c",
+          "content_sha256": "c3312d5901a98e3b91aa85926eed7549747c75aaa1d90967448cb86a25e39979",
+          "lines": 4,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 95,
+          "end_line": 129,
+          "language": "c",
+          "content_sha256": "c647b6172da95086b4e619d13329a4fe8f4397bf5dedd43511ad5e2a1a3121a0",
+          "lines": 33,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 136,
+          "end_line": 148,
+          "language": "c",
+          "content_sha256": "9e72860fa455f60ab10f76e08e5e30efd7557374d4dcd38b487915f4e387f991",
+          "lines": 11,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 155,
+          "end_line": 179,
+          "language": "c",
+          "content_sha256": "b8a47a2af1d7ea3cea5cc1fd8c3c0b8e0b36f82dc2c842b820fb7b066c364822",
+          "lines": 23,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 192,
+          "end_line": 205,
+          "language": "c",
+          "content_sha256": "895c642e576c91310475cc00576c71e926545cc29dec62e687ec657e131a19e7",
+          "lines": 12,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 209,
+          "end_line": 215,
+          "language": "c",
+          "content_sha256": "e06e10d94aa7f6aef5767cc9e65c9266769e9d388236560c69b6410e034f3bc4",
+          "lines": 5,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 226,
+          "end_line": 229,
+          "language": "c",
+          "content_sha256": "1afd44012d360c5105453d85907db5814db72a9ad22f0694c93c014960513bce",
+          "lines": 2,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 232,
+          "end_line": 234,
+          "language": "c",
+          "content_sha256": "c4c85a0e3981464fe37e1ac41c28da3244522e5b3bdea525669155be54e96a2f",
+          "lines": 1,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 242,
+          "end_line": 276,
+          "language": "c",
+          "content_sha256": "abd1f7f6b38df642e275771096ccaa8bcddcf3a6b0acb0440a629172a70c756a",
+          "lines": 33,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 279,
+          "end_line": 287,
+          "language": "c",
+          "content_sha256": "d811113be0796c5273bf051a00d09a28772ac0d38d8f8d4db6efc8c5e1133845",
+          "lines": 7,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 300,
+          "end_line": 338,
+          "language": "c",
+          "content_sha256": "ac7f430ebd624adcdea3463fed0718259feb732131718e1902c5bb7abcc03c9e",
+          "lines": 37,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 346,
+          "end_line": 358,
+          "language": "c",
+          "content_sha256": "b7f5bd636808d2f64bf4a5a958f74d02251d082ad1caa70815cd5cdecfb263a6",
+          "lines": 11,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 364,
+          "end_line": 484,
+          "language": "c",
+          "content_sha256": "67f899df35b1c9786df030280af33d65dc22dce5cb56291d4fd94983fb51e5e0",
+          "lines": 119,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 522,
+          "end_line": 540,
+          "language": "c",
+          "content_sha256": "8cabdef1e1ebe7d16c12ac37c11a0fd3fd5263b09764871ca9e863c7e97acbcc",
+          "lines": 17,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 556,
+          "end_line": 588,
+          "language": "c",
+          "content_sha256": "cd0f9e339334734aa3cfc106b47775f4d4c48a3dd4b4ee22e09c1299d4998760",
+          "lines": 31,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 598,
+          "end_line": 608,
+          "language": "c",
+          "content_sha256": "510c1e4d7eda2e6ff54cf26b2a0cab1f176e4b6b8eedb2a0dbc3a9056046abb8",
+          "lines": 9,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 618,
+          "end_line": 640,
+          "language": "c",
+          "content_sha256": "71cfe2db9b21e3c4a920e897d5dfd43420491c6675d4b8786424aab4d98e40b7",
+          "lines": 21,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 644,
+          "end_line": 684,
+          "language": "c",
+          "content_sha256": "0c0dc2f70c43354e723ba19835074f97e37cf68b0cf0a8af45db420a93c32412",
+          "lines": 39,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 701,
+          "end_line": 706,
+          "language": "unspecified",
+          "content_sha256": "b6a072c9719f7a94320d7a92fd122954e7c80d5c47fd440cade3b72eb6da72a5",
+          "lines": 4,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 708,
+          "end_line": 734,
+          "language": "c",
+          "content_sha256": "2ed2d9fd44892793eb0effcd14eded0f8bd0db568e0729c87a78701094b09cd6",
+          "lines": 25,
+          "validation": "document_snippet_not_independently_compiled"
+        }
+      ]
+    },
+    {
+      "path": "knowledge_base/minibike.md",
+      "category": "source_knowledge",
+      "bytes": 19217,
+      "sha256": "6654b5061069c6cbd0523c1b28a2d8f0014580f2bcedbab79050d34e797cbe35",
+      "line_count": 452,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": [
+        {
+          "start_line": 12,
+          "end_line": 19,
+          "language": "unspecified",
+          "content_sha256": "1342297449c9594978fc25879ad7375765484041802652831fd3791e82937bdf",
+          "lines": 6,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 63,
+          "end_line": 80,
+          "language": "c",
+          "content_sha256": "54a2a1c096041f8efe1cdc51ff3a358f9f173b2365f1815187c2f76fab66755c",
+          "lines": 16,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 83,
+          "end_line": 88,
+          "language": "c",
+          "content_sha256": "07b6146985ef5297dfccbee3d01212faeb05adbce05cf119aeddcf332793ce34",
+          "lines": 4,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 107,
+          "end_line": 120,
+          "language": "c",
+          "content_sha256": "f7f2782eeef862e69c955ad0aeecdedddc19ecbefe7b95e77b8ef021de60016d",
+          "lines": 12,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 129,
+          "end_line": 137,
+          "language": "c",
+          "content_sha256": "fa71c0e0047925dca06fbebbb04a93500571c0abf0261f2de8ee3724b3366852",
+          "lines": 7,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 140,
+          "end_line": 146,
+          "language": "c",
+          "content_sha256": "6b4bb51171b64a8ae6686ea6bd67c40dccfc7458f378dac3b43a9a1eb742880a",
+          "lines": 5,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 150,
+          "end_line": 158,
+          "language": "c",
+          "content_sha256": "f41f67e36bdd4732b6573d8fd56fcdce8dd74176bc720a98a807543a79426d8f",
+          "lines": 7,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 161,
+          "end_line": 168,
+          "language": "c",
+          "content_sha256": "f5ec6b6bbb52f5f74faa10c447e61edb91a1a8a7576889b88b41ec9ced40db73",
+          "lines": 6,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 246,
+          "end_line": 249,
+          "language": "c",
+          "content_sha256": "e820db6268c0cea53c2de5da2fc6baafd3edc718796d88dac43f97a5655f8c86",
+          "lines": 2,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 253,
+          "end_line": 257,
+          "language": "c",
+          "content_sha256": "aba435c1f964863f6263e7eaf7f16d910233fc4029aa82432b16be187f2e9887",
+          "lines": 3,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 265,
+          "end_line": 267,
+          "language": "unspecified",
+          "content_sha256": "dcaca4f2179345399ac621d4c68270cd8a805b0cff2dc7901d180ae290f4204b",
+          "lines": 1,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 279,
+          "end_line": 287,
+          "language": "c",
+          "content_sha256": "68444c23be0eb23e657717095610c3fa294f7c431ed6c7adc24377d93df2eaee",
+          "lines": 7,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 291,
+          "end_line": 303,
+          "language": "c",
+          "content_sha256": "2e6c721825670864343bd73315e99aa6bf5dfdce77e7199942f46e0bc525ac66",
+          "lines": 11,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 311,
+          "end_line": 313,
+          "language": "c",
+          "content_sha256": "e4931ebbb53df0163508992f3675f1fbaac1d67855bd511af630422f5851ac29",
+          "lines": 1,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 320,
+          "end_line": 333,
+          "language": "c",
+          "content_sha256": "4cf58c774bb262015f49e974fa7ac1b5b72e20036a016b899514f06a1884fc6a",
+          "lines": 12,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 341,
+          "end_line": 347,
+          "language": "c",
+          "content_sha256": "b0a6c35f7fc2a83e73fcf6375b5953ce2332b8127a6747ca0ece33f2e6d3a5e3",
+          "lines": 5,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 351,
+          "end_line": 355,
+          "language": "c",
+          "content_sha256": "dfa56c86d0d95475b5c0acd0020ac97ca40065ce20ddec98a59656c24124328e",
+          "lines": 3,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 359,
+          "end_line": 366,
+          "language": "c",
+          "content_sha256": "a4fe815006bd099766f25ba0e8f1135a29e69337d05ae870a7be6d7a22f40efa",
+          "lines": 6,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 373,
+          "end_line": 377,
+          "language": "cmake",
+          "content_sha256": "b56925bdfc6b03092a88536ed58694ec4fd0289a779eaed2cfbd3375c837ee19",
+          "lines": 3,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 381,
+          "end_line": 385,
+          "language": "cmake",
+          "content_sha256": "3b30bc1bef5db43adc0b541696922521ebdde7a56de94c35be6b9910ec9b3718",
+          "lines": 3,
+          "validation": "document_snippet_not_independently_compiled"
+        }
+      ]
+    },
+    {
+      "path": "knowledge_base/oled_ssd1306.md",
+      "category": "source_knowledge",
+      "bytes": 11658,
+      "sha256": "012ed1ab1039332d3fedd507837e85228643c37e545defe300c454e9e16b1c79",
+      "line_count": 301,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": [
+        {
+          "start_line": 21,
+          "end_line": 26,
+          "language": "c",
+          "content_sha256": "ce5d0ca2f4ea7419f7b714ada98fe0f20a0c99db494d2f23edba7f6366632149",
+          "lines": 4,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 33,
+          "end_line": 41,
+          "language": "c",
+          "content_sha256": "9135b3a818a2358cffb9521d20659cf3e4b81a2653963c6fd2f9196fb4a28dde",
+          "lines": 7,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 44,
+          "end_line": 50,
+          "language": "cmake",
+          "content_sha256": "db4463e090ff46e994dd2ef5c9f8cb3ec960b6ea6f97408b3cf0a736b9cd202d",
+          "lines": 5,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 56,
+          "end_line": 111,
+          "language": "c",
+          "content_sha256": "ecc1aa486aaa787724d7357a32932b62929487ccf82ee55efafae8eeafcfa68f",
+          "lines": 54,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 118,
+          "end_line": 130,
+          "language": "c",
+          "content_sha256": "9a557c74631896bdc4d084a2e5668c878cabc160ee072e26616532004b9183ab",
+          "lines": 11,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 133,
+          "end_line": 143,
+          "language": "c",
+          "content_sha256": "8975906eeb8ebb1ce183958c9deb5a1276f65c826188cea5db56f7ecaabc09b4",
+          "lines": 9,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 164,
+          "end_line": 171,
+          "language": "unspecified",
+          "content_sha256": "bfcb4732d331cfccb3e709674958257e425d1fb45891e8766b65d5b8eaaf771f",
+          "lines": 6,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 183,
+          "end_line": 191,
+          "language": "c",
+          "content_sha256": "ad8fba7b4a2ba0c66b1bc7fd29823e4d7a6d2faf6d6905f42d4d6dcd2d865779",
+          "lines": 7,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 197,
+          "end_line": 280,
+          "language": "c",
+          "content_sha256": "29f910258b3059b47315bd95fcf07ab527fff4cfddd171cb6b6fbe38de124bd1",
+          "lines": 82,
+          "validation": "document_snippet_not_independently_compiled"
+        }
+      ]
+    },
+    {
+      "path": "knowledge_base/skate_rev1.3.md",
+      "category": "source_knowledge",
+      "bytes": 27315,
+      "sha256": "a7367323ccbd3849ffc7afd6eb7ec796f375b04e28fed6bbd134fec026fe05e8",
+      "line_count": 523,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": [
+        {
+          "start_line": 123,
+          "end_line": 190,
+          "language": "cpp",
+          "content_sha256": "aec037f6c1b6e5437c83a7ca1a5197c085b73796c827a5de19ac8f71b3612fa6",
+          "lines": 66,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 196,
+          "end_line": 295,
+          "language": "cpp",
+          "content_sha256": "1e63fe628eacab6092e1de649aaaae5660ce26e2f3e28218e1a420a0c8697af2",
+          "lines": 98,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 301,
+          "end_line": 330,
+          "language": "cpp",
+          "content_sha256": "d6e9fc55d5337c51276ba73767ad5b8d166f661b33e21c784caebfb1f8e6952e",
+          "lines": 28,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 373,
+          "end_line": 410,
+          "language": "unspecified",
+          "content_sha256": "10ae35fc5501c93c78b970627dd9b36bcb1af78205e6f1e15ad539518001aec5",
+          "lines": 36,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 427,
+          "end_line": 459,
+          "language": "unspecified",
+          "content_sha256": "2772c295fc72465fe9c19c3849757251afbdcbac6acc4dc965729b6fc60d842c",
+          "lines": 31,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 478,
+          "end_line": 495,
+          "language": "unspecified",
+          "content_sha256": "e16f959518f8a4f1f26ce7392a1f50a42264e113a311119c5d8f11d87c6954bc",
+          "lines": 16,
+          "validation": "document_snippet_not_independently_compiled"
+        }
+      ]
+    },
+    {
+      "path": "knowledge_base/support_scope.md",
+      "category": "source_knowledge",
+      "bytes": 9590,
+      "sha256": "2303a4b4b3604d9a2c60cc3492c670c2214b09cc30953b3574a361266bd317b1",
+      "line_count": 138,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": []
+    },
+    {
+      "path": "resources/knowledge_base/README.md",
+      "category": "bundled_knowledge",
+      "bytes": 13978,
+      "sha256": "c0443aadcc7cd17d38c3da83e70030c857d6a8663db3c290aa73e4cdaa38ff63",
+      "line_count": 290,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": [
+        {
+          "start_line": 32,
+          "end_line": 40,
+          "language": "c",
+          "content_sha256": "65326bbe56020ca20cd917ec2d5e45576745304c636b7f090c635b81f0dfaa3d",
+          "lines": 7,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 48,
+          "end_line": 57,
+          "language": "c",
+          "content_sha256": "20de576f92b5001defff62f411cc42bb15840c941b546105489922dbee891d2c",
+          "lines": 8,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 61,
+          "end_line": 71,
+          "language": "c",
+          "content_sha256": "d063241d8894a91bb4beb0929c50e9b7504391b861039026c97cd80ec50543e4",
+          "lines": 9,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 77,
+          "end_line": 84,
+          "language": "c",
+          "content_sha256": "450004f4848fe47054086d68cd620e085bfb2779acff19978c02bb88948104ec",
+          "lines": 6,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 90,
+          "end_line": 96,
+          "language": "c",
+          "content_sha256": "10ecf9a7b4e5a69d5aebd07009b2673930494a2afae00566011aa3bcf896548f",
+          "lines": 5,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 220,
+          "end_line": 227,
+          "language": "c",
+          "content_sha256": "7ab32c474908e9b2eecf17055ac0e435ff546c9c31c674609567b3271a3feaad",
+          "lines": 6,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 233,
+          "end_line": 242,
+          "language": "unspecified",
+          "content_sha256": "86e07084ac4ffd776ae076f67e989fa11b4385e040e1ff4d12f731ae4f109518",
+          "lines": 8,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 246,
+          "end_line": 255,
+          "language": "unspecified",
+          "content_sha256": "77d96f219d9a0b0531c10a5dc08025aa175f6878a7f0f14fe3b80a95a1dfbea1",
+          "lines": 8,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 259,
+          "end_line": 268,
+          "language": "unspecified",
+          "content_sha256": "4d58c38fe95711a12d0e9dd38e34ab4b5951659dcadea1a1170c0b7d4245121b",
+          "lines": 8,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 272,
+          "end_line": 280,
+          "language": "unspecified",
+          "content_sha256": "b6ddcc384d82529a91ae81851e1f1cee47ef48cc86105fb76b69119258db46a4",
+          "lines": 7,
+          "validation": "document_snippet_not_independently_compiled"
+        }
+      ]
+    },
+    {
+      "path": "resources/knowledge_base/all_models.md",
+      "category": "bundled_knowledge",
+      "bytes": 6146,
+      "sha256": "c408745c35c3455added1766e54b53d99ed1a072f20bd0c6afcba027d4aacc25",
+      "line_count": 45,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": []
+    },
+    {
+      "path": "resources/knowledge_base/compatibility/README.md",
+      "category": "bundled_knowledge",
+      "bytes": 7741,
+      "sha256": "02b74e3b3a9aeec6ee4ed3a100adb4e8ec92096dcda32bdc86819570c9d8ad51",
+      "line_count": 116,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": []
+    },
+    {
+      "path": "resources/knowledge_base/formula_kid_controller.md",
+      "category": "bundled_knowledge",
+      "bytes": 31960,
+      "sha256": "6a89d84cb57400618170903b4ffdbdc1670b0741ef63a9ecb6a6316574506252",
+      "line_count": 738,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": [
+        {
+          "start_line": 32,
+          "end_line": 41,
+          "language": "unspecified",
+          "content_sha256": "4dfde29abd9129964b6d4219eb8d781b23816f559be8ac6dbff3d52991731e64",
+          "lines": 8,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 49,
+          "end_line": 345,
+          "language": "c",
+          "content_sha256": "622bcce6d3c5d665c04e15cff1bcfe782914b0d7e6780ff5c5cb43aad8cf9b7a",
+          "lines": 295,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 393,
+          "end_line": 407,
+          "language": "c",
+          "content_sha256": "31d325a301bc83d3ae9e38ab11aec00d441a3b2f47d4ad9893a06c6bb39aba11",
+          "lines": 13,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 426,
+          "end_line": 436,
+          "language": "c",
+          "content_sha256": "f3e70d4678cdac7329d009fbda85214f43085f6213ee1ba1b13f4a2c8bcab7d4",
+          "lines": 9,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 481,
+          "end_line": 502,
+          "language": "c",
+          "content_sha256": "e1e550506e9d48dacd5f199b4c97c484ec974f73b720c40c148e430f6a529360",
+          "lines": 20,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 512,
+          "end_line": 526,
+          "language": "c",
+          "content_sha256": "a029bf4510e2f06e4e5a46dd830568d38a5ee2c82dcdf043043040517829295a",
+          "lines": 13,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 530,
+          "end_line": 540,
+          "language": "c",
+          "content_sha256": "28bbafddcebb02c4020db0bb79ad0e849576b4e356162bb451f3a2711110b4c2",
+          "lines": 9,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 544,
+          "end_line": 554,
+          "language": "c",
+          "content_sha256": "3756a2e4e18abb67dcd687db38259fa51e79cc0ad22f14ac82ca35ecd426564f",
+          "lines": 9,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 558,
+          "end_line": 569,
+          "language": "c",
+          "content_sha256": "ef5037811a2fad06f767da30d47bc8e3dfcfc2f40328805ab26165132a768bfe",
+          "lines": 10,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 573,
+          "end_line": 592,
+          "language": "c",
+          "content_sha256": "98ab5d39ae802b2d6be413d0664022019878cf81e3e650d258cfe9aaa36b8311",
+          "lines": 18,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 596,
+          "end_line": 618,
+          "language": "c",
+          "content_sha256": "0c5d8b3f9a3aa18f2f1e3ed49714a8f027b534514b142675ea0e8053a8da4166",
+          "lines": 21,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 626,
+          "end_line": 650,
+          "language": "c",
+          "content_sha256": "c61138ed73ba150c294454cbd4e545759310139f5587003343a1fcd0e06e322a",
+          "lines": 23,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 658,
+          "end_line": 716,
+          "language": "c",
+          "content_sha256": "7a955fa7f5771bb331f24197fe9e5ff77bddb70e4be59db1ce27d9706123dbd5",
+          "lines": 57,
+          "validation": "document_snippet_not_independently_compiled"
+        }
+      ]
+    },
+    {
+      "path": "resources/knowledge_base/hardware_schematics_rules.md",
+      "category": "bundled_knowledge",
+      "bytes": 6955,
+      "sha256": "d061dca09f95fbfea9ec4dfa9bea0f398031f84ba023ee209892c5025e1a3829",
+      "line_count": 71,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": []
+    },
+    {
+      "path": "resources/knowledge_base/iKB-1.md",
+      "category": "bundled_knowledge",
+      "bytes": 5719,
+      "sha256": "fe11a41c5ab368f8cf201ebb77211104c3bd6f8832357f31f33dbe9445fda437",
+      "line_count": 50,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": []
+    },
+    {
+      "path": "resources/knowledge_base/inex_ia_ip.md",
+      "category": "bundled_knowledge",
+      "bytes": 12322,
+      "sha256": "f6836b75e4f4a04ad764b6c3098838afe7cfa7dd782306d8e2693779f598ed00",
+      "line_count": 64,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": []
+    },
+    {
+      "path": "resources/knowledge_base/kidbright32iA.md",
+      "category": "bundled_knowledge",
+      "bytes": 123319,
+      "sha256": "b127926bde6e19c9e1e3ea6c9e056bcd3f3c74ccd9bf2959780c24b4703c78b1",
+      "line_count": 2428,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": [
+        {
+          "start_line": 150,
+          "end_line": 159,
+          "language": "unspecified",
+          "content_sha256": "1f41089aa92520312246226698fed90be3ffc8c262a163a942d0fd7c362882bb",
+          "lines": 8,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 164,
+          "end_line": 177,
+          "language": "c",
+          "content_sha256": "da6e9b58cce91483a24b359f3ce0766ea18cc5159f4d1a78bcd57b09bdcc2a54",
+          "lines": 12,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 181,
+          "end_line": 225,
+          "language": "c",
+          "content_sha256": "554cad0952437cfd844b3d2b8e80caf189fa968dd42b3c0e86421e52c058aec2",
+          "lines": 43,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 234,
+          "end_line": 237,
+          "language": "c",
+          "content_sha256": "1afd44012d360c5105453d85907db5814db72a9ad22f0694c93c014960513bce",
+          "lines": 2,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 240,
+          "end_line": 243,
+          "language": "c",
+          "content_sha256": "3c17fb9c76f2582c85dc642a457448bae0440b36fc5bf2aa92c1e9d484fbd182",
+          "lines": 2,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 247,
+          "end_line": 273,
+          "language": "c",
+          "content_sha256": "f9675db7d7b87c5d328bbe4eda7e205c964a2486dd5a351fd3ee78e38b7b2258",
+          "lines": 25,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 281,
+          "end_line": 305,
+          "language": "c",
+          "content_sha256": "c69d4d64a6156b8bfc0fb31f484d43b70b78ce5c06e74c0280631c087ad07b85",
+          "lines": 23,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 333,
+          "end_line": 377,
+          "language": "c",
+          "content_sha256": "5320efdc5db710c46bce34bda4ab22a73444224c471bc31d9bc4628d6ef3de37",
+          "lines": 43,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 466,
+          "end_line": 480,
+          "language": "c",
+          "content_sha256": "d8671e7e401e18781dfe399c7b39e50019a59b82c963e46ef0a3a5e256294de7",
+          "lines": 13,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 485,
+          "end_line": 519,
+          "language": "c",
+          "content_sha256": "067c2c7be98c3aa8ae23b2038743d95c90cc054a8fd5c36f80e2faf70f236b7d",
+          "lines": 33,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 523,
+          "end_line": 560,
+          "language": "c",
+          "content_sha256": "2e83c94f19b5884a78ed9b3c72c46f48846c75f7e5fc13fa5e1e15bf6ff1aed0",
+          "lines": 36,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 564,
+          "end_line": 572,
+          "language": "c",
+          "content_sha256": "ffee61474cecb8edbac78684247a7d70682034b9503638c3a0875cdebcc23845",
+          "lines": 7,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 577,
+          "end_line": 589,
+          "language": "c",
+          "content_sha256": "176550abe77974d5f36f90a3a27e149c85d178d7de805529263f345b965ebb42",
+          "lines": 11,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 597,
+          "end_line": 606,
+          "language": "c",
+          "content_sha256": "37116b5f716448f11412c4da428197af1ad13196ce480610e37b20434e4da7f8",
+          "lines": 8,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 615,
+          "end_line": 623,
+          "language": "c",
+          "content_sha256": "8e89f16042ac5c32439a47a6a97cf4cf3730eb9103b5804fa247feb4a064fc56",
+          "lines": 7,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 628,
+          "end_line": 657,
+          "language": "c",
+          "content_sha256": "cdb0ea1cb90202304104c0212036e572507f3c4af8ca1cdea1a259f379771dfe",
+          "lines": 28,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 672,
+          "end_line": 686,
+          "language": "c",
+          "content_sha256": "4dfb91ce8f78403e8c8cb2741546643f7360d46a34c63cc91cf12271a5653be6",
+          "lines": 13,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 709,
+          "end_line": 723,
+          "language": "c",
+          "content_sha256": "7c20333bea5e0b452fe5f6e247c84ab6f7891a37f65ca0386c1c20e855429dc6",
+          "lines": 13,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 728,
+          "end_line": 739,
+          "language": "c",
+          "content_sha256": "67f2453f53b2005d59bde0f8426d9e3cfe483c01e55e2f00b8b5d8bc6a801a90",
+          "lines": 10,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 744,
+          "end_line": 788,
+          "language": "c",
+          "content_sha256": "451ed1c158bc3dbfe46d4ee44bdb6386b81d534bb24da531990c986e98b3010e",
+          "lines": 43,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 793,
+          "end_line": 802,
+          "language": "c",
+          "content_sha256": "932f59e44adff630fcee443b66529c3ef245d6a8add3e1f8ad0721f2f48468c7",
+          "lines": 8,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 810,
+          "end_line": 836,
+          "language": "c",
+          "content_sha256": "66d2efe51870118366992a7ba04191d151b6f55f0ea9e15d51f6f78b4b9d514a",
+          "lines": 25,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 844,
+          "end_line": 879,
+          "language": "c",
+          "content_sha256": "8b1073882ce348ed76727b8bc8d259b3f3690ce37d848d226a6522f6c50f7e78",
+          "lines": 34,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 901,
+          "end_line": 944,
+          "language": "c",
+          "content_sha256": "f305e60c03e72f209da89bccb3ec682afe9e3dbc29073bbbe73a9c065057f810",
+          "lines": 42,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 953,
+          "end_line": 983,
+          "language": "c",
+          "content_sha256": "6ca0907b8311e405630ea341d786781f7c75c6d12f75beab99bba8681651f62f",
+          "lines": 29,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 1029,
+          "end_line": 1107,
+          "language": "c",
+          "content_sha256": "b3f98f9c55cbf48c3d87104183feebc138eae3331301b95970b3f9b98a098095",
+          "lines": 77,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 1111,
+          "end_line": 1125,
+          "language": "c",
+          "content_sha256": "c246fd64ac65480ebdf043624ba551554a1b22aecac084295dee696cd828303d",
+          "lines": 13,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 1141,
+          "end_line": 1147,
+          "language": "cmake",
+          "content_sha256": "1bed94a7c827ab79dfff83a3dbef53d28b90c20b811fa0e9f0037f1a5e377bc9",
+          "lines": 5,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 1200,
+          "end_line": 1287,
+          "language": "c",
+          "content_sha256": "bef9aaf3163311dbf55cef2d49867236dca0c20d2f16bc7cdd313496a2b1f80f",
+          "lines": 86,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 1382,
+          "end_line": 1425,
+          "language": "c",
+          "content_sha256": "e1c0b5afb777bfc65bcf7d96aee209fca92be5f375d4c9d2d38521a04a501472",
+          "lines": 42,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 1453,
+          "end_line": 1486,
+          "language": "c",
+          "content_sha256": "b2cf8ca303bb5d0461e833a10419ec3b30c404178f0fb3906b4eddce7d60be57",
+          "lines": 32,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 1508,
+          "end_line": 1535,
+          "language": "c",
+          "content_sha256": "e1876d59c8f3c7dcf1463b10babf8cab1d226c16669fc3155a39a3fff5f078e0",
+          "lines": 26,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 1553,
+          "end_line": 1575,
+          "language": "c",
+          "content_sha256": "57c0bafabc3f1bbaedd5e410ada1ebd1fde6d0bb86017c86dd3afbef0362ddb0",
+          "lines": 21,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 1578,
+          "end_line": 1600,
+          "language": "c",
+          "content_sha256": "e7290b9520d53198b5e891bd391d2f6bf0131bf32834e3323285e1ca166a7882",
+          "lines": 21,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 1605,
+          "end_line": 1667,
+          "language": "c",
+          "content_sha256": "b1c24509101a0e1b538dff6e3972ebe5db998b0e6c4a616329db15e8de752523",
+          "lines": 61,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 1726,
+          "end_line": 1742,
+          "language": "c",
+          "content_sha256": "26d39a5dab227d8de1f88719757ecf64c6d6a7cb42b342c739e20011740b4cda",
+          "lines": 15,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 1791,
+          "end_line": 1812,
+          "language": "c",
+          "content_sha256": "051f4e1a830a2c811eb2b053f95e538da317f153d8b1a167684de09a87f72afc",
+          "lines": 20,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 1825,
+          "end_line": 1830,
+          "language": "c",
+          "content_sha256": "aa3213a0fd9c1ea1b5c4bab020b05522c0bd1e707eda718b0b6770809eee2da1",
+          "lines": 4,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 1842,
+          "end_line": 1846,
+          "language": "c",
+          "content_sha256": "1a17f37ab1e54fcebf27e3372ded569c952a6bdebbec9ebedb12e8e885c8aa89",
+          "lines": 3,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 1864,
+          "end_line": 1871,
+          "language": "c",
+          "content_sha256": "1a6b1ffe88e5a576e36886df086c1d0398cba3262d897b6fca32d7f92a25a565",
+          "lines": 6,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 1883,
+          "end_line": 1895,
+          "language": "c",
+          "content_sha256": "33bb3a60595621693d7ed52c4fe7f3ca240b3fda6bad257994b1d11fe4c2176f",
+          "lines": 11,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 1921,
+          "end_line": 1940,
+          "language": "c",
+          "content_sha256": "71cd64cad5b2b496ed851a3b31a62de1077adca02e33f12bf09eb3df5a065511",
+          "lines": 18,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 1947,
+          "end_line": 1951,
+          "language": "c",
+          "content_sha256": "c5d0ad7cd4b23d5c14858379ac914189757ce1f8ba85ab395aec051205cd24eb",
+          "lines": 3,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 1971,
+          "end_line": 1983,
+          "language": "c",
+          "content_sha256": "0e84f39cb8c2dadceb7ffaaa0b7621e9ae5fb223105c63bb652a1fbe19ade393",
+          "lines": 11,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 1995,
+          "end_line": 2000,
+          "language": "unspecified",
+          "content_sha256": "202ace959ed16c0fabe28152ec6c2574d76ca0e13797559b5abeffd5f6ed8f5c",
+          "lines": 4,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 2227,
+          "end_line": 2294,
+          "language": "cpp",
+          "content_sha256": "aec037f6c1b6e5437c83a7ca1a5197c085b73796c827a5de19ac8f71b3612fa6",
+          "lines": 66,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 2300,
+          "end_line": 2399,
+          "language": "cpp",
+          "content_sha256": "1e63fe628eacab6092e1de649aaaae5660ce26e2f3e28218e1a420a0c8697af2",
+          "lines": 98,
+          "validation": "document_snippet_not_independently_compiled"
+        }
+      ]
+    },
+    {
+      "path": "resources/knowledge_base/kidbright_uai.md",
+      "category": "bundled_knowledge",
+      "bytes": 30376,
+      "sha256": "6e1c6ef51e541a8e5588b3de6e35a17099c2eeca699b76767e9d003b81d0b0a5",
+      "line_count": 191,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": []
+    },
+    {
+      "path": "resources/knowledge_base/led_16x8_matrix_mapping.md",
+      "category": "bundled_knowledge",
+      "bytes": 32140,
+      "sha256": "897012b9c929c9a921f0301e0f0d7b7bf227ca4799bf8f96e443875deb861d67",
+      "line_count": 741,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": [
+        {
+          "start_line": 37,
+          "end_line": 46,
+          "language": "unspecified",
+          "content_sha256": "1f41089aa92520312246226698fed90be3ffc8c262a163a942d0fd7c362882bb",
+          "lines": 8,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 55,
+          "end_line": 59,
+          "language": "c",
+          "content_sha256": "7e9404e55d1a4c2052ea27507998231c29e3299f9b89d021eb3a3cbf1631af5c",
+          "lines": 3,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 62,
+          "end_line": 70,
+          "language": "c",
+          "content_sha256": "1129507970111c5c8c3f267466282787a36988459b0334674c79b8a116757882",
+          "lines": 7,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 77,
+          "end_line": 79,
+          "language": "c",
+          "content_sha256": "93bc8e9cde26f7b0112f7631cf6934b813868846084744c762daa045cd15172b",
+          "lines": 1,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 82,
+          "end_line": 87,
+          "language": "c",
+          "content_sha256": "c3312d5901a98e3b91aa85926eed7549747c75aaa1d90967448cb86a25e39979",
+          "lines": 4,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 95,
+          "end_line": 129,
+          "language": "c",
+          "content_sha256": "c647b6172da95086b4e619d13329a4fe8f4397bf5dedd43511ad5e2a1a3121a0",
+          "lines": 33,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 136,
+          "end_line": 148,
+          "language": "c",
+          "content_sha256": "9e72860fa455f60ab10f76e08e5e30efd7557374d4dcd38b487915f4e387f991",
+          "lines": 11,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 155,
+          "end_line": 179,
+          "language": "c",
+          "content_sha256": "b8a47a2af1d7ea3cea5cc1fd8c3c0b8e0b36f82dc2c842b820fb7b066c364822",
+          "lines": 23,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 192,
+          "end_line": 205,
+          "language": "c",
+          "content_sha256": "895c642e576c91310475cc00576c71e926545cc29dec62e687ec657e131a19e7",
+          "lines": 12,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 209,
+          "end_line": 215,
+          "language": "c",
+          "content_sha256": "e06e10d94aa7f6aef5767cc9e65c9266769e9d388236560c69b6410e034f3bc4",
+          "lines": 5,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 226,
+          "end_line": 229,
+          "language": "c",
+          "content_sha256": "1afd44012d360c5105453d85907db5814db72a9ad22f0694c93c014960513bce",
+          "lines": 2,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 232,
+          "end_line": 234,
+          "language": "c",
+          "content_sha256": "c4c85a0e3981464fe37e1ac41c28da3244522e5b3bdea525669155be54e96a2f",
+          "lines": 1,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 242,
+          "end_line": 276,
+          "language": "c",
+          "content_sha256": "abd1f7f6b38df642e275771096ccaa8bcddcf3a6b0acb0440a629172a70c756a",
+          "lines": 33,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 279,
+          "end_line": 287,
+          "language": "c",
+          "content_sha256": "d811113be0796c5273bf051a00d09a28772ac0d38d8f8d4db6efc8c5e1133845",
+          "lines": 7,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 300,
+          "end_line": 338,
+          "language": "c",
+          "content_sha256": "ac7f430ebd624adcdea3463fed0718259feb732131718e1902c5bb7abcc03c9e",
+          "lines": 37,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 346,
+          "end_line": 358,
+          "language": "c",
+          "content_sha256": "b7f5bd636808d2f64bf4a5a958f74d02251d082ad1caa70815cd5cdecfb263a6",
+          "lines": 11,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 364,
+          "end_line": 484,
+          "language": "c",
+          "content_sha256": "67f899df35b1c9786df030280af33d65dc22dce5cb56291d4fd94983fb51e5e0",
+          "lines": 119,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 522,
+          "end_line": 540,
+          "language": "c",
+          "content_sha256": "8cabdef1e1ebe7d16c12ac37c11a0fd3fd5263b09764871ca9e863c7e97acbcc",
+          "lines": 17,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 556,
+          "end_line": 588,
+          "language": "c",
+          "content_sha256": "cd0f9e339334734aa3cfc106b47775f4d4c48a3dd4b4ee22e09c1299d4998760",
+          "lines": 31,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 598,
+          "end_line": 608,
+          "language": "c",
+          "content_sha256": "510c1e4d7eda2e6ff54cf26b2a0cab1f176e4b6b8eedb2a0dbc3a9056046abb8",
+          "lines": 9,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 618,
+          "end_line": 640,
+          "language": "c",
+          "content_sha256": "71cfe2db9b21e3c4a920e897d5dfd43420491c6675d4b8786424aab4d98e40b7",
+          "lines": 21,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 644,
+          "end_line": 684,
+          "language": "c",
+          "content_sha256": "0c0dc2f70c43354e723ba19835074f97e37cf68b0cf0a8af45db420a93c32412",
+          "lines": 39,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 701,
+          "end_line": 706,
+          "language": "unspecified",
+          "content_sha256": "b6a072c9719f7a94320d7a92fd122954e7c80d5c47fd440cade3b72eb6da72a5",
+          "lines": 4,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 708,
+          "end_line": 734,
+          "language": "c",
+          "content_sha256": "2ed2d9fd44892793eb0effcd14eded0f8bd0db568e0729c87a78701094b09cd6",
+          "lines": 25,
+          "validation": "document_snippet_not_independently_compiled"
+        }
+      ]
+    },
+    {
+      "path": "resources/knowledge_base/minibike.md",
+      "category": "bundled_knowledge",
+      "bytes": 19217,
+      "sha256": "6654b5061069c6cbd0523c1b28a2d8f0014580f2bcedbab79050d34e797cbe35",
+      "line_count": 452,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": [
+        {
+          "start_line": 12,
+          "end_line": 19,
+          "language": "unspecified",
+          "content_sha256": "1342297449c9594978fc25879ad7375765484041802652831fd3791e82937bdf",
+          "lines": 6,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 63,
+          "end_line": 80,
+          "language": "c",
+          "content_sha256": "54a2a1c096041f8efe1cdc51ff3a358f9f173b2365f1815187c2f76fab66755c",
+          "lines": 16,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 83,
+          "end_line": 88,
+          "language": "c",
+          "content_sha256": "07b6146985ef5297dfccbee3d01212faeb05adbce05cf119aeddcf332793ce34",
+          "lines": 4,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 107,
+          "end_line": 120,
+          "language": "c",
+          "content_sha256": "f7f2782eeef862e69c955ad0aeecdedddc19ecbefe7b95e77b8ef021de60016d",
+          "lines": 12,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 129,
+          "end_line": 137,
+          "language": "c",
+          "content_sha256": "fa71c0e0047925dca06fbebbb04a93500571c0abf0261f2de8ee3724b3366852",
+          "lines": 7,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 140,
+          "end_line": 146,
+          "language": "c",
+          "content_sha256": "6b4bb51171b64a8ae6686ea6bd67c40dccfc7458f378dac3b43a9a1eb742880a",
+          "lines": 5,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 150,
+          "end_line": 158,
+          "language": "c",
+          "content_sha256": "f41f67e36bdd4732b6573d8fd56fcdce8dd74176bc720a98a807543a79426d8f",
+          "lines": 7,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 161,
+          "end_line": 168,
+          "language": "c",
+          "content_sha256": "f5ec6b6bbb52f5f74faa10c447e61edb91a1a8a7576889b88b41ec9ced40db73",
+          "lines": 6,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 246,
+          "end_line": 249,
+          "language": "c",
+          "content_sha256": "e820db6268c0cea53c2de5da2fc6baafd3edc718796d88dac43f97a5655f8c86",
+          "lines": 2,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 253,
+          "end_line": 257,
+          "language": "c",
+          "content_sha256": "aba435c1f964863f6263e7eaf7f16d910233fc4029aa82432b16be187f2e9887",
+          "lines": 3,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 265,
+          "end_line": 267,
+          "language": "unspecified",
+          "content_sha256": "dcaca4f2179345399ac621d4c68270cd8a805b0cff2dc7901d180ae290f4204b",
+          "lines": 1,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 279,
+          "end_line": 287,
+          "language": "c",
+          "content_sha256": "68444c23be0eb23e657717095610c3fa294f7c431ed6c7adc24377d93df2eaee",
+          "lines": 7,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 291,
+          "end_line": 303,
+          "language": "c",
+          "content_sha256": "2e6c721825670864343bd73315e99aa6bf5dfdce77e7199942f46e0bc525ac66",
+          "lines": 11,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 311,
+          "end_line": 313,
+          "language": "c",
+          "content_sha256": "e4931ebbb53df0163508992f3675f1fbaac1d67855bd511af630422f5851ac29",
+          "lines": 1,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 320,
+          "end_line": 333,
+          "language": "c",
+          "content_sha256": "4cf58c774bb262015f49e974fa7ac1b5b72e20036a016b899514f06a1884fc6a",
+          "lines": 12,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 341,
+          "end_line": 347,
+          "language": "c",
+          "content_sha256": "b0a6c35f7fc2a83e73fcf6375b5953ce2332b8127a6747ca0ece33f2e6d3a5e3",
+          "lines": 5,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 351,
+          "end_line": 355,
+          "language": "c",
+          "content_sha256": "dfa56c86d0d95475b5c0acd0020ac97ca40065ce20ddec98a59656c24124328e",
+          "lines": 3,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 359,
+          "end_line": 366,
+          "language": "c",
+          "content_sha256": "a4fe815006bd099766f25ba0e8f1135a29e69337d05ae870a7be6d7a22f40efa",
+          "lines": 6,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 373,
+          "end_line": 377,
+          "language": "cmake",
+          "content_sha256": "b56925bdfc6b03092a88536ed58694ec4fd0289a779eaed2cfbd3375c837ee19",
+          "lines": 3,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 381,
+          "end_line": 385,
+          "language": "cmake",
+          "content_sha256": "3b30bc1bef5db43adc0b541696922521ebdde7a56de94c35be6b9910ec9b3718",
+          "lines": 3,
+          "validation": "document_snippet_not_independently_compiled"
+        }
+      ]
+    },
+    {
+      "path": "resources/knowledge_base/oled_ssd1306.md",
+      "category": "bundled_knowledge",
+      "bytes": 11658,
+      "sha256": "012ed1ab1039332d3fedd507837e85228643c37e545defe300c454e9e16b1c79",
+      "line_count": 301,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": [
+        {
+          "start_line": 21,
+          "end_line": 26,
+          "language": "c",
+          "content_sha256": "ce5d0ca2f4ea7419f7b714ada98fe0f20a0c99db494d2f23edba7f6366632149",
+          "lines": 4,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 33,
+          "end_line": 41,
+          "language": "c",
+          "content_sha256": "9135b3a818a2358cffb9521d20659cf3e4b81a2653963c6fd2f9196fb4a28dde",
+          "lines": 7,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 44,
+          "end_line": 50,
+          "language": "cmake",
+          "content_sha256": "db4463e090ff46e994dd2ef5c9f8cb3ec960b6ea6f97408b3cf0a736b9cd202d",
+          "lines": 5,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 56,
+          "end_line": 111,
+          "language": "c",
+          "content_sha256": "ecc1aa486aaa787724d7357a32932b62929487ccf82ee55efafae8eeafcfa68f",
+          "lines": 54,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 118,
+          "end_line": 130,
+          "language": "c",
+          "content_sha256": "9a557c74631896bdc4d084a2e5668c878cabc160ee072e26616532004b9183ab",
+          "lines": 11,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 133,
+          "end_line": 143,
+          "language": "c",
+          "content_sha256": "8975906eeb8ebb1ce183958c9deb5a1276f65c826188cea5db56f7ecaabc09b4",
+          "lines": 9,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 164,
+          "end_line": 171,
+          "language": "unspecified",
+          "content_sha256": "bfcb4732d331cfccb3e709674958257e425d1fb45891e8766b65d5b8eaaf771f",
+          "lines": 6,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 183,
+          "end_line": 191,
+          "language": "c",
+          "content_sha256": "ad8fba7b4a2ba0c66b1bc7fd29823e4d7a6d2faf6d6905f42d4d6dcd2d865779",
+          "lines": 7,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 197,
+          "end_line": 280,
+          "language": "c",
+          "content_sha256": "29f910258b3059b47315bd95fcf07ab527fff4cfddd171cb6b6fbe38de124bd1",
+          "lines": 82,
+          "validation": "document_snippet_not_independently_compiled"
+        }
+      ]
+    },
+    {
+      "path": "resources/knowledge_base/skate_rev1.3.md",
+      "category": "bundled_knowledge",
+      "bytes": 27315,
+      "sha256": "a7367323ccbd3849ffc7afd6eb7ec796f375b04e28fed6bbd134fec026fe05e8",
+      "line_count": 523,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": [
+        {
+          "start_line": 123,
+          "end_line": 190,
+          "language": "cpp",
+          "content_sha256": "aec037f6c1b6e5437c83a7ca1a5197c085b73796c827a5de19ac8f71b3612fa6",
+          "lines": 66,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 196,
+          "end_line": 295,
+          "language": "cpp",
+          "content_sha256": "1e63fe628eacab6092e1de649aaaae5660ce26e2f3e28218e1a420a0c8697af2",
+          "lines": 98,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 301,
+          "end_line": 330,
+          "language": "cpp",
+          "content_sha256": "d6e9fc55d5337c51276ba73767ad5b8d166f661b33e21c784caebfb1f8e6952e",
+          "lines": 28,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 373,
+          "end_line": 410,
+          "language": "unspecified",
+          "content_sha256": "10ae35fc5501c93c78b970627dd9b36bcb1af78205e6f1e15ad539518001aec5",
+          "lines": 36,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 427,
+          "end_line": 459,
+          "language": "unspecified",
+          "content_sha256": "2772c295fc72465fe9c19c3849757251afbdcbac6acc4dc965729b6fc60d842c",
+          "lines": 31,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 478,
+          "end_line": 495,
+          "language": "unspecified",
+          "content_sha256": "e16f959518f8a4f1f26ce7392a1f50a42264e113a311119c5d8f11d87c6954bc",
+          "lines": 16,
+          "validation": "document_snippet_not_independently_compiled"
+        }
+      ]
+    },
+    {
+      "path": "resources/knowledge_base/support_scope.md",
+      "category": "bundled_knowledge",
+      "bytes": 9590,
+      "sha256": "2303a4b4b3604d9a2c60cc3492c670c2214b09cc30953b3574a361266bd317b1",
+      "line_count": 138,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": []
+    },
+    {
+      "path": "src-tauri/src/ai/system_prompt.txt",
+      "category": "system_prompt",
+      "bytes": 89740,
+      "sha256": "f70ea53f0e6cc7709d5ec2491bfb806340662e2910bbd3b300b8bdf8b8f7977c",
+      "line_count": 911,
+      "utf8_error": null,
+      "replacement_character_lines": [],
+      "unclosed_fence_line": null,
+      "code_fences": [
+        {
+          "start_line": 68,
+          "end_line": 74,
+          "language": "c",
+          "content_sha256": "97b9de27bc0f4db30fc61aa6d388b71da0b783ad874b60f499947458d6a9b283",
+          "lines": 5,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 95,
+          "end_line": 100,
+          "language": "c",
+          "content_sha256": "56f12fe1c85496f16821c78844fb849f4acf8ebbfa3972931cb713ac2442eaf8",
+          "lines": 4,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 103,
+          "end_line": 111,
+          "language": "c",
+          "content_sha256": "4e73f6fd2e5548fb4791292706a8bba47683118ed3e56a07439ffbeb7a449bce",
+          "lines": 7,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 117,
+          "end_line": 121,
+          "language": "c",
+          "content_sha256": "8c4409aace97f831e16b5e467e21cb6ee664f9c59a3facc4a5fd0a2976a3134e",
+          "lines": 3,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 123,
+          "end_line": 127,
+          "language": "c",
+          "content_sha256": "c98fa181e602487c546a8d7614fa9cabe0c671aa0e68085c2827e56df785e596",
+          "lines": 3,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 147,
+          "end_line": 157,
+          "language": "c",
+          "content_sha256": "de63bd697364d28e75b42d87861ec935672dc9b5f441a0dea9ae3bfa3f514b7a",
+          "lines": 9,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 178,
+          "end_line": 187,
+          "language": "c",
+          "content_sha256": "f205703b362ed9eb52870008b1cfd30892f7dd9c1fe29509cabf942a6b511802",
+          "lines": 8,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 208,
+          "end_line": 212,
+          "language": "unspecified",
+          "content_sha256": "967c430f475a4e1106fa2152224913876eed9ee7e055b564e65005878c2794dd",
+          "lines": 3,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 215,
+          "end_line": 217,
+          "language": "unspecified",
+          "content_sha256": "7ab09be000a56e48d243e8d1e7a2e31092bff68a8c786017f3756042ba0fa8ee",
+          "lines": 1,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 315,
+          "end_line": 330,
+          "language": "c",
+          "content_sha256": "90eae7f62fb9e1edf57878a63506e42eac165a47da4a2606ea2059a8c57ddccd",
+          "lines": 14,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 333,
+          "end_line": 344,
+          "language": "c",
+          "content_sha256": "648eb8958f13a921521cc22b801b5e0c880d59712f7eff35421eb7539f6346c1",
+          "lines": 10,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 348,
+          "end_line": 370,
+          "language": "c",
+          "content_sha256": "320590b277cfaef3cf1d298d67746b5cc94c83216c8638e066fd01a80192f280",
+          "lines": 21,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 380,
+          "end_line": 390,
+          "language": "c",
+          "content_sha256": "e18366ee7ae5b924cbad7a5e2508afdaedd31633568883720c650db69a44c089",
+          "lines": 9,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 394,
+          "end_line": 412,
+          "language": "c",
+          "content_sha256": "71faa94f5cbd84a0cf076566807b5df1bef7278641f486d00653e5daeef7e917",
+          "lines": 17,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 434,
+          "end_line": 439,
+          "language": "c",
+          "content_sha256": "1ae2fc80598c91f025b177f44ada511bcd198d11256b072f61d7753017262861",
+          "lines": 4,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 448,
+          "end_line": 462,
+          "language": "c",
+          "content_sha256": "72d710b5fd2597e1b6bc3de30da6edb70156e2791c1ae45dbc949a4c2cd0fc81",
+          "lines": 13,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 476,
+          "end_line": 510,
+          "language": "c",
+          "content_sha256": "60574a7a944709c89e97dbc7c35cd3c7f7ca15465a0c1b688f965ce79fe595c8",
+          "lines": 33,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 517,
+          "end_line": 522,
+          "language": "unspecified",
+          "content_sha256": "b6a072c9719f7a94320d7a92fd122954e7c80d5c47fd440cade3b72eb6da72a5",
+          "lines": 4,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 523,
+          "end_line": 542,
+          "language": "c",
+          "content_sha256": "e5aaf444682a2d6c84736a00888b0cc28aaa02cbca36b7c02146c1654ad57133",
+          "lines": 18,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 689,
+          "end_line": 693,
+          "language": "c",
+          "content_sha256": "1c89427dd9e5c7e6a5f607fae9352de6c718039f33a9868ce3b5263992b981b2",
+          "lines": 3,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 766,
+          "end_line": 811,
+          "language": "c",
+          "content_sha256": "04896dd4dfee2642717f6d529dd0583249b11c9cb4cdbfb6c9c3a99c78e52a3a",
+          "lines": 44,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 823,
+          "end_line": 827,
+          "language": "c",
+          "content_sha256": "f5aaa9fd5d06989924699c679ea6747d660411f40e4c3be4a8f8968c931c9ab7",
+          "lines": 3,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 830,
+          "end_line": 835,
+          "language": "c",
+          "content_sha256": "33f7c15adca9d3a6b565951aa464f3d118e43a84ddddd265e7c5f25b8462d9e2",
+          "lines": 4,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 838,
+          "end_line": 877,
+          "language": "c",
+          "content_sha256": "8ab37693403eda507f2f8edce4e5658502794588244b2a67bccf0c883f3d61a0",
+          "lines": 38,
+          "validation": "document_snippet_not_independently_compiled"
+        },
+        {
+          "start_line": 880,
+          "end_line": 896,
+          "language": "c",
+          "content_sha256": "c0d5d6f81cb2e3004320648213cf782ff95509473240ee3f36c0c1e91f7462bc",
+          "lines": 15,
+          "validation": "document_snippet_not_independently_compiled"
+        }
+      ]
+    }
+  ]
+}

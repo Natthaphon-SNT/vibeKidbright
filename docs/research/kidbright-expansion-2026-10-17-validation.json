@@ -1,0 +1,1001 @@
+{
+  "schema_version": 1,
+  "validation_date": "2026-10-17",
+  "timezone": "Asia/Bangkok",
+  "scope": "Classic KidBright board comparison, managed program sources, reviewed build workflow, matrix/music software primitives and deterministic recipes. Not full original-IDE parity.",
+  "software_checks": [
+    {
+      "command": "npm test",
+      "status": "passed",
+      "tests": 139,
+      "files": 11
+    },
+    {
+      "command": "cargo test --manifest-path src-tauri/Cargo.toml --lib --offline",
+      "status": "passed",
+      "tests": 119
+    },
+    {
+      "command": "npm run test:compat",
+      "status": "passed",
+      "checks": 490
+    },
+    {
+      "command": "npm run check:boards",
+      "status": "passed"
+    },
+    {
+      "command": "npm run build:release",
+      "status": "passed"
+    }
+  ],
+  "host_c_checks": [
+    {
+      "suite": "core",
+      "command": "npm run test:compat",
+      "status": "passed",
+      "checks": 122,
+      "sources": [
+        {
+          "path": "knowledge_base/compatibility/kb_core.c",
+          "sha256": "05359f6f1dc8a402a4420bc9549230cb20a04900c2b8544a5143fe34c5409c89",
+          "bytes": 4512
+        },
+        {
+          "path": "knowledge_base/compatibility/kb_core.h",
+          "sha256": "752afe78294d71ecd68cb3054f572a15a769f240fd124f1d49bc844aa60d8398",
+          "bytes": 1584
+        },
+        {
+          "path": "src-tauri/tests/kidbright_core_test.c",
+          "sha256": "5a1221371f5b71e5663ad4076110eac92bb4383acbf17e16fa08389690964214",
+          "bytes": 4269
+        }
+      ]
+    },
+    {
+      "suite": "basic",
+      "command": "npm run test:compat",
+      "status": "passed",
+      "checks": 368,
+      "sources": [
+        {
+          "path": "knowledge_base/compatibility/kb_basic.c",
+          "sha256": "f9132c141a0e7f1bb94c3f0051d071184b20aed00596241fbae70f210282fb84",
+          "bytes": 3051
+        },
+        {
+          "path": "knowledge_base/compatibility/kb_basic.h",
+          "sha256": "d1ccee626c2c3581bf7ded5e05b4bceb452fc73582cae75e06bf9598ba0b7742",
+          "bytes": 1076
+        },
+        {
+          "path": "src-tauri/tests/kidbright_basic_test.c",
+          "sha256": "1bc87751560a8b7d2a6ca22dc97be19a4743424c4ab43dc92e2319f7a5939315",
+          "bytes": 3596
+        }
+      ]
+    }
+  ],
+  "board_catalog": {
+    "path": "knowledge_base/compatibility/board_catalog.json",
+    "compared_entries": 16,
+    "sources": 19,
+    "unresolved_label_groups": 4,
+    "executable_profile_ids": [
+      "kidbright32_v13",
+      "kidbright32_rev31"
+    ],
+    "deferred_families": [
+      "kidbright_uai",
+      "kidbright_uai_plus"
+    ]
+  },
+  "firmware_builds": [
+    {
+      "example": "button_buzzer",
+      "board_profile": "kidbright32_v13",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/kidbright-expansion-1792229747883/button_buzzer-build.log",
+        "sha256": "756d93c30a8068f524e158deeaef92b1f7563943c1b4a5920757645f7f16c03c",
+        "bytes": 149272
+      },
+      "flashed": false,
+      "sdk_version": "5.5.4",
+      "target": "esp32",
+      "status": "passed",
+      "firmware": {
+        "path": "src-tauri/target/kidbright-expansion-1792229747883/button_buzzer/build/kidbright_reference.bin",
+        "sha256": "9967c8eca654c55e4adb92d78e09a50d349187803f4909faa1d027dbf4fd6a7f",
+        "bytes": 176944
+      },
+      "sources": [
+        {
+          "path": "knowledge_base/compatibility/button_buzzer.c",
+          "sha256": "9ee6db8976f6996218d7e881be1504a273e80dc4d80ba077a9a3a89d03939c2b",
+          "bytes": 1639,
+          "exported_path": "src-tauri/target/kidbright-expansion-1792229747883/button_buzzer/main/main.c"
+        },
+        {
+          "path": "knowledge_base/compatibility/kb_core.c",
+          "sha256": "05359f6f1dc8a402a4420bc9549230cb20a04900c2b8544a5143fe34c5409c89",
+          "bytes": 4512,
+          "exported_path": "src-tauri/target/kidbright-expansion-1792229747883/button_buzzer/components/kb_reference/kb_core.c"
+        },
+        {
+          "path": "knowledge_base/compatibility/kb_core.h",
+          "sha256": "752afe78294d71ecd68cb3054f572a15a769f240fd124f1d49bc844aa60d8398",
+          "bytes": 1584,
+          "exported_path": "src-tauri/target/kidbright-expansion-1792229747883/button_buzzer/components/kb_reference/include/kb_core.h"
+        }
+      ],
+      "exported_files": [
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/button_buzzer/.vibekidbright/project.json",
+          "sha256": "b07631e9d77c23058ceee489c506aff46f0626868b479bb833f8760874fe19a6",
+          "bytes": 341
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/button_buzzer/CMakeLists.txt",
+          "sha256": "61cd1467cee661e4a751050f918f84bf33c79f130ef0da157d147a7877d5cc8b",
+          "bytes": 116
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/button_buzzer/components/kb_reference/CMakeLists.txt",
+          "sha256": "d3e111e44361bca036b4583b951e54b901496ed00429291c79ac1926011eb175",
+          "bytes": 64
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/button_buzzer/components/kb_reference/include/kb_core.h",
+          "sha256": "752afe78294d71ecd68cb3054f572a15a769f240fd124f1d49bc844aa60d8398",
+          "bytes": 1584
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/button_buzzer/components/kb_reference/kb_core.c",
+          "sha256": "05359f6f1dc8a402a4420bc9549230cb20a04900c2b8544a5143fe34c5409c89",
+          "bytes": 4512
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/button_buzzer/main/CMakeLists.txt",
+          "sha256": "40c63b8ba0b0903f1dc9b3da8ba55ae8d372be183d79642ad74dc1a8588d308e",
+          "bytes": 204
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/button_buzzer/main/kb_board.h",
+          "sha256": "f8b043655135aa2a67ae236f7c26530a1398219efe474b201594a41a30c6d35e",
+          "bytes": 215
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/button_buzzer/main/main.c",
+          "sha256": "9ee6db8976f6996218d7e881be1504a273e80dc4d80ba077a9a3a89d03939c2b",
+          "bytes": 1639
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/button_buzzer/sdkconfig",
+          "sha256": "ded0a83d67695ca201f0b4aec1b8a8d633490c9633a848b65d82d47a361cd561",
+          "bytes": 68194
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/button_buzzer/sdkconfig.defaults",
+          "sha256": "1ac64f587ebfc0ac672551c8dde4b2682a8c241633d5b7a941cabaa71347e99a",
+          "bytes": 50
+        }
+      ]
+    },
+    {
+      "example": "temperature_serial",
+      "board_profile": "kidbright32_rev31",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/kidbright-expansion-1792229747883/temperature_serial-build.log",
+        "sha256": "aff35b4c848530b1fe43215f71e989c006d5e043160d356fbe2ab816ea255ea9",
+        "bytes": 149319
+      },
+      "flashed": false,
+      "sdk_version": "5.5.4",
+      "target": "esp32",
+      "status": "passed",
+      "firmware": {
+        "path": "src-tauri/target/kidbright-expansion-1792229747883/temperature_serial/build/kidbright_reference.bin",
+        "sha256": "893f65b9da21ce1000fd8fade09f18f554e7f00678a87efb3a9b3e4574e473b5",
+        "bytes": 183600
+      },
+      "sources": [
+        {
+          "path": "knowledge_base/compatibility/temperature_serial.c",
+          "sha256": "57cfb940c7038b478ebbdccb8466e08888baf0ed266ab58535f0a9596c61b1f3",
+          "bytes": 1530,
+          "exported_path": "src-tauri/target/kidbright-expansion-1792229747883/temperature_serial/main/main.c"
+        },
+        {
+          "path": "knowledge_base/compatibility/kb_core.c",
+          "sha256": "05359f6f1dc8a402a4420bc9549230cb20a04900c2b8544a5143fe34c5409c89",
+          "bytes": 4512,
+          "exported_path": "src-tauri/target/kidbright-expansion-1792229747883/temperature_serial/components/kb_reference/kb_core.c"
+        },
+        {
+          "path": "knowledge_base/compatibility/kb_core.h",
+          "sha256": "752afe78294d71ecd68cb3054f572a15a769f240fd124f1d49bc844aa60d8398",
+          "bytes": 1584,
+          "exported_path": "src-tauri/target/kidbright-expansion-1792229747883/temperature_serial/components/kb_reference/include/kb_core.h"
+        }
+      ],
+      "exported_files": [
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/temperature_serial/.vibekidbright/project.json",
+          "sha256": "570c031cc36e35223eed663cf4c160845521efce2563f0862f7bdf7027933e37",
+          "bytes": 348
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/temperature_serial/CMakeLists.txt",
+          "sha256": "61cd1467cee661e4a751050f918f84bf33c79f130ef0da157d147a7877d5cc8b",
+          "bytes": 116
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/temperature_serial/components/kb_reference/CMakeLists.txt",
+          "sha256": "d3e111e44361bca036b4583b951e54b901496ed00429291c79ac1926011eb175",
+          "bytes": 64
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/temperature_serial/components/kb_reference/include/kb_core.h",
+          "sha256": "752afe78294d71ecd68cb3054f572a15a769f240fd124f1d49bc844aa60d8398",
+          "bytes": 1584
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/temperature_serial/components/kb_reference/kb_core.c",
+          "sha256": "05359f6f1dc8a402a4420bc9549230cb20a04900c2b8544a5143fe34c5409c89",
+          "bytes": 4512
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/temperature_serial/main/CMakeLists.txt",
+          "sha256": "40c63b8ba0b0903f1dc9b3da8ba55ae8d372be183d79642ad74dc1a8588d308e",
+          "bytes": 204
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/temperature_serial/main/kb_board.h",
+          "sha256": "1659cbe62698123f28153ceb09873005ad97cee717938d3691413976a8c87336",
+          "bytes": 217
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/temperature_serial/main/main.c",
+          "sha256": "57cfb940c7038b478ebbdccb8466e08888baf0ed266ab58535f0a9596c61b1f3",
+          "bytes": 1530
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/temperature_serial/sdkconfig",
+          "sha256": "ded0a83d67695ca201f0b4aec1b8a8d633490c9633a848b65d82d47a361cd561",
+          "bytes": 68194
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/temperature_serial/sdkconfig.defaults",
+          "sha256": "1ac64f587ebfc0ac672551c8dde4b2682a8c241633d5b7a941cabaa71347e99a",
+          "bytes": 50
+        }
+      ]
+    },
+    {
+      "example": "music_scale",
+      "board_profile": "kidbright32_v13",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/kidbright-expansion-1792229747883/music_scale-build.log",
+        "sha256": "3262cd51a90473b855e0758294f7cfc57f84320e3288467f7a1f4039bcaccf4e",
+        "bytes": 149361
+      },
+      "flashed": false,
+      "sdk_version": "5.5.4",
+      "target": "esp32",
+      "status": "passed",
+      "firmware": {
+        "path": "src-tauri/target/kidbright-expansion-1792229747883/music_scale/build/kidbright_reference.bin",
+        "sha256": "04af7c2afe23056bd8399716d2e575bf348eda90935d7e3229f64b049405f96d",
+        "bytes": 182144
+      },
+      "sources": [
+        {
+          "path": "knowledge_base/compatibility/music_scale.c",
+          "sha256": "7f8bcaf0a33e94e9e017eabe3cde9315134a8c215152ee4a8e63335c2331a41a",
+          "bytes": 1921,
+          "exported_path": "src-tauri/target/kidbright-expansion-1792229747883/music_scale/main/main.c"
+        },
+        {
+          "path": "knowledge_base/compatibility/kb_core.c",
+          "sha256": "05359f6f1dc8a402a4420bc9549230cb20a04900c2b8544a5143fe34c5409c89",
+          "bytes": 4512,
+          "exported_path": "src-tauri/target/kidbright-expansion-1792229747883/music_scale/components/kb_reference/kb_core.c"
+        },
+        {
+          "path": "knowledge_base/compatibility/kb_core.h",
+          "sha256": "752afe78294d71ecd68cb3054f572a15a769f240fd124f1d49bc844aa60d8398",
+          "bytes": 1584,
+          "exported_path": "src-tauri/target/kidbright-expansion-1792229747883/music_scale/components/kb_reference/include/kb_core.h"
+        },
+        {
+          "path": "knowledge_base/compatibility/kb_basic.c",
+          "sha256": "f9132c141a0e7f1bb94c3f0051d071184b20aed00596241fbae70f210282fb84",
+          "bytes": 3051,
+          "exported_path": "src-tauri/target/kidbright-expansion-1792229747883/music_scale/components/kb_reference/kb_basic.c"
+        },
+        {
+          "path": "knowledge_base/compatibility/kb_basic.h",
+          "sha256": "d1ccee626c2c3581bf7ded5e05b4bceb452fc73582cae75e06bf9598ba0b7742",
+          "bytes": 1076,
+          "exported_path": "src-tauri/target/kidbright-expansion-1792229747883/music_scale/components/kb_reference/include/kb_basic.h"
+        }
+      ],
+      "exported_files": [
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/music_scale/.vibekidbright/project.json",
+          "sha256": "071361fc2a88b76a652f6af12ea914e4a0d1f5c50fdbb8fe350b6fcaafaaf9f3",
+          "bytes": 339
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/music_scale/CMakeLists.txt",
+          "sha256": "61cd1467cee661e4a751050f918f84bf33c79f130ef0da157d147a7877d5cc8b",
+          "bytes": 116
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/music_scale/components/kb_reference/CMakeLists.txt",
+          "sha256": "3c058ac197195fefc25bf0631a49cdeaf10979e4569912be37560554b8bceaf6",
+          "bytes": 77
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/music_scale/components/kb_reference/include/kb_basic.h",
+          "sha256": "d1ccee626c2c3581bf7ded5e05b4bceb452fc73582cae75e06bf9598ba0b7742",
+          "bytes": 1076
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/music_scale/components/kb_reference/include/kb_core.h",
+          "sha256": "752afe78294d71ecd68cb3054f572a15a769f240fd124f1d49bc844aa60d8398",
+          "bytes": 1584
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/music_scale/components/kb_reference/kb_basic.c",
+          "sha256": "f9132c141a0e7f1bb94c3f0051d071184b20aed00596241fbae70f210282fb84",
+          "bytes": 3051
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/music_scale/components/kb_reference/kb_core.c",
+          "sha256": "05359f6f1dc8a402a4420bc9549230cb20a04900c2b8544a5143fe34c5409c89",
+          "bytes": 4512
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/music_scale/main/CMakeLists.txt",
+          "sha256": "40c63b8ba0b0903f1dc9b3da8ba55ae8d372be183d79642ad74dc1a8588d308e",
+          "bytes": 204
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/music_scale/main/kb_board.h",
+          "sha256": "f8b043655135aa2a67ae236f7c26530a1398219efe474b201594a41a30c6d35e",
+          "bytes": 215
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/music_scale/main/main.c",
+          "sha256": "7f8bcaf0a33e94e9e017eabe3cde9315134a8c215152ee4a8e63335c2331a41a",
+          "bytes": 1921
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/music_scale/sdkconfig",
+          "sha256": "ded0a83d67695ca201f0b4aec1b8a8d633490c9633a848b65d82d47a361cd561",
+          "bytes": 68194
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/music_scale/sdkconfig.defaults",
+          "sha256": "1ac64f587ebfc0ac672551c8dde4b2682a8c241633d5b7a941cabaa71347e99a",
+          "bytes": 50
+        }
+      ]
+    },
+    {
+      "example": "matrix_counter",
+      "board_profile": "kidbright32_v13",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/kidbright-expansion-1792229747883/matrix_counter-build.log",
+        "sha256": "61b99ad38a4eb13a56c42d6abf5fb67599a44ae1e2f7f7258af9de651b6fe058",
+        "bytes": 149506
+      },
+      "flashed": false,
+      "sdk_version": "5.5.4",
+      "target": "esp32",
+      "status": "passed",
+      "firmware": {
+        "path": "src-tauri/target/kidbright-expansion-1792229747883/matrix_counter/build/kidbright_reference.bin",
+        "sha256": "6cb66c462b238e29da7d660942709ac2a0a07db9f99b4f90951b6e2e529fdfb2",
+        "bytes": 184624
+      },
+      "sources": [
+        {
+          "path": "knowledge_base/compatibility/matrix_counter.c",
+          "sha256": "ab8355a593346f7a6bd70e1b12ef92cd404605303b02b181190ad43e4469de86",
+          "bytes": 1251,
+          "exported_path": "src-tauri/target/kidbright-expansion-1792229747883/matrix_counter/main/main.c"
+        },
+        {
+          "path": "knowledge_base/compatibility/kb_core.c",
+          "sha256": "05359f6f1dc8a402a4420bc9549230cb20a04900c2b8544a5143fe34c5409c89",
+          "bytes": 4512,
+          "exported_path": "src-tauri/target/kidbright-expansion-1792229747883/matrix_counter/components/kb_reference/kb_core.c"
+        },
+        {
+          "path": "knowledge_base/compatibility/kb_core.h",
+          "sha256": "752afe78294d71ecd68cb3054f572a15a769f240fd124f1d49bc844aa60d8398",
+          "bytes": 1584,
+          "exported_path": "src-tauri/target/kidbright-expansion-1792229747883/matrix_counter/components/kb_reference/include/kb_core.h"
+        },
+        {
+          "path": "knowledge_base/compatibility/kb_basic.c",
+          "sha256": "f9132c141a0e7f1bb94c3f0051d071184b20aed00596241fbae70f210282fb84",
+          "bytes": 3051,
+          "exported_path": "src-tauri/target/kidbright-expansion-1792229747883/matrix_counter/components/kb_reference/kb_basic.c"
+        },
+        {
+          "path": "knowledge_base/compatibility/kb_basic.h",
+          "sha256": "d1ccee626c2c3581bf7ded5e05b4bceb452fc73582cae75e06bf9598ba0b7742",
+          "bytes": 1076,
+          "exported_path": "src-tauri/target/kidbright-expansion-1792229747883/matrix_counter/components/kb_reference/include/kb_basic.h"
+        },
+        {
+          "path": "knowledge_base/compatibility/kb_display_idf.c",
+          "sha256": "328347ff7007138e375a7ad8455e4c00c21d6566ff0776a0943286ecf5c9bc1c",
+          "bytes": 1533,
+          "exported_path": "src-tauri/target/kidbright-expansion-1792229747883/matrix_counter/components/kb_reference/kb_display_idf.c"
+        },
+        {
+          "path": "knowledge_base/compatibility/kb_display_idf.h",
+          "sha256": "49a48a6f24ec79d031ba3887a4dd191fe10458f3c7230db2fd30b5c6785f526c",
+          "bytes": 647,
+          "exported_path": "src-tauri/target/kidbright-expansion-1792229747883/matrix_counter/components/kb_reference/include/kb_display_idf.h"
+        }
+      ],
+      "exported_files": [
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/matrix_counter/.vibekidbright/project.json",
+          "sha256": "af07fc1c02417e44175c870dac060de43c93d61a338e3e520fc277b4fe1cc930",
+          "bytes": 342
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/matrix_counter/CMakeLists.txt",
+          "sha256": "61cd1467cee661e4a751050f918f84bf33c79f130ef0da157d147a7877d5cc8b",
+          "bytes": 116
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/matrix_counter/components/kb_reference/CMakeLists.txt",
+          "sha256": "0cb605c1e9b24b0eff6ffbd93dd16a89f0036f2edab6786a21f962c4ee8aa4a6",
+          "bytes": 120
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/matrix_counter/components/kb_reference/include/kb_basic.h",
+          "sha256": "d1ccee626c2c3581bf7ded5e05b4bceb452fc73582cae75e06bf9598ba0b7742",
+          "bytes": 1076
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/matrix_counter/components/kb_reference/include/kb_core.h",
+          "sha256": "752afe78294d71ecd68cb3054f572a15a769f240fd124f1d49bc844aa60d8398",
+          "bytes": 1584
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/matrix_counter/components/kb_reference/include/kb_display_idf.h",
+          "sha256": "49a48a6f24ec79d031ba3887a4dd191fe10458f3c7230db2fd30b5c6785f526c",
+          "bytes": 647
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/matrix_counter/components/kb_reference/kb_basic.c",
+          "sha256": "f9132c141a0e7f1bb94c3f0051d071184b20aed00596241fbae70f210282fb84",
+          "bytes": 3051
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/matrix_counter/components/kb_reference/kb_core.c",
+          "sha256": "05359f6f1dc8a402a4420bc9549230cb20a04900c2b8544a5143fe34c5409c89",
+          "bytes": 4512
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/matrix_counter/components/kb_reference/kb_display_idf.c",
+          "sha256": "328347ff7007138e375a7ad8455e4c00c21d6566ff0776a0943286ecf5c9bc1c",
+          "bytes": 1533
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/matrix_counter/main/CMakeLists.txt",
+          "sha256": "40c63b8ba0b0903f1dc9b3da8ba55ae8d372be183d79642ad74dc1a8588d308e",
+          "bytes": 204
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/matrix_counter/main/kb_board.h",
+          "sha256": "7cecf77569bcffeb378f0a9cfbfb0fe4581859f74eff16549be76438c75f52d8",
+          "bytes": 366
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/matrix_counter/main/main.c",
+          "sha256": "ab8355a593346f7a6bd70e1b12ef92cd404605303b02b181190ad43e4469de86",
+          "bytes": 1251
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/matrix_counter/sdkconfig",
+          "sha256": "ded0a83d67695ca201f0b4aec1b8a8d633490c9633a848b65d82d47a361cd561",
+          "bytes": 68194
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/matrix_counter/sdkconfig.defaults",
+          "sha256": "1ac64f587ebfc0ac672551c8dde4b2682a8c241633d5b7a941cabaa71347e99a",
+          "bytes": 50
+        }
+      ]
+    },
+    {
+      "example": "button_buzzer",
+      "board_profile": "kidbright32_rev31",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/kidbright-expansion-1792229747883/variant_rev31/button_buzzer-build.log",
+        "sha256": "fb66525b414cc648d60547e4bb2937926ffaf5de8e1156867c0f28dbba7908cc",
+        "bytes": 150111
+      },
+      "flashed": false,
+      "sdk_version": "5.5.4",
+      "target": "esp32",
+      "status": "passed",
+      "firmware": {
+        "path": "src-tauri/target/kidbright-expansion-1792229747883/variant_rev31/button_buzzer/build/kidbright_reference.bin",
+        "sha256": "17924ee462245cc44e326da9b276586bb1117c5749e7f605743e368e786edd57",
+        "bytes": 176944
+      },
+      "sources": [
+        {
+          "path": "knowledge_base/compatibility/button_buzzer.c",
+          "sha256": "9ee6db8976f6996218d7e881be1504a273e80dc4d80ba077a9a3a89d03939c2b",
+          "bytes": 1639,
+          "exported_path": "src-tauri/target/kidbright-expansion-1792229747883/variant_rev31/button_buzzer/main/main.c"
+        },
+        {
+          "path": "knowledge_base/compatibility/kb_core.c",
+          "sha256": "05359f6f1dc8a402a4420bc9549230cb20a04900c2b8544a5143fe34c5409c89",
+          "bytes": 4512,
+          "exported_path": "src-tauri/target/kidbright-expansion-1792229747883/variant_rev31/button_buzzer/components/kb_reference/kb_core.c"
+        },
+        {
+          "path": "knowledge_base/compatibility/kb_core.h",
+          "sha256": "752afe78294d71ecd68cb3054f572a15a769f240fd124f1d49bc844aa60d8398",
+          "bytes": 1584,
+          "exported_path": "src-tauri/target/kidbright-expansion-1792229747883/variant_rev31/button_buzzer/components/kb_reference/include/kb_core.h"
+        }
+      ],
+      "exported_files": [
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/variant_rev31/button_buzzer/.vibekidbright/project.json",
+          "sha256": "2ba33959207698bc163643d57821a0b4bcf0e24d6a387d022e688109b62e1451",
+          "bytes": 343
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/variant_rev31/button_buzzer/CMakeLists.txt",
+          "sha256": "61cd1467cee661e4a751050f918f84bf33c79f130ef0da157d147a7877d5cc8b",
+          "bytes": 116
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/variant_rev31/button_buzzer/components/kb_reference/CMakeLists.txt",
+          "sha256": "d3e111e44361bca036b4583b951e54b901496ed00429291c79ac1926011eb175",
+          "bytes": 64
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/variant_rev31/button_buzzer/components/kb_reference/include/kb_core.h",
+          "sha256": "752afe78294d71ecd68cb3054f572a15a769f240fd124f1d49bc844aa60d8398",
+          "bytes": 1584
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/variant_rev31/button_buzzer/components/kb_reference/kb_core.c",
+          "sha256": "05359f6f1dc8a402a4420bc9549230cb20a04900c2b8544a5143fe34c5409c89",
+          "bytes": 4512
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/variant_rev31/button_buzzer/main/CMakeLists.txt",
+          "sha256": "40c63b8ba0b0903f1dc9b3da8ba55ae8d372be183d79642ad74dc1a8588d308e",
+          "bytes": 204
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/variant_rev31/button_buzzer/main/kb_board.h",
+          "sha256": "1659cbe62698123f28153ceb09873005ad97cee717938d3691413976a8c87336",
+          "bytes": 217
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/variant_rev31/button_buzzer/main/main.c",
+          "sha256": "9ee6db8976f6996218d7e881be1504a273e80dc4d80ba077a9a3a89d03939c2b",
+          "bytes": 1639
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/variant_rev31/button_buzzer/sdkconfig",
+          "sha256": "ded0a83d67695ca201f0b4aec1b8a8d633490c9633a848b65d82d47a361cd561",
+          "bytes": 68194
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/variant_rev31/button_buzzer/sdkconfig.defaults",
+          "sha256": "1ac64f587ebfc0ac672551c8dde4b2682a8c241633d5b7a941cabaa71347e99a",
+          "bytes": 50
+        }
+      ]
+    },
+    {
+      "example": "music_scale",
+      "board_profile": "kidbright32_rev31",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/kidbright-expansion-1792229747883/variant_rev31/music_scale-build.log",
+        "sha256": "7fc57f3d0fa96e01cef36f88fd75d0e450594b6944f52a0ff5934bc0fb1c3e62",
+        "bytes": 150186
+      },
+      "flashed": false,
+      "sdk_version": "5.5.4",
+      "target": "esp32",
+      "status": "passed",
+      "firmware": {
+        "path": "src-tauri/target/kidbright-expansion-1792229747883/variant_rev31/music_scale/build/kidbright_reference.bin",
+        "sha256": "3d718fe69f4d1c4dd9913ff35e3f224ddb644dcfe266cccea727f7b045e5eac2",
+        "bytes": 182144
+      },
+      "sources": [
+        {
+          "path": "knowledge_base/compatibility/music_scale.c",
+          "sha256": "7f8bcaf0a33e94e9e017eabe3cde9315134a8c215152ee4a8e63335c2331a41a",
+          "bytes": 1921,
+          "exported_path": "src-tauri/target/kidbright-expansion-1792229747883/variant_rev31/music_scale/main/main.c"
+        },
+        {
+          "path": "knowledge_base/compatibility/kb_core.c",
+          "sha256": "05359f6f1dc8a402a4420bc9549230cb20a04900c2b8544a5143fe34c5409c89",
+          "bytes": 4512,
+          "exported_path": "src-tauri/target/kidbright-expansion-1792229747883/variant_rev31/music_scale/components/kb_reference/kb_core.c"
+        },
+        {
+          "path": "knowledge_base/compatibility/kb_core.h",
+          "sha256": "752afe78294d71ecd68cb3054f572a15a769f240fd124f1d49bc844aa60d8398",
+          "bytes": 1584,
+          "exported_path": "src-tauri/target/kidbright-expansion-1792229747883/variant_rev31/music_scale/components/kb_reference/include/kb_core.h"
+        },
+        {
+          "path": "knowledge_base/compatibility/kb_basic.c",
+          "sha256": "f9132c141a0e7f1bb94c3f0051d071184b20aed00596241fbae70f210282fb84",
+          "bytes": 3051,
+          "exported_path": "src-tauri/target/kidbright-expansion-1792229747883/variant_rev31/music_scale/components/kb_reference/kb_basic.c"
+        },
+        {
+          "path": "knowledge_base/compatibility/kb_basic.h",
+          "sha256": "d1ccee626c2c3581bf7ded5e05b4bceb452fc73582cae75e06bf9598ba0b7742",
+          "bytes": 1076,
+          "exported_path": "src-tauri/target/kidbright-expansion-1792229747883/variant_rev31/music_scale/components/kb_reference/include/kb_basic.h"
+        }
+      ],
+      "exported_files": [
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/variant_rev31/music_scale/.vibekidbright/project.json",
+          "sha256": "eb17f8aa35d4f96a0bf4a35a14bbd4fd31611845b31e5980a2209d6666783749",
+          "bytes": 341
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/variant_rev31/music_scale/CMakeLists.txt",
+          "sha256": "61cd1467cee661e4a751050f918f84bf33c79f130ef0da157d147a7877d5cc8b",
+          "bytes": 116
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/variant_rev31/music_scale/components/kb_reference/CMakeLists.txt",
+          "sha256": "3c058ac197195fefc25bf0631a49cdeaf10979e4569912be37560554b8bceaf6",
+          "bytes": 77
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/variant_rev31/music_scale/components/kb_reference/include/kb_basic.h",
+          "sha256": "d1ccee626c2c3581bf7ded5e05b4bceb452fc73582cae75e06bf9598ba0b7742",
+          "bytes": 1076
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/variant_rev31/music_scale/components/kb_reference/include/kb_core.h",
+          "sha256": "752afe78294d71ecd68cb3054f572a15a769f240fd124f1d49bc844aa60d8398",
+          "bytes": 1584
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/variant_rev31/music_scale/components/kb_reference/kb_basic.c",
+          "sha256": "f9132c141a0e7f1bb94c3f0051d071184b20aed00596241fbae70f210282fb84",
+          "bytes": 3051
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/variant_rev31/music_scale/components/kb_reference/kb_core.c",
+          "sha256": "05359f6f1dc8a402a4420bc9549230cb20a04900c2b8544a5143fe34c5409c89",
+          "bytes": 4512
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/variant_rev31/music_scale/main/CMakeLists.txt",
+          "sha256": "40c63b8ba0b0903f1dc9b3da8ba55ae8d372be183d79642ad74dc1a8588d308e",
+          "bytes": 204
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/variant_rev31/music_scale/main/kb_board.h",
+          "sha256": "1659cbe62698123f28153ceb09873005ad97cee717938d3691413976a8c87336",
+          "bytes": 217
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/variant_rev31/music_scale/main/main.c",
+          "sha256": "7f8bcaf0a33e94e9e017eabe3cde9315134a8c215152ee4a8e63335c2331a41a",
+          "bytes": 1921
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/variant_rev31/music_scale/sdkconfig",
+          "sha256": "ded0a83d67695ca201f0b4aec1b8a8d633490c9633a848b65d82d47a361cd561",
+          "bytes": 68194
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/variant_rev31/music_scale/sdkconfig.defaults",
+          "sha256": "1ac64f587ebfc0ac672551c8dde4b2682a8c241633d5b7a941cabaa71347e99a",
+          "bytes": 50
+        }
+      ]
+    },
+    {
+      "example": "temperature_serial",
+      "board_profile": "kidbright32_v13",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/kidbright-expansion-1792229747883/variant_v13/temperature_serial-build.log",
+        "sha256": "1806c100da4a58b9bf27953bb901c832a140aaa7e73e28775a0bcf23a82290e5",
+        "bytes": 150127
+      },
+      "flashed": false,
+      "sdk_version": "5.5.4",
+      "target": "esp32",
+      "status": "passed",
+      "firmware": {
+        "path": "src-tauri/target/kidbright-expansion-1792229747883/variant_v13/temperature_serial/build/kidbright_reference.bin",
+        "sha256": "bb3234db0128787e9ea9d82384f1a37fd4eaad799ce769199b2ffbc482d741e2",
+        "bytes": 183600
+      },
+      "sources": [
+        {
+          "path": "knowledge_base/compatibility/temperature_serial.c",
+          "sha256": "57cfb940c7038b478ebbdccb8466e08888baf0ed266ab58535f0a9596c61b1f3",
+          "bytes": 1530,
+          "exported_path": "src-tauri/target/kidbright-expansion-1792229747883/variant_v13/temperature_serial/main/main.c"
+        },
+        {
+          "path": "knowledge_base/compatibility/kb_core.c",
+          "sha256": "05359f6f1dc8a402a4420bc9549230cb20a04900c2b8544a5143fe34c5409c89",
+          "bytes": 4512,
+          "exported_path": "src-tauri/target/kidbright-expansion-1792229747883/variant_v13/temperature_serial/components/kb_reference/kb_core.c"
+        },
+        {
+          "path": "knowledge_base/compatibility/kb_core.h",
+          "sha256": "752afe78294d71ecd68cb3054f572a15a769f240fd124f1d49bc844aa60d8398",
+          "bytes": 1584,
+          "exported_path": "src-tauri/target/kidbright-expansion-1792229747883/variant_v13/temperature_serial/components/kb_reference/include/kb_core.h"
+        }
+      ],
+      "exported_files": [
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/variant_v13/temperature_serial/.vibekidbright/project.json",
+          "sha256": "9303943859d9ab931c65f70ccfedf43ff83108963c8a49002a24a565ec6f4536",
+          "bytes": 346
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/variant_v13/temperature_serial/CMakeLists.txt",
+          "sha256": "61cd1467cee661e4a751050f918f84bf33c79f130ef0da157d147a7877d5cc8b",
+          "bytes": 116
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/variant_v13/temperature_serial/components/kb_reference/CMakeLists.txt",
+          "sha256": "d3e111e44361bca036b4583b951e54b901496ed00429291c79ac1926011eb175",
+          "bytes": 64
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/variant_v13/temperature_serial/components/kb_reference/include/kb_core.h",
+          "sha256": "752afe78294d71ecd68cb3054f572a15a769f240fd124f1d49bc844aa60d8398",
+          "bytes": 1584
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/variant_v13/temperature_serial/components/kb_reference/kb_core.c",
+          "sha256": "05359f6f1dc8a402a4420bc9549230cb20a04900c2b8544a5143fe34c5409c89",
+          "bytes": 4512
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/variant_v13/temperature_serial/main/CMakeLists.txt",
+          "sha256": "40c63b8ba0b0903f1dc9b3da8ba55ae8d372be183d79642ad74dc1a8588d308e",
+          "bytes": 204
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/variant_v13/temperature_serial/main/kb_board.h",
+          "sha256": "f8b043655135aa2a67ae236f7c26530a1398219efe474b201594a41a30c6d35e",
+          "bytes": 215
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/variant_v13/temperature_serial/main/main.c",
+          "sha256": "57cfb940c7038b478ebbdccb8466e08888baf0ed266ab58535f0a9596c61b1f3",
+          "bytes": 1530
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/variant_v13/temperature_serial/sdkconfig",
+          "sha256": "ded0a83d67695ca201f0b4aec1b8a8d633490c9633a848b65d82d47a361cd561",
+          "bytes": 68194
+        },
+        {
+          "path": "src-tauri/target/kidbright-expansion-1792229747883/variant_v13/temperature_serial/sdkconfig.defaults",
+          "sha256": "1ac64f587ebfc0ac672551c8dde4b2682a8c241633d5b7a941cabaa71347e99a",
+          "bytes": 50
+        }
+      ]
+    }
+  ],
+  "source_hashes": [
+    {
+      "path": "src/App.tsx",
+      "sha256": "fd05ffd568f5e4db70bc35b67dfa8f17a45ba16fb0df74eda188917443ab1cac",
+      "bytes": 103211
+    },
+    {
+      "path": "src/buildFlash.ts",
+      "sha256": "355f24ee70ce33374f869193297ff054fa2e9f00dac64c098bd09d6bb08b3078",
+      "bytes": 1310
+    },
+    {
+      "path": "src/projectFiles.ts",
+      "sha256": "de2e83d4d31ce2f5d0345d52c226066d20b8d6a7bb684d04474f42f7012ea6cd",
+      "bytes": 4519
+    },
+    {
+      "path": "src/test/buildWorkflow.test.tsx",
+      "sha256": "0a4acbe3776ff396dc28ac4433c8aab6cb3f854cc89b012144882dc50bfdcf04",
+      "bytes": 11982
+    },
+    {
+      "path": "src/test/projectSidebar.test.tsx",
+      "sha256": "a198d586e1be3347a996d27e51e5473824bb3911e3353bedcd5b73b83fe13b1c",
+      "bytes": 12372
+    },
+    {
+      "path": "src-tauri/src/esp_idf.rs",
+      "sha256": "cad850d1f0c4b30eb97359066e3c1d424771e92c28c2148ae7ebb0092b763a9c",
+      "bytes": 117049
+    },
+    {
+      "path": "src-tauri/src/lib.rs",
+      "sha256": "cb46b1a1968d98faf9ec7fbcfc5a3c29e34dfbd8dad954773fb3d331fe7c4579",
+      "bytes": 5351
+    },
+    {
+      "path": "src-tauri/src/ai/compatibility.rs",
+      "sha256": "49758b6556f5d55cee2684a9a2a9938e5929f71f000ae671ca0b306098e4e986",
+      "bytes": 24178
+    },
+    {
+      "path": "src-tauri/src/ai/tools.rs",
+      "sha256": "6b8d8f6ec48cccbc5c344886f605b301f66c848d288db30ebeca332de295a9dc",
+      "bytes": 37595
+    },
+    {
+      "path": "src-tauri/src/ai/providers.rs",
+      "sha256": "6dbf3c957480832550f1c292f3f26882d17015526099e8cef21c8f6f0e073340",
+      "bytes": 71532
+    },
+    {
+      "path": "src-tauri/src/ai/language.rs",
+      "sha256": "7e46a30237577f1b29314025c07d0a3f4898515d81019b734c8257b12f415fe8",
+      "bytes": 21971
+    },
+    {
+      "path": "src-tauri/src/ai/system_prompt.txt",
+      "sha256": "a72a90cba6bd40085d597d8ca3fa5361a696a9b9115c32ae872d5796ea83634c",
+      "bytes": 81788
+    },
+    {
+      "path": "src-tauri/src/ai/project_review.rs",
+      "sha256": "659fef19f4741fb40692bb05b1b24375b8b7d8220c66285d941f7ceeb1ff4bd6",
+      "bytes": 24835
+    },
+    {
+      "path": "knowledge_base/support_scope.md",
+      "sha256": "ad4a2fe4b1785d957fc84b2ebcfce4e2f23aed1f143247b0dbd0f7041c4a6054",
+      "bytes": 7605
+    },
+    {
+      "path": "knowledge_base/all_models.md",
+      "sha256": "76bc33cd72bf6c29fe396368f34a167db556edba337154dbb7c3cb20c18ff120",
+      "bytes": 6068
+    },
+    {
+      "path": "knowledge_base/inex_ia_ip.md",
+      "sha256": "6f6fba77ae277582ba84d6d55200c43e4b43f3e29d697e193fec68f2018525d7",
+      "bytes": 7065
+    },
+    {
+      "path": "knowledge_base/compatibility/README.md",
+      "sha256": "e527c0dc8e9748525937f121d7e7690fa5dcb5070aecd4d1fd43f94c73fa2935",
+      "bytes": 7256
+    },
+    {
+      "path": "knowledge_base/compatibility/board_catalog.json",
+      "sha256": "7d4da7ec832b4f24c704f8665ea5e43f449cb441f2ca006d9fa653212da14e19",
+      "bytes": 39024
+    },
+    {
+      "path": "scripts/build-kidbright-examples.py",
+      "sha256": "66ef44ccebe944c82e695664572b2c435b50a134a05460e713586ce98c876366",
+      "bytes": 3679
+    },
+    {
+      "path": "scripts/test-kidbright-compat.mjs",
+      "sha256": "15437106f967eeeeb5e9f55f9de0493d12920583db948886c295a88558400e4c",
+      "bytes": 3117
+    },
+    {
+      "path": "scripts/check-kidbright-board-catalog.mjs",
+      "sha256": "974c240b31c390e951b2bf615d3b8e55b4078d8f632dd7841ca786ff2a939c28",
+      "bytes": 3621
+    },
+    {
+      "path": "package.json",
+      "sha256": "840cb79d8b4ce977f2d963a727f1813d5e8dc12ca42ba68e47df5c543bf9adf3",
+      "bytes": 2136
+    },
+    {
+      "path": "knowledge_base/compatibility/button_buzzer.c",
+      "sha256": "9ee6db8976f6996218d7e881be1504a273e80dc4d80ba077a9a3a89d03939c2b",
+      "bytes": 1639
+    },
+    {
+      "path": "knowledge_base/compatibility/kb_basic.c",
+      "sha256": "f9132c141a0e7f1bb94c3f0051d071184b20aed00596241fbae70f210282fb84",
+      "bytes": 3051
+    },
+    {
+      "path": "knowledge_base/compatibility/kb_core.c",
+      "sha256": "05359f6f1dc8a402a4420bc9549230cb20a04900c2b8544a5143fe34c5409c89",
+      "bytes": 4512
+    },
+    {
+      "path": "knowledge_base/compatibility/kb_display_idf.c",
+      "sha256": "328347ff7007138e375a7ad8455e4c00c21d6566ff0776a0943286ecf5c9bc1c",
+      "bytes": 1533
+    },
+    {
+      "path": "knowledge_base/compatibility/matrix_counter.c",
+      "sha256": "ab8355a593346f7a6bd70e1b12ef92cd404605303b02b181190ad43e4469de86",
+      "bytes": 1251
+    },
+    {
+      "path": "knowledge_base/compatibility/music_scale.c",
+      "sha256": "7f8bcaf0a33e94e9e017eabe3cde9315134a8c215152ee4a8e63335c2331a41a",
+      "bytes": 1921
+    },
+    {
+      "path": "knowledge_base/compatibility/temperature_serial.c",
+      "sha256": "57cfb940c7038b478ebbdccb8466e08888baf0ed266ab58535f0a9596c61b1f3",
+      "bytes": 1530
+    },
+    {
+      "path": "knowledge_base/compatibility/kb_basic.h",
+      "sha256": "d1ccee626c2c3581bf7ded5e05b4bceb452fc73582cae75e06bf9598ba0b7742",
+      "bytes": 1076
+    },
+    {
+      "path": "knowledge_base/compatibility/kb_core.h",
+      "sha256": "752afe78294d71ecd68cb3054f572a15a769f240fd124f1d49bc844aa60d8398",
+      "bytes": 1584
+    },
+    {
+      "path": "knowledge_base/compatibility/kb_display_idf.h",
+      "sha256": "49a48a6f24ec79d031ba3887a4dd191fe10458f3c7230db2fd30b5c6785f526c",
+      "bytes": 647
+    }
+  ],
+  "user_reported_hardware_evidence": {
+    "path": "docs/research/kidbright-inex-user-evidence-2026-10-17.json",
+    "sha256": "e52169e68dc54716093a870bed66d09ddc39ba0c59a5ab12af757295836a185f",
+    "bytes": 2163
+  },
+  "physical_board_tested": false,
+  "physical_board_tested_by_agent": false,
+  "live_ai_provider_tested": false,
+  "original_generator_differential_tested": false,
+  "limitations": [
+    "All seven builds use the explicitly selected ESP-IDF 5.5.4 target esp32, with no dependency installation or flash. Logs/binaries are local ignored build artifacts.",
+    "DOM frontend tests mock desktop calls; they are not an installed desktop/USB end-to-end run.",
+    "Host C checks validate new helper contracts, not whole original C++ method or Blockly semantics.",
+    "New numeric glyphs/packing and music helpers do not implement the complete original fonts, Unicode, scroll, Device/task scheduler or SOUND runtime.",
+    "User-reported iA Hello/Heartbeat pass is separate from agent checks and exercises no onboard peripheral. No iP physical result was reported.",
+    "Catalog comparison is not a census of every community derivative and does not make catalog-only entries executable profiles.",
+    "No installer has been built or replaced in this validation."
+  ]
+}

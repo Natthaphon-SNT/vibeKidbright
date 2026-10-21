@@ -1,0 +1,45 @@
+{
+  "date": "2026-10-19",
+  "frozen_dataset_sha256": "c75de0d838a5f0e6670c48776c67d3b5c0a98ca755f02ba09c2d548c28b55c43",
+  "frozen_queries": 69,
+  "frozen_corpus_files_verified": 37,
+  "qrel_paths_exist": true,
+  "qrel_relevance_independently_validated": false,
+  "development_packet": "retrieval-development-review-20261019.json",
+  "development_packet_sha256": "7b149e399b143f2b7a552d4a09f46162478c820a4f05ae7879bb765ad1844a36",
+  "query_kinds": {
+    "exact_symbol": 4,
+    "natural_language": 4,
+    "mixed_language": 4,
+    "compiler_error": 4,
+    "hardware": 4
+  },
+  "languages": {
+    "technical": 4,
+    "th": 4,
+    "en": 6,
+    "mixed": 6
+  },
+  "reviewed_cases": 0,
+  "all_judgments_null": true,
+  "draft_gate": {
+    "command": [
+      "python",
+      "scripts/review-retrieval.py",
+      "validate-development",
+      "docs/ai-engineering/retrieval-development-review-20261019.json",
+      "--output",
+      "src-tauri/target/capability-reviewed-dev-should-not-exist.json"
+    ],
+    "exit_code_expected_nonzero": 1,
+    "dataset_exported": false,
+    "log_sha256": "e72cf1dd3e4762bbde3322a62895d36ba6febac020b4f0c639db028a3e1d2a00"
+  },
+  "ranking_changed": false,
+  "performance_evaluation_executed": false,
+  "metrics": null,
+  "limits": [
+    "Corpus/qrel identity and source/citation mechanics are not human relevance/factual-support judgments.",
+    "Compiler-error coverage exists only in the unreviewed development draft, not in the frozen final set."
+  ]
+}

@@ -1,0 +1,644 @@
+{
+  "schema_version": 1,
+  "audit_date": "2026-10-16",
+  "scope": "Board coverage and hardware-rule consistency in application source and knowledge_base; attached Downloads/SKILL.md read as reference data only. Findings record observations before concurrent corrective edits by the root agent.",
+  "status_semantics": {
+    "documented": "A name or claimed pinout exists in Markdown; this alone is not runtime support.",
+    "runtime_profile": "Validated deterministic profile in src-tauri/src/ai/compatibility.rs.",
+    "build_enabled": "A generic deployment route exists; it does not certify every revision/peripheral.",
+    "physical_tested": "Requires actual board results. Current pilot validation explicitly records false."
+  },
+  "reviewed": [
+    "knowledge_base/README.md",
+    "knowledge_base/all_models.md",
+    "knowledge_base/kidbright32iA.md",
+    "knowledge_base/hardware_schematics_rules.md",
+    "knowledge_base/minibike.md",
+    "knowledge_base/formula_kid_controller.md",
+    "knowledge_base/skate_rev1.3.md",
+    "knowledge_base/iKB-1.md",
+    "knowledge_base/kidbright_uai.md",
+    "knowledge_base/oled_ssd1306.md",
+    "knowledge_base/led_16x8_matrix_mapping.md",
+    "knowledge_base/compatibility/README.md",
+    "src/buildFlash.ts",
+    "src/App.tsx",
+    "src-tauri/src/ai/compatibility.rs",
+    "src-tauri/src/ai/system_prompt.txt",
+    "docs/research/kidbright-pilot-2026-10-16-validation.json",
+    "Downloads/SKILL.md (external reference)"
+  ],
+  "runtime": {
+    "profiles": [
+      "kidbright32_v13",
+      "kidbright32_rev31"
+    ],
+    "recipes": [
+      "button_buzzer",
+      "temperature_serial"
+    ],
+    "profile_scope": [
+      "S1 GPIO16",
+      "buzzer GPIO13",
+      "LM73 at 0x4D on GPIO4/5",
+      "ESP32 target / SDK 5.5 series"
+    ],
+    "concrete_builds": [
+      {
+        "profile": "kidbright32_v13",
+        "recipe": "button_buzzer",
+        "sdk": "5.5.4",
+        "flashed": false
+      },
+      {
+        "profile": "kidbright32_rev31",
+        "recipe": "temperature_serial",
+        "sdk": "5.5.4",
+        "flashed": false
+      }
+    ],
+    "generic_ui_values": [
+      "kidbright32",
+      "miuaiplus"
+    ],
+    "ui_deployment_gate": {
+      "kidbright32": "enabled",
+      "miuaiplus": "disabled / coming soon"
+    },
+    "physical_tested": false,
+    "live_ai_provider_tested": false,
+    "evidence": [
+      "src-tauri/src/ai/compatibility.rs:11",
+      "src-tauri/src/ai/compatibility.rs:71",
+      "src/buildFlash.ts:2",
+      "src/buildFlash.ts:7",
+      "src/App.tsx:1883",
+      "docs/research/kidbright-pilot-2026-10-16-validation.json:4"
+    ]
+  },
+  "board_inventory": [
+    {
+      "name": "KidBright V2016",
+      "aliases": [],
+      "category": "historical ESP8266",
+      "evidence": [
+        "knowledge_base/all_models.md:11",
+        "knowledge_base/all_models.md:30"
+      ],
+      "runtime_profile": null,
+      "physical_tested": false,
+      "gaps": [
+        "Historical specifications not independently verified in this audit",
+        "No ESP8266 deployment route or deterministic profile"
+      ]
+    },
+    {
+      "name": "KidBright V1.0",
+      "aliases": [],
+      "category": "historical ESP8266",
+      "evidence": [
+        "knowledge_base/all_models.md:12",
+        "knowledge_base/all_models.md:30"
+      ],
+      "runtime_profile": null,
+      "physical_tested": false,
+      "gaps": [
+        "No supported target or deterministic recipe"
+      ]
+    },
+    {
+      "name": "KidBright32 V1.1",
+      "aliases": [
+        "V1.1"
+      ],
+      "category": "ESP32 base board",
+      "evidence": [
+        "knowledge_base/all_models.md:13",
+        "knowledge_base/all_models.md:51"
+      ],
+      "runtime_profile": null,
+      "physical_tested": false,
+      "gaps": [
+        "Documentation only; no revision-validated BSP or full peripheral tests"
+      ]
+    },
+    {
+      "name": "KidBright32 V1.2",
+      "aliases": [
+        "V1.2"
+      ],
+      "category": "ESP32 base board",
+      "evidence": [
+        "knowledge_base/all_models.md:14",
+        "knowledge_base/all_models.md:51"
+      ],
+      "runtime_profile": null,
+      "physical_tested": false,
+      "gaps": [
+        "Documentation only; revision equivalence is asserted, not tested here"
+      ]
+    },
+    {
+      "name": "KidBright32 V1.3",
+      "aliases": [
+        "V1.3"
+      ],
+      "category": "ESP32 base board",
+      "evidence": [
+        "knowledge_base/all_models.md:15",
+        "knowledge_base/all_models.md:78",
+        "src-tauri/src/ai/compatibility.rs:13"
+      ],
+      "runtime_profile": "kidbright32_v13",
+      "physical_tested": false,
+      "gaps": [
+        "Pilot S1/buzzer/LM73 only",
+        "Only button_buzzer firmware build recorded for this profile",
+        "Matrix, RTC, ports, light, radio and full Blockly parity not certified"
+      ]
+    },
+    {
+      "name": "KidBright32 V1.4",
+      "aliases": [
+        "V1.4"
+      ],
+      "category": "ESP32 base board",
+      "evidence": [
+        "knowledge_base/all_models.md:16",
+        "knowledge_base/all_models.md:84",
+        "knowledge_base/formula_kid_controller.md:5"
+      ],
+      "runtime_profile": null,
+      "physical_tested": false,
+      "gaps": [
+        "No deterministic profile",
+        "Documented shared LED/I2C pins need hardware-specific verification"
+      ]
+    },
+    {
+      "name": "KidBright32 V1.5 Rev 3.1",
+      "aliases": [
+        "Rev 3.1",
+        "3.1"
+      ],
+      "category": "ESP32 base board",
+      "evidence": [
+        "knowledge_base/all_models.md:17",
+        "knowledge_base/all_models.md:110",
+        "src-tauri/src/ai/compatibility.rs:13"
+      ],
+      "runtime_profile": "kidbright32_rev31",
+      "physical_tested": false,
+      "gaps": [
+        "Pilot S1/buzzer/LM73 only",
+        "Only temperature_serial firmware build recorded for this profile",
+        "RTC bus and external-port claims conflict across documents"
+      ]
+    },
+    {
+      "name": "KidBright32 V1.5 Rev 3.1G",
+      "aliases": [
+        "Rev 3.1G",
+        "3.1G"
+      ],
+      "category": "ESP32 base board",
+      "evidence": [
+        "knowledge_base/all_models.md:18",
+        "knowledge_base/all_models.md:135"
+      ],
+      "runtime_profile": null,
+      "physical_tested": false,
+      "gaps": [
+        "Do not infer runtime support from same-pinout statements",
+        "Extension/controller wiring requires separate contract"
+      ]
+    },
+    {
+      "name": "KidBright32 V1.5 iA",
+      "aliases": [
+        "iA"
+      ],
+      "category": "ESP32 base board / ambiguous shorthand",
+      "evidence": [
+        "knowledge_base/all_models.md:19",
+        "knowledge_base/all_models.md:142",
+        "knowledge_base/README.md:136"
+      ],
+      "runtime_profile": null,
+      "physical_tested": false,
+      "gaps": [
+        "README SW2=17 conflicts with all_models SW2=14",
+        "Alias iA must not silently collapse distinct manufacturer/revision variants"
+      ]
+    },
+    {
+      "name": "KidBright32i",
+      "aliases": [
+        "32i"
+      ],
+      "category": "INEX ESP32 base board",
+      "evidence": [
+        "knowledge_base/all_models.md:20",
+        "knowledge_base/all_models.md:178"
+      ],
+      "runtime_profile": null,
+      "physical_tested": false,
+      "gaps": [
+        "No runtime profile",
+        "LDR/phototransistor and ADC connector behavior require exact circuit validation"
+      ]
+    },
+    {
+      "name": "KidBright32iA",
+      "aliases": [
+        "32iA"
+      ],
+      "category": "INEX ESP32 base board",
+      "evidence": [
+        "knowledge_base/all_models.md:21",
+        "knowledge_base/all_models.md:218"
+      ],
+      "runtime_profile": null,
+      "physical_tested": false,
+      "gaps": [
+        "Current manufacturer page lists iA-MC3479 and LDR, contradicting unconditional KXTJ3/phototransistor claims",
+        "No deterministic accelerometer recipe or chip-identity verification"
+      ]
+    },
+    {
+      "name": "KidBright32 V1.6",
+      "aliases": [
+        "V1.6"
+      ],
+      "category": "Gravitech ESP32 base board",
+      "evidence": [
+        "knowledge_base/all_models.md:22",
+        "knowledge_base/all_models.md:286",
+        "knowledge_base/README.md:267"
+      ],
+      "runtime_profile": null,
+      "physical_tested": false,
+      "gaps": [
+        "Documentation asserts MPU6050/RGB/servo but no validated profile",
+        "Shared switch/servo pins need resource ownership checks"
+      ]
+    },
+    {
+      "name": "KidBright32iP",
+      "aliases": [
+        "32iP"
+      ],
+      "category": "INEX ESP32 base board",
+      "evidence": [
+        "knowledge_base/all_models.md:23",
+        "knowledge_base/all_models.md:243"
+      ],
+      "runtime_profile": null,
+      "physical_tested": false,
+      "gaps": [
+        "Timeline SW2=14 contradicts pin table SW2=17/SERVO2",
+        "Manufacturer product page alone does not resolve SW2 pin",
+        "Custom minibike rules are not a universal iP profile"
+      ]
+    },
+    {
+      "name": "KidBright microAI",
+      "aliases": [
+        "KidBright μAI",
+        "KidBright µAI",
+        "KidBright uAI"
+      ],
+      "category": "AI platform",
+      "evidence": [
+        "knowledge_base/all_models.md:24",
+        "knowledge_base/all_models.md:358",
+        "knowledge_base/kidbright_uai.md:1"
+      ],
+      "runtime_profile": null,
+      "physical_tested": false,
+      "gaps": [
+        "No deployment route for first model",
+        "All_models hardware assertions are not independently certified",
+        "Do not use ESP32 BSP by assuming equivalence to its auxiliary radio module"
+      ]
+    },
+    {
+      "name": "KidBright microAI Plus",
+      "aliases": [
+        "KidBright μAI Plus",
+        "KidBright µAI Plus",
+        "KidBright uAI Plus",
+        "MiuAiPlus",
+        "miuaiplus"
+      ],
+      "category": "AI platform",
+      "evidence": [
+        "knowledge_base/kidbright_uai.md:1",
+        "src/buildFlash.ts:2",
+        "src/buildFlash.ts:5",
+        "src/App.tsx:1884"
+      ],
+      "runtime_profile": null,
+      "physical_tested": false,
+      "gaps": [
+        "UI deployment explicitly disabled",
+        "Manufacturer SG2002/QMI8658A/2.4-inch platform must be kept separate from generic older μAI descriptions",
+        "Connection/training workflow documentation is not an implemented Linux/C BSP"
+      ]
+    },
+    {
+      "name": "KidBright Controller V1",
+      "aliases": [
+        "Bike Controller V1",
+        "Minibike Sender",
+        "ESP32 bare-module controller"
+      ],
+      "category": "ADC joystick controller",
+      "evidence": [
+        "knowledge_base/minibike.md:22",
+        "knowledge_base/minibike.md:27",
+        "knowledge_base/hardware_schematics_rules.md:25"
+      ],
+      "runtime_profile": null,
+      "physical_tested": false,
+      "gaps": [
+        "Legacy-only ADC statements contradict current SDK policy and source",
+        "No S1/LM73/matrix base-board assumptions allowed",
+        "OLED command sequence requires SH1106-specific correction"
+      ]
+    },
+    {
+      "name": "Formula Kid Controller",
+      "aliases": [
+        "KB1.3 Controller",
+        "KB1.5G Controller",
+        "Formula Kid rev 1.1"
+      ],
+      "category": "KidBright32 + RC timing extension",
+      "evidence": [
+        "knowledge_base/formula_kid_controller.md:2",
+        "knowledge_base/formula_kid_controller.md:6",
+        "knowledge_base/formula_kid_controller.md:370"
+      ],
+      "runtime_profile": null,
+      "physical_tested": false,
+      "gaps": [
+        "KB1.3 nickname is not the same as bare KidBright32 V1.3 profile",
+        "GPIO36/39 extension switches are distinct from board SW1/SW2",
+        "Custom binary protocol must not replace original ASCII plugin peers"
+      ]
+    },
+    {
+      "name": "Formula Kid CAR rev 1.0",
+      "aliases": [
+        "KidBright32 V1.4 + Formula Kid CAR"
+      ],
+      "category": "motor receiver extension",
+      "evidence": [
+        "knowledge_base/formula_kid_controller.md:5",
+        "knowledge_base/formula_kid_controller.md:15"
+      ],
+      "runtime_profile": null,
+      "physical_tested": false,
+      "gaps": [
+        "Document claims 100% hardware verified without current-run hardware evidence",
+        "DRV8833 polarity, channel routing and exact paired wire protocol need their own tests"
+      ]
+    },
+    {
+      "name": "ESP32minibike / Minibike Extension V0.3",
+      "aliases": [
+        "Minibike receiver",
+        "KidBright32iP + L298N"
+      ],
+      "category": "robot base/extension variants",
+      "evidence": [
+        "knowledge_base/minibike.md:23",
+        "knowledge_base/minibike.md:170",
+        "knowledge_base/hardware_schematics_rules.md:45"
+      ],
+      "runtime_profile": null,
+      "physical_tested": false,
+      "gaps": [
+        "Original generator BDC/BLDC pin contract differs from custom L298N examples",
+        "I2C bus numbering must be tied to actual pins/circuit",
+        "No current robot build, feedback sign or physical balancing validation"
+      ]
+    },
+    {
+      "name": "SKATE V1.3",
+      "aliases": [
+        "SKATE Rev 1.3"
+      ],
+      "category": "custom balancing robot board",
+      "evidence": [
+        "knowledge_base/skate_rev1.3.md:1",
+        "knowledge_base/skate_rev1.3.md:54",
+        "knowledge_base/skate_rev1.3.md:519"
+      ],
+      "runtime_profile": null,
+      "physical_tested": false,
+      "gaps": [
+        "Arduino examples remain reference only; not an ESP-IDF BSP",
+        "File names claim V1.3 while cited KiCad revision says 1.2; provenance needs confirmation"
+      ]
+    },
+    {
+      "name": "iKB-1",
+      "aliases": [],
+      "category": "INEX I2C expansion board",
+      "evidence": [
+        "knowledge_base/iKB-1.md:1"
+      ],
+      "runtime_profile": null,
+      "physical_tested": false,
+      "gaps": [
+        "Original board firmware/revision still unverified; do not infer every iKB-1Z command applies",
+        "No C adapter/build evidence"
+      ]
+    },
+    {
+      "name": "iKB-1Z",
+      "aliases": [
+        "iKB1z"
+      ],
+      "category": "INEX I2C expansion board",
+      "evidence": [
+        "knowledge_base/iKB-1.md:1"
+      ],
+      "runtime_profile": null,
+      "physical_tested": false,
+      "gaps": [
+        "Manufacturer source observed; no physical board validation or C adapter",
+        "Old fabricated MCP23017/0x20/three-byte commands were removed during this audit",
+        "Exact host SDA/SCL and jumper must be confirmed"
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "id": "BOARD-001",
+      "severity": "high",
+      "status_at_observation": "conflicting",
+      "issue": "iA SW2 is GPIO17 in README but GPIO14 in other rules",
+      "evidence": [
+        "knowledge_base/README.md:138",
+        "knowledge_base/README.md:149",
+        "knowledge_base/README.md:200",
+        "knowledge_base/README.md:254",
+        "knowledge_base/all_models.md:151"
+      ],
+      "action": "Resolve by exact revision/source; do not let duplicate rules vote."
+    },
+    {
+      "id": "BOARD-002",
+      "severity": "high",
+      "status_at_observation": "conflicting",
+      "issue": "32iP SW2 timeline=14 versus table=17 shared SERVO2",
+      "evidence": [
+        "knowledge_base/all_models.md:23",
+        "knowledge_base/all_models.md:255",
+        "knowledge_base/all_models.md:280",
+        "knowledge_base/all_models.md:318",
+        "knowledge_base/all_models.md:431"
+      ],
+      "action": "Mark unresolved until revision-specific schematic/test resolves it."
+    },
+    {
+      "id": "BOARD-003",
+      "severity": "high",
+      "status_at_observation": "conflicting",
+      "issue": "RTC bus and KB-CHAIN routing are mixed across documents",
+      "evidence": [
+        "knowledge_base/hardware_schematics_rules.md:14",
+        "knowledge_base/README.md:107",
+        "Downloads/SKILL.md:64",
+        "Downloads/SKILL.md:81"
+      ],
+      "action": "Separate physical net names, SDA/SCL pins and software controller ID."
+    },
+    {
+      "id": "BOARD-004",
+      "severity": "high",
+      "status_at_observation": "contradicts current manufacturer source",
+      "issue": "Unconditional 32iA KXTJ3/phototransistor claims conflict with INEX page specifying iA-MC3479/LDR",
+      "evidence": [
+        "knowledge_base/all_models.md:220",
+        "knowledge_base/all_models.md:238",
+        "https://inex.co.th/home/product/kidbright32ia/"
+      ],
+      "action": "Represent variants/chip identity as unresolved; probe/register-check before selecting driver."
+    },
+    {
+      "id": "BOARD-005",
+      "severity": "high",
+      "status_at_observation": "corrected in iKB-1.md by delegated agent",
+      "issue": "Old iKB document fabricated MCP23017-compatible registers, address0x20 and universal three-byte motor/servo packets",
+      "evidence_before_correction": [
+        "knowledge_base/iKB-1.md:12",
+        "knowledge_base/iKB-1.md:32",
+        "knowledge_base/iKB-1.md:117",
+        "knowledge_base/iKB-1.md:139"
+      ],
+      "primary": "https://raw.githubusercontent.com/inexglobal/pxt-iKB1z/main/iKB-1z.ts",
+      "action": "Replaced with observed manufacturer source contract,0x48/0x49,exact arithmetic/corner-case notes; no tested C implementation claim."
+    },
+    {
+      "id": "BOARD-006",
+      "severity": "high",
+      "status_at_observation": "contradicts controller datasheet",
+      "issue": "SH1106 charge pump command incorrectly assigned0x8D; horizontal SSD1306 addressing sent to SH1106",
+      "evidence": [
+        "knowledge_base/minibike.md:68",
+        "knowledge_base/minibike.md:69"
+      ],
+      "primary": "https://www.pololu.com/file/0J1813/SH1106.pdf",
+      "primary_location": "printed page22 section10, page23 section12",
+      "action": "Use SH1106 AD/8A-8B and page addressing for confirmed SH1106; migrate old examples explicitly."
+    },
+    {
+      "id": "BOARD-007",
+      "severity": "medium",
+      "status_at_observation": "conflicting",
+      "issue": "ADC removed-in-v5 and Controller legacy-only claims contradict official SDK5.5.4 migration documentation",
+      "evidence": [
+        "knowledge_base/README.md:43",
+        "knowledge_base/minibike.md:100",
+        "knowledge_base/hardware_schematics_rules.md:69"
+      ],
+      "primary": "https://docs.espressif.com/projects/esp-idf/en/v5.5.4/esp32/migration-guides/release-5.x/5.0/peripherals.html",
+      "action": "Legacy is deprecated but available in5.5.4; choose by SDK/application, not board name."
+    },
+    {
+      "id": "BOARD-008",
+      "severity": "medium",
+      "status_at_observation": "missing versioned profile",
+      "issue": "microAI connection/training docs and generic SoC descriptions cannot establish deployable microAI Plus support",
+      "evidence": [
+        "knowledge_base/all_models.md:24",
+        "knowledge_base/all_models.md:358",
+        "knowledge_base/kidbright_uai.md:61",
+        "src/buildFlash.ts:5"
+      ],
+      "primary": "https://inex.co.th/home/product/kidbright-microai-plus/",
+      "action": "Keep first microAI and Plus separate; preserve deployment gate until BSP/runtime is implemented and tested."
+    },
+    {
+      "id": "BOARD-009",
+      "severity": "medium",
+      "status_at_observation": "unsupported verification claim",
+      "issue": "Historical text says hardware-verified/100% without associated current-repository hardware test artifact",
+      "evidence": [
+        "knowledge_base/formula_kid_controller.md:45",
+        "knowledge_base/README.md:8",
+        "docs/research/kidbright-pilot-2026-10-16-validation.json:4"
+      ],
+      "action": "Label historical author assertions separately from tests run on this repository."
+    }
+  ],
+  "primary_sources": [
+    {
+      "url": "https://raw.githubusercontent.com/inexglobal/pxt-iKB1z/main/iKB-1z.ts",
+      "title": "INEX iKB-1Z implementation",
+      "observed": "2026-10-16",
+      "supports": "Default0x48/jumper-open0x49, command words, digital/ADC/motor/servo/serial operations; negative-angle and zero-reverse arithmetic need explicit porting policy."
+    },
+    {
+      "url": "https://www.pololu.com/file/0J1813/SH1106.pdf",
+      "title": "SH1106 V2.3 controller datasheet, distributor mirror",
+      "observed": "2026-10-16",
+      "supports": "ADh DC-DC control;8Ah off/8Bh on;page/column addressing."
+    },
+    {
+      "url": "https://inex.co.th/home/product/kidbright32ia/",
+      "title": "INEX KidBright32iA product",
+      "observed": "2026-10-16",
+      "supports": "Current product description names LDR and iA-MC3479; not proof all historical boards have that chip."
+    },
+    {
+      "url": "https://inex.co.th/home/product/kidbright32ip/",
+      "title": "INEX KidBright32iP product",
+      "observed": "2026-10-16",
+      "supports": "ESP32, phototransistor, external connector group naming; does not resolve SW2 GPIO conflict."
+    },
+    {
+      "url": "https://inex.co.th/home/product/kidbright-microai-plus/",
+      "title": "INEX KidBright microAI Plus product",
+      "observed": "2026-10-16",
+      "supports": "SG2002/QMI8658A platform; distinct from prior generic microAI claims."
+    },
+    {
+      "url": "https://docs.espressif.com/projects/esp-idf/en/v5.5.4/esp32/migration-guides/release-5.x/5.0/peripherals.html",
+      "title": "Espressif SDK5.5.4 ADC migration guide",
+      "observed": "2026-10-16",
+      "supports": "Legacy ADC exists but is deprecated; new oneshot/continuous families are supported."
+    }
+  ],
+  "limitations": [
+    "No board flashed, connected or physically tested in this audit.",
+    "No claim that all historical model names, dates, MCU identities or revision-equivalence assertions are correct.",
+    "This is not a complete per-block translation coverage audit; another task covers the block catalog.",
+    "Line references under evidence_before_correction and observations may refer to the pre-correction snapshot; root agent is concurrently updating other rule files.",
+    "Unrelated board names in third-party dependencies/plugins are outside this application-board inventory."
+  ]
+}

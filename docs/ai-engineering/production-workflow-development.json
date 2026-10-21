@@ -1,0 +1,16 @@
+{
+  "production_dist": true,
+  "strict_production_csp": true,
+  "native_backend_stubbed": true,
+  "model_response_fixture": true,
+  "live_provider": false,
+  "knowledge_citation_rendered": true,
+  "code_edit_reviewed": true,
+  "source_unchanged_before_keep": true,
+  "revision_bound_keep": true,
+  "automatic_project_path_export": false,
+  "external_requests_attempted": [],
+  "page_errors": [],
+  "scope": "Actual compiled React UI with in-memory event/native fixture; actual native Engine/journal and installer probes are separate evidence; current development dist, not a replacement NSIS qualification",
+  "production_index_sha256": "8cc12a2aa3a1d1e20e067b1a42475ab2d2046d5e7dce3914798383785413031f"
+}

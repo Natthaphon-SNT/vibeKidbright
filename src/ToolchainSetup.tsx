@@ -13,7 +13,7 @@ import { listen } from "@tauri-apps/api/event";
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 interface ToolchainProgress {
-  stage: "downloading" | "extracting" | "done" | "error";
+  stage: "idle" | "downloading" | "extracting" | "done" | "error";
   percent: number;
   message: string;
 }
@@ -62,8 +62,6 @@ export default function ToolchainSetup({
   const [showUrlInput, setShowUrlInput] = useState(false);
   const [logs, setLogs] = useState<string[]>([]);
   const logsRef = useRef<HTMLDivElement>(null);
-  // Auto-start countdown (ไม่สามารถยกเลิกได้)
-  const [countdown, setCountdown] = useState<number | null>(null);
   // Mini widget state
   const [miniExpanded, setMiniExpanded] = useState(false);
 
@@ -110,22 +108,13 @@ export default function ToolchainSetup({
         setProgress({ stage: "done", percent: 100, message: `Toolchain v${status.version} ready.` });
         setTimeout(() => onReady(), 500);
       } else {
-        // not_installed → เริ่ม auto-countdown 5 วินาที (ไม่สามารถยกเลิกได้)
-        setCountdown(5);
+        setProgress({ stage: "idle", percent: 0, message: "Install toolchain when you need Build & Flash." });
       }
     } catch (err) {
       setCheckDone(true);
       setErrorMsg(String(err));
     }
   };
-
-  // ── Auto-start countdown (บังคับ — ห้ามยกเลิก) ────────────────────────────
-  useEffect(() => {
-    if (countdown === null || isDownloading) return;
-    if (countdown === 0) { startDownload(); return; }
-    const t = setTimeout(() => setCountdown((c) => (c !== null ? c - 1 : null)), 1000);
-    return () => clearTimeout(t);
-  }, [countdown, isDownloading]);
 
   const startDownload = async () => {
     if (isDownloading) return;
@@ -172,6 +161,7 @@ export default function ToolchainSetup({
   const isError = progress.stage === "error" || !!errorMsg;
 
   const stageLabel: Record<string, string> = {
+    idle: "Install toolchain before Build & Flash",
     downloading: "📥 Downloading toolchain...",
     extracting: "📦 Extracting files...",
     done: "✅ Ready!",
@@ -251,8 +241,7 @@ export default function ToolchainSetup({
                 ? progress.stage === "extracting" ? "Extracting..." : "Downloading..."
                 : isError ? "Setup Error"
                 : isReady ? "Toolchain Ready!"
-                : countdown !== null ? `Auto-installing in ${countdown}s...`
-                : "Setting up toolchain"}
+                : "Toolchain not installed"}
             </div>
             <div style={{ fontSize: "10px", color: "rgba(148,163,184,0.7)", marginTop: "1px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
               {shortMsg}
@@ -304,7 +293,7 @@ export default function ToolchainSetup({
                 fontSize: "10px",
                 color: "rgba(148,163,184,0.7)",
               }}>
-                🔒 การติดตั้ง toolchain เป็นขั้นตอนบังคับ กรุณารอจนเสร็จสมบูรณ์
+                ติดตั้ง toolchain เมื่อต้องการ Build & Flash ส่วนการเรียนรู้และแก้โค้ดใช้ได้ก่อน
               </div>
             )}
 
@@ -336,7 +325,7 @@ export default function ToolchainSetup({
             {/* Retry button on error */}
             {isError && !isDownloading && (
               <button
-                onClick={() => { setCountdown(null); startDownload(); }}
+                onClick={() => { startDownload(); }}
                 style={{
                   width: "100%", padding: "7px", borderRadius: "8px", border: "none",
                   background: "linear-gradient(135deg, #1d4ed8, #3b82f6)",
@@ -349,9 +338,9 @@ export default function ToolchainSetup({
             )}
 
             {/* Start now button (before download starts) */}
-            {!isDownloading && !isReady && !isError && countdown !== null && (
+            {!isDownloading && !isReady && !isError && checkDone && (
               <button
-                onClick={() => { setCountdown(null); startDownload(); }}
+                onClick={() => { startDownload(); }}
                 disabled={!checkDone}
                 style={{
                   width: "100%", padding: "7px", borderRadius: "8px", border: "none",
@@ -361,7 +350,7 @@ export default function ToolchainSetup({
                   marginTop: "10px",
                 }}
               >
-                ⬇️ Install Now (auto in {countdown}s)
+                ⬇️ Install Toolchain
               </button>
             )}
           </div>
@@ -405,7 +394,6 @@ export default function ToolchainSetup({
       </div>
 
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
         @keyframes pulse { 0%,100% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(1.1); opacity: 1; } }
         @keyframes shimmer { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -480,7 +468,7 @@ export default function ToolchainSetup({
               ? "Setup encountered an error. Please try again."
               : isDownloading
               ? "Setting up the C compiler toolchain for ESP32..."
-              : "The ESP32 compiler toolchain needs to be installed.\nThis only happens once on first launch."}
+              : "The ESP32 compiler toolchain needs to be installed.\nInstall it once when you need to build or flash a board."}
           </p>
         </div>
 
@@ -498,8 +486,8 @@ export default function ToolchainSetup({
           }}>
             <span style={{ fontSize: "16px", flexShrink: 0 }}>🔒</span>
             <p style={{ fontSize: "12px", color: "rgba(148,163,184,0.7)", margin: 0, lineHeight: 1.5 }}>
-              การติดตั้ง Toolchain เป็น<strong style={{ color: "#93c5fd" }}> ขั้นตอนบังคับ</strong> ที่จำเป็นต้องทำก่อนใช้งานโปรแกรม
-              กรุณารอจนกว่าการติดตั้งจะเสร็จสมบูรณ์ (~1 GB · ครั้งเดียวเท่านั้น)
+              ติดตั้ง Toolchain <strong style={{ color: "#93c5fd" }}>ก่อน Build & Flash</strong> เปิดพื้นที่เรียนรู้และแก้โค้ดได้ก่อนติดตั้ง
+              กรุณารอจนกว่าการติดตั้งจะเสร็จสมบูรณ์ (~2.3 GB · ครั้งเดียวเท่านั้น)
             </p>
           </div>
         )}
@@ -707,7 +695,7 @@ export default function ToolchainSetup({
             <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "8px" }}>
               <button
                 id="btn-start-download"
-                onClick={() => { setCountdown(null); startDownload(); }}
+                onClick={() => { startDownload(); }}
                 disabled={!checkDone}
                 style={{
                   width: "100%",
@@ -730,26 +718,8 @@ export default function ToolchainSetup({
                   gap: "10px",
                 }}
               >
-                {/* Countdown ring */}
-                {countdown !== null && (
-                  <svg width="22" height="22" viewBox="0 0 30 30" style={{ flexShrink: 0 }}>
-                    <circle cx="15" cy="15" r="14" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="2.5" />
-                    <circle
-                      cx="15" cy="15" r="14"
-                      fill="none" stroke="#fff" strokeWidth="2.5"
-                      strokeLinecap="round"
-                      className="countdown-arc"
-                      style={{ transformOrigin: "center", transform: "rotate(-90deg)" }}
-                    />
-                    <text x="15" y="19" textAnchor="middle" fill="white" fontSize="11" fontWeight="700" fontFamily="monospace">
-                      {countdown}
-                    </text>
-                  </svg>
-                )}
                 {isError
                   ? "🔄 Try Again"
-                  : countdown !== null
-                  ? `Auto-installing in ${countdown}s...`
                   : "⬇️ Install Toolchain (1-time)"}
               </button>
             </div>
@@ -781,7 +751,7 @@ export default function ToolchainSetup({
         {/* Download info note */}
         {!isDownloading && !isReady && (
           <p style={{ textAlign: "center", marginTop: "16px", fontSize: "12px", color: "#334155" }}>
-            Download size: ~1 GB · Extracted to AppData · One-time only
+            Download size: ~2.3 GB · Extracted to AppData · One-time only
           </p>
         )}
 

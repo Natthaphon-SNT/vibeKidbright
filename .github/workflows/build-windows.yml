@@ -18,19 +18,6 @@ jobs:
         with:
           path: main_repo
 
-      - name: Checkout external knowledge_base repo
-        uses: actions/checkout@v4
-        with:
-          repository: Natthaphon-SNT/Knowledge
-          path: external_repo
-
-      - name: Extract external knowledge_base.zip
-        run: |
-          $zip = "external_repo/knowledge_base.zip"
-          if (-not (Test-Path $zip)) { Write-Error "ไม่พบไฟล์ $zip"; exit 1 }
-          Expand-Archive -Path $zip -DestinationPath "external_repo/extracted" -Force
-        shell: pwsh
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -54,32 +41,13 @@ jobs:
         working-directory: main_repo
         run: npm run check:public
 
-      - name: Merge knowledge_base from both repos
-        run: |
-          $dst = "main_repo/resources/knowledge_base"
-          if (-not (Test-Path $dst)) { New-Item -ItemType Directory -Path $dst -Force }
-          # Keep this allowlist in sync with bundleExtensions in scripts/check-public.mjs.
-          $allowedExtensions = @(
-            ".c", ".h", ".jpeg", ".jpg", ".md", ".pdf", ".png", ".txt", ".webp"
-          )
+      - name: Prepare bundled offline model and runtime
+        working-directory: main_repo
+        run: npm run prepare:runtime -- --download
 
-          function Sync-KnowledgeBase($src) {
-            if (-not (Test-Path $src)) { Write-Host "Skipping $src (not found)"; return }
-            Get-ChildItem $src -Recurse -File | Where-Object {
-              $allowedExtensions -contains $_.Extension.ToLowerInvariant()
-            } | ForEach-Object {
-              $rel = $_.FullName.Substring((Resolve-Path $src).Path.Length + 1)
-              $dstFile = Join-Path $dst $rel
-              $dstDir = Split-Path $dstFile -Parent
-              if (-not (Test-Path $dstDir)) { New-Item -ItemType Directory -Path $dstDir -Force | Out-Null }
-              Copy-Item $_.FullName $dstFile -Force
-            }
-          }
-
-          Sync-KnowledgeBase "external_repo/extracted/knowledge_base"
-          Sync-KnowledgeBase "main_repo/knowledge_base"
-          Write-Host "Merge complete -> $dst"
-        shell: pwsh
+      - name: Synchronize audited repository knowledge base
+        working-directory: main_repo
+        run: npm run sync:kb
 
       - name: Verify clean installer resources
         working-directory: main_repo
@@ -160,10 +128,12 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.get_version.outputs.TAG }}
+          target_commitish: ${{ github.sha }}
           name: 'vibeKidbright ${{ steps.get_version.outputs.TAG }} (Windows)'
           body: 'ดาวน์โหลดไฟล์ .exe ด้านล่างเพื่อติดตั้งบน Windows'
           draft: true
           prerelease: false
+          fail_on_unmatched_files: true
           files: |
             main_repo/src-tauri/target/release/bundle/nsis/*.exe
             main_repo/src-tauri/target/release/bundle/msi/*.msi

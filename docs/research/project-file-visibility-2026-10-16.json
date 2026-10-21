@@ -1,0 +1,140 @@
+{
+  "schema_version": 1,
+  "validation_date": "2026-10-16",
+  "scope": "Learner file visibility and portable internal profile; no firmware behavior changes",
+  "software_checks": [
+    {
+      "command": "cargo test --manifest-path src-tauri/Cargo.toml --lib --offline",
+      "status": "passed",
+      "tests": 94
+    },
+    {
+      "command": "npm test",
+      "status": "passed",
+      "tests": 100,
+      "files": 8
+    },
+    {
+      "command": "npm run build:release",
+      "status": "passed"
+    }
+  ],
+  "export_checks": [
+    {
+      "example": "button_buzzer",
+      "board_profile": "kidbright32_v13",
+      "export_path": "src-tauri/target/project-visibility-1792148352081/button_buzzer",
+      "owned_file_count": 9,
+      "visible_file_count": 8,
+      "root_reference_documents_absent": true,
+      "private_metadata_readable": true,
+      "private_directory_windows_hidden": true,
+      "unchanged_source_and_config": [
+        {
+          "path": "CMakeLists.txt",
+          "sha256": "61cd1467cee661e4a751050f918f84bf33c79f130ef0da157d147a7877d5cc8b",
+          "matches_previously_built_export": true
+        },
+        {
+          "path": "components/kb_reference/CMakeLists.txt",
+          "sha256": "d3e111e44361bca036b4583b951e54b901496ed00429291c79ac1926011eb175",
+          "matches_previously_built_export": true
+        },
+        {
+          "path": "components/kb_reference/include/kb_core.h",
+          "sha256": "752afe78294d71ecd68cb3054f572a15a769f240fd124f1d49bc844aa60d8398",
+          "matches_previously_built_export": true
+        },
+        {
+          "path": "components/kb_reference/kb_core.c",
+          "sha256": "05359f6f1dc8a402a4420bc9549230cb20a04900c2b8544a5143fe34c5409c89",
+          "matches_previously_built_export": true
+        },
+        {
+          "path": "main/CMakeLists.txt",
+          "sha256": "dc0d0fcb544df32c476c39124594bdd1736bae643a40532ef53b6ff83c9271d3",
+          "matches_previously_built_export": true
+        },
+        {
+          "path": "main/kb_board.h",
+          "sha256": "f8b043655135aa2a67ae236f7c26530a1398219efe474b201594a41a30c6d35e",
+          "matches_previously_built_export": true
+        },
+        {
+          "path": "main/main.c",
+          "sha256": "9ee6db8976f6996218d7e881be1504a273e80dc4d80ba077a9a3a89d03939c2b",
+          "matches_previously_built_export": true
+        },
+        {
+          "path": "sdkconfig.defaults",
+          "sha256": "1ac64f587ebfc0ac672551c8dde4b2682a8c241633d5b7a941cabaa71347e99a",
+          "matches_previously_built_export": true
+        }
+      ]
+    },
+    {
+      "example": "temperature_serial",
+      "board_profile": "kidbright32_rev31",
+      "export_path": "src-tauri/target/project-visibility-1792148352081/temperature_serial",
+      "owned_file_count": 9,
+      "visible_file_count": 8,
+      "root_reference_documents_absent": true,
+      "private_metadata_readable": true,
+      "private_directory_windows_hidden": true,
+      "unchanged_source_and_config": [
+        {
+          "path": "CMakeLists.txt",
+          "sha256": "61cd1467cee661e4a751050f918f84bf33c79f130ef0da157d147a7877d5cc8b",
+          "matches_previously_built_export": true
+        },
+        {
+          "path": "components/kb_reference/CMakeLists.txt",
+          "sha256": "d3e111e44361bca036b4583b951e54b901496ed00429291c79ac1926011eb175",
+          "matches_previously_built_export": true
+        },
+        {
+          "path": "components/kb_reference/include/kb_core.h",
+          "sha256": "752afe78294d71ecd68cb3054f572a15a769f240fd124f1d49bc844aa60d8398",
+          "matches_previously_built_export": true
+        },
+        {
+          "path": "components/kb_reference/kb_core.c",
+          "sha256": "05359f6f1dc8a402a4420bc9549230cb20a04900c2b8544a5143fe34c5409c89",
+          "matches_previously_built_export": true
+        },
+        {
+          "path": "main/CMakeLists.txt",
+          "sha256": "dc0d0fcb544df32c476c39124594bdd1736bae643a40532ef53b6ff83c9271d3",
+          "matches_previously_built_export": true
+        },
+        {
+          "path": "main/kb_board.h",
+          "sha256": "1659cbe62698123f28153ceb09873005ad97cee717938d3691413976a8c87336",
+          "matches_previously_built_export": true
+        },
+        {
+          "path": "main/main.c",
+          "sha256": "57cfb940c7038b478ebbdccb8466e08888baf0ed266ab58535f0a9596c61b1f3",
+          "matches_previously_built_export": true
+        },
+        {
+          "path": "sdkconfig.defaults",
+          "sha256": "1ac64f587ebfc0ac672551c8dde4b2682a8c241633d5b7a941cabaa71347e99a",
+          "matches_previously_built_export": true
+        }
+      ]
+    }
+  ],
+  "previous_sdk_build_evidence": "docs/research/kidbright-pilot-2026-10-16-validation.json",
+  "notes": [
+    "Export helper uses sdkconfig.defaults; IDE projects use sdkconfig.",
+    "Every exported source/config file is byte-identical to the previously built export. Firmware was not rebuilt for this visibility-only change.",
+    "Backend tests cover private profile precedence, corrupt profile rejection, Windows Hidden, legacy/user document visibility, Keep and Undo retaining all owned files.",
+    "Frontend tests cover legacy backend payload and events hiding internal entries from review counts and lists.",
+    "Existing legacy root metadata files are hidden in the IDE, not deleted or moved.",
+    "Windows Hidden attribute is organization, not access control.",
+    "Reserved root metadata protection also normalizes dot/parent path components; ordinary nested user documents remain visible and editable."
+  ],
+  "physical_board_tested": false,
+  "live_ai_provider_tested": false
+}

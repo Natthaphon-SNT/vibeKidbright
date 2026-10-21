@@ -1,0 +1,587 @@
+[
+  {
+    "id": "heldout-delay-en",
+    "query": "Convert a fractional delay in seconds to validated milliseconds",
+    "language": "en",
+    "relevant_files": [
+      "compatibility/kb_core.c",
+      "compatibility/kb_core.h"
+    ]
+  },
+  {
+    "id": "heldout-delay-th",
+    "query": "แปลงเวลาหน่วงจากวินาทีที่มีทศนิยมเป็นมิลลิวินาทีและตรวจค่าที่ไม่ถูกต้อง",
+    "language": "th",
+    "relevant_files": [
+      "compatibility/kb_core.c",
+      "compatibility/kb_core.h"
+    ]
+  },
+  {
+    "id": "heldout-delay-mixed",
+    "query": "แปลง delay วินาทีเป็น milliseconds พร้อมเช็คค่า",
+    "language": "mixed",
+    "relevant_files": [
+      "compatibility/kb_core.c",
+      "compatibility/kb_core.h"
+    ]
+  },
+  {
+    "id": "heldout-beat-en",
+    "query": "Calculate how long a musical beat lasts from the tempo",
+    "language": "en",
+    "relevant_files": [
+      "compatibility/kb_basic.c",
+      "compatibility/kb_basic.h"
+    ]
+  },
+  {
+    "id": "heldout-beat-th",
+    "query": "คำนวณความยาวตัวโน้ตจากความเร็วของเพลงและจำนวนจังหวะ",
+    "language": "th",
+    "relevant_files": [
+      "compatibility/kb_basic.c",
+      "compatibility/kb_basic.h"
+    ]
+  },
+  {
+    "id": "heldout-beat-mixed",
+    "query": "คำนวณ duration ของโน้ตจาก BPM และ beats",
+    "language": "mixed",
+    "relevant_files": [
+      "compatibility/kb_basic.c",
+      "compatibility/kb_basic.h"
+    ]
+  },
+  {
+    "id": "heldout-frame-en",
+    "query": "Pack a sixteen by eight pixel frame for the LED display controller",
+    "language": "en",
+    "relevant_files": [
+      "compatibility/kb_basic.c",
+      "compatibility/kb_basic.h"
+    ]
+  },
+  {
+    "id": "heldout-frame-th",
+    "query": "จัดข้อมูลพิกเซลสิบหกคอลัมน์แปดแถวเป็นแพ็กเก็ตส่งให้ตัวควบคุมจอ",
+    "language": "th",
+    "relevant_files": [
+      "compatibility/kb_basic.c",
+      "compatibility/kb_basic.h"
+    ]
+  },
+  {
+    "id": "heldout-frame-mixed",
+    "query": "pack เฟรม LED 16x8 ไปยัง HT16K33",
+    "language": "mixed",
+    "relevant_files": [
+      "compatibility/kb_basic.c",
+      "compatibility/kb_basic.h"
+    ]
+  },
+  {
+    "id": "heldout-button-en",
+    "query": "Play a short tone once per button press and wait until release",
+    "language": "en",
+    "relevant_files": [
+      "compatibility/button_buzzer.c"
+    ]
+  },
+  {
+    "id": "heldout-button-th",
+    "query": "กดปุ่มแล้วส่งเสียงหนึ่งครั้งจากนั้นรอให้ปล่อยปุ่มก่อน",
+    "language": "th",
+    "relevant_files": [
+      "compatibility/button_buzzer.c"
+    ]
+  },
+  {
+    "id": "heldout-button-mixed",
+    "query": "กด S1 แล้ว beep ครั้งเดียว ต้องรอ release",
+    "language": "mixed",
+    "relevant_files": [
+      "compatibility/button_buzzer.c"
+    ]
+  },
+  {
+    "id": "heldout-temperature-en",
+    "query": "Read a signed digital temperature over the sensor bus",
+    "language": "en",
+    "relevant_files": [
+      "compatibility/temperature_serial.c",
+      "compatibility/kb_core.c"
+    ]
+  },
+  {
+    "id": "heldout-temperature-th",
+    "query": "อ่านอุณหภูมิผ่านบัสเซนเซอร์โดยแปลงค่าติดลบได้ถูกต้อง",
+    "language": "th",
+    "relevant_files": [
+      "compatibility/temperature_serial.c",
+      "compatibility/kb_core.c"
+    ]
+  },
+  {
+    "id": "heldout-temperature-mixed",
+    "query": "อ่าน temperature ติดลบจาก LM73 ผ่าน I2C",
+    "language": "mixed",
+    "relevant_files": [
+      "compatibility/temperature_serial.c",
+      "compatibility/kb_core.c"
+    ]
+  },
+  {
+    "id": "heldout-pid-en",
+    "query": "Maintain proportional integral derivative state with elapsed time",
+    "language": "en",
+    "relevant_files": [
+      "compatibility/kb_core.c",
+      "compatibility/kb_core.h"
+    ]
+  },
+  {
+    "id": "heldout-pid-th",
+    "query": "เก็บสถานะตัวควบคุมสัดส่วนสะสมและอนุพันธ์โดยใช้เวลาที่ผ่านไป",
+    "language": "th",
+    "relevant_files": [
+      "compatibility/kb_core.c",
+      "compatibility/kb_core.h"
+    ]
+  },
+  {
+    "id": "heldout-pid-mixed",
+    "query": "ตัวควบคุม PID ต้องเก็บ integral และ previous error",
+    "language": "mixed",
+    "relevant_files": [
+      "compatibility/kb_core.c",
+      "compatibility/kb_core.h"
+    ]
+  },
+  {
+    "id": "heldout-average-en",
+    "query": "Smooth measurements using a fixed length sliding average",
+    "language": "en",
+    "relevant_files": [
+      "compatibility/kb_core.c",
+      "compatibility/kb_core.h"
+    ]
+  },
+  {
+    "id": "heldout-average-th",
+    "query": "ลดความแกว่งของค่าที่วัดด้วยค่าเฉลี่ยเลื่อนหน้าต่าง",
+    "language": "th",
+    "relevant_files": [
+      "compatibility/kb_core.c",
+      "compatibility/kb_core.h"
+    ]
+  },
+  {
+    "id": "heldout-average-mixed",
+    "query": "กรองสัญญาณด้วย moving average แบบ window",
+    "language": "mixed",
+    "relevant_files": [
+      "compatibility/kb_core.c",
+      "compatibility/kb_core.h"
+    ]
+  },
+  {
+    "id": "heldout-joystick-en",
+    "query": "Calibrate a joystick midpoint and map its raw input range",
+    "language": "en",
+    "relevant_files": [
+      "compatibility/kb_core.c",
+      "compatibility/kb_core.h"
+    ]
+  },
+  {
+    "id": "heldout-joystick-th",
+    "query": "ปรับเทียบจุดกึ่งกลางคันโยกและแปลงช่วงค่าอินพุต",
+    "language": "th",
+    "relevant_files": [
+      "compatibility/kb_core.c",
+      "compatibility/kb_core.h"
+    ]
+  },
+  {
+    "id": "heldout-joystick-mixed",
+    "query": "calibrate joystick midpoint แล้ว map ค่า raw",
+    "language": "mixed",
+    "relevant_files": [
+      "compatibility/kb_core.c",
+      "compatibility/kb_core.h"
+    ]
+  },
+  {
+    "id": "heldout-ascii-en",
+    "query": "Encode and decode numeric wireless payloads as text rather than binary floats",
+    "language": "en",
+    "relevant_files": [
+      "compatibility/kb_core.c",
+      "compatibility/kb_core.h"
+    ]
+  },
+  {
+    "id": "heldout-ascii-th",
+    "query": "เข้ารหัสและถอดข้อมูลตัวเลขไร้สายเป็นข้อความแทนการส่งทศนิยมไบนารี",
+    "language": "th",
+    "relevant_files": [
+      "compatibility/kb_core.c",
+      "compatibility/kb_core.h"
+    ]
+  },
+  {
+    "id": "heldout-ascii-mixed",
+    "query": "ส่ง ESP-NOW payload แบบ ASCII ตัวเลข ไม่ใช่ binary float",
+    "language": "mixed",
+    "relevant_files": [
+      "compatibility/kb_core.c",
+      "compatibility/kb_core.h"
+    ]
+  },
+  {
+    "id": "heldout-iaip-en",
+    "query": "What differs between the pink board and the acceleration equipped board",
+    "language": "en",
+    "relevant_files": [
+      "inex_ia_ip.md"
+    ]
+  },
+  {
+    "id": "heldout-iaip-th",
+    "query": "บอร์ดสีชมพูกับบอร์ดที่มีเซนเซอร์ความเร่งต่างกันอย่างไร",
+    "language": "th",
+    "relevant_files": [
+      "inex_ia_ip.md"
+    ]
+  },
+  {
+    "id": "heldout-iaip-mixed",
+    "query": "เทียบ KidBright32iP กับ iA เรื่องแสงและ accelerometer",
+    "language": "mixed",
+    "relevant_files": [
+      "inex_ia_ip.md"
+    ]
+  },
+  {
+    "id": "heldout-pins-en",
+    "query": "Which pins are assigned to external digital input and output connectors",
+    "language": "en",
+    "relevant_files": [
+      "inex_ia_ip.md"
+    ]
+  },
+  {
+    "id": "heldout-pins-th",
+    "query": "พอร์ตอินพุตและเอาต์พุตดิจิทัลภายนอกต่อกับขาใด",
+    "language": "th",
+    "relevant_files": [
+      "inex_ia_ip.md"
+    ]
+  },
+  {
+    "id": "heldout-pins-mixed",
+    "query": "IN1 IN4 OUT1 OUT2 ใช้ GPIO ไหน",
+    "language": "mixed",
+    "relevant_files": [
+      "inex_ia_ip.md"
+    ]
+  },
+  {
+    "id": "heldout-mc3479-en",
+    "query": "Find an example driver for the three axis acceleration sensor on the newer board",
+    "language": "en",
+    "relevant_files": [
+      "sensor_examples/accel_mc3479.c"
+    ]
+  },
+  {
+    "id": "heldout-mc3479-th",
+    "query": "ขอตัวอย่างอ่านความเร่งสามแกนของบอร์ดรุ่นที่ใช้ชิปเอ็มซี",
+    "language": "th",
+    "relevant_files": [
+      "sensor_examples/accel_mc3479.c"
+    ]
+  },
+  {
+    "id": "heldout-mc3479-mixed",
+    "query": "อ่าน acceleration เซนเซอร์ MC3479 ตัวอย่าง driver",
+    "language": "mixed",
+    "relevant_files": [
+      "sensor_examples/accel_mc3479.c"
+    ]
+  },
+  {
+    "id": "heldout-kxtj3-en",
+    "query": "Read axes from the older acceleration sensor using its registers",
+    "language": "en",
+    "relevant_files": [
+      "sensor_examples/accel_kxtj3.c"
+    ]
+  },
+  {
+    "id": "heldout-kxtj3-th",
+    "query": "อ่านค่าแกนจากรีจิสเตอร์ของเซนเซอร์ความเร่งรุ่นเก่า",
+    "language": "th",
+    "relevant_files": [
+      "sensor_examples/accel_kxtj3.c"
+    ]
+  },
+  {
+    "id": "heldout-kxtj3-mixed",
+    "query": "อ่านค่าแกน KXTJ3 ผ่าน register I2C",
+    "language": "mixed",
+    "relevant_files": [
+      "sensor_examples/accel_kxtj3.c"
+    ]
+  },
+  {
+    "id": "heldout-external-adc-en",
+    "query": "Measure an external light dependent resistor with the analog converter",
+    "language": "en",
+    "relevant_files": [
+      "sensor_examples/adc_ldr_external.c"
+    ]
+  },
+  {
+    "id": "heldout-external-adc-th",
+    "query": "อ่านตัวต้านทานแปรตามแสงภายนอกด้วยวงจรแปลงแอนะล็อก",
+    "language": "th",
+    "relevant_files": [
+      "sensor_examples/adc_ldr_external.c"
+    ]
+  },
+  {
+    "id": "heldout-external-adc-mixed",
+    "query": "อ่าน external LDR ผ่าน ADC แบบแยก",
+    "language": "mixed",
+    "relevant_files": [
+      "sensor_examples/adc_ldr_external.c"
+    ]
+  },
+  {
+    "id": "heldout-oled-en",
+    "query": "Connect and initialize a monochrome organic LED display over a two wire bus",
+    "language": "en",
+    "relevant_files": [
+      "oled_ssd1306.md"
+    ]
+  },
+  {
+    "id": "heldout-oled-th",
+    "query": "ต่อจอภาพขาวดำแบบโอแอลอีดีด้วยบัสสองสายและเริ่มต้นใช้งาน",
+    "language": "th",
+    "relevant_files": [
+      "oled_ssd1306.md"
+    ]
+  },
+  {
+    "id": "heldout-oled-mixed",
+    "query": "ต่อจอ OLED SSD1306 ผ่าน I2C ต้องตั้งค่าอะไร",
+    "language": "mixed",
+    "relevant_files": [
+      "oled_ssd1306.md"
+    ]
+  },
+  {
+    "id": "heldout-balance-en",
+    "query": "Find the firmware example for a self balancing robot",
+    "language": "en",
+    "relevant_files": [
+      "sensor_examples/balanced_robot.c"
+    ]
+  },
+  {
+    "id": "heldout-balance-th",
+    "query": "ขอตัวอย่างเฟิร์มแวร์หุ่นยนต์รักษาสมดุลทรงตัว",
+    "language": "th",
+    "relevant_files": [
+      "sensor_examples/balanced_robot.c"
+    ]
+  },
+  {
+    "id": "heldout-balance-mixed",
+    "query": "ตัวอย่าง self balancing robot โค้ดควบคุม",
+    "language": "mixed",
+    "relevant_files": [
+      "sensor_examples/balanced_robot.c"
+    ]
+  },
+  {
+    "id": "heldout-formula-en",
+    "query": "Explain the controller wiring and protocol for the steering vehicle",
+    "language": "en",
+    "relevant_files": [
+      "formula_kid_controller.md"
+    ]
+  },
+  {
+    "id": "heldout-formula-th",
+    "query": "อธิบายการต่อวงจรรีโมตและรูปแบบสื่อสารของรถฟอร์มูลา",
+    "language": "th",
+    "relevant_files": [
+      "formula_kid_controller.md"
+    ]
+  },
+  {
+    "id": "heldout-formula-mixed",
+    "query": "รีโมต Formula Kid ใช้ protocol และขาอะไร",
+    "language": "mixed",
+    "relevant_files": [
+      "formula_kid_controller.md"
+    ]
+  },
+  {
+    "id": "heldout-minibike-en",
+    "query": "Find the electrical and communication constraints for the miniature motorcycle",
+    "language": "en",
+    "relevant_files": [
+      "minibike.md"
+    ]
+  },
+  {
+    "id": "heldout-minibike-th",
+    "query": "ข้อจำกัดวงจรไฟฟ้าและการสื่อสารของมอเตอร์ไซค์จำลองมีอะไรบ้าง",
+    "language": "th",
+    "relevant_files": [
+      "minibike.md"
+    ]
+  },
+  {
+    "id": "heldout-minibike-mixed",
+    "query": "minibike ข้อจำกัด hardware และการสื่อสาร",
+    "language": "mixed",
+    "relevant_files": [
+      "minibike.md"
+    ]
+  },
+  {
+    "id": "heldout-mai-en",
+    "query": "Does the camera based AI board use the same firmware toolchain as the microcontroller board",
+    "language": "en",
+    "relevant_files": [
+      "kidbright_uai.md"
+    ]
+  },
+  {
+    "id": "heldout-mai-th",
+    "query": "บอร์ดปัญญาประดิษฐ์ที่มีกล้องใช้เครื่องมือคอมไพล์เหมือนบอร์ดไมโครคอนโทรลเลอร์หรือไม่",
+    "language": "th",
+    "relevant_files": [
+      "kidbright_uai.md"
+    ]
+  },
+  {
+    "id": "heldout-mai-mixed",
+    "query": "บอร์ด μAI Linux ใช้ ESP-IDF เหมือน KidBright32 หรือเปล่า",
+    "language": "mixed",
+    "relevant_files": [
+      "kidbright_uai.md"
+    ]
+  },
+  {
+    "id": "heldout-schematic-en",
+    "query": "How should a board revision be verified before choosing pin assignments",
+    "language": "en",
+    "relevant_files": [
+      "hardware_schematics_rules.md"
+    ]
+  },
+  {
+    "id": "heldout-schematic-th",
+    "query": "ต้องตรวจสอบรุ่นย่อยของบอร์ดจากหลักฐานใดก่อนกำหนดขาวงจร",
+    "language": "th",
+    "relevant_files": [
+      "hardware_schematics_rules.md"
+    ]
+  },
+  {
+    "id": "heldout-schematic-mixed",
+    "query": "ยืนยัน board revision จาก schematic ก่อนเลือก pin mapping",
+    "language": "mixed",
+    "relevant_files": [
+      "hardware_schematics_rules.md"
+    ]
+  },
+  {
+    "id": "heldout-symbol-kb_matrix_pixel",
+    "query": "kb_matrix_pixel",
+    "language": "technical",
+    "relevant_files": [
+      "compatibility/kb_basic.c",
+      "compatibility/kb_basic.h"
+    ]
+  },
+  {
+    "id": "heldout-symbol-kb_matrix_shift",
+    "query": "kb_matrix_shift",
+    "language": "technical",
+    "relevant_files": [
+      "compatibility/kb_basic.c",
+      "compatibility/kb_basic.h"
+    ]
+  },
+  {
+    "id": "heldout-symbol-kb_ascii_format",
+    "query": "kb_ascii_format",
+    "language": "technical",
+    "relevant_files": [
+      "compatibility/kb_core.c",
+      "compatibility/kb_core.h"
+    ]
+  },
+  {
+    "id": "heldout-symbol-kb_joystick_init",
+    "query": "kb_joystick_init",
+    "language": "technical",
+    "relevant_files": [
+      "compatibility/kb_core.c",
+      "compatibility/kb_core.h"
+    ]
+  },
+  {
+    "id": "heldout-symbol-kb_delay_ms",
+    "query": "kb_delay_ms",
+    "language": "technical",
+    "relevant_files": [
+      "compatibility/kb_core.c",
+      "compatibility/kb_core.h"
+    ]
+  },
+  {
+    "id": "heldout-symbol-kb_music_duration",
+    "query": "kb_music_duration",
+    "language": "technical",
+    "relevant_files": [
+      "compatibility/kb_basic.c",
+      "compatibility/kb_basic.h"
+    ]
+  },
+  {
+    "id": "heldout-symbol-kb_music_frequency",
+    "query": "kb_music_frequency",
+    "language": "technical",
+    "relevant_files": [
+      "compatibility/kb_basic.c",
+      "compatibility/kb_basic.h"
+    ]
+  },
+  {
+    "id": "heldout-symbol-kb_matrix_pack",
+    "query": "kb_matrix_pack",
+    "language": "technical",
+    "relevant_files": [
+      "compatibility/kb_basic.c",
+      "compatibility/kb_basic.h"
+    ]
+  },
+  {
+    "id": "heldout-symbol-kb_matrix_digit",
+    "query": "kb_matrix_digit",
+    "language": "technical",
+    "relevant_files": [
+      "compatibility/kb_basic.c",
+      "compatibility/kb_basic.h"
+    ]
+  }
+]

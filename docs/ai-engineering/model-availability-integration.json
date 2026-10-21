@@ -1,0 +1,22 @@
+{
+  "status": "NO_READY_MODEL_AT_PROBED_ENDPOINTS",
+  "method": "Read-only Invoke-WebRequest with two-second timeout, no headers/keys or inference",
+  "endpoints": [
+    {
+      "url": "http://localhost:11434/api/tags",
+      "outcome": "unavailable"
+    },
+    {
+      "url": "http://localhost:1234/v1/models",
+      "outcome": "unavailable"
+    },
+    {
+      "url": "http://localhost:8080/v1/models",
+      "outcome": "unavailable"
+    }
+  ],
+  "inference_requests": 0,
+  "paid_credential_reads": 0,
+  "charges": 0,
+  "not_exhaustive_service_discovery": true
+}

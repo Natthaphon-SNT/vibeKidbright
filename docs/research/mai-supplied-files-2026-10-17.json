@@ -1,0 +1,786 @@
+{
+  "schema_version": 1,
+  "audit_date": "2026-10-17",
+  "timezone": "Asia/Bangkok",
+  "scope": "Read-only input hashing, ZIP central-directory/bounded image-header inspection, complete PDF text extraction and selected-page visual inspection.",
+  "manual": {
+    "name": "วิธีใช้ Kidbright uAi PLUS.pdf",
+    "bytes": 6801348,
+    "sha256": "f7855e8840715729c6684cd069bdfaa2995667309931af6752eb8e11fd2085e7",
+    "hash_seconds": 0.01,
+    "pdf_pages": 89,
+    "pages_with_nonempty_extracted_text": 88,
+    "text_extraction": {
+      "tool": "Git-distributed pdftotext -layout -enc UTF-8",
+      "cache_path": "src-tauri/target/mai-file-audit/manual.txt",
+      "sha256": "77bd5d2de7f0ee3aff17953715d53ce2e832ff184ca4991158d4d6f058054478"
+    },
+    "selected_pages_rendered_and_visually_inspected": [
+      4,
+      14,
+      23,
+      33,
+      78,
+      79,
+      87,
+      88,
+      89
+    ],
+    "rendering_tool": "pypdfium2 5.14.0 installed only under ignored workspace target cache; original PDF not modified",
+    "page_topics": [
+      {
+        "pdf_page": 1,
+        "heading": "",
+        "empty_extracted_text": true
+      },
+      {
+        "pdf_page": 2,
+        "heading": "ขั้นตอนการใช้งานบอร์ด KidBright µAI PLUS",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 3,
+        "heading": "ขั้นตอนการใช้งาน",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 4,
+        "heading": "ขั้นตอนการใช้งาน",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 5,
+        "heading": "ขั้นตอนการใช้งาน",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 6,
+        "heading": "ตรวจการเชื่อมต่อบอร์ดและคอมพิเตอร์",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 7,
+        "heading": "ขั้นตอนการใช้งาน",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 8,
+        "heading": "ขั้นตอนการใช้งาน",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 9,
+        "heading": "ขั้นตอนการใช้งาน",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 10,
+        "heading": "ทาไมต้องขออนุญาตเชื่อมต่อ",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 11,
+        "heading": "ขั้นตอนการใช้งาน",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 12,
+        "heading": "กรณีที่เชื่อมต่อไม่สาเร็จ",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 13,
+        "heading": "ข้อแนะนา ให้ไปที่หน้าแท็บนี้ขออณุญาตหรือเข้าไปที่ https://10.155.55.1:5050 ทา",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 14,
+        "heading": "บล็อกคาสั่งพื้นฐาน",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 15,
+        "heading": "ตัวอย่างใช้บล็อกคาสั่งที่อยู่ในกลุ่มเมนู Basic",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 16,
+        "heading": "ตัวอย่างใช้บล็อกคาสั่งแสดงภาพจากกล้อง",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 17,
+        "heading": "กาหนดโปรแกรมทางานอัตโนมัติเมื่อจ่ายไฟเลี้ยงให้แก่บอร์ด",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 18,
+        "heading": "กาหนดโปรแกรมทางานอัตโนมัติเมื่อจ่ายไฟเลี้ยงให้แก่บอร์ด",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 19,
+        "heading": "การสร้าวตัวแปร",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 20,
+        "heading": "การสร้าวตัวแปร",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 21,
+        "heading": "การสร้าวตัวแปร",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 22,
+        "heading": "การสร้างตัวแปร",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 23,
+        "heading": "บล็อกคาสั่งพอร์ตอินพุตเอาต์พุตและตัวตรวจจับ : GPIO/Sensors",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 24,
+        "heading": "ทดสอบอ่านค่าจากตัวตรวจวัดความเร่ง 3 แกน",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 25,
+        "heading": "ทดสอบอ่านค่าสถานะสวิตช์ S1 และ S2 บนบอร์ด KidBright µAI PLUS",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 26,
+        "heading": "ทดสอบอ่านค่าสถานะลอจิกจากพอร์ตอินพุตของบอร์ด KidBright µAI PLUS",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 27,
+        "heading": "ทดสอบการทางานของพอร์ตเอาต์พุตดิจิทัลของบอร์ด KidBright µAI PLUS",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 28,
+        "heading": "ทดสอบการทางานของพอร์ตขับมอเตอร์เซอร์โวของบอร์ด KidBright µAI PLUS",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 29,
+        "heading": "ทดสอบเพิ่มข้อความลงบนหน้าจอพร้อมกับแสดงภาพจากกล้อง",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 30,
+        "heading": "พัฒนางานปัญญาประดิษฐ์เบื้องต้น",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 31,
+        "heading": "Machine Learning (ML) และ Deep Learning (DL)",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 32,
+        "heading": "Machine Learning (ML) และ Deep Learning (DL)",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 33,
+        "heading": "การใช้งานในส่วนปัญญาประดิษฐ์จะสามารถทาได้",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 34,
+        "heading": "กระบวนการพัฒนามี 4 ขั้นตอนดังนี้",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 35,
+        "heading": "การแยกแยะด้วยรูปภาพ (Image Classification)",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 36,
+        "heading": "การแยกแยะด้วยรูปภาพ (Image Classification)",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 37,
+        "heading": "ขั้นตอนเลือกประเภทโมเดล",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 38,
+        "heading": "ขั้นตอนที่ 1 เก็บข้อมูล ( Capture )",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 39,
+        "heading": "ขั้นตอนที่ 2 การติดป้ายกากับ (Annotate)",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 40,
+        "heading": "ขั้นตอนที่ 2 การติดป้ายกากับ (Annotate)",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 41,
+        "heading": "ขั้นตอนที่ 2 การติดป้ายกากับ (Annotate)",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 42,
+        "heading": "ขั้นตอนที่ 3 การเรียนรู้ (Train)",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 43,
+        "heading": "AI Designer",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 44,
+        "heading": "การสร้างโมเดลผ่าน Google colab",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 45,
+        "heading": "สร้าง Server บน Google coab",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 46,
+        "heading": "สร้าง Server บน Google colab",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 47,
+        "heading": "สร้าง Server บน Google colab",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 48,
+        "heading": "สร้าง Server บน Google clab",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 49,
+        "heading": "สร้าง Server บน Google colab",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 50,
+        "heading": "สร้าง Server บน Google colab",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 51,
+        "heading": "สร้าง Server บน Google colab ส่วนการ Training",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 52,
+        "heading": "สร้าง Server บน Google colab                            ส่วนการ Training",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 53,
+        "heading": "นา URL มาใส่ยัง KidBright microAI IDE",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 54,
+        "heading": "เมื่อกาลัง Train บน Google",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 55,
+        "heading": "เมื่อTrain เสร็จ",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 56,
+        "heading": "เมื่อTrain เสร็จ",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 57,
+        "heading": "เมื่อTrain เสร็จ",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 58,
+        "heading": "ชุดคาสั่งบล็อกของ AI ในโหมด Image classification",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 59,
+        "heading": "ตัวอย่างการนาไปใช้  Basic-Garbage-Image-Classification.zip",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 60,
+        "heading": "ตัวอย่างการใช้อักษรขึ้นต้นมาแยกประเภท",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 61,
+        "heading": "การสร้างโมเดลการตรวจจับวัตถุ (Object Detection)",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 62,
+        "heading": "ขั้นตอนเลือกประเภทโมเดล",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 63,
+        "heading": "ภาพตัวอย่างที่นามาใช้สร้างโมเดล",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 64,
+        "heading": "ขั้นตอนที่ 1 เก็บข้อมูล ( Capture )",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 65,
+        "heading": "ขั้นตอนที่ 2 ติดป้ายชื่อ (ANNOTATE )",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 66,
+        "heading": "ขั้นตอนที่ 2 ติดป้ายชื่อ (ANNOTATE )",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 67,
+        "heading": "ขั้นตอนเลือกกากับป้ายชื่อมีดังนี้",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 68,
+        "heading": "ขั้นตอนที่ 3 การเรียนรู้ (Train)",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 69,
+        "heading": "AI Designer",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 70,
+        "heading": "นา URL จาก ขั้นตอน Goole Colab มาใส่ยัง KidBright microAI IDE",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 71,
+        "heading": "Train จนเสร็จจนถึงขั้นตอน Download",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 72,
+        "heading": "เมื่อTrain เสร็จ",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 73,
+        "heading": "ชุดคาสั่งบล็อกของ AI ในโหมด Object detection",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 74,
+        "heading": "ตัวอย่างการนาไปใช้งาน  Basic-Object-Detection.zip",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 75,
+        "heading": "ขั้นตอนการติดตั้ง ระบบปฏิบัติการบน SD Card",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 76,
+        "heading": "โปรแกรมที่เกี่ยวข้อง",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 77,
+        "heading": "โปรแกรม SD Card Formatter              เลือก ไดร์ให้ถูกต้อง",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 78,
+        "heading": "โหลดไฟล์ OS Kidbright uAi PLUS",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 79,
+        "heading": "โปรแกรม Rufus  2",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 80,
+        "heading": "โปรแกรม Rufus",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 81,
+        "heading": "ทดสอบ SD Card  เสียบ USB ช่อง OTG จากนั้นเลื่อน",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 82,
+        "heading": "ติดตั้ง Runtime",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 83,
+        "heading": "เชื่อมต่ออินเตอร์เน็ตผ่านสัญญาณ Wi-Fi",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 84,
+        "heading": "เชื่อมต่ออินเตอร์เน็ตผ่านสัญญาณ Wi-Fi",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 85,
+        "heading": "เชื่อมต่ออินเตอร์เน็ตผ่านสัญญาณ Wi-Fi",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 86,
+        "heading": "เชื่อมต่ออินเตอร์เน็ตผ่านสัญญาณ Wi-Fi",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 87,
+        "heading": "ติดตั้ง Runtime                  2",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 88,
+        "heading": "ติดตั้ง Runtime                                    4",
+        "empty_extracted_text": false
+      },
+      {
+        "pdf_page": 89,
+        "heading": "ทดสอบหลังติดตั้ง Runtime เปิด App Camera",
+        "empty_extracted_text": false
+      }
+    ],
+    "observations": [
+      {
+        "pdf_pages": [
+          4,
+          6,
+          10,
+          13
+        ],
+        "finding": "USB-OTG, RNDIS and the board-local HTTPS5050 connection are documented; reference procedure not executed."
+      },
+      {
+        "pdf_pages": [
+          17,
+          18
+        ],
+        "finding": "Run-now and install-as-app/start-on-boot are distinct operations."
+      },
+      {
+        "pdf_pages": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29
+        ],
+        "finding": "GPIO/Sensors, acceleration, gyroscope, S1/S2, I/O, servo and camera/text examples; presence is not an implemented vibeKidbright port."
+      },
+      {
+        "pdf_pages": [
+          33,
+          38,
+          42,
+          44,
+          55,
+          56,
+          64,
+          69,
+          71,
+          73
+        ],
+        "finding": "Three AI task categories; image/object capture/annotation/Colab training/model download flows; example collection sizes20/100 are tutorial guidance."
+      },
+      {
+        "pdf_pages": [
+          75,
+          76,
+          77,
+          78,
+          79,
+          80,
+          81
+        ],
+        "finding": "OS writing to microSD is separate from program upload. Illustrated image is May02/v4.12.5B1, not the provided June09 ZIP."
+      },
+      {
+        "pdf_pages": [
+          82,
+          83,
+          84,
+          85,
+          86,
+          87,
+          88,
+          89
+        ],
+        "finding": "After OS installation, WiFi and Runtime installation/upgrade are documented. Screenshot shows MaixPy4.12.5, Runtime1.24.0 and a camera smoke test; not measured on an attached board."
+      }
+    ]
+  },
+  "archives": [
+    {
+      "name": "KidBrightAI_JaxBot-v3-1.zip",
+      "bytes": 14214054419,
+      "sha256": "5617efea1bcea58475fecae985233453415a7ef41c27a990aca463c74e75914d",
+      "hash_seconds": 11.58,
+      "role": "disk-image-container",
+      "image_boot_tested": false,
+      "source_code_tree_directly_in_zip": false,
+      "filesystem_contents_inspected": false,
+      "hardware_binding": "unconfirmed-exact-platform",
+      "executable_profile_added": false,
+      "member_count": 1,
+      "members": [
+        {
+          "name": "KidBrightAI_JaxBot-v3-1.img",
+          "bytes": 31914983424,
+          "compressed_bytes": 14214054115,
+          "crc32": "a32990f7",
+          "compression_method": 8,
+          "encrypted": false
+        }
+      ],
+      "header_inspection": {
+        "sample_bytes": 1048576,
+        "sample_sha256": "a9f176a8581b6689d102f12a9f6bbd9a6809dcac66a46d83290b184456f43b3e",
+        "mbr_signature": "55aa",
+        "disk_image_bytes": 31914983424,
+        "full_image_crc_verified": false,
+        "partitions": [
+          {
+            "index": 1,
+            "type_guid": "0fc63daf-8483-4772-8e79-3d69d8477de4",
+            "start_bytes": 14680064,
+            "bytes": 31900286464,
+            "label": "APP"
+          }
+        ],
+        "scheme": "GPT-with-protective-MBR"
+      }
+    },
+    {
+      "name": "KidBright_AI_IDE_NanoPi_v1_0_1.zip",
+      "bytes": 11208696934,
+      "sha256": "dae3d46f72d1d28635f3cd46f2a64779f41b7de57db2d136c3165fa22952665d",
+      "hash_seconds": 9.62,
+      "role": "disk-image-container",
+      "image_boot_tested": false,
+      "source_code_tree_directly_in_zip": false,
+      "filesystem_contents_inspected": false,
+      "hardware_binding": "unconfirmed-exact-platform",
+      "executable_profile_added": false,
+      "member_count": 1,
+      "members": [
+        {
+          "name": "KidBright_AI_IDE_NanoPi_ver1_0_1.img",
+          "bytes": 31914983424,
+          "compressed_bytes": 11208696648,
+          "crc32": "863bccfa",
+          "compression_method": 9,
+          "encrypted": false
+        }
+      ],
+      "header_inspection": {
+        "status": "unsupported-compression-for-payload-reader",
+        "error": "That compression method is not supported",
+        "compression_method": 9
+      }
+    },
+    {
+      "name": "KidBrightAI_RSP_v1_0_1.zip",
+      "bytes": 5134681418,
+      "sha256": "35b08349fb27abc5b7b5c3f917ed774d058746eaba6df999cf7a103edae90751",
+      "hash_seconds": 4.58,
+      "role": "disk-image-container",
+      "image_boot_tested": false,
+      "source_code_tree_directly_in_zip": false,
+      "filesystem_contents_inspected": false,
+      "hardware_binding": "unconfirmed-exact-platform",
+      "executable_profile_added": false,
+      "member_count": 1,
+      "members": [
+        {
+          "name": "KidBrightAI_RSP_v1_0_1.img",
+          "bytes": 31914983424,
+          "compressed_bytes": 5134681116,
+          "crc32": "078aca70",
+          "compression_method": 8,
+          "encrypted": false
+        }
+      ],
+      "header_inspection": {
+        "sample_bytes": 1048576,
+        "sample_sha256": "78d9da1b5b05983401483a6207d465efebe790560a4eed409ecad270a17dff50",
+        "mbr_signature": "55aa",
+        "disk_image_bytes": 31914983424,
+        "full_image_crc_verified": false,
+        "partitions": [
+          {
+            "index": 1,
+            "type_hex": "0xc",
+            "start_bytes": 4194304,
+            "bytes": 268435456
+          },
+          {
+            "index": 2,
+            "type_hex": "0x83",
+            "start_bytes": 272629760,
+            "bytes": 15658909696
+          }
+        ],
+        "scheme": "MBR"
+      }
+    },
+    {
+      "name": "kidbright-mAi-plus-2026-06-09-v4.12.5.zip",
+      "bytes": 471506687,
+      "sha256": "f01bbcd1baa8b3f42760007a0b633ee4b3e19957671e0969a65a1e11d51e170f",
+      "hash_seconds": 0.35,
+      "role": "disk-image-container",
+      "image_boot_tested": false,
+      "source_code_tree_directly_in_zip": false,
+      "filesystem_contents_inspected": false,
+      "hardware_binding": "candidate-Plus-from-user-context-and-filename",
+      "executable_profile_added": false,
+      "member_count": 1,
+      "members": [
+        {
+          "name": "kidbright-mAi-plus-2026-06-09-v4.12.5.img",
+          "bytes": 1556086784,
+          "compressed_bytes": 471506471,
+          "crc32": "3a65fdd9",
+          "compression_method": 8,
+          "encrypted": false
+        }
+      ],
+      "header_inspection": {
+        "sample_bytes": 1048576,
+        "sample_sha256": "fa76f1c83166ea66df03a4ae3a2ad59d5feadfb4588e720371cf7c8b0e7a08af",
+        "mbr_signature": "55aa",
+        "disk_image_bytes": 1556086784,
+        "full_image_crc_verified": false,
+        "partitions": [
+          {
+            "index": 1,
+            "type_hex": "0xc",
+            "start_bytes": 512,
+            "bytes": 16777216
+          },
+          {
+            "index": 2,
+            "type_hex": "0x83",
+            "start_bytes": 16777728,
+            "bytes": 1539309056
+          }
+        ],
+        "scheme": "MBR"
+      }
+    }
+  ],
+  "totals": {
+    "zip_bytes": 31028939458,
+    "expanded_image_bytes": 97301037056
+  },
+  "files_installed_from_user_archives": false,
+  "archive_programs_executed": false,
+  "disk_images_written_or_mounted": false,
+  "private_board_endpoint_contacted": false,
+  "physical_board_tested": false,
+  "active_profiles_added": false,
+  "limits": [
+    "All ZIP inputs were hashed in full, but their large uncompressed image payloads were not fully extracted, CRC-verified, mounted or boot-tested.",
+    "No internal root filesystem, IDE source tree, driver source, runtime inventory or installed package version is certified from these headers.",
+    "NanoPi ZIP uses Deflate64 method9. Python and the available .NET ZIP reader cannot decode that payload; central-directory metadata and full ZIP SHA256 are still recorded.",
+    "JaxBot/NanoPi/RSP labels are not proof of a particular SoC, ABI, GPIO map or compatibility with V831/SG2002.",
+    "The name v4.12.5 and manual screenshot Runtime1.24.0 are distinct reference version fields, not a current-version guarantee or proof of what is installed on a physical board.",
+    "Text was extracted across all89 PDF pages; only selected pages listed above were rendered and visually inspected. The blank-text cover is still included in page numbering.",
+    "Hash identity does not prove manufacturer authenticity or redistribution permission; input source paths and image binaries are not added to the app bundle."
+  ],
+  "repository_snapshot": [
+    {
+      "path": "docs/KIDBRIGHT_MAI_SUPPLIED_FILES_AUDIT_2026-10-17.md",
+      "sha256": "d5810ba973694d595a10ee9b873c47728b71b5cebfe9b8f1c92846a4542f06de"
+    },
+    {
+      "path": "docs/VIBEKIDBRIGHT_UNIFIED_BOARD_ARCHITECTURE_2026-10-17.md",
+      "sha256": "2838eea6db24bbe738eca49f653603539dc06e34507f0b74117f88bd1eaa0fcf"
+    },
+    {
+      "path": "knowledge_base/kidbright_uai.md",
+      "sha256": "1b94de2397636f6e4be87801ae1864285f17f1b9d826a37ec8c3eff5957b1b19"
+    },
+    {
+      "path": "resources/knowledge_base/kidbright_uai.md",
+      "sha256": "1b94de2397636f6e4be87801ae1864285f17f1b9d826a37ec8c3eff5957b1b19"
+    },
+    {
+      "path": "src-tauri/src/ai/system_prompt.txt",
+      "sha256": "6cd6519ce516d705c457448f7136ac3849bf89f7c10b88811a2ef2b8c11febaa"
+    }
+  ],
+  "validation": {
+    "checks": [
+      {
+        "command": "npm run check:kb",
+        "status": "passed"
+      },
+      {
+        "command": "npm run check:coverage",
+        "status": "passed"
+      },
+      {
+        "command": "npm run check:rules",
+        "status": "passed"
+      },
+      {
+        "command": "npm run check:boards",
+        "status": "passed"
+      },
+      {
+        "command": "npm run check:bundle",
+        "status": "passed"
+      },
+      {
+        "command": "npm run check:public",
+        "status": "passed"
+      },
+      {
+        "command": "git -c core.safecrlf=false diff --check",
+        "status": "passed"
+      }
+    ],
+    "report_links_checked": true,
+    "source_and_bundled_knowledge_match": true,
+    "pdf_page_count_checked_with_pdfium": true,
+    "new_firmware_tests_run": false,
+    "new_runtime_or_provisioner_implemented": false
+  }
+}

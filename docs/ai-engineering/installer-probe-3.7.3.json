@@ -1,0 +1,28 @@
+{
+  "architecture": "x86_64",
+  "durable_review_restart_and_undo": true,
+  "embedding_dimensions": 384,
+  "embedding_samples": 2,
+  "hardware_flashed": false,
+  "indexed_chunks": 2026,
+  "knowledge_files_copied": 41,
+  "lexical_intelligence_search": true,
+  "local_vector_search": true,
+  "native_credential_roundtrip": true,
+  "platform": "windows",
+  "runtime_downloads_required": false,
+  "settings_write_and_read": true,
+  "startup_recovery_journals": true,
+  "toolchain_required_for_self_check": false,
+  "tree_sitter_c": "0.24.2",
+  "version": "3.7.3",
+  "probe_environment": {
+    "separate_install_directory": true,
+    "separate_working_directory": true,
+    "fresh_appdata": true,
+    "developer_paths_removed_from_environment": true,
+    "http_proxy_closed": true,
+    "os_firewall_isolation": false,
+    "fresh_virtual_machine": false
+  }
+}

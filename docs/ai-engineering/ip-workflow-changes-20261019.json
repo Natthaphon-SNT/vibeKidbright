@@ -1,0 +1,138 @@
+{
+  "date": "2026-10-19",
+  "baseline": {
+    "path": "src-tauri/target/ip-workflow-baseline-20261019.json",
+    "sha256": "47ce9fd8ea1b296a5d5c64536ea1847e37f075f9ef93392836d39d22d338ecb8",
+    "bytes": 65354
+  },
+  "baseline_files_matched_before_changes": 287,
+  "scope": "Prior recorded source/evidence plus newly recorded current files, not entire pre-existing Git diff. Newly recorded paths are not proof of new file creation. No self-hash or verification.json hash.",
+  "files": [
+    {
+      "path": "docs/KIDBRIGHT_BLOCK_COVERAGE_2026-10-16.md",
+      "before_sha256": null,
+      "after_sha256": "eb2224b69aaad9af14c4f65d56acdce84cd17017b275904ce5c800e7fc7aa1c2",
+      "comparison": "newly_recorded"
+    },
+    {
+      "path": "docs/ai-engineering/07-implementation-progress.md",
+      "before_sha256": "ca769834094ed411be66fb07b84ae99f110f7dddf853c2ad36210bfe7267c6f8",
+      "after_sha256": "4aec287d7b091e349838ece72b81d33f5bdcde8571ee89a5ea755b08b0953b9d",
+      "comparison": "changed_from_verified_baseline"
+    },
+    {
+      "path": "docs/ai-engineering/09-known-limitations.md",
+      "before_sha256": "f50cb12199ea21f35b6a93bdf1062e039d94613ba5dcea92690927fcf1c4b9f0",
+      "after_sha256": "99f2ec0ab4e25063868352c9ac130f4642b7834e9270a26d99b1ab7bc7130b0f",
+      "comparison": "changed_from_verified_baseline"
+    },
+    {
+      "path": "docs/ai-engineering/26-ip-custom-draft-workflow.md",
+      "before_sha256": null,
+      "after_sha256": "87e4a1ee6f34b7a07894883ffe9692f503b8a433d98d48857b84c69615bfd117",
+      "comparison": "newly_recorded"
+    },
+    {
+      "path": "docs/ai-engineering/bundled-source-hashes.json",
+      "before_sha256": "aed6f38531319e4a669cae74babfef67402950ac1a721eb938f621f4c558520a",
+      "after_sha256": "f5e42af699ee6483426b0640726a370d1476879e0b6d1c12933ef7c65e5bf7c1",
+      "comparison": "changed_from_verified_baseline"
+    },
+    {
+      "path": "docs/ai-engineering/ip-workflow-production-ui-20261019.json",
+      "before_sha256": null,
+      "after_sha256": "52a89990d539e4721182ca43a4e5fa556410d5826a1226b5c605a6d18a961fee",
+      "comparison": "newly_recorded"
+    },
+    {
+      "path": "docs/ai-engineering/ip-workflow-verification-20261019.json",
+      "before_sha256": null,
+      "after_sha256": "4d47d5325c227855488411e321bcb8f283d6d6dcd80b77d093079dd473d0cafe",
+      "comparison": "newly_recorded"
+    },
+    {
+      "path": "docs/previews/board-guide-compact-dark.png",
+      "before_sha256": "186ee3061f3275158825d035a94dc856ac67f8dd9e05def77698abd300851c8a",
+      "after_sha256": "64d8020cd4627789d235f3fc5b3715c06314b2d1139f95b9de7376770eb7eca3",
+      "comparison": "changed_from_verified_baseline"
+    },
+    {
+      "path": "docs/previews/board-guide-th-plus.png",
+      "before_sha256": "a9ccdc03144891a028f3ef3edd982a9b1974628ba88374d52a1154b5f000d9b8",
+      "after_sha256": "10e47297db8d0a97c6443e8b46bd283333bf1c5df28830e7b253648f2a534628",
+      "comparison": "changed_from_verified_baseline"
+    },
+    {
+      "path": "docs/research/kidbright-coverage-2026-10-16.json",
+      "before_sha256": null,
+      "after_sha256": "0e4f513d5edda295470b79b5f4c308b46f3caaa36473c598a1688354d4d3204b",
+      "comparison": "newly_recorded"
+    },
+    {
+      "path": "docs/research/rule-documents-2026-10-16.json",
+      "before_sha256": "be5040fb7aae96dbc222d09be14572295ec6ab01a75f7f8abd191e7e1da03ae3",
+      "after_sha256": "e657c8de7b192f0fdcfacdf87c177a70855aba298e3392eb1209d964d2fba2ef",
+      "comparison": "changed_from_verified_baseline"
+    },
+    {
+      "path": "knowledge_base/compatibility/README.md",
+      "before_sha256": null,
+      "after_sha256": "02b74e3b3a9aeec6ee4ed3a100adb4e8ec92096dcda32bdc86819570c9d8ad51",
+      "comparison": "newly_recorded"
+    },
+    {
+      "path": "knowledge_base/inex_ia_ip.md",
+      "before_sha256": null,
+      "after_sha256": "04d3d98f7a8453cfc36a454f22b714e979979ccfd3f4bf6ce54f5df82d299187",
+      "comparison": "newly_recorded"
+    },
+    {
+      "path": "knowledge_base/support_scope.md",
+      "before_sha256": null,
+      "after_sha256": "f15f22d407f0292ae462a1b166f86d8f142c76bfa16ae72e5ba37c83d4bc9849",
+      "comparison": "newly_recorded"
+    },
+    {
+      "path": "resources/knowledge_base/compatibility/README.md",
+      "before_sha256": null,
+      "after_sha256": "02b74e3b3a9aeec6ee4ed3a100adb4e8ec92096dcda32bdc86819570c9d8ad51",
+      "comparison": "newly_recorded"
+    },
+    {
+      "path": "resources/knowledge_base/inex_ia_ip.md",
+      "before_sha256": null,
+      "after_sha256": "04d3d98f7a8453cfc36a454f22b714e979979ccfd3f4bf6ce54f5df82d299187",
+      "comparison": "newly_recorded"
+    },
+    {
+      "path": "resources/knowledge_base/support_scope.md",
+      "before_sha256": null,
+      "after_sha256": "f15f22d407f0292ae462a1b166f86d8f142c76bfa16ae72e5ba37c83d4bc9849",
+      "comparison": "newly_recorded"
+    },
+    {
+      "path": "src-tauri/src/ai/orchestration.rs",
+      "before_sha256": "6e9b0bc430c18ed598b6f6bfb02ea379aabcb3cb74ce5f6cde959067527b4b32",
+      "after_sha256": "e7e5983a20a21cde43e199f23843bb6cda7f98b4f01e7cb2ae714dfee1aa9461",
+      "comparison": "changed_from_verified_baseline"
+    },
+    {
+      "path": "src-tauri/src/ai/providers.rs",
+      "before_sha256": "05c1a34dee5052916389392ab95a1d05b9b5e80c7d26fcaa6010f6c9cebd2805",
+      "after_sha256": "55ba2fae4d0146621252ea25268cfdaa971a43a6c864a5a8ce0ef76ba1f975b0",
+      "comparison": "changed_from_verified_baseline"
+    },
+    {
+      "path": "src-tauri/src/ai/system_prompt.txt",
+      "before_sha256": "c9741f30dac5ff1846b40193cac92b7a757428f9d5c625bd8db32ca8b9e2af70",
+      "after_sha256": "d2a7155a223778596514987a16cef8e578e852e1bd13879b078ab51dd95d1c79",
+      "comparison": "changed_from_verified_baseline"
+    },
+    {
+      "path": "src-tauri/src/ai/tools.rs",
+      "before_sha256": "4936223d59b7d85c711c52d7aa86832668682fcd2e8d6d7e7a8bdc2c3cb474c7",
+      "after_sha256": "9abf235813aa26deb2f305b4670e9b21c30da4c53d57ff8c0379716531344f8f",
+      "comparison": "changed_from_verified_baseline"
+    }
+  ]
+}

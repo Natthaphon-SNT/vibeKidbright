@@ -42,6 +42,15 @@
 // This file is a thin re-export layer until the full split is done.
 
 pub mod config;
+pub(crate) mod wiki;
+pub(crate) mod compatibility;
+pub(crate) mod project_review;
+pub(crate) mod change_journal;
+pub(crate) mod repair;
 pub mod kb;
+pub(crate) mod language;
+pub(crate) mod orchestration;
+pub(crate) mod privacy;
+pub(crate) mod evidence;
 pub mod providers;
 pub mod tools;

@@ -1,0 +1,43 @@
+{
+  "local_date": "2026-10-19",
+  "status": "PREFLIGHT_PASSED_MODEL_QUALITY_NOT_EVALUATED",
+  "scope": "Actual debug-native WebView2/production React/Tauri evidence-listener preflight only. No inference, model outputs, patches, semantic queries, build or Flash. Existing public fixture only.",
+  "raw_report": "src-tauri/target/workflow-recorder-ready-20261019.json",
+  "raw_report_sha256": "8d94ca583954bfa7b54c9721709ec2c7bf7d7799cb71d9054f59cb1221bbc12d",
+  "identifier": "th.nectec.vibekidbright.desktop-evaluation",
+  "native_event_subscriptions": 11,
+  "synthetic_native_event_captured": true,
+  "synthetic_marker_is_model_evidence": false,
+  "disk_sources_unchanged": true,
+  "compilation_database_restored": true,
+  "page_errors": [],
+  "inference_requests": 0,
+  "paid_credential_reads": 0,
+  "patches_approved": 0,
+  "semantic_queries_executed": 0,
+  "builds_executed": 0,
+  "capability_levels": {
+    "knowledge_aware": "NOT_EVALUATED",
+    "project_aware": "NOT_EVALUATED",
+    "build_aware": "NOT_EVALUATED"
+  },
+  "source_sha256": {
+    "src-tauri/src/lib.rs": "1b51d9a3b39e8e15119fffa436731f84e1d05127c4060d8de5f89e05ab412dc8",
+    "src-tauri/src/ai/config.rs": "ae0c19d990bcf82a5fea3a5673b320d9186478b254da2171cd85937ce35bf595",
+    "src-tauri/src/esp_idf.rs": "62728b30693db31b4e17da2ce159ff74bba8f812a58a9dd1fdced193e9573a5c",
+    "src-tauri/src/toolchain.rs": "a6e8b8935c774a2b9b274176a3398a807bb8c1be2ff8bc59257377b733325e80",
+    "src-tauri/src/intelligence/semantic.rs": "80f08d42ed5676072a11a30f3ea1afd4437ec5c470de28b5543a4f54ec04e9cc",
+    "src-tauri/build.rs": "10653c53fdefb7e3dee3654ab791f5e2146e734955ed0671172cd8f506cfa69f",
+    "src-tauri/examples/desktop_evaluation.rs": "6780ef718fc211f43e4a7c68cdf7147caa2def6514998061290cd133e801e3b0",
+    "src-tauri/examples/desktop-evaluation.manifest": "708bff8872b2502137891dcbb140f403c3e98977661dd15f818c760b881723f2",
+    "src-tauri/examples/stalling_lsp_fixture.rs": "582f68d74eaa8d65ff2307c66eef777588319320c81ff01e762f0c34c9d3a64d",
+    "src/CIntelligencePanel.tsx": "586e1830259c4a5eb617f60963cbdca80416fc75dbd6763c5775bdac003681cc",
+    "src/CodeEditor.tsx": "6bf768136cce69a18c6e1bd4afc071e79e645e117048f57eec5233494c133e9b",
+    "scripts/probe-desktop-semantic.mjs": "ee8e3320a914e02a251b990a380ce1aeeef3bbad8d8f01fffeb227af4b391892",
+    "scripts/evaluate-vibe-coder-real.mjs": "aa3c6564cb4561795a4816da2a1a55d29b6c608df58bf153a5675dbefff9012a",
+    "scripts/lib/vibe-evidence.mjs": "0080d09ba1453dd73e993121b4f1805222e71c9086e5cfa8642c41d7a4027ffe",
+    "docs/ai-engineering/real-vibe-coder-cases.json": "e71e99c81c7dcb381f6bc9a96d963db9fdf49dfb7c00aa6f79cfebc010fdbf73"
+  },
+  "desktop_executable_sha256": "da26bd506708af8b12b3961333d16b35055b43ad78047b8a2b61aa1171b6acf1",
+  "production_index_sha256": "a4ff51a573def4a1196df2cac2f68fe9eab91f342acf0ae6e75633f2fbd43f00"
+}

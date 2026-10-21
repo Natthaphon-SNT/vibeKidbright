@@ -1,0 +1,20 @@
+[
+  {"id":"dev-th-1","language":"th","query":"สาธิตให้พักการทำงานของทาสก์สั้น ๆ","relevant_files":["compatibility/button_buzzer.c"]},
+  {"id":"dev-th-2","language":"th","query":"ต้องการตรวจสถานะสวิตช์ระหว่างวนลูป","relevant_files":["compatibility/button_buzzer.c"]},
+  {"id":"dev-th-3","language":"th","query":"เพิ่มความถี่ของบัซเซอร์ระหว่างเล่นสเกล","relevant_files":["compatibility/music_scale.c"]},
+  {"id":"dev-th-4","language":"th","query":"อ่านแสงภายนอกด้วยการแปลงอนาล็อก","relevant_files":["sensor_examples/adc_ldr_external.c"]},
+  {"id":"dev-th-5","language":"th","query":"จัดไบต์สำหรับเมทริกซ์ก่อนส่งไปแสดงผล","relevant_files":["compatibility/kb_basic.c"]},
+  {"id":"dev-en-1","language":"en","query":"Read a thermometer register and convert the signed bytes","relevant_files":["compatibility/temperature_serial.c"]},
+  {"id":"dev-en-2","language":"en","query":"Pause execution for a timed note in a loop","relevant_files":["compatibility/button_buzzer.c"]},
+  {"id":"dev-en-3","language":"en","query":"Wait for a button release before accepting another press","relevant_files":["compatibility/button_buzzer.c"]},
+  {"id":"dev-en-4","language":"en","query":"Pack a dot matrix frame into controller RAM bytes","relevant_files":["compatibility/kb_basic.c"]},
+  {"id":"dev-en-5","language":"en","query":"Change the frequency of a piezo during a musical scale","relevant_files":["compatibility/music_scale.c"]},
+  {"id":"dev-mixed-1","language":"mixed","query":"ขอโค้ด thermometer ที่อ่านข้อมูลสองไบต์","relevant_files":["compatibility/temperature_serial.c"]},
+  {"id":"dev-mixed-2","language":"mixed","query":"อยาก pause execution ในงานเสียงสั้น ๆ","relevant_files":["compatibility/button_buzzer.c"]},
+  {"id":"dev-mixed-3","language":"mixed","query":"อ่าน switch input แล้วรอให้ปล่อย","relevant_files":["compatibility/button_buzzer.c"]},
+  {"id":"dev-mixed-4","language":"mixed","query":"เตรียม frame ของ dot matrix ก่อนส่งข้อมูล","relevant_files":["compatibility/kb_basic.c"]},
+  {"id":"dev-mixed-5","language":"mixed","query":"วัด ambient light จากพอร์ตอนาล็อก","relevant_files":["sensor_examples/adc_ldr_external.c"]},
+  {"id":"dev-api-1","language":"api","query":"gpio_get_level","relevant_files":["compatibility/button_buzzer.c"]},
+  {"id":"dev-api-2","language":"api","query":"i2c_master_bus_add_device","relevant_files":["compatibility/kb_display_idf.c"]},
+  {"id":"dev-api-3","language":"api","query":"adc_oneshot_read","relevant_files":["sensor_examples/adc_ldr_external.c"]}
+]

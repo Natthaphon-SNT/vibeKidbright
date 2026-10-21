@@ -1,0 +1,501 @@
+{
+  "date": "2026-10-19",
+  "scope": "Offline preparation/runbook closeout only. No implementation/test additions or actual-model execution.",
+  "baseline": {
+    "path": "src-tauri/target/offline-closeout-baseline-20261019.json",
+    "sha256": "90d8394039f7e8d3ecab1b4f6f26bba001fc9a8689840d944f9c796373b341b5",
+    "bytes": 74398
+  },
+  "baseline_verified_before_changes": true,
+  "baseline_files_matched": 322,
+  "git_status": {
+    "path": "src-tauri/target/offline-closeout-start-status-20261019.txt",
+    "sha256": "ddbf09a9452a4eaf5ef0eaa264a211f10a7ec124738cd1d9f9e3fe4df555b0e1",
+    "bytes": 11434
+  },
+  "git_diffstat": {
+    "path": "src-tauri/target/offline-closeout-start-diffstat-20261019.txt",
+    "sha256": "aed0b1eb40f2177a4d2d2deb109a89d7669f86d91ddc9209b6573943d7024a0c",
+    "bytes": 5844
+  },
+  "status": {
+    "path": "docs/ai-engineering/offline-closeout-status-20261019.json",
+    "sha256": "238bc5106529e82cd3dea77149d9bce7a175674cdef7982037816bf12d37d1de",
+    "bytes": 2672
+  },
+  "commands": [
+    {
+      "command": "node scripts/evaluate-vibe-coder-real.mjs --workflow thai-delay-existing-project-v1 --output src-tauri/target/offline-closeout-20261019/prepared.json",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "scope": "offline command/check",
+      "log": {
+        "path": "src-tauri/target/offline-closeout-prepare-20261019.log",
+        "sha256": "76ee21f0ba4874b7054e1242339d6218e73cfc01202e24074cffce11359e656a",
+        "bytes": 324
+      }
+    },
+    {
+      "command": "node scripts/evaluate-capabilities.mjs --evidence src-tauri/target/offline-closeout-20261019/prepared.json --output src-tauri/target/offline-closeout-20261019/matrix.json",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "scope": "offline command/check",
+      "log": {
+        "path": "src-tauri/target/offline-closeout-matrix-20261019.log",
+        "sha256": "bf879bbfaa481b309c7729d80e10ed439714bb4c46842454f4826972f688c13f",
+        "bytes": 390
+      }
+    },
+    {
+      "command": "node scripts/evaluate-capabilities.mjs --evidence src-tauri/target/offline-closeout-20261019/prepared.json --template review --output src-tauri/target/offline-closeout-20261019/review-draft.json",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "scope": "offline command/check",
+      "log": {
+        "path": "src-tauri/target/offline-closeout-review-draft-20261019.log",
+        "sha256": "eed0d4764f73c641c3d267d092c742b943d3df4aff87c2898b875b4ff242daf9",
+        "bytes": 256
+      }
+    },
+    {
+      "command": "node scripts/evaluate-capabilities.mjs --evidence src-tauri/target/offline-closeout-20261019/prepared.json --manual src-tauri/target/offline-closeout-20261019/manual-stage-draft.json --output src-tauri/target/offline-closeout-20261019/invalid-manual-matrix-must-not-exist.json",
+      "exit_code": 1,
+      "expected_exit_code": 1,
+      "scope": "expected draft rejection; no successful output",
+      "log": {
+        "path": "src-tauri/target/offline-closeout-manual-draft-rejection-20261019.log",
+        "sha256": "ebe2631ee1aede01f328971c2d6c7349063a2258fe9539254b7ef81572eb16dc",
+        "bytes": 2006
+      }
+    },
+    {
+      "command": "node scripts/evaluate-capabilities.mjs --evidence src-tauri/target/offline-closeout-20261019/prepared.json --review src-tauri/target/offline-closeout-20261019/review-draft.json --output src-tauri/target/offline-closeout-20261019/invalid-review-matrix-must-not-exist.json",
+      "exit_code": 1,
+      "expected_exit_code": 1,
+      "scope": "expected draft rejection; no successful output",
+      "log": {
+        "path": "src-tauri/target/offline-closeout-review-draft-rejection-20261019.log",
+        "sha256": "49a7f52412ec47ad8588c03765c25d752a335a87000c031ff7e843b19a892624",
+        "bytes": 2934
+      }
+    },
+    {
+      "command": "python -m unittest discover -s scripts/tests -v",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "scope": "offline command/check",
+      "log": {
+        "path": "src-tauri/target/offline-closeout-python-20261019.log",
+        "sha256": "25b1f1afc2c9252b07b5347a45049b35c5a986922411d1435378ce8cb4b61565",
+        "bytes": 8986
+      }
+    },
+    {
+      "command": "node --test scripts/tests/*.test.mjs",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "scope": "offline command/check",
+      "log": {
+        "path": "src-tauri/target/offline-closeout-node-20261019.log",
+        "sha256": "2f8762cec75dabe141f014b89242f809fe8a3003679c9179a82d216f064706f4",
+        "bytes": 2584
+      }
+    },
+    {
+      "command": "node scripts/audit-rule-documents.mjs",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "scope": "offline command/check",
+      "log": {
+        "path": "src-tauri/target/offline-closeout-rules-inventory-20261019.log",
+        "sha256": "bc2bc2b251e25201e135bb8fa48392ab0037cd5b77cea8a8adf7986c4ede357f",
+        "bytes": 574
+      }
+    },
+    {
+      "command": "npm run check:rules",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "scope": "offline command/check",
+      "log": {
+        "path": "src-tauri/target/offline-closeout-rules-check-20261019.log",
+        "sha256": "13794c9e8b06fb1341690ee5e54009bfd17d30ec200edaed3aad3c9cd2e346db",
+        "bytes": 752
+      }
+    },
+    {
+      "command": "npm run check:public",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "scope": "offline command/check",
+      "log": {
+        "path": "src-tauri/target/offline-closeout-public-20261019.log",
+        "sha256": "8c443926d69c0221b36108146423ed6275c6bed70098fe9365d18f85dc99d924",
+        "bytes": 290
+      }
+    },
+    {
+      "command": "npm run check:standalone",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "scope": "offline command/check",
+      "log": {
+        "path": "src-tauri/target/offline-closeout-standalone-20261019.log",
+        "sha256": "882c2e7160084ebbe400f85ba9a7ffab8782405d187430e2100945c8fca53fc8",
+        "bytes": 408
+      }
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "scope": "offline command/check",
+      "log": {
+        "path": "src-tauri/target/offline-closeout-diff-20261019.log",
+        "sha256": "a8c1c703a7263d29dc8b54fa6f2bc7982a665ce06f3069ada685e7a73f052474",
+        "bytes": 8724
+      }
+    }
+  ],
+  "mechanical_tests": {
+    "python_passed": 24,
+    "node_passed": 12,
+    "tests_added": 0
+  },
+  "actual_model": {
+    "requests": 0,
+    "metadata_probes": 0,
+    "workflow_successes": 0,
+    "workflow_failures": 0,
+    "required_stages_not_executed": 7,
+    "pilot_api_cost_usd": 0
+  },
+  "criteria": [
+    {
+      "id": "retrieval_relevance",
+      "level": "knowledge",
+      "status": "NOT_EXECUTED",
+      "ai_quality_status": "NOT_EXECUTED",
+      "cases": [
+        {
+          "case_id": "grounding-th",
+          "status": "NOT_EXECUTED",
+          "ai_quality_status": "NOT_EXECUTED",
+          "mechanical_status": "NOT_EXECUTED",
+          "review": null
+        }
+      ]
+    },
+    {
+      "id": "citation_existence",
+      "level": "knowledge",
+      "status": "NOT_EXECUTED",
+      "ai_quality_status": "NOT_EXECUTED",
+      "cases": [
+        {
+          "case_id": "grounding-th",
+          "status": "NOT_EXECUTED",
+          "ai_quality_status": "NOT_EXECUTED",
+          "mechanical_status": "NOT_EXECUTED",
+          "review": null
+        },
+        {
+          "case_id": "generation-th",
+          "status": "NOT_EXECUTED",
+          "ai_quality_status": "NOT_EXECUTED",
+          "mechanical_status": "NOT_EXECUTED",
+          "review": null
+        }
+      ]
+    },
+    {
+      "id": "citation_support",
+      "level": "knowledge",
+      "status": "NOT_EXECUTED",
+      "ai_quality_status": "NOT_EXECUTED",
+      "cases": [
+        {
+          "case_id": "grounding-th",
+          "status": "NOT_EXECUTED",
+          "ai_quality_status": "NOT_EXECUTED",
+          "mechanical_status": "NOT_EXECUTED",
+          "review": null
+        },
+        {
+          "case_id": "generation-th",
+          "status": "NOT_EXECUTED",
+          "ai_quality_status": "NOT_EXECUTED",
+          "mechanical_status": "NOT_EXECUTED",
+          "review": null
+        }
+      ]
+    },
+    {
+      "id": "api_version_correctness",
+      "level": "knowledge",
+      "status": "NOT_EXECUTED",
+      "ai_quality_status": "NOT_EXECUTED",
+      "cases": [
+        {
+          "case_id": "grounding-th",
+          "status": "NOT_EXECUTED",
+          "ai_quality_status": "NOT_EXECUTED",
+          "mechanical_status": "NOT_EXECUTED",
+          "review": null
+        },
+        {
+          "case_id": "generation-th",
+          "status": "NOT_EXECUTED",
+          "ai_quality_status": "NOT_EXECUTED",
+          "mechanical_status": "NOT_EXECUTED",
+          "review": null
+        }
+      ]
+    },
+    {
+      "id": "hardware_metadata",
+      "level": "knowledge",
+      "status": "NOT_EXECUTED",
+      "ai_quality_status": "NOT_EXECUTED",
+      "cases": [
+        {
+          "case_id": "generation-th",
+          "status": "NOT_EXECUTED",
+          "ai_quality_status": "NOT_EXECUTED",
+          "mechanical_status": "NOT_EXECUTED",
+          "review": null
+        }
+      ]
+    },
+    {
+      "id": "project_identity",
+      "level": "project",
+      "status": "NOT_EXECUTED",
+      "ai_quality_status": "NOT_EXECUTED",
+      "cases": [
+        {
+          "case_id": "project-th",
+          "status": "NOT_EXECUTED",
+          "ai_quality_status": "NOT_EXECUTED",
+          "mechanical_status": "NOT_EXECUTED",
+          "review": null
+        }
+      ]
+    },
+    {
+      "id": "file_symbol_selection",
+      "level": "project",
+      "status": "NOT_EXECUTED",
+      "ai_quality_status": "NOT_EXECUTED",
+      "cases": [
+        {
+          "case_id": "project-th",
+          "status": "NOT_EXECUTED",
+          "ai_quality_status": "NOT_EXECUTED",
+          "mechanical_status": "NOT_EXECUTED",
+          "review": null
+        }
+      ]
+    },
+    {
+      "id": "dependency_understanding",
+      "level": "project",
+      "status": "NOT_EXECUTED",
+      "ai_quality_status": "NOT_EXECUTED",
+      "cases": [
+        {
+          "case_id": "project-th",
+          "status": "NOT_EXECUTED",
+          "ai_quality_status": "NOT_EXECUTED",
+          "mechanical_status": "NOT_EXECUTED",
+          "review": null
+        },
+        {
+          "case_id": "generation-th",
+          "status": "NOT_EXECUTED",
+          "ai_quality_status": "NOT_EXECUTED",
+          "mechanical_status": "NOT_EXECUTED",
+          "review": null
+        }
+      ]
+    },
+    {
+      "id": "patch_scope",
+      "level": "project",
+      "status": "NOT_EXECUTED",
+      "ai_quality_status": "NOT_EXECUTED",
+      "cases": [
+        {
+          "case_id": "generation-th",
+          "status": "NOT_EXECUTED",
+          "ai_quality_status": "NOT_EXECUTED",
+          "mechanical_status": "NOT_EXECUTED",
+          "review": null
+        }
+      ]
+    },
+    {
+      "id": "unrelated_code_preserved",
+      "level": "project",
+      "status": "NOT_EXECUTED",
+      "ai_quality_status": "NOT_EXECUTED",
+      "cases": [
+        {
+          "case_id": "generation-th",
+          "status": "NOT_EXECUTED",
+          "ai_quality_status": "NOT_EXECUTED",
+          "mechanical_status": "NOT_EXECUTED",
+          "review": null
+        },
+        {
+          "case_id": "rollback",
+          "status": "NOT_EXECUTED",
+          "ai_quality_status": "NOT_EXECUTED",
+          "mechanical_status": "NOT_EXECUTED",
+          "review": null
+        }
+      ]
+    },
+    {
+      "id": "compiler_classification",
+      "level": "build",
+      "status": "NOT_EXECUTED",
+      "ai_quality_status": "NOT_EXECUTED",
+      "cases": [
+        {
+          "case_id": "diagnostics",
+          "status": "NOT_EXECUTED",
+          "ai_quality_status": "NOT_EXECUTED",
+          "mechanical_status": "NOT_EXECUTED",
+          "review": null
+        }
+      ]
+    },
+    {
+      "id": "focused_repair",
+      "level": "build",
+      "status": "NOT_EXECUTED",
+      "ai_quality_status": "NOT_EXECUTED",
+      "cases": [
+        {
+          "case_id": "bounded-repair",
+          "status": "NOT_EXECUTED",
+          "ai_quality_status": "NOT_EXECUTED",
+          "mechanical_status": "NOT_EXECUTED",
+          "review": null
+        }
+      ]
+    },
+    {
+      "id": "per_attempt_approval",
+      "level": "build",
+      "status": "NOT_EXECUTED",
+      "ai_quality_status": "NOT_EXECUTED",
+      "cases": [
+        {
+          "case_id": "bounded-repair",
+          "status": "NOT_EXECUTED",
+          "ai_quality_status": "NOT_EXECUTED",
+          "mechanical_status": "NOT_EXECUTED",
+          "review": null
+        }
+      ]
+    },
+    {
+      "id": "compilation_success",
+      "level": "build",
+      "status": "NOT_EXECUTED",
+      "ai_quality_status": "NOT_EXECUTED",
+      "cases": [
+        {
+          "case_id": "compile",
+          "status": "NOT_EXECUTED",
+          "ai_quality_status": "NOT_EXECUTED",
+          "mechanical_status": "NOT_EXECUTED",
+          "review": null
+        },
+        {
+          "case_id": "bounded-repair",
+          "status": "NOT_EXECUTED",
+          "ai_quality_status": "NOT_EXECUTED",
+          "mechanical_status": "NOT_EXECUTED",
+          "review": null
+        }
+      ]
+    },
+    {
+      "id": "rollback_correctness",
+      "level": "build",
+      "status": "NOT_EXECUTED",
+      "ai_quality_status": "NOT_EXECUTED",
+      "cases": [
+        {
+          "case_id": "rollback",
+          "status": "NOT_EXECUTED",
+          "ai_quality_status": "NOT_EXECUTED",
+          "mechanical_status": "NOT_EXECUTED",
+          "review": null
+        }
+      ]
+    },
+    {
+      "id": "bounded_attempts",
+      "level": "build",
+      "status": "NOT_EXECUTED",
+      "ai_quality_status": "NOT_EXECUTED",
+      "cases": [
+        {
+          "case_id": "bounded-repair",
+          "status": "NOT_EXECUTED",
+          "ai_quality_status": "NOT_EXECUTED",
+          "mechanical_status": "NOT_EXECUTED",
+          "review": null
+        }
+      ]
+    }
+  ],
+  "human_review": {
+    "independent_reviewers": 0,
+    "judgments": 0,
+    "review_template_null_rows": 22,
+    "blind_packet_queries": 20,
+    "all_blind_judgments_null": true
+  },
+  "preserved_nsis": {
+    "path": "src-tauri/target/release/bundle/nsis/VibeKidbright IDE_3.7.3_x64-setup.exe",
+    "sha256": "d09d0f9418d94059e801fc43a38241314757c686e5060e26596a806ba56ae7c1",
+    "bytes": 316758944
+  },
+  "preserved_bundled_corpus_files": 42,
+  "model_ranker_frozen_dataset_block_schema_ids_sdk_config_lockfiles_changed": false,
+  "new_app_or_installer_build": false,
+  "not_executed": [
+    "actual model/metadata requests",
+    "actual approvals and patches",
+    "actual model-assisted firmware build/diagnostics/repair/rollback",
+    "native/installed desktop qualification this round",
+    "clean VM",
+    "agent physical board tests",
+    "cross-platform qualification",
+    "new retrieval metrics"
+  ],
+  "implementation_gaps_still_open": [
+    "native ten-HTTP-attempt enforcement across retries/metadata/redirects",
+    "guaranteed one-USD cost upper bound",
+    "public-source-only outbound scope",
+    "full redacted actual-request/response capture"
+  ],
+  "api_questions_this_increment": 0,
+  "release": "NOT_READY",
+  "requirements": {
+    "system_architecture": "PARTIAL",
+    "hybrid_rag": "PARTIAL",
+    "knowledge_base_data": "PARTIAL",
+    "code_aware_chunking": "PARTIAL",
+    "compiler_validation_auto_fix": "PARTIAL",
+    "technology_integration": "PARTIAL",
+    "development_phases": "PARTIAL",
+    "evaluation_quality": "PARTIAL"
+  },
+  "committed_pushed_published_deployed": false
+}

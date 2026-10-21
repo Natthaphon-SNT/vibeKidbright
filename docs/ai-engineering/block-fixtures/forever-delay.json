@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "board_profile": "kidbright32_rev31",
+  "blocks": [
+    {"type":"basic_forever","statements":{"HANDLER":[{"type":"basic_delay","fields":{"VALUE":0.5}}]}}
+  ]
+}

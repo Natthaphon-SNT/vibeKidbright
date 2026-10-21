@@ -1,0 +1,25 @@
+{
+  "local_date": "2026-10-19",
+  "method": "Read-only loopback discovery, two-second per-endpoint timeout, redirects rejected, no credentials or inference",
+  "endpoints": [
+    {
+      "url": "http://localhost:11434/api/tags",
+      "outcome": "UNAVAILABLE_AT_PROBE",
+      "error_name": "TypeError"
+    },
+    {
+      "url": "http://localhost:1234/v1/models",
+      "outcome": "UNAVAILABLE_AT_PROBE",
+      "error_name": "TypeError"
+    },
+    {
+      "url": "http://localhost:8080/v1/models",
+      "outcome": "UNAVAILABLE_AT_PROBE",
+      "error_name": "TypeError"
+    }
+  ],
+  "inference_requests": 0,
+  "paid_credential_reads": 0,
+  "charges": 0,
+  "exhaustive_discovery": false
+}

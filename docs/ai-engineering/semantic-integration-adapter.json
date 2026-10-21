@@ -1,0 +1,160 @@
+{
+  "adapter": "actual application Rust semantic::query, native process-tree containment, real unmodified ESP-IDF CDB",
+  "all_project_reference_completeness": false,
+  "exact_identifier_ranges_verified": true,
+  "executed_queries": 6,
+  "expected_definition_path_and_reference_counts_verified": true,
+  "external_context_exported": false,
+  "persistent_background_index": false,
+  "projects": 2,
+  "results": [
+    {
+      "answer": {
+        "buffer_sha256": "ace975b65bbe205264e118b80d1c0da08a56088e9bf661a68a7c10eb9e4f961e",
+        "compile_commands_sha256": "2dcf65e17e5595a509fef4e1d27f89a87477c0d59962279a4f91afe65cd3d5c7",
+        "engine": "clangd",
+        "limitation": "Local request-scoped semantic results using exact SDK compile command and open unsaved buffers. References cover opened translation units; background indexing and header command inference are disabled. No physical correctness claim.",
+        "locations": [
+          {
+            "character": 5,
+            "end_character": 16,
+            "end_line": 14,
+            "line": 14,
+            "path": "D:\\Internship-NECTEC\\vibeKidbright\\src-tauri\\target\\block-c-evaluation-20261018\\repeat_delay\\components\\kb_reference\\kb_core.c"
+          }
+        ]
+      },
+      "elapsed_ms": 649.2485,
+      "project": "repeat_delay",
+      "scenario": "definition",
+      "source_unchanged": true
+    },
+    {
+      "answer": {
+        "buffer_sha256": "ace975b65bbe205264e118b80d1c0da08a56088e9bf661a68a7c10eb9e4f961e",
+        "compile_commands_sha256": "2dcf65e17e5595a509fef4e1d27f89a87477c0d59962279a4f91afe65cd3d5c7",
+        "engine": "clangd",
+        "limitation": "Local request-scoped semantic results using exact SDK compile command and open unsaved buffers. References cover opened translation units; background indexing and header command inference are disabled. No physical correctness claim.",
+        "locations": [
+          {
+            "character": 7,
+            "end_character": 18,
+            "end_line": 8,
+            "line": 8,
+            "path": "D:\\Internship-NECTEC\\vibeKidbright\\src-tauri\\target\\block-c-evaluation-20261018\\repeat_delay\\main\\main.c"
+          },
+          {
+            "character": 7,
+            "end_character": 18,
+            "end_line": 11,
+            "line": 11,
+            "path": "D:\\Internship-NECTEC\\vibeKidbright\\src-tauri\\target\\block-c-evaluation-20261018\\repeat_delay\\main\\main.c"
+          },
+          {
+            "character": 5,
+            "end_character": 16,
+            "end_line": 14,
+            "line": 14,
+            "path": "D:\\Internship-NECTEC\\vibeKidbright\\src-tauri\\target\\block-c-evaluation-20261018\\repeat_delay\\components\\kb_reference\\kb_core.c"
+          }
+        ]
+      },
+      "elapsed_ms": 638.8249000000001,
+      "project": "repeat_delay",
+      "scenario": "references",
+      "source_unchanged": true
+    },
+    {
+      "answer": {
+        "buffer_sha256": "95b164f84be7c91b54bde1e8a48ad3306d0cae86f262f83de8e1f6c700ef017b",
+        "compile_commands_sha256": "2dcf65e17e5595a509fef4e1d27f89a87477c0d59962279a4f91afe65cd3d5c7",
+        "engine": "clangd",
+        "limitation": "Local request-scoped semantic results using exact SDK compile command and open unsaved buffers. References cover opened translation units; background indexing and header command inference are disabled. No physical correctness claim.",
+        "locations": [
+          {
+            "character": 11,
+            "end_character": 23,
+            "end_line": 16,
+            "line": 16,
+            "path": "D:\\Internship-NECTEC\\vibeKidbright\\src-tauri\\target\\block-c-evaluation-20261018\\repeat_delay\\main\\main.c"
+          }
+        ]
+      },
+      "elapsed_ms": 650.2633,
+      "project": "repeat_delay",
+      "scenario": "unsaved_definition",
+      "source_unchanged": true
+    },
+    {
+      "answer": {
+        "buffer_sha256": "513c690c3b412a1a24918256f7f423cf5f9e2ed4b7493969792b33678010a435",
+        "compile_commands_sha256": "5965109f84635465829d5da6c6743ca94608cac3f0618ee36ff8b27561c22eb9",
+        "engine": "clangd",
+        "limitation": "Local request-scoped semantic results using exact SDK compile command and open unsaved buffers. References cover opened translation units; background indexing and header command inference are disabled. No physical correctness claim.",
+        "locations": [
+          {
+            "character": 5,
+            "end_character": 16,
+            "end_line": 14,
+            "line": 14,
+            "path": "D:\\Internship-NECTEC\\vibeKidbright\\src-tauri\\target\\block-c-evaluation-20261018\\forever_delay\\components\\kb_reference\\kb_core.c"
+          }
+        ]
+      },
+      "elapsed_ms": 637.7524,
+      "project": "forever_delay",
+      "scenario": "definition",
+      "source_unchanged": true
+    },
+    {
+      "answer": {
+        "buffer_sha256": "513c690c3b412a1a24918256f7f423cf5f9e2ed4b7493969792b33678010a435",
+        "compile_commands_sha256": "5965109f84635465829d5da6c6743ca94608cac3f0618ee36ff8b27561c22eb9",
+        "engine": "clangd",
+        "limitation": "Local request-scoped semantic results using exact SDK compile command and open unsaved buffers. References cover opened translation units; background indexing and header command inference are disabled. No physical correctness claim.",
+        "locations": [
+          {
+            "character": 7,
+            "end_character": 18,
+            "end_line": 8,
+            "line": 8,
+            "path": "D:\\Internship-NECTEC\\vibeKidbright\\src-tauri\\target\\block-c-evaluation-20261018\\forever_delay\\main\\main.c"
+          },
+          {
+            "character": 5,
+            "end_character": 16,
+            "end_line": 14,
+            "line": 14,
+            "path": "D:\\Internship-NECTEC\\vibeKidbright\\src-tauri\\target\\block-c-evaluation-20261018\\forever_delay\\components\\kb_reference\\kb_core.c"
+          }
+        ]
+      },
+      "elapsed_ms": 738.66,
+      "project": "forever_delay",
+      "scenario": "references",
+      "source_unchanged": true
+    },
+    {
+      "answer": {
+        "buffer_sha256": "3ad2ed593e9e7859ceb53072545154b0a4083d1c9092eb901a05e5dc11a4dcdb",
+        "compile_commands_sha256": "5965109f84635465829d5da6c6743ca94608cac3f0618ee36ff8b27561c22eb9",
+        "engine": "clangd",
+        "limitation": "Local request-scoped semantic results using exact SDK compile command and open unsaved buffers. References cover opened translation units; background indexing and header command inference are disabled. No physical correctness claim.",
+        "locations": [
+          {
+            "character": 11,
+            "end_character": 23,
+            "end_line": 13,
+            "line": 13,
+            "path": "D:\\Internship-NECTEC\\vibeKidbright\\src-tauri\\target\\block-c-evaluation-20261018\\forever_delay\\main\\main.c"
+          }
+        ]
+      },
+      "elapsed_ms": 1031.6036,
+      "project": "forever_delay",
+      "scenario": "unsaved_definition",
+      "source_unchanged": true
+    }
+  ],
+  "source_written": false
+}

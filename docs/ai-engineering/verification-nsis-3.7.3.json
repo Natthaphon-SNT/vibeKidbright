@@ -1,0 +1,449 @@
+{
+  "schema_version": 2,
+  "started": "2026-10-17",
+  "verified_local_date": "2026-10-18",
+  "timezone": "Asia/Bangkok",
+  "os": "Windows",
+  "architecture": "AMD64",
+  "overall_status": "PARTIAL",
+  "scope": "Windows safety/recovery, controlled SDK processes, pinned syntax/project indexing, review-gated repair, typed Block pilot, frozen multilingual comparison, dependency remediation and rebuilt NSIS extraction/probe; original eight requirements remain partial",
+  "tests": {
+    "frontend": {
+      "command": "npm test -- --reporter=dot",
+      "files": 17,
+      "passed": 165,
+      "failed": 0,
+      "exit_code": 0
+    },
+    "rust": {
+      "command": "cargo test --manifest-path src-tauri/Cargo.toml --offline --locked --all-targets --quiet",
+      "library_passed": 173,
+      "example_passed": 9,
+      "passed": 182,
+      "failed": 0,
+      "exit_code": 0,
+      "scope": "Current native source after dependency remediation and installation self-check directory fix"
+    }
+  },
+  "checks": {
+    "build_release": {
+      "command": "npm run build:release",
+      "exit_code": 0,
+      "includes": [
+        "runtime",
+        "standalone",
+        "KB sync",
+        "board catalog",
+        "block inventory",
+        "rule inventory",
+        "public",
+        "bundle",
+        "TypeScript",
+        "Vite"
+      ],
+      "scope": "Passed as final NSIS beforeBuildCommand; subsequent changes are documentation/verification only"
+    },
+    "final_standalone_policy": {
+      "exit_code": 0,
+      "includes_normalized_public_provenance": true
+    },
+    "final_rules": {
+      "exit_code": 0,
+      "documents": 66,
+      "invalid_utf8": 0,
+      "unclosed_fences": 0
+    },
+    "git_diff_check": {
+      "exit_code": 0
+    },
+    "nsis": {
+      "command": "npm run tauri -- build --bundles nsis -- --offline --locked",
+      "exit_code": 0,
+      "report": "installer-validation-3.7.3.json"
+    },
+    "installer_probe": {
+      "command": "python scripts/test-standalone-install.py --installed-directory src-tauri/target/standalone-extracted-3.7.3-final --report docs/ai-engineering/installer-probe-3.7.3.json",
+      "exit_code": 0,
+      "fresh_appdata": true,
+      "developer_paths_removed": true,
+      "fresh_virtual_machine": false
+    },
+    "production_workflows": {
+      "command": "node scripts/check-production-workflows.mjs",
+      "exit_code": 0,
+      "native_backend_stubbed": true,
+      "live_provider": false
+    }
+  },
+  "retrieval": {
+    "current_comparison": "evaluation-heldout-comparison.json",
+    "queries": 69,
+    "dataset_sha256": "c75de0d838a5f0e6670c48776c67d3b5c0a98ca755f02ba09c2d548c28b55c43",
+    "human_independent_annotation": false,
+    "runs": [
+      {
+        "mode": "lexical",
+        "report": "evaluation-heldout-lexical.json",
+        "metrics": {
+          "mrr": 0.322463768115942,
+          "ndcg_at_5": 0.3027054878445835,
+          "precision_at_5": 0.11304347826086962,
+          "recall_at_5": 0.34782608695652173
+        },
+        "latency_ms": {
+          "median": 4.0150999999999994,
+          "p95": 9.6
+        },
+        "resources": {
+          "peak_working_set_bytes": 19394560,
+          "peak_sampled_private_bytes": 7946240,
+          "wall_seconds": 2.1169045999995433,
+          "sampling_interval_ms": 100,
+          "method": "Windows GetProcessMemoryInfo, one process per ranker; single run"
+        },
+        "index_ms": 1073.198,
+        "model_bytes": 0
+      },
+      {
+        "mode": "bundled",
+        "report": "evaluation-heldout-bundled.json",
+        "metrics": {
+          "mrr": 0.38888888888888895,
+          "ndcg_at_5": 0.34875715276580155,
+          "precision_at_5": 0.11594202898550732,
+          "recall_at_5": 0.36231884057971014
+        },
+        "latency_ms": {
+          "median": 168.8231,
+          "p95": 192.7343
+        },
+        "resources": {
+          "peak_working_set_bytes": 388841472,
+          "peak_sampled_private_bytes": 648929280,
+          "wall_seconds": 135.99046289999387,
+          "sampling_interval_ms": 100,
+          "method": "Windows GetProcessMemoryInfo, one process per ranker; single run"
+        },
+        "index_ms": 122319.4186,
+        "model_bytes": 91115499
+      },
+      {
+        "mode": "bundled-routed",
+        "report": "evaluation-heldout-bundled-routed.json",
+        "metrics": {
+          "mrr": 0.35507246376811596,
+          "ndcg_at_5": 0.33153221583117476,
+          "precision_at_5": 0.11594202898550732,
+          "recall_at_5": 0.36231884057971014
+        },
+        "latency_ms": {
+          "median": 186.598,
+          "p95": 230.50390000000002
+        },
+        "resources": {
+          "peak_working_set_bytes": 389017600,
+          "peak_sampled_private_bytes": 649338880,
+          "wall_seconds": 143.40987019999739,
+          "sampling_interval_ms": 100,
+          "method": "Windows GetProcessMemoryInfo, one process per ranker; single run"
+        },
+        "index_ms": 129332.8378,
+        "model_bytes": 91115499
+      },
+      {
+        "mode": "multilingual-e5-small",
+        "report": "evaluation-heldout-multilingual-e5-small.json",
+        "metrics": {
+          "mrr": 0.38768115942028986,
+          "ndcg_at_5": 0.3670720430132047,
+          "precision_at_5": 0.13043478260869573,
+          "recall_at_5": 0.427536231884058
+        },
+        "latency_ms": {
+          "median": 216.2179,
+          "p95": 453.1291
+        },
+        "resources": {
+          "peak_working_set_bytes": 1418936320,
+          "peak_sampled_private_bytes": 1535107072,
+          "wall_seconds": 282.6568352999966,
+          "sampling_interval_ms": 100,
+          "method": "Windows GetProcessMemoryInfo, one process per ranker; single run"
+        },
+        "index_ms": 257450.533,
+        "model_bytes": 135394008
+      },
+      {
+        "mode": "multilingual-minilm",
+        "report": "evaluation-heldout-multilingual-minilm.json",
+        "metrics": {
+          "mrr": 0.3635265700483092,
+          "ndcg_at_5": 0.3342913524175959,
+          "precision_at_5": 0.12173913043478267,
+          "recall_at_5": 0.391304347826087
+        },
+        "latency_ms": {
+          "median": 152.60660000000001,
+          "p95": 182.9094
+        },
+        "resources": {
+          "peak_working_set_bytes": 1422368768,
+          "peak_sampled_private_bytes": 1540988928,
+          "wall_seconds": 332.9129858000015,
+          "sampling_interval_ms": 100,
+          "method": "Windows GetProcessMemoryInfo, one process per ranker; single run"
+        },
+        "index_ms": 309207.5693,
+        "model_bytes": 135394365
+      }
+    ],
+    "historical_development_scores": "verification-before-2026-10-18.json",
+    "candidate_or_parameter_selected_on_final_set": false,
+    "model_replaced": false,
+    "performance_scope": "Single development-host runs before security dependency refresh; not rebuilt-installer performance certification"
+  },
+  "resolved_during_verification": [
+    "Incorrect relative path to recipe metadata include corrected",
+    "Missing command-policy import in test module corrected",
+    "Generated coverage/rule inventory refreshed after prompt/document changes",
+    "Review proposals/backups moved from volatile state to revision-bound durable journals with exact-content rollback/recovery",
+    "SDK cancellation, timeout and Windows descendant termination integrated with workspace leases and AI Stop",
+    "Initial held-out Thai text damaged by native shell codepage restored to original intended text; invalid measurements retained separately, never reported as valid",
+    "DOMPurify override mismatch and actionable selected Windows dependency advisories remediated without changing bundled embeddings",
+    "Fresh extracted-binary self-check discovered missing scratch index directory; fixed, rebuilt and successfully re-probed",
+    "Automatic private absolute project-path wrapping removed from user chat; provider metadata and SDK context gated"
+  ],
+  "warnings": [
+    "18 Rust unused legacy/helper warnings and Vite mixed event import/large Monaco chunks remain",
+    "Thai/mixed retrieval remains below target; assistant-authored qrels are not independent human annotation",
+    "Full multi-platform Cargo.lock still has 10 advisory records across 8 packages; selected Windows graph has 2 maintenance-only findings",
+    "Recovery provides application-level safeguards, not an atomic filesystem/power-failure or hostile OS-race guarantee",
+    "Browser workflow uses fixtures; actual native parser/model/journal execution is separately checked by the extracted binary"
+  ],
+  "not_executed": [
+    "Clean-machine VM GUI install/upgrade/uninstall and USB-driver behavior",
+    "macOS/Unix process and installer execution; MSI/DMG packaging",
+    "Actual remote/local LLM conversation, citation correctness or provider repair quality",
+    "Existing user API credential inspection or paid provider requests",
+    "Firmware build of newly LLM-generated code (deterministic Block fixtures built separately)",
+    "Physical board runtime behavior, Flash or all-board/block equivalence",
+    "Real power-cut and complete hostile OS race fault injection",
+    "Commit/staging/push/deploy/publish"
+  ],
+  "requirements": {
+    "system_architecture": "PARTIAL",
+    "hybrid_rag": "PARTIAL",
+    "knowledge_base_data": "PARTIAL",
+    "code_aware_chunking": "PARTIAL",
+    "compiler_validation_auto_fix": "PARTIAL",
+    "technology_integration": "PARTIAL",
+    "development_phases": "PARTIAL",
+    "evaluation_quality": "PARTIAL"
+  },
+  "phase_f_generic_block_conversion": "PARTIAL; typed normalized four-ID pilot, no generic Blockly importer",
+  "source_sha256": {
+    "docs/ai-engineering/00-repository-audit.md": "d632fc08eca15f09e4f034a75ebbc0b630191cad1fb163994e84a5c5492d4431",
+    "docs/ai-engineering/01-architecture.md": "c1844c4b9daf25d3b57ab4117c9bd8e5ac6df4e0d54eb43dcb8fcda6cdd5052a",
+    "docs/ai-engineering/02-hybrid-rag.md": "fff4722da080363329b6fbcdedfe1cd2f76673e1e38837654759359e0d53ea8b",
+    "docs/ai-engineering/03-knowledge-base.md": "74eb6b779190153cb6ad4f34cc6a3f29dea47e57fd3e4bfd9338c90b01270de2",
+    "docs/ai-engineering/04-code-intelligence.md": "ea4b3b9e65b13b8c5195cf7b2a1f4bed8a1f81bc7e4c7621987918acbdf1e7b6",
+    "docs/ai-engineering/05-compiler-validation.md": "a95113fb47f3ca88fef3ef95ca61523bf0af524829f1f017eea9f0ee145094f3",
+    "docs/ai-engineering/06-technology-decisions.md": "99bd97473486f23bdabfa5917a15cf8e34e7bff8d696fe757f21d26103b40cd2",
+    "docs/ai-engineering/07-implementation-progress.md": "b37c833a575f50014d87e3506a2f5f36c29b8d897e469360f689cf0a34657ba9",
+    "docs/ai-engineering/08-evaluation.md": "ee1839d4bc5649350bb85869322dfe409328a1922e67f6be3129f077294b02c1",
+    "docs/ai-engineering/09-known-limitations.md": "6c752dc85a0ecba0c2ba914fb4ed53b0d1fdc421c57275fea3617a5e2928f406",
+    "docs/ai-engineering/10-block-to-c.md": "595bed589b13013009101b600d67a2e503cee00f2a05486c71a7a00e3ee076f5",
+    "docs/ai-engineering/11-safety-recovery.md": "6289ea08843fc7818c9c440aa874d482ff2685a9a9c71994566d27dc11e8f5f2",
+    "docs/ai-engineering/12-dependency-security.md": "df66f329d833c518d0ee320c4d16ac7fd975ead59a0424811536adb54822e084",
+    "docs/ai-engineering/block-compilation.json": "1f2c2e1cca7b18f1e62e638ef1cfd163db832f4396c9b59925ec7505ef59c15a",
+    "docs/ai-engineering/block-fixtures/forever-delay.json": "86fb7cee2a832101fa19bab3cc01fb72b8b6fff4eb87ae6fd17ae83d640e6459",
+    "docs/ai-engineering/block-fixtures/repeat-delay.json": "f07269d95aeb8f818b4a4aa52b71ddd5a66a29a78910afce1f54a275bccfe027",
+    "docs/ai-engineering/block-mapping.schema.json": "ad7e62ba6b2bbfe4803926867e4fa7589f5f3bbe48917cd7e09f37a94d5cb990",
+    "docs/ai-engineering/block-source-evidence.json": "2d0c381ef4aa3dcaae7c76a49a73cbabd6da8be9420de9021240364f4a95802d",
+    "docs/ai-engineering/bundled-source-hashes.json": "aed6f38531319e4a669cae74babfef67402950ac1a721eb938f621f4c558520a",
+    "docs/ai-engineering/clangd-evaluation.json": "75b51b3617946f71ab91f022381234463020f87a8d6c0f0502d889731019ca0c",
+    "docs/ai-engineering/evaluation-heldout-bundled-routed.json": "3bcba45fd8f6ee1af88299b27e584de0de8729ea753112d4eac7dfe0c3e4fdd1",
+    "docs/ai-engineering/evaluation-heldout-bundled.json": "b6190b25ef7ed7ab09b80c19f52da26463b22912098e29f82d5c02300bc18885",
+    "docs/ai-engineering/evaluation-heldout-comparison.json": "6129705b58b11c495f5c11c667f8c833ba2463f6003adb68b7576c6bd33803f1",
+    "docs/ai-engineering/evaluation-heldout-lexical.json": "315fda85417609c400848b0b4ec47caf2d7392cfcdfc6f6d48ede1f7ebf3adad",
+    "docs/ai-engineering/evaluation-heldout-multilingual-e5-small.json": "e1668de964acc1dc827752353ba02885824d2d022352de0e4098233531892bb7",
+    "docs/ai-engineering/evaluation-heldout-multilingual-minilm.json": "d07eb433c43188096678043f4d58e01bf7f8b8fb4c0fde487b01b07f4a0d536d",
+    "docs/ai-engineering/evaluation-heldout-v1-freeze.json": "12e71c090f81c7a064dd3a1110d11e84768891bd82a5c1e0fc158c91e4baf690",
+    "docs/ai-engineering/evaluation-heldout-v1.json": "c75de0d838a5f0e6670c48776c67d3b5c0a98ca755f02ba09c2d548c28b55c43",
+    "docs/ai-engineering/evaluation-hybrid.json": "1f3fe6be81b275108b8719f63a547c22878040676f693c4bf5d0db38d6d10e04",
+    "docs/ai-engineering/evaluation-lexical.json": "d92e41bdba74c208c7607ca7a453953657b124920ca67b49736ddec601d770d6",
+    "docs/ai-engineering/evaluation-queries.json": "4d614988017dfef16d3ca187bd689317e291d9b1ae033598de79bb974244ad2a",
+    "docs/ai-engineering/installer-probe-3.7.3-before-fix.json": "d17bd02a76f2d99e2e828491e376016d5d6f15cd145ee7df8595fb219dce918d",
+    "docs/ai-engineering/installer-probe-3.7.3.json": "2fb8fc134f418b3961072e66732b5f578680179c52d2ac71393c5fe812741f89",
+    "docs/ai-engineering/installer-validation-3.7.3.json": "58b0377aa66c575254e0b6c1f3c9a4a6aa15f4bf624f68743397c63fcd3d20f9",
+    "docs/ai-engineering/invalid-encoding-results/evaluation-heldout-bundled-routed.json": "37018c8a9ef4e4a82623bb7853a574e9974f7e733dd2732e0c18ae1902da04ca",
+    "docs/ai-engineering/invalid-encoding-results/evaluation-heldout-bundled.json": "7178b97219beac07d058a6d6b0d16eae5210b85ae4dc4998abb5e74bb08fd512",
+    "docs/ai-engineering/invalid-encoding-results/evaluation-heldout-lexical.json": "09cc5be17d58eaaf76a86e85e89355aa3a8c6f33bc203ff5d6f9237dbccd2dd4",
+    "docs/ai-engineering/invalid-encoding-results/evaluation-heldout-v1-freeze.json": "71c57897db956fd5f2a2efd1110447de8133100c2771545bd9fbd6ec7cb27f8a",
+    "docs/ai-engineering/invalid-encoding-results/evaluation-heldout-v1.json": "f6c8676e420ff2b7502e26a102cb71e5b8961c57f29caf712479f67b4e170049",
+    "docs/ai-engineering/knowledge-sources.json": "8a07d88df990025200b853fc371104d866e9bf4e7dd90af66b2995b364ab40e4",
+    "docs/ai-engineering/npm-audit-production.json": "683a1da8caf50c67fecc531fd727d76786e6db3202d0dac45e2364445208b9f9",
+    "docs/ai-engineering/npm-audit.json": "683a1da8caf50c67fecc531fd727d76786e6db3202d0dac45e2364445208b9f9",
+    "docs/ai-engineering/production-workflow-probe.json": "939a5e89048fa0aeccaafa65e288ef12963e86da14390c6214b7677e44c8420d",
+    "docs/ai-engineering/rust-advisory-audit.json": "3f1e099e30a3d4a92b333ab83a2fcddb6b70bbda897dc7af7ee0fb4ef8dcc0e7",
+    "docs/ai-engineering/rust-advisory-before.json": "4bc25921ba7b437bcad27919cc1853bc4d066745760941f1a94b773494e71c31",
+    "docs/ai-engineering/verification-before-2026-10-18.json": "da946c75d0cdb66eda9018688fa55421eb95d45db8a4455c2026ccd69984a44f",
+    "package-lock.json": "26a6de9ec117de7cb2a7b10a19c295a9a85689bfa143f1323ee7b217fc3fe5d6",
+    "package.json": "efabda7c4e78f82fef5b4399b9ab56615d87730906abf3899e57ad8b07ba4ffa",
+    "Readme.md": "cadd7c9cd389b0cd5d3d4793ee4d9a90e8fb3df432f374711a5662e58b5a1c73",
+    "scripts/audit-kidbright-coverage.mjs": "3c62537a3a5b386bd76d11aaa92ca9bb57cc26275031f1096c0a88e89c04b559",
+    "scripts/audit-kidbright-functions.py": "a9f0321aa13d2c045d42f0f609f5d4952d7bea3d4ad365b59684d49b2b2a6969",
+    "scripts/audit-rule-documents.mjs": "2a282b933d119ba997156692375c854451b5cce3b5f1769843b8493dca328080",
+    "scripts/audit-rust-dependencies.py": "a56cd7a47b603fab8582402e8fcbf1552e068fc9ddd66e77bda390855105ed06",
+    "scripts/build-kidbright-examples.py": "2b2c4b7a9acbb09637b74ec41d6de340b4698c43ce407a0f12bb643e46c64b96",
+    "scripts/check-kidbright-board-catalog.mjs": "974c240b31c390e951b2bf615d3b8e55b4078d8f632dd7841ca786ff2a939c28",
+    "scripts/check-production-workflows.mjs": "0834088dcb67792ca0f2f9f2dcea3101b8516d50c9822f660bb1f51a3485a986",
+    "scripts/check-public.mjs": "d4055c048669428dea5b3b12991d94ba9419beef2ae4c5286f0784ce55b64d92",
+    "scripts/check-standalone.mjs": "1ea9852aca01adf6e38300c2ab3f1ac204f708588208d67ef630a2b3fa4103f9",
+    "scripts/evaluate-clangd.py": "e42da86b4293f145ea3bb63c6a988039542364efc24920f4136ddbf4ff43dd17",
+    "scripts/evaluate-retrieval.py": "2f7830b34e98cf8eda7c0fb487d59e7fa0a7b75d0f70281fa1a0f5c52cb0958b",
+    "scripts/prepare-retrieval-candidates.py": "1b04e1a253629a6df91830c2a78a13b6eb5af9d4205ce2d7185a2ab6fac983bc",
+    "scripts/prepare-runtime.mjs": "a9768315a98ac4d57e60215a25a99694370346be5eaf05d2227c279fbc45bdea",
+    "scripts/repair-evaluation-encoding.py": "242d94061c753a6cdd8588c43a549d93c95faa67762ce86bf43e9aacdd89a89d",
+    "scripts/sync-knowledge-base.mjs": "6471166b5d9c9d7997168ca59795b5cba08f286b2fd5b0f8d958f040d98e9a11",
+    "scripts/test-kidbright-compat.mjs": "15437106f967eeeeb5e9f55f9de0493d12920583db948886c295a88558400e4c",
+    "scripts/test-standalone-install.py": "7cfcca328f199dfc842129c3367c78cde3eee57597f9b0b02bf5425525d6fcd6",
+    "src/AiChat.tsx": "db04651e0bf57fb3b16afe1a75498e58c66b539bc1b29339731948638550701e",
+    "src/App.css": "83def7d6844afee5d49a2a1b16083444fb14ba25ce5eed761351876163b3e053",
+    "src/App.tsx": "cb3dfcdda8a561f83a78345407959bcaf70e56784c2e526d5796507c5720c3bf",
+    "src/BuildErrorList.tsx": "eec8c3fc02d410132c988cac213771c39d80307b20c4f136eea1e1f8d0c9fa6b",
+    "src/buildFlash.ts": "355f24ee70ce33374f869193297ff054fa2e9f00dac64c098bd09d6bb08b3078",
+    "src/CodeEditor.tsx": "3f1813f9a0df506da87921a6747811a5a93a86fd998d6cf3ff276dbe5938c694",
+    "src/CompilerRepairReview.tsx": "5ab55f14c73447605757d520bc51e517c4278acd43c6ed2e49788b27541b1de1",
+    "src/DiffReview.tsx": "5163a2dd6d1ade07326b2ed3c6f426d3528e010110f67720322cda00751ec779",
+    "src/errorHints.ts": "4d609afcb0c26e459c8acb3d253431d0cf88d4fbaa0f7fcf77e8d4d590481af3",
+    "src/index.css": "85fd2c86c873a35917adb912c57c7aa26672bf948dd77d55d13369a5ea1da2ec",
+    "src/LearningWorkspace.css": "84cf6d302407631522b9edad8567cb00304fba0f015134f02cb8276fdb0f264a",
+    "src/LearningWorkspace.tsx": "702038f3460094837d5ccb87a8574a4bdd2a5a0587a567cdf00e55b9e0e6f541",
+    "src/main.tsx": "3eebbee8ab58cc8e596bd7b8278ce84a4337b912d59e5cca725f534d21f1e160",
+    "src/PrivateContextConsent.tsx": "2871cce6150f10fd53711e86abfcd66921a49e8ef6af8d2b828ec43881f7c91c",
+    "src/ProjectCreationReview.tsx": "115f581a91b8adbe2a0a7b4cc54f23b63e40eadce705ae7a78176331d23e3bb0",
+    "src/projectFiles.ts": "de2e83d4d31ce2f5d0345d52c226066d20b8d6a7bb684d04474f42f7012ea6cd",
+    "src/SetupRepairButton.tsx": "8d3568be2ed8946c7ad772e9c2e0d4a34bc0af0f81d587d7f7f7030eec8c3979",
+    "src/syntaxLinter.ts": "c8c307cecbaa38ccd1ebf319f5a198dcb0c1a17f391559af29b2a8b2ee5cb21e",
+    "src/test/buildErrorList.test.tsx": "0047705e1fbb6ba42e60dd64122b6cc3aafd9e9c7fddc52b1a8e72b3d12b5f50",
+    "src/test/buildFlash.test.ts": "8a7f57ca1ecb0a995b8ee94dd9a0c0f7686d94f28e0968f1e0e2555ea8f49ee0",
+    "src/test/buildWorkflow.test.tsx": "89844fe19074685435ea092c20eaaf81534bbe2753aefff4f1516916423d1425",
+    "src/test/codeEditorDiff.test.tsx": "3761fa6cb1bd14105bfd92b4e5a50651d7be27bf54d3c19d64f68b2e0143185c",
+    "src/test/compilerRepairReview.test.tsx": "5d2e5f695343cbc01e11b22492ab26e308e0507a40eb08031845999101cc41d3",
+    "src/test/diffReview.test.ts": "bb76fe83fdf7bd598a2e2892b8852a9a3f97f32cd7a4ab81eff2031a11364574",
+    "src/test/errorHints.test.ts": "8f3bf13004189443e5ddc3f7f9e2c4ab9d765c3721e3a27b44068e522c447c2f",
+    "src/test/learningWorkspace.test.tsx": "11768433355b39598f2c4c9e556fbc3ea645865f561f1207fa8aa1a7e6c90d6f",
+    "src/test/privateContextConsent.test.tsx": "c440d2b99e0833ea280ed55914b58f5b3618767ded7ae8695da7c8579f5bbce6",
+    "src/test/projectCreationReview.test.tsx": "0aa760181aed1e84ce5410d97418989294bc4ea60879c508f53695770fd8a008",
+    "src/test/projectFiles.test.ts": "f6bafad1f2be6deebc1993a675058f14d83cfa97ae10433801367e56d2e52dc9",
+    "src/test/projectSidebar.test.tsx": "45d759eafc22c47655cddf00e5de1ed1921ec9847fef46943b44625abd642e8a",
+    "src/test/setup.ts": "c4b8ce62f56d13ee7c47ab8263787fa484b3aec730f099b2d2fa57e56c98efaf",
+    "src/test/setupRepairButton.test.tsx": "c3f29a214f013f85292af390643a87087529fbcd8d01d0d33fcd67b1414e8179",
+    "src/test/toast.test.tsx": "3c286250c24018d4a2810e9d16aa81acd2ab3f0b5edf58276a5193a2a5831bed",
+    "src/test/toolchainFirstLaunch.test.tsx": "354c509affb840c4fc59fa5b0feab9cee5c587075c61145dfca0e559c3ee822a",
+    "src/test/utils.test.ts": "442c5c37cef2640e5db5588b3c15bb35672aa704e26002d5f5818102c124fa3f",
+    "src/test/wikiView.test.tsx": "5808c94fd530485d7530cd173ba1c0adf6f1a7d25f83550dd308274dec092db1",
+    "src/Toast.tsx": "c2f905df79b6759ece1049c7cee9392085e5ef1e1b02d6305159275857e055a6",
+    "src/ToolchainSetup.tsx": "ad242395c025276bbf9a3fc09d898b659cab8a8753489b2346e4db5539996449",
+    "src/utils.ts": "3f1a5190875965ca984bae644c4a86d68b5bdd1d7681606086bb0cedcdc55bcf",
+    "src/vite-env.d.ts": "424faf9241dd699dda995b367ed36665732da1e6ec1f33b2fd40394488ecac92",
+    "src/WikiView.tsx": "53fe668c7fece3ffcf82b840079066559d1ecbda46b1d4945e60c3d2961a60d7",
+    "src-tauri/Cargo.lock": "eb87460f9044180f98ac7f761a446bdef2579e1f2be8c6e16f9ba07d04f34a1b",
+    "src-tauri/Cargo.toml": "41937edaf3ffadf6298736e7069b64a35a7e0fdd74fef43ddabd30d18514ebea",
+    "src-tauri/examples/export_block_fixture.rs": "ff70ba2515f4173e52d489be1ffb9f6a30c89cfc4df9894551c7550a02a32a2e",
+    "src-tauri/examples/export_kidbright_reference.rs": "ce9446cb63162cc69180b0244a60e012902e19fe7bc7867805860bf489b7947c",
+    "src-tauri/examples/knowledge_eval.rs": "6460c670e34b9bdaa0d6dba6da7244fa60efb9e0876ef3a6be0bb10f2bcd3464",
+    "src-tauri/src/ai/change_journal.rs": "849809abf39188f19921f7958d9b56f914401ce04d012837883d5da2d85c9e17",
+    "src-tauri/src/ai/compatibility.rs": "c53ab5724a6e9137e476f009ee72d6db4273c470b0b67e7f72afd891ae22bf8d",
+    "src-tauri/src/ai/config.rs": "609d77d69885bb18ba74a04c9ebaa7be9538b525f4834443b44e13f1f23542e5",
+    "src-tauri/src/ai/kb.rs": "ca2b6f6436e76f4f2821784fcff9ded1bad98ad738a7abac87b8d51507a8d94f",
+    "src-tauri/src/ai/language.rs": "15f99fd08dd035b7b80124a22b03c1b234a653664cef2c8a156eaac91b0ff2d4",
+    "src-tauri/src/ai/mod.rs": "cec04e0bca54723d7c875729c440d11e7345f3cfd9c278979d23882155722ca0",
+    "src-tauri/src/ai/orchestration.rs": "6e9b0bc430c18ed598b6f6bfb02ea379aabcb3cb74ce5f6cde959067527b4b32",
+    "src-tauri/src/ai/privacy.rs": "86bc604bd5df21e38d89e975295f02c25004c8ea307497c4355d7c5d11c85c30",
+    "src-tauri/src/ai/project_review.rs": "b891678f6cd831acfe9eef3df86c864ac9a5dfdbfa85eaf7708b45f06d660fb3",
+    "src-tauri/src/ai/providers.rs": "e4f1af8b5328f3ed83e0360d341a08122e96cf3a7a0eb0e68c2d8691033938d6",
+    "src-tauri/src/ai/repair.rs": "b90e38f829b0b0cc6aa8a9bfe3d52cbb6206d7640f5520da2d1fc10cb00e8ff0",
+    "src-tauri/src/ai/system_prompt.txt": "e5466b3c35ef0878075f80694e0b7b700b99331d2d12d27ffbe0e2caf2cbb543",
+    "src-tauri/src/ai/tools.rs": "f94da5c0d05cd2826427f04764a8cd58e27b131e2c36ca96b0a48987417e9e2e",
+    "src-tauri/src/ai/wiki.rs": "c9c9770124af24c97c41a60db3d9bbb894af3c5b3419fbcd0a475f58f392253f",
+    "src-tauri/src/ai_chat.rs": "aea04df2618485505d70f3abd93a639ddb8c2dbc736771b8f9e5c1d0827aec24",
+    "src-tauri/src/archive.rs": "375f6b61fe90cbf4dc4637b0431d168b7275878d597c7a1b83d04cd621af9e09",
+    "src-tauri/src/esp_idf.rs": "d177d089efbd9ee7902f3cb32fc491df237469d3eaa804da0d1c7a28fdea89e0",
+    "src-tauri/src/installation.rs": "603f88462cfac743b5c6c03638c3a7f7801c2fb36eddbb3146952ce7aabaa9d6",
+    "src-tauri/src/intelligence/block_to_c.rs": "75429dde6a17f62073b122a17fa9d9a2f620807a2b6e6380a71aec57095d5287",
+    "src-tauri/src/intelligence/c_parser.rs": "f48969b82d9017b514b8e1a3185280d7cd9eccaa302914bcd285bd31308e1eaa",
+    "src-tauri/src/intelligence/chunking.rs": "cb6150dc1a0eb2abfffda4ad91a65e64bbd7aa789505634152822269b36e4672",
+    "src-tauri/src/intelligence/diagnostics.rs": "33cec0962525325270986f0194372e95be0fe028f9f0875b098fd90d83b67de9",
+    "src-tauri/src/intelligence/evaluation.rs": "610ea85c64a551a13d620e6a4601b06457c6afa768cfb952fba0c8096287df6f",
+    "src-tauri/src/intelligence/mod.rs": "31c4eb110f240877125ae44f07cb4e0c095fc6e7f71d9ac53f6304b1fa635e06",
+    "src-tauri/src/intelligence/project.rs": "13f54d21247bf1d846cac2cc80cb928855a402580a2eb7c04afab65d210751df",
+    "src-tauri/src/intelligence/retrieval.rs": "e71d3917f004f05128819baf084feaf0a045d19a6a1c67098b4fe15493f3a405",
+    "src-tauri/src/kb_embed.rs": "be085e810caa915e60337ec08ef40b0908add370e35408e2da5cb9b710a116ef",
+    "src-tauri/src/kb_store.rs": "65da19701073a4ac8aa89c065a69071853bdff66238165be0c7919530c3e6c8f",
+    "src-tauri/src/lib.rs": "8f3a4461ee32e8a42fa5c382bd703ed9df3437005f8724b73d6ddd9a8ba3f183",
+    "src-tauri/src/main.rs": "cccbfc53a48eee9695ad2254b5e49f36d1c13a9b34cb52938a296a11f728791c",
+    "src-tauri/src/sdk_process.rs": "652bada3f78a82d12de3866d95004a15544c96fb55c72cf238cb17993aa349bf",
+    "src-tauri/src/toolchain.rs": "1092ebe6bc8a3e183dedbd58112e4110b3717e9cf2b383aa2309ae95807b5118",
+    "src-tauri/tauri.conf.json": "1d5278776cd13e1e80439719320f1dc615e9ecd1e07192fb54f7b522d6ba0c96",
+    "src-tauri/tauri.windows.conf.json": "b83b14703ae5a82e3e99e38ddee5ad255fe549e77bb748a6825c18f13ae9534e"
+  },
+  "baseline_evidence": {
+    "report": "verification-before-2026-10-18.json",
+    "all_recorded_source_hashes_matched_at_start": true,
+    "dirty_tree_inspected_before_changes": true
+  },
+  "retrieval_heldout": {
+    "report": "evaluation-heldout-comparison.json",
+    "queries": 69,
+    "dataset_sha256": "c75de0d838a5f0e6670c48776c67d3b5c0a98ca755f02ba09c2d548c28b55c43",
+    "tuned_on_heldout": false,
+    "model_replaced": false
+  },
+  "block_conversion": {
+    "status": "PARTIAL",
+    "verified_ids": 4,
+    "actual_archive_rechecked": true,
+    "firmware_builds_passed": 2,
+    "physical_verification": false,
+    "report": "block-compilation.json"
+  },
+  "clangd": {
+    "report": "clangd-evaluation.json",
+    "actual_sdk_cdb": true,
+    "lsp_definition_and_three_reference_locations": true,
+    "live_editor_integrated": false
+  },
+  "workflow_probe": {
+    "report": "production-workflow-probe.json",
+    "production_react_csp_checked": true,
+    "native_backend_stubbed": true,
+    "live_llm": false
+  },
+  "security": {
+    "npm_report": "npm-audit.json",
+    "full_npm_advisories": 0,
+    "rust_before_report": "rust-advisory-before.json",
+    "rust_current_report": "rust-advisory-audit.json",
+    "rust_remaining_packages": 8,
+    "rust_remaining_advisory_records": 10,
+    "windows_selected_maintenance_findings": 2,
+    "windows_selected_nonmaintenance_advisory_matches": 0,
+    "all_lockfile_clean": false,
+    "remediation_status": "Actionable recorded selected Windows findings patched; remaining Linux paths/maintenance and cross-platform tests unresolved",
+    "cargo_lock_sha256": "eb87460f9044180f98ac7f761a446bdef2579e1f2be8c6e16f9ba07d04f34a1b",
+    "npm_lock_sha256": "26a6de9ec117de7cb2a7b10a19c295a9a85689bfa143f1323ee7b217fc3fe5d6"
+  },
+  "release": {
+    "version": "3.7.3",
+    "nsis_built": true,
+    "security_updated_installer_verified": true,
+    "artifact_report": "installer-validation-3.7.3.json",
+    "artifact_sha256": "d09d0f9418d94059e801fc43a38241314757c686e5060e26596a806ba56ae7c1",
+    "published": false,
+    "deployed": false,
+    "clean_machine_gui_verified": false
+  },
+  "source_manifest_scope": "Current source/tests/scripts/engineering docs and reports; raw bytes; verification.json excludes itself. Initial inspected source manifest retained in baseline report."
+}

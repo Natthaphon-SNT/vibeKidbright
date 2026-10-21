@@ -1,0 +1,229 @@
+{
+  "local_date": "2026-10-19",
+  "timezone": "Asia/Bangkok",
+  "status": "PARTIAL",
+  "report": "18-capability-milestone.md",
+  "change_manifest": "workflow-changes-20261019.json",
+  "baseline": "src-tauri/target/verification-workflow-start.json",
+  "baseline_sha256": "057433502f1b29f4c8bcd9c9615c81b20f93f426b3de5ab09d76651fe96bf2a2",
+  "baseline_manifest_files": 207,
+  "all_recorded_hashes_matched_at_increment_start": true,
+  "commands": [
+    {
+      "command": "node --check scripts/evaluate-vibe-coder-real.mjs",
+      "exit_code": 0
+    },
+    {
+      "command": "node --check scripts/lib/vibe-evidence.mjs",
+      "exit_code": 0
+    },
+    {
+      "command": "node --check scripts/probe-desktop-semantic.mjs",
+      "exit_code": 0
+    },
+    {
+      "command": "node --test scripts/tests/vibe-evidence.test.mjs",
+      "exit_code": 0,
+      "passed": 5,
+      "failed": 0,
+      "scope": "Synthetic source/trace safety checks, not LLM outputs"
+    },
+    {
+      "command": "python -m unittest discover -s scripts/tests -v",
+      "exit_code": 0,
+      "passed": 16,
+      "failed": 0
+    },
+    {
+      "command": "node scripts/evaluate-vibe-coder-real.mjs --workflow thai-delay-existing-project-v1 --output docs/ai-engineering/workflow-prepared-20261019.json",
+      "exit_code": 0,
+      "inference_requests": 0
+    },
+    {
+      "command": "node scripts/audit-rule-documents.mjs",
+      "exit_code": 0,
+      "documents": 72,
+      "code_fences": 330,
+      "invalid_utf8": 0,
+      "unclosed_fences": 0
+    },
+    {
+      "command": "npm run check:standalone",
+      "exit_code": 0
+    },
+    {
+      "command": "npm run check:coverage",
+      "exit_code": 0
+    },
+    {
+      "command": "npm run check:rules",
+      "exit_code": 0,
+      "documents": 72,
+      "invalid_utf8": 0,
+      "unclosed_fences": 0
+    },
+    {
+      "command": "npm run check:public",
+      "exit_code": 0,
+      "files_scanned": 473,
+      "scope": "Before final manifest/verification write; final check recorded separately below"
+    },
+    {
+      "command": "git diff --check 2> src-tauri/target/workflow-diff-check-20261019.stderr.log; exit $LASTEXITCODE",
+      "exit_code": 0
+    }
+  ],
+  "desktop_attempts": [
+    {
+      "command": "node scripts/probe-desktop-semantic.mjs --output src-tauri/target/desktop-workflow-evidence-20261019.json > src-tauri/target/desktop-workflow-evidence-20261019.stdout.log 2> src-tauri/target/desktop-workflow-evidence-20261019.stderr.log",
+      "exit_code": 1,
+      "raw_report": "src-tauri/target/desktop-workflow-evidence-20261019.json",
+      "raw_report_sha256": "57e71a176da83f43d50c0d2e5b42751755d94ffd87af79d7602167eb90fa2c08",
+      "observations": 14,
+      "error": "TimeoutError: locator.waitFor: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('status').filter({ hasText: 'Tree-sitter syntax candidates' }) to be visible\u001b[22m\n",
+      "scope": "Actual debug native desktop WebView2 with production React/CSP, Tauri IPC, configured SDK, clangd and Monaco. No native/provider stubs or Vite/HMR. No paid credentials. Generated public fixtures only."
+    },
+    {
+      "command": "node scripts/probe-desktop-semantic.mjs --preflight-only --output src-tauri/target/workflow-recorder-preflight-20261019.json > src-tauri/target/workflow-recorder-preflight-20261019.stdout.log 2> src-tauri/target/workflow-recorder-preflight-20261019.stderr.log",
+      "exit_code": 0,
+      "raw_report": "src-tauri/target/workflow-recorder-preflight-20261019.json",
+      "raw_report_sha256": "d63b71264cc1721a13247b1e5d95f0ef1625d2354b35370d2c3f824fb4c481b5",
+      "observations": 1,
+      "error": null,
+      "scope": "Actual debug-native WebView2/production React/Tauri evidence-listener preflight only. No inference, model outputs, patches, semantic queries, build or Flash. Existing public fixture only."
+    },
+    {
+      "command": "node scripts/probe-desktop-semantic.mjs --preflight-only --output src-tauri/target/workflow-recorder-preflight-final-20261019.json > src-tauri/target/workflow-recorder-preflight-final-20261019.stdout.log 2> src-tauri/target/workflow-recorder-preflight-final-20261019.stderr.log",
+      "exit_code": 0,
+      "raw_report": "src-tauri/target/workflow-recorder-preflight-final-20261019.json",
+      "raw_report_sha256": "7a87b803e20592b3aa48a3e6f8ebc960000290cb30fe429d7710baebd3a01326",
+      "observations": 1,
+      "error": null,
+      "scope": "Actual debug-native WebView2/production React/Tauri evidence-listener preflight only. No inference, model outputs, patches, semantic queries, build or Flash. Existing public fixture only."
+    },
+    {
+      "command": "node scripts/probe-desktop-semantic.mjs --preflight-only --output src-tauri/target/workflow-recorder-roundtrip-20261019.json > src-tauri/target/workflow-recorder-roundtrip-20261019.stdout.log 2> src-tauri/target/workflow-recorder-roundtrip-20261019.stderr.log",
+      "exit_code": 0,
+      "raw_report": "src-tauri/target/workflow-recorder-roundtrip-20261019.json",
+      "raw_report_sha256": "2fecbc83a2c79c81e832b46caa6ede3248a1a0418f6f5f799e21c396a105ef95",
+      "observations": 1,
+      "error": null,
+      "scope": "Actual debug-native WebView2/production React/Tauri evidence-listener preflight only. No inference, model outputs, patches, semantic queries, build or Flash. Existing public fixture only."
+    },
+    {
+      "command": "node scripts/probe-desktop-semantic.mjs --preflight-only --output src-tauri/target/workflow-recorder-qualified-20261019.json > src-tauri/target/workflow-recorder-qualified-20261019.stdout.log 2> src-tauri/target/workflow-recorder-qualified-20261019.stderr.log",
+      "exit_code": 1,
+      "raw_report": "src-tauri/target/workflow-recorder-qualified-20261019.json",
+      "raw_report_sha256": "0989de09bf6d0583e04902ef6ec8228547dd739c6427dc6ec34fce652398af31",
+      "observations": 0,
+      "error": "Error: page.evaluate: SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.\n    at UtilityScript.evaluate (<anonymous>:372:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)",
+      "scope": "Actual debug-native WebView2/production React/Tauri evidence-listener preflight only. No inference, model outputs, patches, semantic queries, build or Flash. Existing public fixture only."
+    },
+    {
+      "command": "node scripts/probe-desktop-semantic.mjs --preflight-only --output src-tauri/target/workflow-recorder-ready-20261019.json > src-tauri/target/workflow-recorder-ready-20261019.stdout.log 2> src-tauri/target/workflow-recorder-ready-20261019.stderr.log",
+      "exit_code": 0,
+      "raw_report": "src-tauri/target/workflow-recorder-ready-20261019.json",
+      "raw_report_sha256": "8d94ca583954bfa7b54c9721709ec2c7bf7d7799cb71d9054f59cb1221bbc12d",
+      "observations": 1,
+      "error": null,
+      "scope": "Actual debug-native WebView2/production React/Tauri evidence-listener preflight only. No inference, model outputs, patches, semantic queries, build or Flash. Existing public fixture only."
+    }
+  ],
+  "desktop_evidence": "workflow-desktop-preflight-20261019.json",
+  "real_llm": {
+    "status": "NOT_EXECUTED",
+    "inference_requests": 0,
+    "paid_credential_reads": 0,
+    "charges": 0,
+    "model_generated_code_compilations": 0,
+    "approved_patches": 0,
+    "quality_metrics": null,
+    "availability_report": "model-availability-workflow-20261019.json",
+    "prepared_cases": "workflow-prepared-20261019.json"
+  },
+  "capability_levels": {
+    "knowledge_aware": "NOT_EVALUATED",
+    "project_aware": "NOT_EVALUATED",
+    "build_aware": "NOT_EVALUATED"
+  },
+  "retrieval": {
+    "parameters_changed": false,
+    "model_changed": false,
+    "dataset_changed": false,
+    "new_accuracy_or_latency_measurements": false,
+    "previous_measured_report": "query-expansion-comparison.json"
+  },
+  "block_to_c": {
+    "verified_ids": 9,
+    "expanded": false,
+    "previous_firmware_report": "block-integration-regression.json",
+    "physical_verification": false
+  },
+  "installer": {
+    "bytes": 316758944,
+    "sha256": "d09d0f9418d94059e801fc43a38241314757c686e5060e26596a806ba56ae7c1",
+    "unchanged": true,
+    "new_installer_built": false,
+    "release_candidate_prepared": false
+  },
+  "requirements": {
+    "system_architecture": "PARTIAL",
+    "hybrid_rag": "PARTIAL",
+    "knowledge_base_data": "PARTIAL",
+    "code_aware_chunking": "PARTIAL",
+    "compiler_validation_auto_fix": "PARTIAL",
+    "technology_integration": "PARTIAL",
+    "development_phases": "PARTIAL",
+    "evaluation_quality": "PARTIAL"
+  },
+  "production_source_changed": false,
+  "not_rerun": [
+    "Frontend/Rust/release/host-C suites: production source unchanged; previous scoped results retained in integration-verification.json",
+    "Full semantic desktop rerun after the broad attempt left editor; failed evidence retained",
+    "Retrieval candidate/frozen quality runs: no parameters or model changes",
+    "Clean Windows VM installer lifecycle",
+    "Firmware compilation from actual model output",
+    "Real-model diagnostics/repair/approval/rollback",
+    "Physical boards and Flash",
+    "Fresh dependency advisory database audit"
+  ],
+  "security_findings": [
+    "No paid credentials or inference used",
+    "Evidence output reserved before discovery/submission; private raw runs restricted to ignored target",
+    "Public fixture roots and evidence paths reject links/junctions, escaping paths and ADS-style names",
+    "Read-only unexpected proposals and prohibited command/project/dependency/network tool attempts fail collection; this detects attempts, native review gates remain authoritative",
+    "Source hashes cover declared source/config scope, not every filesystem write, transient edit or OS race",
+    "Native preflight uses an explicitly synthetic marker, not model evidence",
+    "No claim of prompt-injection immunity; outstanding platform/dependency qualifications remain"
+  ],
+  "remaining_blockers": [
+    "Authorized available LLM for actual Vibe Coder workflow",
+    "Independent relevance/citation/claim/project reviewers and broader predeclared task set",
+    "Complete relevant versioned authoritative ESP-IDF/FreeRTOS reference coverage",
+    "Explicit per-patch user approvals and actual generated-code build/repair/recovery sessions",
+    "Unresolved broad desktop view transition; clean VM and physical qualification"
+  ],
+  "commit_push_publish_deploy_performed": false,
+  "final_checks": {
+    "public": {
+      "command": "npm run check:public",
+      "exit_code": 0,
+      "files_scanned": 474
+    },
+    "rules": {
+      "command": "npm run check:rules",
+      "exit_code": 0,
+      "documents": 72,
+      "invalid_utf8": 0,
+      "unclosed_fences": 0
+    },
+    "diff": {
+      "command": "git diff --check 2> src-tauri/target/workflow-final-diff-check-20261019.stderr.log; exit $LASTEXITCODE",
+      "exit_code": 0
+    },
+    "source_hashes": {
+      "files_checked": 216,
+      "mismatches": 0
+    }
+  }
+}

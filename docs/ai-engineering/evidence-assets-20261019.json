@@ -1,0 +1,65 @@
+{
+  "date": "2026-10-19",
+  "installer": {
+    "bytes": 316758944,
+    "sha256": "d09d0f9418d94059e801fc43a38241314757c686e5060e26596a806ba56ae7c1",
+    "rebuilt": false
+  },
+  "production_embedding_files": [
+    {
+      "file": "LICENSE.txt",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "matches_preserved_extraction": true
+    },
+    {
+      "file": "manifest.json",
+      "sha256": "6e2c396405d9b56abefe09dfe375bc8396b7df95ddb13df5faf726ed0dfbadc4",
+      "matches_preserved_extraction": true
+    },
+    {
+      "file": "model-config.json",
+      "sha256": "1b4d8e2a3988377ed8b519a31d8d31025a25f1c5f8606998e8014111438efcd7",
+      "matches_preserved_extraction": true
+    },
+    {
+      "file": "model.onnx",
+      "sha256": "bbd7b466f6d58e646fdc2bd5fd67b2f5e93c0b687011bd4548c420f7bd46f0c5",
+      "matches_preserved_extraction": true
+    },
+    {
+      "file": "special_tokens_map.json",
+      "sha256": "5d5b662e421ea9fac075174bb0688ee0d9431699900b90662acd44b2a350503a",
+      "matches_preserved_extraction": true
+    },
+    {
+      "file": "tokenizer.json",
+      "sha256": "851ca67100d372ca3ae031a6abd168f53489eebfd7d89523f35c5c9b4d372c3c",
+      "matches_preserved_extraction": true
+    },
+    {
+      "file": "tokenizer_config.json",
+      "sha256": "abda01c8c14c5151ae498aceb30db406d6b91242c394fd88d3b6fd5a63a101e6",
+      "matches_preserved_extraction": true
+    },
+    {
+      "file": "UPSTREAM.txt",
+      "sha256": "2c47a70b94fe29e24841acf0e177949f1c9aa543e450d43af7e872ea81e43501",
+      "matches_preserved_extraction": true
+    }
+  ],
+  "model_pinned_files_verified": 5,
+  "baseline_unchanged_paths": {
+    "src-tauri/src/intelligence/retrieval.rs": "cf3b96f951a93b1f2ac261cde4c0852a1ce624bf2fd9d46ff9952d7e43622406",
+    "src-tauri/src/intelligence/query_expansion.rs": "d4624a41ae62ac2a6f67c224806244d9c0cb2f7233692023896d035579e0019d",
+    "src-tauri/src/kb_embed.rs": "be085e810caa915e60337ec08ef40b0908add370e35408e2da5cb9b710a116ef",
+    "scripts/evaluate-retrieval.py": "42e6d9630d1175bc7900b1652051e09c3cd7e9bb0b398b50e1785af2081dc7cf",
+    "src-tauri/examples/knowledge_eval.rs": "2397cd061ee30afe065711796d7ad14926cf6a5aae98bc7df7eb9c26267acbac",
+    "src-tauri/src/intelligence/block_to_c.rs": "49f92ef8f75244e0d6eccf1ad0f921772019040858fb56e520c7ebe544027d9c",
+    "src-tauri/Cargo.lock": "eb87460f9044180f98ac7f761a446bdef2579e1f2be8c6e16f9ba07d04f34a1b",
+    "package-lock.json": "26a6de9ec117de7cb2a7b10a19c295a9a85689bfa143f1323ee7b217fc3fe5d6"
+  },
+  "frozen_dataset_sha256": "c75de0d838a5f0e6670c48776c67d3b5c0a98ca755f02ba09c2d548c28b55c43",
+  "corpus_files_verified": 37,
+  "new_installer_or_rc": false,
+  "production_model_or_ranking_changed": false
+}

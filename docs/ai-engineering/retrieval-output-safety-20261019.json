@@ -1,0 +1,7 @@
+{
+  "scope": "Actual native evaluation example early-output reservation; no embeddings/provider invocation expected before this guard",
+  "native_exit_code_expected_nonzero": 1,
+  "existing_evidence_preserved": true,
+  "elapsed_seconds": 1.698172299998987,
+  "stderr": "Error: Os { code: 80, kind: AlreadyExists, message: \"The file exists.\" }\n"
+}

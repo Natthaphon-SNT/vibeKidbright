@@ -1,0 +1,123 @@
+{
+  "dataset_sha256": "c75de0d838a5f0e6670c48776c67d3b5c0a98ca755f02ba09c2d548c28b55c43",
+  "queries": 69,
+  "tuned_on_heldout": false,
+  "installer_model_replaced": false,
+  "runs": [
+    {
+      "mode": "lexical",
+      "report": "evaluation-heldout-lexical.json",
+      "metrics": {
+        "mrr": 0.322463768115942,
+        "ndcg_at_5": 0.3027054878445835,
+        "precision_at_5": 0.11304347826086962,
+        "recall_at_5": 0.34782608695652173
+      },
+      "latency_ms": {
+        "median": 4.0150999999999994,
+        "p95": 9.6
+      },
+      "resources": {
+        "peak_working_set_bytes": 19394560,
+        "peak_sampled_private_bytes": 7946240,
+        "wall_seconds": 2.1169045999995433,
+        "sampling_interval_ms": 100,
+        "method": "Windows GetProcessMemoryInfo, one process per ranker; single run"
+      },
+      "index_ms": 1073.198,
+      "model_bytes": 0
+    },
+    {
+      "mode": "bundled",
+      "report": "evaluation-heldout-bundled.json",
+      "metrics": {
+        "mrr": 0.38888888888888895,
+        "ndcg_at_5": 0.34875715276580155,
+        "precision_at_5": 0.11594202898550732,
+        "recall_at_5": 0.36231884057971014
+      },
+      "latency_ms": {
+        "median": 168.8231,
+        "p95": 192.7343
+      },
+      "resources": {
+        "peak_working_set_bytes": 388841472,
+        "peak_sampled_private_bytes": 648929280,
+        "wall_seconds": 135.99046289999387,
+        "sampling_interval_ms": 100,
+        "method": "Windows GetProcessMemoryInfo, one process per ranker; single run"
+      },
+      "index_ms": 122319.4186,
+      "model_bytes": 91115499
+    },
+    {
+      "mode": "bundled-routed",
+      "report": "evaluation-heldout-bundled-routed.json",
+      "metrics": {
+        "mrr": 0.35507246376811596,
+        "ndcg_at_5": 0.33153221583117476,
+        "precision_at_5": 0.11594202898550732,
+        "recall_at_5": 0.36231884057971014
+      },
+      "latency_ms": {
+        "median": 186.598,
+        "p95": 230.50390000000002
+      },
+      "resources": {
+        "peak_working_set_bytes": 389017600,
+        "peak_sampled_private_bytes": 649338880,
+        "wall_seconds": 143.40987019999739,
+        "sampling_interval_ms": 100,
+        "method": "Windows GetProcessMemoryInfo, one process per ranker; single run"
+      },
+      "index_ms": 129332.8378,
+      "model_bytes": 91115499
+    },
+    {
+      "mode": "multilingual-e5-small",
+      "report": "evaluation-heldout-multilingual-e5-small.json",
+      "metrics": {
+        "mrr": 0.38768115942028986,
+        "ndcg_at_5": 0.3670720430132047,
+        "precision_at_5": 0.13043478260869573,
+        "recall_at_5": 0.427536231884058
+      },
+      "latency_ms": {
+        "median": 216.2179,
+        "p95": 453.1291
+      },
+      "resources": {
+        "peak_working_set_bytes": 1418936320,
+        "peak_sampled_private_bytes": 1535107072,
+        "wall_seconds": 282.6568352999966,
+        "sampling_interval_ms": 100,
+        "method": "Windows GetProcessMemoryInfo, one process per ranker; single run"
+      },
+      "index_ms": 257450.533,
+      "model_bytes": 135394008
+    },
+    {
+      "mode": "multilingual-minilm",
+      "report": "evaluation-heldout-multilingual-minilm.json",
+      "metrics": {
+        "mrr": 0.3635265700483092,
+        "ndcg_at_5": 0.3342913524175959,
+        "precision_at_5": 0.12173913043478267,
+        "recall_at_5": 0.391304347826087
+      },
+      "latency_ms": {
+        "median": 152.60660000000001,
+        "p95": 182.9094
+      },
+      "resources": {
+        "peak_working_set_bytes": 1422368768,
+        "peak_sampled_private_bytes": 1540988928,
+        "wall_seconds": 332.9129858000015,
+        "sampling_interval_ms": 100,
+        "method": "Windows GetProcessMemoryInfo, one process per ranker; single run"
+      },
+      "index_ms": 309207.5693,
+      "model_bytes": 135394365
+    }
+  ]
+}

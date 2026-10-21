@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "evaluation_sha256": "2abe0c3313ff4e63dbfcfcfb477ba388898626e24e39a0739ccd4adc9b6ea709",
+  "checks": [
+    {
+      "criterion_id": "citation_existence",
+      "status": "PASS",
+      "scope": "Source/citation hash/range and invented-citation negative tests only, not factual support or model answers.",
+      "evidence_refs": [
+        {
+          "path": "src-tauri/target/capability-node-final-cli-20261019.log",
+          "sha256": "81611c011d1df5cd66e6f2a739ef4b4c3b4e7efaf2a0a597972fdd9a3c1b45d9"
+        }
+      ]
+    },
+    {
+      "criterion_id": "project_identity",
+      "status": "PASS",
+      "scope": "Public fixture manifest/path isolation checks only, not model project identification.",
+      "evidence_refs": [
+        {
+          "path": "src-tauri/target/capability-node-final-cli-20261019.log",
+          "sha256": "81611c011d1df5cd66e6f2a739ef4b4c3b4e7efaf2a0a597972fdd9a3c1b45d9"
+        }
+      ]
+    },
+    {
+      "criterion_id": "file_symbol_selection",
+      "status": "PASS",
+      "scope": "Actual opened-source clangd/Monaco navigation and labelled protocol faults, not model symbol choice.",
+      "evidence_refs": [
+        {
+          "path": "src-tauri/target/capability-desktop-20261019.json",
+          "sha256": "3929c6fd1aa9594499a6df496dd4c6a8cafda6419ef8a37c86fbdfe7628bdc6a"
+        }
+      ]
+    },
+    {
+      "criterion_id": "patch_scope",
+      "status": "PASS",
+      "scope": "Native non-source patch rejection and revision phase guards, not model patch focus.",
+      "evidence_refs": [
+        {
+          "path": "src-tauri/target/capability-rust-20261019.log",
+          "sha256": "0d311b81ee1402598fb9f048feb850d55a79b17a7f4f92b8998a5cf15cdadf04"
+        }
+      ]
+    },
+    {
+      "criterion_id": "unrelated_code_preserved",
+      "status": "PASS",
+      "scope": "Repair fixture preserves an unrelated header across actual writes, rollback and reopened journal/session representations.",
+      "evidence_refs": [
+        {
+          "path": "src-tauri/target/capability-rust-20261019.log",
+          "sha256": "0d311b81ee1402598fb9f048feb850d55a79b17a7f4f92b8998a5cf15cdadf04"
+        }
+      ]
+    },
+    {
+      "criterion_id": "compiler_classification",
+      "status": "PASS",
+      "scope": "Deterministic compiler diagnostic parser tests only, not actual model classification.",
+      "evidence_refs": [
+        {
+          "path": "src-tauri/target/capability-rust-20261019.log",
+          "sha256": "0d311b81ee1402598fb9f048feb850d55a79b17a7f4f92b8998a5cf15cdadf04"
+        }
+      ]
+    },
+    {
+      "criterion_id": "per_attempt_approval",
+      "status": "PASS",
+      "scope": "Native revision/attempt authorization and frontend project/revision-bound consumed consent regressions.",
+      "evidence_refs": [
+        {
+          "path": "src-tauri/target/capability-frontend-20261019.log",
+          "sha256": "fe151f3bb6986da0c5ba7327f5494448f9d0482cda32c43084ccfb304d498efb"
+        }
+      ]
+    },
+    {
+      "criterion_id": "rollback_correctness",
+      "status": "PASS",
+      "scope": "Real temporary-file journal rollback/conflict/recovery tests, not a connected model workflow or OS reboot.",
+      "evidence_refs": [
+        {
+          "path": "src-tauri/target/capability-rust-20261019.log",
+          "sha256": "0d311b81ee1402598fb9f048feb850d55a79b17a7f4f92b8998a5cf15cdadf04"
+        }
+      ]
+    },
+    {
+      "criterion_id": "bounded_attempts",
+      "status": "PASS",
+      "scope": "Native three-attempt test plus duplicate rejection after reopened persisted representations.",
+      "evidence_refs": [
+        {
+          "path": "src-tauri/target/capability-rust-20261019.log",
+          "sha256": "0d311b81ee1402598fb9f048feb850d55a79b17a7f4f92b8998a5cf15cdadf04"
+        }
+      ]
+    }
+  ]
+}

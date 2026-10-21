@@ -1,0 +1,25 @@
+# File review, rollback and restart recovery
+
+The old in-memory pending-diff/backup maps have been replaced by a versioned local journal. Per-user AppData contains `review-journal.json`, `created-project-reviews.json`, and `compiler-repairs.json`. These hold private source snapshots locally; they are never bundled or exported by a knowledge tool.
+
+Every file proposal records the canonical workspace/path, exact original or absence, proposed text, message, revision digest and status. New files are proposals too: no directory/file is written before explicit Keep. Identical pending proposals are idempotent; different overlapping proposals require review first. Rejected revisions and failed repair fingerprints cannot be silently reapplied.
+
+Keep checks the exact revision and original bytes, stages/syncs a temporary file, rechecks preconditions, and atomically replaces a file (new files use no-clobber persistence). Workspace write leases exclude overlapping SDK operations. A batch persists `applying` intent before writes; later write failure rolls back completed writes when their exact contents still match. Incomplete recovery records remain instead of being discarded.
+
+Message Undo checks every affected file before restoring any. Multiple accepted revisions from one message restore the first original, while preserving a later manual edit by refusing to overwrite it. Interrupted apply/Undo is reconciled against original/proposed states on restart. Unknown content becomes a conflict; a partial multi-file Undo remains build-blocking until explicitly resolved. Empty directories created for an approved new file can remain after its Undo.
+
+Project review snapshots survive restart and bind approval to both the snapshot and pending revisions. Project Undo validates the complete unchanged tree, persists its intended recovery path, then renames the whole tree into a same-parent `.vibekidbright-undo-*` container. It never walks a possibly changed tree deleting files one by one. A conflicting or additional user file stops Undo. Recovery paths remain recorded for manual restoration. Stale SDK build output is likewise retained in a `.vibekidbright-stale-build-*` container.
+
+Windows device aliases, alternate data streams, traversal and reparse points are rejected for reviewed writes. Windows path separator/case normalization is included in review lookup and unsuccessful repair fingerprints. Tests cover stale approvals, concurrent user creation, later edits, batch preflight and injected second-write failure, rollback, corrupt journal preservation, partial crash reconciliation, project snapshot serialization/quarantine and real process-tree cancellation.
+
+Limits: 2 MiB reviewed source, 2048 file-change records, 64 MiB file/project journals, 16 MiB repair journal. Full history returns an error while preserving source; no automatic history deletion is implemented. Corruption/unsupported schema fails closed and must be recovered with the original journal preserved.
+
+These are application-level crash recovery safeguards, not a transactional filesystem or protection against every hostile OS race/power/storage failure. Parent-directory fsync and real power-loss fault injection are not certified. Cross-file writes and the three journals are not one atomic filesystem transaction. Unix/macOS process and installer paths still need platform testing. Unsaved editor buffers remain session-only. The application does not claim that every generic native filesystem IPC command is a security sandbox.
+
+The SDK ZIP extractor additionally uses these canonical-path checks, temporary file replacement and in-copy cancellation. See 12-dependency-security.md for archive expansion limits and remaining dependency findings. AI Stop is relayed to its own SDK future without cancelling unrelated user jobs.
+
+The Build Stop control is bound to the workspace captured when Build began, even if the user switches projects. Stop during a pending editor save lets that save finish but prevents the SDK from starting afterward. UI regressions cover both cases; an already-started SDK uses native cancellation.
+
+The continuation adds deterministic interruption checkpoints after serialization, writing and sync, before atomic settings/journal replacement. Each injected error leaves the exact original JSON and cleans the owned temporary file. These simulate pre-replacement failures, not real power loss. A separate real Windows parent/grandchild test verifies that dropping the interactive clangd protocol owner kills descendants while stdin remains open. Repair phase tests confirm that even a current revision cannot apply a patch outside awaiting_approval.
+
+Provider transports now wrap tool evidence as bounded JSON data with explicit untrusted authority. Payload tests preserve tool-call IDs/signatures and prevent user objects with reserved tool markers from becoming assistant function calls or tool responses. Text inside documentation/comments/logs cannot obtain a native apply tool. Real-model prompt-injection resistance remains unmeasured; the wrapper does not replace consent or review gates.

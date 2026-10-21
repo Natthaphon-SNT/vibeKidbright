@@ -1,57 +1,38 @@
-/// kb_embed.rs — Local ONNX-based text embedding (offline, no API key required)
-///
-/// Uses the `fastembed` crate which bundles ONNX Runtime and downloads
-/// the all-MiniLM-L6-v2 model on first use (~45 MB, cached in app data).
-///
-/// The model is:
-///   - sentence-transformers/all-MiniLM-L6-v2
-///   - 384-dimensional embeddings
-///   - Efficient on CPU (no GPU needed)
-///   - Semantically strong for technical English + Thai text
-///
-/// Model cache location: OS app data dir / fastembed-cache / (managed by fastembed)
-///
-/// Usage:
-///   let model = get_local_embedder()?;
-///   let embeddings = model.embed(vec!["text"], None)?;  // returns Vec<Vec<f32>>
-
-#[allow(unused_imports)]
-use fastembed::{EmbeddingModel, InitOptions, InitOptionsUserDefined, TextEmbedding};
+//! Local embedding from installer resources. No hub client or runtime downloads.
+use fastembed::{InitOptionsUserDefined, Pooling, TextEmbedding, TokenizerFiles, UserDefinedEmbeddingModel};
+use std::path::{Path, PathBuf};
 use std::sync::{Mutex, OnceLock};
 
-// ── Lazy global model instance ─────────────────────────────────────────────────
-// OnceLock ensures the model is initialized exactly once per process.
-// Mutex allows interior mutability since TextEmbedding is not Sync.
-
 static LOCAL_EMBEDDER: OnceLock<Mutex<Option<TextEmbedding>>> = OnceLock::new();
-
+static MODEL_DIRECTORY: OnceLock<PathBuf> = OnceLock::new();
 fn embedder_cell() -> &'static Mutex<Option<TextEmbedding>> {
     LOCAL_EMBEDDER.get_or_init(|| Mutex::new(None))
 }
 
-/// Initialize the local embedding model.
-/// Downloads the model on first call (~45 MB), then uses cached version.
-/// Returns Err if the model can't be loaded (network unavailable + no cache).
-pub fn init_local_embedder(cache_dir: Option<&std::path::Path>) -> Result<(), String> {
-    let mut lock = embedder_cell().lock().unwrap();
-    if lock.is_some() {
-        return Ok(()); // Already initialized
+pub fn configure_model_directory(directory: PathBuf) -> Result<(), String> {
+    if let Some(existing) = MODEL_DIRECTORY.get() {
+        if existing == &directory { return Ok(()); }
+        return Err("Embedding model directory is already configured.".into());
     }
+    MODEL_DIRECTORY.set(directory).map_err(|_| "Embedding directory initialization raced.".into())
+}
 
-    eprintln!("[KB Embed] Initializing all-MiniLM-L6-v2 (first run: ~45 MB download)...");
-
-    let mut opts = InitOptions::new(EmbeddingModel::AllMiniLML6V2);
-
-    // Use custom cache directory if provided (e.g. Tauri app_data_dir)
-    if let Some(dir) = cache_dir {
-        opts = opts.with_cache_dir(dir.to_path_buf());
-    }
-
-    let model = TextEmbedding::try_new(opts)
-        .map_err(|e| format!("[KB Embed] Failed to load model: {e}"))?;
-
-    *lock = Some(model);
-    eprintln!("[KB Embed] Model ready — 384-dim, all-MiniLM-L6-v2");
+pub fn init_local_embedder(directory: Option<&Path>) -> Result<(), String> {
+    let mut lock = embedder_cell().lock().map_err(|_| "Embedding state is unavailable.")?;
+    if lock.is_some() { return Ok(()); }
+    let directory = directory.map(Path::to_path_buf).or_else(|| MODEL_DIRECTORY.get().cloned());
+    #[cfg(debug_assertions)]
+    let directory = directory.or_else(|| Some(Path::new(env!("CARGO_MANIFEST_DIR")).join("../resources/embedding")));
+    let directory = directory.ok_or("Bundled embedding resources are unavailable. Reinstall the application.")?;
+    let read = |name: &str| std::fs::read(directory.join(name))
+        .map_err(|error| format!("Cannot load bundled embedding resource {name}: {error}"));
+    let tokenizer = TokenizerFiles {
+        tokenizer_file: read("tokenizer.json")?, config_file: read("model-config.json")?,
+        special_tokens_map_file: read("special_tokens_map.json")?, tokenizer_config_file: read("tokenizer_config.json")?,
+    };
+    let model = UserDefinedEmbeddingModel::new(read("model.onnx")?, tokenizer).with_pooling(Pooling::Mean);
+    *lock = Some(TextEmbedding::try_new_from_user_defined(model, InitOptionsUserDefined::default())
+        .map_err(|error| format!("Cannot initialize the bundled embedding model: {error}"))?);
     Ok(())
 }
 
@@ -98,62 +79,31 @@ pub fn is_embedder_ready() -> bool {
 /// Target chunk size ~600 chars with 80-char overlap (matching Python script).
 /// Splits on paragraph/sentence boundaries when possible.
 pub fn chunk_text_for_embedding(text: &str, target_size: usize, overlap: usize) -> Vec<String> {
+    let chars: Vec<char> = text.chars().collect();
+    let size = target_size.max(1);
+    let step = size.saturating_sub(overlap.min(size - 1)).max(1);
     let mut chunks = Vec::new();
-    let mut current = String::new();
-
-    // Split on double newlines (paragraph boundaries)
-    let paragraphs: Vec<&str> = text
-        .split("\n\n")
-        .map(str::trim)
-        .filter(|p| !p.is_empty())
-        .collect();
-
-    for para in &paragraphs {
-        if current.len() + para.len() + 2 <= target_size {
-            if !current.is_empty() {
-                current.push_str("\n\n");
-            }
-            current.push_str(para);
-        } else {
-            if !current.is_empty() {
-                chunks.push(current.clone());
-            }
-            // Start next chunk with overlap from previous
-            if overlap > 0 && !chunks.is_empty() {
-                let prev = &chunks[chunks.len() - 1];
-                let tail = &prev[prev.len().saturating_sub(overlap)..];
-                current = format!("{}\n\n{}", tail, para);
-            } else {
-                current = para.to_string();
-            }
-        }
+    let mut start = 0;
+    while start < chars.len() {
+        let end = (start + size).min(chars.len());
+        let chunk: String = chars[start..end].iter().collect();
+        if !chunk.trim().is_empty() { chunks.push(chunk.trim().to_string()); }
+        if end == chars.len() { break; }
+        start += step;
     }
-    if !current.is_empty() {
-        chunks.push(current);
-    }
-
-    // Fallback for text without paragraph breaks
-    if chunks.is_empty() && !text.is_empty() {
-        let mut i = 0;
-        while i < text.len() {
-            let end = (i + target_size).min(text.len());
-            let chunk = text[i..end].trim().to_string();
-            if chunk.len() > 20 {
-                chunks.push(chunk);
-            }
-            if end >= text.len() { break; }
-            i += target_size.saturating_sub(overlap);
-        }
-    }
-
-    chunks.into_iter().filter(|c| c.len() > 5).collect()
+    chunks
 }
-
-// ── Tests ─────────────────────────────────────────────────────────────────────
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn unicode_chunks_preserve_thai_without_panics_or_infinite_overlap() {
+        let text = "อ่านอุณหภูมิและตรวจสอบปุ่มกด".repeat(50);
+        assert_eq!(chunk_text_for_embedding(&text, 23, 0).concat(), text);
+        assert!(chunk_text_for_embedding("ไทย", 0, 500).len() <= 3);
+    }
 
     #[test]
     fn test_chunk_text_short_single_chunk() {
@@ -190,7 +140,5 @@ mod tests {
         assert!(combined.contains("Third"),  "combined: {combined}");
     }
 
-    // Note: embed_texts / embed_query tests are integration tests that require
-    // network access (first run) and are not included here.
-    // They are covered by manual testing and the CI integration test job.
+    // The packaged-binary --self-check verifies real offline model inference.
 }

@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "recorded_date": "2026-10-17",
+  "timezone": "Asia/Bangkok",
+  "provenance": "User supplied iA/iP specifications and front/back product diagrams in chat; user reported this main.c passed on KidBright32iA. Source read without executing or modifying the original project.",
+  "board_id": "kidbright32_ia",
+  "board_revision": null,
+  "test": {
+    "status": "user_reported_pass",
+    "kind": "basic_runtime_serial_smoke_test",
+    "agent_witnessed": false,
+    "source": {
+      "path": "docs/research/kidbright32ia-user-tested-main-2026-10-17.c",
+      "sha256": "6c230842521ee0221cf24efe0ab0d5bc7941a2f9c9fe476029be2b6cf0f838ce",
+      "bytes": 242
+    },
+    "behavior": [
+      "Print Hello from vibeKidbright! at startup",
+      "Print Heartbeat... with a FreeRTOS delay of 1000 ms per loop"
+    ],
+    "not_exercised": [
+      "LED matrix",
+      "buttons",
+      "buzzer",
+      "ADC/light",
+      "I2C",
+      "temperature",
+      "RTC",
+      "MC3479",
+      "servo",
+      "USB power switch",
+      "WiFi/Bluetooth/IoT"
+    ]
+  },
+  "missing_evidence": [
+    "Build log and exact SDK version",
+    "Serial capture",
+    "Physical PCB/BOM revision",
+    "Timing measurements",
+    "Peripheral test results"
+  ],
+  "provided_board_material": {
+    "boards": [
+      "kidbright32_ia",
+      "kidbright32_ip"
+    ],
+    "diagrams": "User supplied front/back product diagrams. Original image bytes are not copied or rehashed in this record.",
+    "ia": "LDR; iA-MC3479; USB-C; GPIO32/33/34/35 inputs and26/27 outputs; diagram labels light36,buzzer13,USB switch25,servos15/17.",
+    "ip": "Phototransistor; USB-C; separate board/servo supply indicators; same documented external I/O numbers; not reported physically tested."
+  },
+  "limitations": [
+    "Source snapshot is not a firmware binary or proof of the compiler settings used in the reported test.",
+    "User-reported basic runtime success is not full hardware or original KidBright behavioral equivalence.",
+    "Do not infer iA button GPIO, I2C addresses or a complete executable profile from this smoke test."
+  ]
+}

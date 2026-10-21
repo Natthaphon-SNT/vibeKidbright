@@ -5,10 +5,12 @@ import AiChat from "./AiChat";
 import CodeEditor from "./CodeEditor";
 import ToolchainSetup from "./ToolchainSetup";
 import WikiView from "./WikiView";
+import LearningWorkspace from "./LearningWorkspace";
 import { parseErrorLine, type ParsedBuildError } from "./errorHints";
 import BuildErrorList from "./BuildErrorList";
 import { toast, ToastHost } from "./Toast";
 import { normPath } from "./utils";
+import { learnerProjectTree, isLearnerEditablePath, type ProjectFileEntry as FileEntry } from "./projectFiles";
 import SetupRepairButton from "./SetupRepairButton";
 import {
   executeBuildLifecycle,
@@ -20,11 +22,30 @@ import {
 
 const PORT_REFRESH_INTERVAL_MS = 2_000;
 
-interface FileEntry {
-  name: string;
-  path: string;
-  is_dir: boolean;
-  children?: FileEntry[];
+function terminalArguments(input: string): string[] {
+  const args: string[] = [];
+  let value = "";
+  let quote: string | null = null;
+  let started = false;
+  for (const character of input) {
+    if (quote) {
+      if (character === quote) quote = null;
+      else value += character;
+    } else if (character === '"' || character === "'") {
+      quote = character;
+      started = true;
+    } else if (/\s/.test(character)) {
+      if (started) args.push(value);
+      value = "";
+      started = false;
+    } else {
+      value += character;
+      started = true;
+    }
+  }
+  if (quote) throw new Error("Close the quote before running the command.");
+  if (started) args.push(value);
+  return args;
 }
 
 // ── File Icon SVGs by type ──────────────────────────────────────────────────
@@ -205,6 +226,7 @@ function FileTreeItem({
         {isRenaming ? renderInput(item.name, true) : (
           <button
             onClick={() => onFolderToggle(item.path)}
+            aria-label={item.name}
             onContextMenu={(e) => onContextMenu(e, item.path, true)}
             className="w-full text-left py-[5px] px-2 flex items-center gap-1.5 text-[12px] transition-all duration-150 rounded-md group relative"
             style={{ color: 'var(--text-muted)', paddingLeft: `${8 + indent}px` }}
@@ -246,6 +268,7 @@ function FileTreeItem({
   return isRenaming ? renderInput(item.name, false) : (
     <button
       onClick={() => onFileClick(item.path)}
+      aria-label={item.name}
       onDoubleClick={() => onFileClick(item.path)}
       onContextMenu={(e) => onContextMenu(e, item.path, false)}
       className="w-full text-left py-[5px] px-2 flex items-center gap-1.5 text-[12px] transition-all duration-150 rounded-md group relative"
@@ -414,9 +437,13 @@ function App({
     const saved = localStorage.getItem("vibe-ai-panel");
     return saved === null ? true : saved === "true"; // default: เปิดอยู่เสมอ
   });
-  const [activeView, setActiveView] = useState<"editor" | "wiki">(() => {
-    return (localStorage.getItem("vibe-active-view") as "editor" | "wiki") || "editor";
+  const [activeView, setActiveView] = useState<"editor" | "wiki" | "learning">(() => {
+    const saved = localStorage.getItem("vibe-active-view");
+    return saved === "editor" || saved === "wiki" ? saved : "learning";
   });
+  useEffect(() => { localStorage.setItem("vibe-active-view", activeView); }, [activeView]);
+  const activeViewRef = useRef(activeView);
+  activeViewRef.current = activeView;
 
   // Persist the active project across F5 / webview reloads (restored + validated on startup).
   const [projectDir, setProjectDir] = useState<string>(() => {
@@ -426,6 +453,7 @@ function App({
   const projectDirRef = useRef(projectDir);
   projectDirRef.current = projectDir;
   const [isBuilding, setIsBuilding] = useState(false);
+  const [isCancellingBuild,setIsCancellingBuild] = useState(false);
   const [buildStep, setBuildStep] = useState(0);
   const [buildTotal, setBuildTotal] = useState(0);
   const [buildCurrentTask, setBuildCurrentTask] = useState("");
@@ -449,6 +477,8 @@ function App({
   const [newProjectName, setNewProjectName] = useState("my_esp_project");
   const [newProjectPath, setNewProjectPath] = useState("");
   const [projectFiles, setProjectFiles] = useState<FileEntry[]>([]);
+  const mainDirectoryPath = projectFiles.find(file => file.is_dir)?.path;
+  const sidebarProjectRef = useRef("");
   const [openFolders, setOpenFolders] = useState<Set<string>>(new Set());
   const [showSetupModal, setShowSetupModal] = useState(false);
   const [customIdfPath, setCustomIdfPath] = useState("");
@@ -469,9 +499,34 @@ function App({
   const openFilesRef = useRef<FileTab[]>(openFiles);
   const parseBuildProgressRef = useRef<(msg: string) => void>(() => {});
   const aiChatSendRef = useRef<((text: string) => void) | null>(null);
+  const [chatDraftRequest, setChatDraftRequest] = useState<{ id: number; text: string } | null>(null);
+  const chatDraftSequence = useRef(0);
   const saveAllFilesRef = useRef<() => Promise<void>>(async () => {});
   const buildFlashRef = useRef<() => void>(() => {});
-  useEffect(() => { openFilesRef.current = openFiles; }, [openFiles]);
+  const buildInFlightRef = useRef(false);
+  const activeBuildProjectRef = useRef<string | null>(null);
+  const buildCancelRequestedRef = useRef(false);
+  const sdkBuildStartedRef = useRef(false);
+  openFilesRef.current = openFiles;
+  const projectDraftsRef = useRef(new Map<string, FileTab[]>());
+
+  // AI creation can change the workspace without a user navigation event.
+  // Retain unsaved buffers separately so returning to that project restores them.
+  const activateProject = (directory: string) => {
+    const previous = projectDirRef.current;
+    if (normPath(previous) === normPath(directory)) return;
+    const drafts = openFilesRef.current.filter(file => file.content !== file.savedContent);
+    projectDraftsRef.current.set(normPath(previous), drafts);
+    const restored = projectDraftsRef.current.get(normPath(directory)) || [];
+    projectDirRef.current = directory;
+    openFilesRef.current = restored;
+    setProjectDir(directory);
+    setOpenFiles(restored);
+    setActiveFilePath(restored[0]?.path || "");
+    if (drafts.length || restored.length) {
+      toast("Unsaved code is kept in this session. Reopen its project to continue; save before closing the app.", "info");
+    }
+  };
 
   const activeFile = openFiles.find(f => normPath(f.path) === normPath(activeFilePath));
 
@@ -520,36 +575,6 @@ function App({
     if (path) setCustomToolsPath(path as string);
   };
 
-  // --- 🛠 COMMAND WRAPPER HACK FOR WINDOWS 🛠 ---
-  const runIdfWrappedCommand = async (baseCmd: string, args: string[], cwd: string | null) => {
-    let idfPathToUse = customIdfPath;
-    
-    if (!idfPathToUse) {
-      try {
-        const p: any = await invoke("get_idf_custom_paths");
-        if (p && p.idf_path) idfPathToUse = p.idf_path;
-      } catch (e) {}
-    }
-
-    if (idfPathToUse) {
-      const cleanPath = idfPathToUse.replace(/\//g, '\\');
-      const exportScript = `${cleanPath}\\export.bat`;
-      
-      // 🛠 แก้ไข: เอาเครื่องหมาย "" รอบๆ ${exportScript} ออก เพื่อไม่ให้ CMD งงกับตัวอักษร \"
-      const fullCmd = `call ${exportScript} && ${baseCmd} ${args.join(" ")}`;
-      
-      addLog(`[IDF Wrapper] Injecting environment from: ${exportScript}`);
-      
-      return await invoke("run_shell_command", {
-        cmd: "cmd.exe",
-        args: ["/c", fullCmd],
-        cwd
-      });
-    } else {
-      return await invoke("run_shell_command", { cmd: baseCmd, args, cwd });
-    }
-  };
-
   // Check the ESP-IDF environment once; port discovery is polled separately below.
   useEffect(() => {
     checkEnvironment();
@@ -559,7 +584,7 @@ function App({
     const unlistenTerminal = listen("terminal-output", (event) => {
       const line = event.payload as string;
       parseBuildProgressRef.current(line);
-      setLogs((prev) => [...prev, line]);
+      setLogs((prev) => [...prev.slice(-1999), line.slice(-8192)]);
     });
 
     const unlistenFile = listen("file-modified", async (event) => {
@@ -569,16 +594,15 @@ function App({
         f => f.path.replace(/\\/g, '/') === normP
       );
       if (isOpen) {
-        reloadFile(isOpen.path);
+        void reloadFile(isOpen.path, true);
       }
       loadProjectFiles();
     });
 
     const unlistenForceDir = listen("force-project-dir", async (event) => {
       const newPath = event.payload as string;
-      setProjectDir(newPath);
-      setOpenFiles([]);
-      setActiveFilePath("");
+      activateProject(newPath);
+      setActiveView("editor");
       addLog(`Switched project to: ${newPath}`);
     });
 
@@ -587,13 +611,16 @@ function App({
         const data = typeof event.payload === 'string' ? JSON.parse(event.payload) : event.payload as any;
         const fullPath = String(data.fullPath || "");
         if (!fullPath) return;
+        setActiveView("editor");
 
         const norm = (p: string) => p.replace(/\\/g, '/').toLowerCase();
         const existing = openFilesRef.current.find(f => norm(f.path) === norm(fullPath));
 
         if (!existing) {
           try {
-            const content = await invoke("read_project_file", { path: fullPath });
+            const pending = await invoke<{before:string|null} | null>("check_pending_diff", { path: fullPath });
+            const content = pending && typeof pending === "object" && "before" in pending
+              ? (pending.before ?? "") : await invoke("read_project_file", { path: fullPath });
             const fileName = fullPath.split(/[\/\\]/).pop() || "file";
             const newTab: FileTab = { name: fileName, path: fullPath, content: content as string, savedContent: content as string };
             setOpenFiles(prev => [...prev, newTab]);
@@ -611,10 +638,16 @@ function App({
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "s") {
         e.preventDefault();
-        saveAllFilesRef.current();
+        if (activeViewRef.current === "learning") {
+          toast(localStorage.getItem("vibe-learning-language") === "en"
+            ? "Practice data is temporary and is not saved to a project."
+            : "ข้อมูลในพื้นที่ทดลองยังไม่บันทึกลงโปรเจกต์", "info");
+          return;
+        }
+        void saveAllFilesRef.current().catch(() => {});
       }
       // Ctrl+Shift+B → Build & Flash
-      if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key === "b") {
+      if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key.toLowerCase() === "b") {
         e.preventDefault();
         buildFlashRef.current();
       }
@@ -632,11 +665,20 @@ function App({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const reloadFile = async (path: string) => {
+  const reloadFile = async (path: string, automatic = false) => {
+    const previous = openFilesRef.current.find(file => normPath(file.path) === normPath(path));
+    if (previous && previous.content !== previous.savedContent) {
+      if (automatic) {
+        toast("The file changed on disk. Your unsaved code was kept; use Reload to review the disk version.", "info");
+        return;
+      }
+      if (!window.confirm("Reload this file and discard its unsaved changes?")) return;
+    }
     try {
       const content = await invoke("read_project_file", { path });
       setOpenFiles(prev => prev.map(f =>
-        f.path === path ? { ...f, content: content as string, savedContent: content as string } : f
+        normPath(f.path) === normPath(path) && f.content === previous?.content
+          ? { ...f, content: content as string, savedContent: content as string } : f
       ));
       addLog(`Auto-reloaded: ${path.split("/").pop()}`);
     } catch (err) {
@@ -650,20 +692,20 @@ function App({
     } else {
       localStorage.setItem("vibe-project-dir", projectDir);
     }
-    if (projectDir !== ".") {
-      loadProjectFiles();
-    }
+    void loadProjectFiles();
   }, [projectDir]);
 
   // On startup: if the restored project no longer exists / is invalid, fall back to "no project".
   useEffect(() => {
     if (projectDir === ".") return;
-    invoke("validate_idf_project", { path: projectDir })
+    const restoredProject = projectDir;
+    invoke("validate_idf_project", { path: restoredProject })
       .then((ok) => {
+        if (projectDirRef.current !== restoredProject) return;
         if (!ok) setProjectDir(".");
         else addLog(`Restored project: ${projectDir}`);
       })
-      .catch(() => setProjectDir("."));
+      .catch(() => { if (projectDirRef.current === restoredProject) setProjectDir("."); });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -674,22 +716,32 @@ function App({
   }, [logs]);
 
   const saveAllFiles = useCallback(async () => {
-    if (openFiles.length === 0) return;
+    const pendingFiles = openFilesRef.current
+      .filter(file => isLearnerEditablePath(projectDir, file.path) && file.content !== file.savedContent)
+      .map(file => ({ path: file.path, content: file.content }));
+    const savedContents = new Map<string, string>();
     try {
-      let savedCount = 0;
-      for (const file of openFiles) {
+      for (const file of pendingFiles) {
         await invoke("write_project_file", {
           path: file.path,
           content: file.content
         });
-        savedCount++;
+        savedContents.set(normPath(file.path), file.content);
       }
-      setOpenFiles(prev => prev.map(f => ({ ...f, savedContent: f.content })));
-      addLog(`✨ Saved all ${savedCount} open files`);
+      if (savedContents.size > 0) addLog(`✨ Saved ${savedContents.size} program files`);
     } catch (err) {
       addLog(`❌ Failed to save files: ${err}`);
+      throw err;
+    } finally {
+      // Mark only bytes acknowledged by the backend as saved. Newer edits stay dirty.
+      if (savedContents.size > 0) {
+        setOpenFiles(prev => prev.map(file => {
+          const content = savedContents.get(normPath(file.path));
+          return content === undefined ? file : { ...file, savedContent: content };
+        }));
+      }
     }
-  }, [openFiles]);
+  }, [projectDir]);
   // Keep ref in sync so the keyboard shortcut always calls the latest version
   useEffect(() => { saveAllFilesRef.current = saveAllFiles; }, [saveAllFiles]);
 
@@ -699,9 +751,8 @@ function App({
       return;
     }
 
-    await saveAllFiles();
-
     try {
+      await saveAllFiles();
       addLog("Opening folder picker to save project as...");
       const result = await invoke("save_project_as", { sourceDir: projectDir });
       const [newPath, fileCount] = (result as string).split("|");
@@ -711,9 +762,7 @@ function App({
       const switchProject = window.confirm(`Project saved successfully!\n\nDo you want to switch to the new project location?\n\n${newPath}`);
 
       if (switchProject) {
-        setProjectDir(newPath);
-        setOpenFiles([]);
-        setActiveFilePath("");
+        activateProject(newPath);
         addLog(`Switched project to: ${newPath}`);
       }
     } catch (err) {
@@ -728,6 +777,7 @@ function App({
   };
 
   const handleDeleteItem = async (path: string, isDir: boolean) => {
+    if (!isLearnerEditablePath(projectDir, path)) return;
     const name = path.split(/[\/\\]/).pop() || "";
     if (name === "CMakeLists.txt" || name === "sdkconfig") {
       const confirmCritical = window.confirm(`⚠️ WARNING: '${name}' is a critical ESP-IDF file.\n\nDeleting it may break your project.\n\nAre you absolutely sure you want to delete '${name}'?`);
@@ -738,17 +788,13 @@ function App({
     }
 
     try {
-      if (isDir) {
-        await invoke("delete_directory", { path });
-      } else {
-        await invoke("delete_file", { path });
-      }
+      await invoke("delete_program_item", { projectDir, path });
       addLog(`✨ Deleted: ${path}`);
       loadProjectFiles();
-      if (openFiles.some(f => normPath(f.path) === normPath(path))) {
-        setOpenFiles(prev => prev.filter(f => normPath(f.path) !== normPath(path)));
-      }
-      if (normPath(activeFilePath) === normPath(path)) setActiveFilePath("");
+      const removedPath = (filePath: string) => normPath(filePath) === normPath(path)
+        || (isDir && normPath(filePath).startsWith(`${normPath(path)}/`));
+      setOpenFiles(prev => prev.filter(file => !removedPath(file.path)));
+      if (removedPath(activeFilePath)) setActiveFilePath("");
     } catch (err) {
       toast(`Failed to delete: ${err}`, "error");
     }
@@ -762,21 +808,38 @@ function App({
 
     const value = inlineInputValue.trim();
     try {
+      if (value === "." || value === ".." || /[\\/:]/.test(value)) {
+        throw new Error("Enter a file or folder name inside main.");
+      }
       if (inlineAction.mode === "rename") {
         const oldName = inlineAction.path.split(/[\/\\]/).pop() || "";
         const newPath = inlineAction.path.substring(0, inlineAction.path.length - oldName.length) + value;
-        await invoke("rename_item", { old_path: inlineAction.path, new_path: newPath });
+        if (!isLearnerEditablePath(projectDir, inlineAction.path) || !isLearnerEditablePath(projectDir, newPath)) {
+          throw new Error("Only program files inside main can be renamed.");
+        }
+        await invoke("rename_program_item", { projectDir, oldPath: inlineAction.path, newPath });
         addLog(`✨ Renamed to ${value}`);
-        setOpenFiles(prev => prev.map(f => normPath(f.path) === normPath(inlineAction.path) ? { ...f, path: newPath, name: value } : f));
-        if (normPath(activeFilePath) === normPath(inlineAction.path)) setActiveFilePath(newPath);
+        const renamedPath = (path: string) => {
+          if (normPath(path) === normPath(inlineAction.path)) return newPath;
+          if (normPath(path).startsWith(`${normPath(inlineAction.path)}/`)) return newPath + path.slice(inlineAction.path.length);
+          return path;
+        };
+        setOpenFiles(prev => prev.map(file => {
+          const path = renamedPath(file.path);
+          return path === file.path ? file : { ...file, path, name: path.split(/[\/\\]/).pop() || file.name };
+        }));
+        setActiveFilePath(renamedPath);
+        setOpenFolders(prev => new Set([...prev].map(renamedPath)));
       } else {
         const parentPath = inlineAction.path;
         const sep = parentPath.includes('\\') ? '\\' : '/';
         const newPath = parentPath + sep + value;
+        if (!isLearnerEditablePath(projectDir, newPath)) {
+          throw new Error("Create program files inside main. Build and board settings are managed separately.");
+        }
         
         if (inlineAction.mode === "createFile") {
-          await invoke("safe_write_project_file", { path: newPath, content: "" })
-            .catch(async () => await invoke("write_project_file", { path: newPath, content: "" }));
+          await invoke("create_program_file", { projectDir, path: newPath });
           addLog(`✨ Created file ${value}`);
           
           await loadProjectFiles();
@@ -785,7 +848,7 @@ function App({
           setOpenFiles(prev => [...prev, newFile]);
           setActiveFilePath(newPath);
         } else {
-          await invoke("create_directory", { path: newPath });
+          await invoke("create_program_directory", { projectDir, path: newPath });
           addLog(`✨ Created directory ${value}`);
         }
         setOpenFolders(prev => new Set(prev).add(parentPath));
@@ -804,12 +867,18 @@ function App({
     const dir = projectDirRef.current;
     if (dir === ".") {
       setProjectFiles([]);
+      sidebarProjectRef.current = "";
       return;
     }
     try {
       const files = await invoke("list_project_files", { path: dir });
       if (dir !== projectDirRef.current) return; // project changed while loading
-      setProjectFiles(files as FileEntry[]);
+      const tree = learnerProjectTree(files as FileEntry[], dir);
+      setProjectFiles(tree);
+      if (sidebarProjectRef.current !== dir) {
+        setOpenFolders(new Set(tree.filter(file => file.is_dir).map(file => file.path)));
+        sidebarProjectRef.current = dir;
+      }
     } catch (err) {
       console.error("Failed to load project files:", err);
       toast("Could not load the project file list.", "error");
@@ -880,6 +949,7 @@ function App({
   }, [selectedBoard]);
 
   const handleFileClick = async (path: string) => {
+    setActiveView("editor");
     const np = normPath(path);
     const existing = openFiles.find(f => normPath(f.path) === np);
     if (existing) {
@@ -888,14 +958,16 @@ function App({
     }
 
     try {
+      const requestedProject = projectDirRef.current;
       const content = await invoke("read_project_file", { path });
+      if (requestedProject !== projectDirRef.current) return;
       const newTab: FileTab = {
         name: path.split(/[\/\\]/).pop() || "unknown",
         path,
         content: content as string,
         savedContent: content as string
       };
-      setOpenFiles(prev => [...prev, newTab]);
+      setOpenFiles(prev => prev.some(file => normPath(file.path) === np) ? prev : [...prev, newTab]);
       setActiveFilePath(path);
       addLog(`Opened: ${newTab.name}`);
     } catch (err) {
@@ -906,6 +978,9 @@ function App({
   const closeFile = (path: string, e: React.MouseEvent) => {
     e.stopPropagation();
     const np = normPath(path);
+    const file = openFilesRef.current.find(item => normPath(item.path) === np);
+    if (file && file.content !== file.savedContent
+      && !window.confirm(`Close ${file.name} and discard its unsaved changes?`)) return;
     setOpenFiles(prev => {
       const next = prev.filter(f => normPath(f.path) !== np);
       if (normPath(activeFilePath) === np) {
@@ -921,20 +996,21 @@ function App({
       addLog("❌ Vibe Code: No active file selected. Please click on a file in the sidebar to open it first.");
       return;
     }
+    if (!isLearnerEditablePath(projectDir, activeFilePath)) return;
     const np = normPath(activeFilePath);
-    setOpenFiles(prev => prev.map(f =>
-      normPath(f.path) === np ? { ...f, content: newContent, savedContent: newContent } : f
-    ));
+    setOpenFiles(prev => prev.map(f => normPath(f.path) === np ? { ...f, content: newContent } : f));
 
     try {
       await invoke("write_project_file", {
         path: activeFilePath,
         content: newContent
       });
+      setOpenFiles(prev => prev.map(f => normPath(f.path) === np ? { ...f, savedContent: newContent } : f));
       const fileName = activeFilePath.split(/[\/\\]/).pop() || activeFilePath;
       addLog(`✨ Vibe Code Applied & Saved to: ${fileName}`);
     } catch (err) {
       addLog(`❌ Failed to save injected code: ${err}`);
+      toast(`Could not save AI code: ${err}. Your changes remain unsaved.`, "error");
     }
   };
 
@@ -943,7 +1019,7 @@ function App({
   };
 
   const handleEditorChange = (newContent: string) => {
-    if (!activeFilePath) return;
+    if (!activeFilePath || !isLearnerEditablePath(projectDir, activeFilePath)) return;
     const np = normPath(activeFilePath);
     setOpenFiles(prev => prev.map(f =>
       normPath(f.path) === np ? { ...f, content: newContent } : f
@@ -975,7 +1051,7 @@ function App({
       if (existingFile) {
         setOpenFiles((prev) =>
           prev.map((f) =>
-            comparePath(f.path) === comparePath(absolutePath) ? { ...f, content: newContent } : f
+            comparePath(f.path) === comparePath(absolutePath) ? { ...f, content: newContent, savedContent: newContent } : f
           )
         );
         setActiveFilePath(existingFile.path);
@@ -999,9 +1075,8 @@ function App({
 
       const isValid = await invoke("validate_idf_project", { path });
       if (isValid) {
-        setProjectDir(path as string);
-        setOpenFiles([]);
-        setActiveFilePath("");
+        activateProject(path as string);
+        setActiveView("editor");
         addLog(`Project opened: ${path}`);
       } else {
         toast("Not a valid ESP-IDF project (missing CMakeLists.txt)", "error");
@@ -1248,7 +1323,7 @@ function App({
 
   const addLog = (msg: string) => {
     parseBuildProgress(msg);
-    setLogs((prev) => [...prev, `[${new Date().toLocaleTimeString()}] ${msg}`]);
+    setLogs((prev) => [...prev.slice(-1999), `[${new Date().toLocaleTimeString()}] ${msg.slice(-8192)}`]);
   };
 
   // Keep ref in sync so event listeners always have the latest parser
@@ -1263,8 +1338,15 @@ function App({
       return;
     }
 
-    const parts = terminalInput.trim().split(" ");
+    let parts: string[];
+    try {
+      parts = terminalArguments(terminalInput);
+    } catch (err) {
+      addLog(`Error: ${err}`);
+      return;
+    }
     const cmd = parts[0];
+    if (!cmd) return;
     const args = parts.slice(1);
 
     addLog(`> ${terminalInput}`);
@@ -1274,9 +1356,11 @@ function App({
     setTerminalInput("");
 
     try {
-      // 🛠 ใช้ Wrapper ถ้าเป็นคำสั่งของ IDF
-      if (["idf.py", "ninja", "cmake", "esptool.py"].includes(cmd)) {
-        await runIdfWrappedCommand(cmd, args, projectDir === "." ? null : projectDir);
+      if (cmd === "idf.py") {
+        await invoke("run_idf_command", {
+          command: args[0] || "--help", args: args.slice(1),
+          projectDir: projectDir === "." ? null : projectDir,
+        });
       } else {
         await invoke("run_shell_command", {
           cmd,
@@ -1321,7 +1405,8 @@ function App({
       addLog(`Success: ${result}`);
 
       const fullPath = `${newProjectPath}/${newProjectName}`;
-      setProjectDir(fullPath);
+      activateProject(fullPath);
+      setActiveView("editor");
       addLog(`Active project set to: ${fullPath}`);
     } catch (err) {
       console.error("New project error:", err);
@@ -1331,11 +1416,15 @@ function App({
   };
 
   const handleBuildFlash = async () => {
-    if (isBuilding) return;
+    if (buildInFlightRef.current || isBuilding) return;
 
     if (!isBuildFlashSupported(selectedBoard)) {
       addLog(`⚠️ ${MIUAI_DEPLOYMENT_UNAVAILABLE}`);
       toast(MIUAI_DEPLOYMENT_UNAVAILABLE, "info");
+      return;
+    }
+    if (activeView === "learning") {
+      toast("เปิดพื้นที่เขียนโปรแกรมและตรวจบอร์ดที่เลือกก่อน Build & Flash", "info");
       return;
     }
     
@@ -1344,47 +1433,59 @@ function App({
       toast("Please open or create a project first from the sidebar.", "info");
       return;
     }
-
-    setBuildStep(0);
-    setBuildTotal(0);
-    setBuildErrors([]);
-    setBuildCurrentTask("Initializing...");
-    addLog("--- Starting Build & Flash ---");
-    // Free the COM port: an open serial monitor makes esptool fail with
-    // "PermissionError(13, 'Access is denied.')" on Windows.
-    if (isSerialConnected && selectedBoard !== "miuaiplus") {
-      try {
-        await invoke("stop_serial_monitor");
-        setIsSerialConnected(false);
-        addLog("🔌 Serial monitor disconnected automatically to free the COM port for flashing.");
-        await new Promise((r) => setTimeout(r, 500));
-      } catch (err) {
-        addLog(`⚠️ Could not stop serial monitor before flashing: ${err}`);
-      }
+    if (!toolchainReady || isSettingUpEspIdf) {
+      toast("Wait for ESP-IDF setup to finish before building.", "info");
+      return;
     }
-
-    await executeBuildLifecycle({
-      run: async () => {
-        // 🛠 ใช้ Wrapper เพื่อให้มันโหลด export.bat ก่อนสั่ง idf.py เสมอ
-        const flashArgs = ["build", "flash"];
-        if (selectedSerialPort) {
-          flashArgs.push("-p", selectedSerialPort);
-          addLog(`Using port: ${selectedSerialPort}`);
-        } else {
-          addLog("⚠️ No serial port selected — idf.py will use its default port");
-        }
-        await runBuildForBoard(selectedBoard, () =>
-          runIdfWrappedCommand("idf.py", flashArgs, projectDir)
-        );
-      },
-      setResult: setBuildResult,
-      setBuilding: setIsBuilding,
-      onFailure: (err) => {
-        addLog(`Build failed: ${err}`);
-        setBuildCurrentTask("Build failed");
-      },
-    });
-    setBuildCurrentTask(prev => prev === "Initializing..." ? "" : prev);
+    // Lock before any save/disconnect await, including repeated shortcut events.
+    buildInFlightRef.current = true;
+    const buildProjectDir = projectDir;
+    activeBuildProjectRef.current = buildProjectDir;
+    buildCancelRequestedRef.current = false;
+    sdkBuildStartedRef.current = false;
+    try {
+      setBuildStep(0);
+      setBuildTotal(0);
+      setBuildErrors([]);
+      addLog("--- Starting Build & Flash ---");
+      await executeBuildLifecycle({
+        run: async () => {
+          setBuildCurrentTask("Saving program files...");
+          await saveAllFiles();
+          if (buildCancelRequestedRef.current) throw new Error("Build cancelled before starting the SDK.");
+          if (projectDirRef.current !== buildProjectDir) throw new Error("Project changed while preparing the build. Build again in the selected project.");
+          setBuildCurrentTask("Initializing...");
+          // Release the COM port before esptool opens it.
+          if (isSerialConnected) {
+            await invoke("stop_serial_monitor");
+            setIsSerialConnected(false);
+            addLog("🔌 Serial monitor disconnected automatically to free the COM port for flashing.");
+            await new Promise(resolve => setTimeout(resolve, 500));
+          }
+          if (projectDirRef.current !== buildProjectDir) throw new Error("Project changed while preparing the build. Build again in the selected project.");
+          const argv = selectedSerialPort ? ["-p", selectedSerialPort, "build", "flash"] : ["build", "flash"];
+          if (buildCancelRequestedRef.current) throw new Error("Build cancelled before starting the SDK.");
+          if (selectedSerialPort) addLog(`Using port: ${selectedSerialPort}`);
+          else addLog("⚠️ No serial port selected — idf.py will use its default port");
+          sdkBuildStartedRef.current = true;
+          await runBuildForBoard(selectedBoard, () => invoke("run_idf_command", {
+            command: argv[0], args: argv.slice(1), projectDir: buildProjectDir,
+          }));
+        },
+        setResult: setBuildResult,
+        setBuilding: setIsBuilding,
+        onFailure: err => {
+          addLog(`Build failed: ${err}`);
+          setBuildCurrentTask("Build failed");
+          toast(`Build stopped: ${err}`, "error");
+        },
+      });
+      setBuildCurrentTask(prev => prev === "Initializing..." ? "" : prev);
+    } finally {
+      buildInFlightRef.current = false;
+      activeBuildProjectRef.current = null;
+      sdkBuildStartedRef.current = false;
+    }
   };
   // Keep ref in sync so the keyboard shortcut (Ctrl+Shift+B) always calls the latest version
   useEffect(() => { buildFlashRef.current = handleBuildFlash; });
@@ -1409,15 +1510,13 @@ function App({
   };
 
   // Send the collected build errors to Vibe Coder and ask for a simple fix
-  const askAiToFixErrors = () => {
+  const askAiToFixErrors = async () => {
     if (buildErrors.length === 0) return;
-    const errText = buildErrors.slice(0, 5)
-      .map((e, i) => `${i + 1}. [${e.title}] ${e.file ? `${e.file}:${e.line ?? "?"}` : "(flash/hardware)"}\n   ${e.message}`)
-      .join("\n");
-    const prompt =
-      `The Build & Flash of my ESP-IDF project just failed. Here are the detected problems:\n\n${errText}\n\n` +
-      `Please explain each error in simple Thai first (one sentence each), then use read_file to look at the code ` +
-      `and write_file to fix it. Show me exactly what you changed and why.`;
+    try {
+      const output=buildErrors.slice(0,20).map(e=>e.file?`${e.file}:${e.line??1}:${e.column??1}: error: ${e.message}`:e.message).join("\n");
+      await invoke("begin_compiler_repair",{projectDir,output,maxAttempts:3});
+    } catch(error) {toast(`Could not start compiler repair: ${String(error)}`,"error");return;}
+    const prompt = "My configured ESP-IDF build failed. Call compiler_diagnostics to read its structured evidence, then inspect the relevant project files and propose a correction with write_file. Explain why it helps. The user must approve each attempt separately in Compiler Repair; do not apply a patch or report success before the configured build passes.";
     setShowAiPanel(true);
     setTimeout(() => {
       aiChatSendRef.current?.(prompt);
@@ -1439,26 +1538,34 @@ function App({
               {darkMode ? '☀️' : '🌙'}
             </button>
           </div>
-          <p className="text-xs mt-1 uppercase tracking-widest font-semibold" style={{ color: 'var(--text-muted)' }}>ESP-IDF IDE</p>
+          <p className="text-xs mt-1 uppercase tracking-widest font-semibold" style={{ color: 'var(--text-muted)' }}>KidBright · Code &amp; AI</p>
         </div>
 
         <div className="flex-1 overflow-y-auto p-2 space-y-1">
+          <button onClick={() => setActiveView("learning")} aria-pressed={activeView === "learning"}
+            className="w-full flex items-center gap-2 rounded-lg px-3 py-3 text-sm text-left mb-3"
+            style={{ color: activeView === "learning" ? 'var(--accent)' : 'var(--text-secondary)', background: activeView === "learning" ? 'var(--pms-293-ultra)' : 'transparent' }}>
+            <span aria-hidden="true">◈</span> พื้นที่เรียนรู้
+            <span className="ml-auto text-[9px] font-semibold" style={{ color: 'var(--text-muted)' }}>Code + AI</span>
+          </button>
           <div className="flex items-center justify-between p-2">
             <span className="text-sm font-medium" style={{ color: 'var(--text-muted)' }}>PROJECT</span>
             <div className="flex gap-1 items-center">
               <button
-                onClick={() => { setInlineAction({ mode: "createFile", path: projectDir }); setInlineInputValue(""); }}
+                onClick={() => { if (mainDirectoryPath) { setInlineAction({ mode: "createFile", path: mainDirectoryPath }); setInlineInputValue(""); } }}
+                disabled={!mainDirectoryPath}
                 className="transition-colors p-1 rounded" style={{ color: 'var(--text-muted)' }}
-                title="New File in Root"
+                title="New File in main"
                 onMouseEnter={e => (e.currentTarget.style.color = 'var(--accent)')}
                 onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-muted)')}
               >
                 <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/><path d="M14 2v6h6"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
               </button>
               <button
-                onClick={() => { setInlineAction({ mode: "createDir", path: projectDir }); setInlineInputValue(""); }}
+                onClick={() => { if (mainDirectoryPath) { setInlineAction({ mode: "createDir", path: mainDirectoryPath }); setInlineInputValue(""); } }}
+                disabled={!mainDirectoryPath}
                 className="transition-colors p-1 rounded mr-2" style={{ color: 'var(--text-muted)' }}
-                title="New Folder in Root"
+                title="New Folder in main"
                 onMouseEnter={e => (e.currentTarget.style.color = 'var(--accent)')}
                 onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-muted)')}
               >
@@ -1480,28 +1587,7 @@ function App({
               </button>
             </div>
           </div>
-          <div className="space-y-1">
-            {(inlineAction?.mode === "createFile" || inlineAction?.mode === "createDir") && inlineAction.path === projectDir && (
-              <div className="w-full text-left py-[5px] px-2 flex items-center gap-1.5 rounded-md relative text-neutral-200">
-                {inlineAction.mode === "createDir" ? (
-                  <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none"><path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" fill="#38bdf8" fillOpacity="0.08" stroke="#475569" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                ) : (
-                  <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="#475569" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /><path d="M14 2v6h6" stroke="#475569" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                )}
-                <input
-                  autoFocus
-                  value={inlineInputValue}
-                  onChange={(e) => setInlineInputValue(e.target.value)}
-                  onKeyDown={e => {
-                    if (e.key === "Enter") handleInlineSubmit();
-                    if (e.key === "Escape") handleInlineCancel();
-                  }}
-                  onBlur={handleInlineCancel}
-                  className="flex-1 text-[12px] rounded px-1 outline-none relative z-10 w-full"
-                  style={{ backgroundColor: 'var(--bg-input)', color: 'var(--text-primary)', border: '1.5px solid var(--accent)' }}
-                />
-              </div>
-            )}
+          <div className="space-y-1" role="region" aria-label="Project files">
             {projectFiles.map((file) => (
               <FileTreeItem
                 key={file.path}
@@ -1520,7 +1606,7 @@ function App({
             ))}
             {projectFiles.length === 0 && !inlineAction && (
               <div className="text-[10px] p-2 italic" style={{ color: 'var(--text-disabled)' }}>
-                No files found
+                {projectDir === "." ? "No project selected" : "No main folder found"}
               </div>
             )}
           </div>
@@ -1539,7 +1625,7 @@ function App({
               setShowAiPanel(next);
               localStorage.setItem("vibe-ai-panel", String(next));
               // Exclusive selection: opening Vibe Coder leaves the Wiki view
-              if (next && activeView === "wiki") {
+              if (next && activeView !== "editor") {
                 setActiveView("editor");
                 localStorage.setItem("vibe-active-view", "editor");
               }
@@ -1622,14 +1708,16 @@ function App({
           )}
           <button
             onClick={handleBuildFlash}
-            disabled={isBuilding || isSettingUpEspIdf || !toolchainReady || !isBuildFlashSupported(selectedBoard)}
+            disabled={activeView === "learning" || isBuilding || isSettingUpEspIdf || !toolchainReady || !isBuildFlashSupported(selectedBoard)}
             title={!isBuildFlashSupported(selectedBoard)
               ? MIUAI_DEPLOYMENT_UNAVAILABLE
+              : activeView === "learning"
+                ? "Open the code workspace and confirm the target board before Build & Flash"
               : !toolchainReady
                 ? "Waiting for toolchain download to complete..."
                 : "Build & Flash (Ctrl+Shift+B)"}
             className="w-full justify-center text-sm px-4 py-2 rounded-lg transition-all duration-200 font-bold flex items-center gap-2 shadow-lg active:scale-[0.98]"
-            style={isBuilding || !toolchainReady || !isBuildFlashSupported(selectedBoard)
+            style={activeView === "learning" || isBuilding || !toolchainReady || !isBuildFlashSupported(selectedBoard)
               ? { backgroundColor: 'var(--bg-hover)', color: 'var(--text-muted)', cursor: 'not-allowed' }
               : { backgroundColor: 'var(--accent)', color: '#fff', boxShadow: '0 4px 16px var(--accent-glow)' }
             }
@@ -1653,11 +1741,25 @@ function App({
               </>
             )}
           </button>
+          {isBuilding && <button className="w-full mt-2 text-sm rounded px-3 py-2" disabled={isCancellingBuild}
+            onClick={async()=>{const ownedProject=activeBuildProjectRef.current;if(!ownedProject)return;buildCancelRequestedRef.current=true;setIsCancellingBuild(true);try{if(!sdkBuildStartedRef.current){addLog("Build cancellation requested; the current save will finish, then the SDK will not start.");return;}await invoke("cancel_sdk_command",{projectDir:ownedProject});addLog("Stopping SDK process tree...");}catch(error){toast(String(error),"error");}finally{setIsCancellingBuild(false);}}}>
+            {isCancellingBuild ? "Stopping..." : "Stop build"}
+          </button>}
         </div>
       </div>
 
       {/* Main Area */}
       <div className="flex-1 min-w-0" style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        <nav className="workspace-view-nav" aria-label="Workspace views">
+          <button aria-pressed={activeView === "learning"} onClick={() => setActiveView("learning")}>ห้องเรียน AI</button>
+          <button aria-pressed={activeView === "editor"} onClick={() => setActiveView("editor")}>เขียนโปรแกรม</button>
+        </nav>
+        <div className="workspace-learning-container" hidden={activeView !== "learning"}>
+          <LearningWorkspace onOpenEditor={() => setActiveView("editor")} onOpenCoder={(prompt) => {
+            if (prompt?.trim()) setChatDraftRequest({ id: ++chatDraftSequence.current, text: prompt });
+            setActiveView("editor"); setShowAiPanel(true); localStorage.setItem("vibe-ai-panel", "true");
+          }}/>
+        </div>
 
         {/* ── Wiki View ──────────────────────────────────────────────── */}
         {activeView === "wiki" && (
@@ -1667,7 +1769,7 @@ function App({
         )}
 
         {/* ── Editor + Terminal (hidden when Wiki is active) ─────────── */}
-        {activeView !== "wiki" && (
+        {activeView === "editor" && (
           <>
         <div className="flex-1 overflow-hidden relative" style={{ backgroundColor: 'var(--bg-main)' }}>
 
@@ -1693,6 +1795,7 @@ function App({
                       )}
                       <span>{file.name}</span>
                       <button
+                        aria-label={`Close ${file.name}`}
                         onClick={(e) => closeFile(file.path, e)}
                         className="hover:text-red-400 transition-colors p-0.5 rounded-sm ml-1"
                       >
@@ -1824,16 +1927,28 @@ function App({
             </div>
 
             {activeFile ? (
+              <>
+              {!isLearnerEditablePath(projectDir, activeFile.path) && (
+                <div className="px-3 py-1 text-xs" role="status" style={{ backgroundColor: 'var(--bg-hover)', color: 'var(--text-secondary)' }}>
+                  Supporting file · Read only
+                </div>
+              )}
               <CodeEditor
                 key={activeFile.path}
+                projectDir={projectDir}
+                sourceBuffers={openFiles.filter(file=>/\.[ch]$/i.test(file.path)).map(file=>({path:file.path,text:file.content}))}
+                onNavigateSource={(path,line,column)=>{void handleFileClick(path).then(()=>setGotoLineRequest({path,line,column,token:Date.now()}));}}
                 value={activeFile.content}
                 onChange={handleEditorChange}
                 filePath={activeFile.path}
-                onSave={saveAllFiles}
+                hasUnsavedChanges={activeFile.content !== activeFile.savedContent}
+                onSave={() => { void saveAllFiles().catch(() => {}); }}
+                readOnly={!isLearnerEditablePath(projectDir, activeFile.path)}
                 isDarkMode={darkMode}
                 gotoLineRequest={gotoLineRequest && normPath(gotoLineRequest.path) === normPath(activeFile.path) ? gotoLineRequest : null}
                 buildErrors={buildErrors}
               />
+              </>
             ) : (
               <div className="flex-1 flex items-center justify-center" style={{ backgroundColor: 'var(--bg-editor)' }}>
                 <div className="text-center space-y-3 opacity-40">
@@ -2049,12 +2164,15 @@ function App({
       {/* AI Chat Panel */}
 
       {showAiPanel && (
-        <div className="w-96 relative flex flex-col" style={{ borderLeft: '1px solid var(--border-color)' }}>
+        <div className="w-96 relative flex flex-col" style={{ borderLeft: '1px solid var(--border-color)', display: activeView === "learning" ? 'none' : undefined }}>
           <AiChat
+            hasUnsavedChanges={openFiles.some(file => file.content !== file.savedContent)}
             projectDir={projectDir}
             onInjectCode={(newCode) => updateActiveFileContent(newCode)}
             onApplyToFile={handleApplyToFile}
             sendApiRef={aiChatSendRef}
+            draftRequest={chatDraftRequest}
+            onDraftConsumed={id => setChatDraftRequest(current => current?.id === id ? null : current)}
           />
         </div>
       )}
@@ -2241,12 +2359,12 @@ function App({
           className="fixed z-50 w-48 rounded-md py-1 transform scale-100 origin-top-left flex flex-col text-[13px] font-medium animate-fadein"
           style={{ top: contextMenu.y, left: contextMenu.x, backgroundColor: 'var(--bg-modal)', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-lg)', color: 'var(--text-primary)' }}
         >
-          <button
+          {isLearnerEditablePath(projectDir, contextMenu.path) && <button
             onClick={() => { setInlineAction({ mode: "rename", path: contextMenu.path }); setInlineInputValue(contextMenu.path.split(/[\/\\]/).pop() || ""); setContextMenu(null); }}
             className="w-full text-left px-3 py-1.5 hover:bg-red-600/20 hover:text-red-300 transition-colors flex items-center gap-2"
           >
             <span>📝</span> Rename <span className="ml-auto text-[10px] text-neutral-500 font-sans">เปลี่ยนชื่อ</span>
-          </button>
+          </button>}
           
           {contextMenu.isDir && (
             <>
@@ -2265,14 +2383,14 @@ function App({
             </>
           )}
 
-          <div className="my-1 border-t border-neutral-700/80"></div>
+          {isLearnerEditablePath(projectDir, contextMenu.path) && <div className="my-1 border-t border-neutral-700/80"></div>}
           
-          <button
+          {isLearnerEditablePath(projectDir, contextMenu.path) && <button
             onClick={() => { handleDeleteItem(contextMenu.path, contextMenu.isDir); setContextMenu(null); }}
             className="w-full text-left px-3 py-1.5 hover:bg-red-500/20 text-red-400 hover:text-red-300 transition-colors flex items-center gap-2"
           >
             <span>🗑️</span> Delete <span className="ml-auto text-[10px] text-red-500/80 font-sans">ลบ</span>
-          </button>
+          </button>}
         </div>
       )}
     </div>

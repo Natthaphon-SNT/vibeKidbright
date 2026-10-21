@@ -1,0 +1,321 @@
+{
+  "date": "2026-10-19",
+  "baseline": {
+    "path": "src-tauri/target/verification-diagnosis-start-20261019.json",
+    "sha256": "cb9d00cbd05d190202bfb2e49aef3a14e5529d540666e556019ef01719b3d175",
+    "bytes": 50177
+  },
+  "scope": "Comparison to the 216 recorded workflow sources; pre-existing dirty Git tree is not attributed to this increment. Null before hash means not previously recorded, not necessarily a new file. Current board-guide preview PNGs were refreshed by the browser probe; historical release reports/installers remain preserved.",
+  "ranker_model_lockfiles_corpus_changed": false,
+  "files": [
+    {
+      "path": "docs/ai-engineering/04-code-intelligence.md",
+      "before_sha256": "09ab695aa8f33ba15aa262f36dec99e94603fdbfeb301632350f3dcb10e1c70e",
+      "after_sha256": "3ccc7b7e9c9df9f08ebf464312992dd2fd554b5c29af239f3564cf08a1a4f58f",
+      "comparison": "changed_from_recorded_baseline",
+      "production_embedding_preserved": false
+    },
+    {
+      "path": "docs/ai-engineering/07-implementation-progress.md",
+      "before_sha256": "79d3aee993e452c3ebe2bb85157ce45e01ad0626d73bbaee191212ef199c9ef0",
+      "after_sha256": "4eafc927cb2522b1b6b232de16acff32e23bc55cc640fad604bf56a9b5d8b713",
+      "comparison": "changed_from_recorded_baseline",
+      "production_embedding_preserved": false
+    },
+    {
+      "path": "docs/ai-engineering/08-evaluation.md",
+      "before_sha256": "1ab36b18f677c2928becb8b9ab2f1fa0f4a29f46f4e99d3f1dd820fba1078e4e",
+      "after_sha256": "16ecac44c0605db8e7d8ee8934ecc5ef3be5e4c1e295d3b741571a281d7f70b9",
+      "comparison": "changed_from_recorded_baseline",
+      "production_embedding_preserved": false
+    },
+    {
+      "path": "docs/ai-engineering/09-known-limitations.md",
+      "before_sha256": "0991da9c3a921e574c63dc3e60b025c9e5cb36f065270aa0f8493a7057e8bba2",
+      "after_sha256": "a05f2c3aaa2f8734b53776025e7ff01bfe7b7d7b7517d1d7b5dee50652777948",
+      "comparison": "changed_from_recorded_baseline",
+      "production_embedding_preserved": false
+    },
+    {
+      "path": "docs/ai-engineering/10-block-to-c.md",
+      "before_sha256": "14095f05b86daf21d37b4a65cfe56d45119be9a6027a81d8fac2943cb01df41d",
+      "after_sha256": "3f66ad72c0354ae51c781615e814cdc8ddde4957259d55e8b6f0d87d3f21c623",
+      "comparison": "changed_from_recorded_baseline",
+      "production_embedding_preserved": false
+    },
+    {
+      "path": "docs/ai-engineering/12-dependency-security.md",
+      "before_sha256": "db245595bf6d2e63c6f52d701bcf29ba5d2a31305f1501473531ee2de04f58a4",
+      "after_sha256": "782b5f3dc642bc2195862fd305578d032159bc38fac5809e2fade49cd43df32d",
+      "comparison": "changed_from_recorded_baseline",
+      "production_embedding_preserved": false
+    },
+    {
+      "path": "docs/ai-engineering/13-independent-evaluation.md",
+      "before_sha256": "af4079adb8499d0b7f32e58250ed75d8a5d0f32117d57d1885e8787c30b3ff33",
+      "after_sha256": "2d6729a13e83df8d4f9b43ad217d903729a8617e2d504826cd85b05908b3e67f",
+      "comparison": "changed_from_recorded_baseline",
+      "production_embedding_preserved": false
+    },
+    {
+      "path": "docs/ai-engineering/19-diagnosis-plan.md",
+      "before_sha256": null,
+      "after_sha256": "e1d4daff7e30e72b3dc4065cb73ea9559bffd45cc9750a2ad35251e966550da4",
+      "comparison": "newly_recorded_not_proof_of_creation",
+      "production_embedding_preserved": false
+    },
+    {
+      "path": "docs/ai-engineering/20-diagnosis-and-hardening-report.md",
+      "before_sha256": null,
+      "after_sha256": "f9f8a60f66333d7cec53b58c68d3369a4c7f75fa69a2a58d190a5e4bad3380de",
+      "comparison": "newly_recorded_not_proof_of_creation",
+      "production_embedding_preserved": false
+    },
+    {
+      "path": "docs/ai-engineering/dependency-security-diagnosis-20261019.json",
+      "before_sha256": null,
+      "after_sha256": "44f036cd5d952af4baed668fddc3fae9510cfc25c29b0c7ad3f158ec9bbe3373",
+      "comparison": "newly_recorded_not_proof_of_creation",
+      "production_embedding_preserved": false
+    },
+    {
+      "path": "docs/ai-engineering/development-review-gate-20261019.json",
+      "before_sha256": null,
+      "after_sha256": "295580bf183eae014ea7118a4370b81d6cf301f8f944f85853665f29787f0204",
+      "comparison": "newly_recorded_not_proof_of_creation",
+      "production_embedding_preserved": false
+    },
+    {
+      "path": "docs/ai-engineering/diagnosis-verification-20261019.json",
+      "before_sha256": null,
+      "after_sha256": "7701bcdac593afd8a938dd11b78f4ebaace26b9e340d8cd9d842b7ce39092bef",
+      "comparison": "newly_recorded_not_proof_of_creation",
+      "production_embedding_preserved": false
+    },
+    {
+      "path": "docs/ai-engineering/firmware-diagnosis-20261019.json",
+      "before_sha256": null,
+      "after_sha256": "c10ebc23975ba19da93a9798ba42b5a4f474f5d2dceb8a4d56c4c585fec4b22a",
+      "comparison": "newly_recorded_not_proof_of_creation",
+      "production_embedding_preserved": false
+    },
+    {
+      "path": "docs/ai-engineering/model-availability-diagnosis-20261019.json",
+      "before_sha256": null,
+      "after_sha256": "38bbc66706ec65cbdec53404815ec46839e8129c09174e9f0ea8122ba286f5a3",
+      "comparison": "newly_recorded_not_proof_of_creation",
+      "production_embedding_preserved": false
+    },
+    {
+      "path": "docs/ai-engineering/production-diagnosis-ui-20261019.json",
+      "before_sha256": null,
+      "after_sha256": "3df663993b368d10ed25de1dd2c2afbb575ab88ce28437baecf0a082fd2de9be",
+      "comparison": "newly_recorded_not_proof_of_creation",
+      "production_embedding_preserved": false
+    },
+    {
+      "path": "docs/ai-engineering/release-preservation-diagnosis-20261019.json",
+      "before_sha256": null,
+      "after_sha256": "aca24bdcc65c8740d7d5f59a0fcd5574494e177e981de4dc4d47cb9af58c332a",
+      "comparison": "newly_recorded_not_proof_of_creation",
+      "production_embedding_preserved": false
+    },
+    {
+      "path": "docs/ai-engineering/retrieval-development-review-20261019.json",
+      "before_sha256": null,
+      "after_sha256": "7b149e399b143f2b7a552d4a09f46162478c820a4f05ae7879bb765ad1844a36",
+      "comparison": "newly_recorded_not_proof_of_creation",
+      "production_embedding_preserved": false
+    },
+    {
+      "path": "docs/ai-engineering/retrieval-diagnosis-20261019.json",
+      "before_sha256": null,
+      "after_sha256": "05f8897613ff6ae43356f40522b618a7a4bdbf7af4fb7201d400f690aca4f865",
+      "comparison": "newly_recorded_not_proof_of_creation",
+      "production_embedding_preserved": false
+    },
+    {
+      "path": "docs/ai-engineering/retrieval-fixed-measurement-20261019.json",
+      "before_sha256": null,
+      "after_sha256": "f88a7da5bb63feb4d62c50939afe72b8ec1ee4e26422015e9afea783b12beda8",
+      "comparison": "newly_recorded_not_proof_of_creation",
+      "production_embedding_preserved": false
+    },
+    {
+      "path": "docs/ai-engineering/retrieval-output-safety-20261019.json",
+      "before_sha256": null,
+      "after_sha256": "f9bfc7e6ed7f7a0ac7a61f235a46e72aeabd74753ec49c6abc0751b3c0b3bf52",
+      "comparison": "newly_recorded_not_proof_of_creation",
+      "production_embedding_preserved": false
+    },
+    {
+      "path": "docs/ai-engineering/semantic-hardening-20261019.json",
+      "before_sha256": null,
+      "after_sha256": "50d41e014e434df2acbe9225a82cdc074c2c2a80dac4d18f186a552a9570a9fb",
+      "comparison": "newly_recorded_not_proof_of_creation",
+      "production_embedding_preserved": false
+    },
+    {
+      "path": "docs/previews/board-guide-compact-dark.png",
+      "before_sha256": "0c98ea5459a9674d37c1752da295e23119e128abf176ad0dab9994529450c035",
+      "after_sha256": "64d8020cd4627789d235f3fc5b3715c06314b2d1139f95b9de7376770eb7eca3",
+      "comparison": "changed_from_recorded_baseline",
+      "production_embedding_preserved": false
+    },
+    {
+      "path": "docs/previews/board-guide-en-mai.png",
+      "before_sha256": "e4e7772552bfbbd5e1cd00849718e9cbbb0aad702c478f6ef6fd86a2c46c669f",
+      "after_sha256": "345112fc2f24720ab2d7b303aeafa0ec818b904164c97ae1e804ee84dcdbbc4e",
+      "comparison": "changed_from_recorded_baseline",
+      "production_embedding_preserved": false
+    },
+    {
+      "path": "docs/previews/board-guide-th-plus.png",
+      "before_sha256": "33d1947dfcda51893cc142f4fd189ae581cab79210b6f898e6637b442854c767",
+      "after_sha256": "7e8e5c5d00274b119c9fae14db2813cbb83b58c0774b2ad9c51f8a62389943ba",
+      "comparison": "changed_from_recorded_baseline",
+      "production_embedding_preserved": false
+    },
+    {
+      "path": "docs/research/rule-documents-2026-10-16.json",
+      "before_sha256": "bbe0ae9800a419bdf76611cc66cd677b354f0a26e8b453bc11e6428878b23d8c",
+      "after_sha256": "4d4727592c7c3aad43f33c8705442da7888c353f9f625b82e778723b3ee814ea",
+      "comparison": "changed_from_recorded_baseline",
+      "production_embedding_preserved": false
+    },
+    {
+      "path": "resources/embedding/LICENSE.txt",
+      "before_sha256": null,
+      "after_sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "comparison": "newly_recorded_not_proof_of_creation",
+      "production_embedding_preserved": true
+    },
+    {
+      "path": "resources/embedding/UPSTREAM.txt",
+      "before_sha256": null,
+      "after_sha256": "2c47a70b94fe29e24841acf0e177949f1c9aa543e450d43af7e872ea81e43501",
+      "comparison": "newly_recorded_not_proof_of_creation",
+      "production_embedding_preserved": true
+    },
+    {
+      "path": "resources/embedding/manifest.json",
+      "before_sha256": null,
+      "after_sha256": "6e2c396405d9b56abefe09dfe375bc8396b7df95ddb13df5faf726ed0dfbadc4",
+      "comparison": "newly_recorded_not_proof_of_creation",
+      "production_embedding_preserved": true
+    },
+    {
+      "path": "resources/embedding/model-config.json",
+      "before_sha256": null,
+      "after_sha256": "1b4d8e2a3988377ed8b519a31d8d31025a25f1c5f8606998e8014111438efcd7",
+      "comparison": "newly_recorded_not_proof_of_creation",
+      "production_embedding_preserved": true
+    },
+    {
+      "path": "resources/embedding/model.onnx",
+      "before_sha256": null,
+      "after_sha256": "bbd7b466f6d58e646fdc2bd5fd67b2f5e93c0b687011bd4548c420f7bd46f0c5",
+      "comparison": "newly_recorded_not_proof_of_creation",
+      "production_embedding_preserved": true
+    },
+    {
+      "path": "resources/embedding/special_tokens_map.json",
+      "before_sha256": null,
+      "after_sha256": "5d5b662e421ea9fac075174bb0688ee0d9431699900b90662acd44b2a350503a",
+      "comparison": "newly_recorded_not_proof_of_creation",
+      "production_embedding_preserved": true
+    },
+    {
+      "path": "resources/embedding/tokenizer.json",
+      "before_sha256": null,
+      "after_sha256": "851ca67100d372ca3ae031a6abd168f53489eebfd7d89523f35c5c9b4d372c3c",
+      "comparison": "newly_recorded_not_proof_of_creation",
+      "production_embedding_preserved": true
+    },
+    {
+      "path": "resources/embedding/tokenizer_config.json",
+      "before_sha256": null,
+      "after_sha256": "abda01c8c14c5151ae498aceb30db406d6b91242c394fd88d3b6fd5a63a101e6",
+      "comparison": "newly_recorded_not_proof_of_creation",
+      "production_embedding_preserved": true
+    },
+    {
+      "path": "scripts/audit-rust-dependencies.py",
+      "before_sha256": "a56cd7a47b603fab8582402e8fcbf1552e068fc9ddd66e77bda390855105ed06",
+      "after_sha256": "03ff8635cfb04a5778c407409a42be58f92243c7261b6270e7aebc03bb163a9b",
+      "comparison": "changed_from_recorded_baseline",
+      "production_embedding_preserved": false
+    },
+    {
+      "path": "scripts/build-kidbright-examples.py",
+      "before_sha256": "4429c78448b6b2e9f0621674306abb69cfb466a0903802d8c6234aa7aacdbed8",
+      "after_sha256": "70bed14dd0ed11c793c9f81770a8ed98091b2c94ddebd4a2ff7bc182cca15a5c",
+      "comparison": "changed_from_recorded_baseline",
+      "production_embedding_preserved": false
+    },
+    {
+      "path": "scripts/diagnose-retrieval.py",
+      "before_sha256": null,
+      "after_sha256": "3f314a5b02ac0fa98694ec742dceb13b3528bb03a54a14fa190f8b2fb6482255",
+      "comparison": "newly_recorded_not_proof_of_creation",
+      "production_embedding_preserved": false
+    },
+    {
+      "path": "scripts/evaluate-retrieval.py",
+      "before_sha256": "2f7830b34e98cf8eda7c0fb487d59e7fa0a7b75d0f70281fa1a0f5c52cb0958b",
+      "after_sha256": "42e6d9630d1175bc7900b1652051e09c3cd7e9bb0b398b50e1785af2081dc7cf",
+      "comparison": "changed_from_recorded_baseline",
+      "production_embedding_preserved": false
+    },
+    {
+      "path": "scripts/probe-desktop-semantic.mjs",
+      "before_sha256": "ee8e3320a914e02a251b990a380ce1aeeef3bbad8d8f01fffeb227af4b391892",
+      "after_sha256": "7e77b85f42ebd023dfc362f55df766b2a652f43faf8eacf2ad120d7bb3590a1b",
+      "comparison": "changed_from_recorded_baseline",
+      "production_embedding_preserved": false
+    },
+    {
+      "path": "scripts/review-retrieval.py",
+      "before_sha256": "277611da3890adc362f2e8e7147d481d93d7c32bc162fe7464a3361ac6cd5577",
+      "after_sha256": "bfb8111558de500d0434dac8f28a3c5c6b70a19859e488841e5bcf5b610f8fdd",
+      "comparison": "changed_from_recorded_baseline",
+      "production_embedding_preserved": false
+    },
+    {
+      "path": "scripts/tests/test_retrieval_diagnosis.py",
+      "before_sha256": null,
+      "after_sha256": "def914d2870aedf25a893e4f72bafa98b1ccd523cc1f77a404a7ac2ccd1085ec",
+      "comparison": "newly_recorded_not_proof_of_creation",
+      "production_embedding_preserved": false
+    },
+    {
+      "path": "scripts/tests/test_retrieval_review.py",
+      "before_sha256": "f0f873f94685efbc736eb28254c306f6edf98293c809c2f8f333a800282c90d1",
+      "after_sha256": "04dd98a655667b5ed3e6f5c4a15af4984a9986d3b4c306c481e6f3d0f4c3be51",
+      "comparison": "changed_from_recorded_baseline",
+      "production_embedding_preserved": false
+    },
+    {
+      "path": "scripts/tests/test_retrieval_runner.py",
+      "before_sha256": null,
+      "after_sha256": "35d4ad0a7c5801a5ec0eb65032cd07ead35f905ba8433079d9d61f25e0e8f047",
+      "comparison": "newly_recorded_not_proof_of_creation",
+      "production_embedding_preserved": false
+    },
+    {
+      "path": "src-tauri/examples/knowledge_eval.rs",
+      "before_sha256": "0a90cc6d15f8aa556f18df05a061e6ecd42e9c42c31d995e9544e9d5d01b2cb1",
+      "after_sha256": "2397cd061ee30afe065711796d7ad14926cf6a5aae98bc7df7eb9c26267acbac",
+      "comparison": "changed_from_recorded_baseline",
+      "production_embedding_preserved": false
+    },
+    {
+      "path": "src-tauri/src/intelligence/block_to_c.rs",
+      "before_sha256": "927bf9f89a491fd1f1c0dc9fd457a579d89484d97208529651b3ad1f6620ca77",
+      "after_sha256": "49f92ef8f75244e0d6eccf1ad0f921772019040858fb56e520c7ebe544027d9c",
+      "comparison": "changed_from_recorded_baseline",
+      "production_embedding_preserved": false
+    }
+  ],
+  "verification_json_excluded_to_avoid_self_reference": true
+}

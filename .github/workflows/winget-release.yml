@@ -3,19 +3,27 @@ name: Submit to winget on Release
 on:
   release:
     types: [published]
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Existing published release tag to submit (for example v3.7.3)'
+        required: true
+        type: string
+
+permissions:
+  contents: read
 
 jobs:
   winget:
+    if: github.event_name == 'workflow_dispatch' || (!github.event.release.prerelease && !github.event.release.draft)
     runs-on: windows-latest
     steps:
-      # ── Verify WINGET_TOKEN exists ──────────────────────────────────────────
-      - name: Check WINGET_TOKEN secret
-        run: |
-          if (-not "${{ secrets.WINGET_TOKEN }}") {
-            Write-Error "WINGET_TOKEN secret is not set. Go to Settings → Secrets and add a PAT with public_repo scope on your winget-pkgs fork."
-            exit 1
-          }
-          Write-Host "WINGET_TOKEN is configured ✓"
+      # Validate the separate PAT before fork synchronization.
+      - uses: actions/checkout@v4
+      - name: Validate WINGET_TOKEN scopes
+        env:
+          GH_TOKEN: ${{ secrets.WINGET_TOKEN }}
+        run: ./scripts/check-winget-token.ps1
         shell: pwsh
 
       # ── Submit to winget-pkgs via vedantmgoyal9/winget-releaser ────────────
@@ -27,7 +35,7 @@ jobs:
       #
       # Prerequisites (one-time setup):
       #   - Fork https://github.com/microsoft/winget-pkgs to your own GitHub account
-      #   - Create a PAT with "public_repo" scope on that fork account
+      #   - Create a classic PAT with public_repo + workflow for fork sync
       #   - Add the PAT as repository secret: Settings → Secrets → WINGET_TOKEN
       #   - The first submission must be manually approved by the winget team
       - name: Submit to winget
@@ -35,5 +43,6 @@ jobs:
         with:
           identifier: Natthaphon-SNT.vibeKidbright
           token: ${{ secrets.WINGET_TOKEN }}
-          # Release assets matching pattern (auto-detects .exe and .msi)
-          installers-regex: '\.exe$'
+          release-tag: ${{ inputs.release_tag || github.event.release.tag_name }}
+          # Match the Windows x64 NSIS installer, excluding portable executables.
+          installers-regex: '(?i)_x64-setup\.exe$'

@@ -25,6 +25,11 @@ pnpm-debug.log*
 # Tauri / Rust build output
 src-tauri/target/
 
+# Prepared build assets; shipped in the installer, never downloaded by users.
+resources/embedding/model.onnx
+resources/runtime/windows/*.dll
+resources/runtime/windows/manifest.json
+
 # ESP-IDF local toolchain/cache
 resources/.espressif/
 
@@ -33,6 +38,8 @@ resources/.espressif/
 *.temp
 *.swp
 *.swo
+__pycache__/
+*.py[cod]
 
 # Credentials and App Data
 config.json

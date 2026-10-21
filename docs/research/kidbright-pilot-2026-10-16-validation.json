@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "validation_date": "2026-10-16",
+  "scope": "Two deterministic ESP-IDF recipes; no physical board or live AI provider run",
+  "software_checks": [
+    {
+      "command": "npm run test:compat",
+      "status": "passed",
+      "checks": 122,
+      "compiler": "MSVC /W4 /WX /std:c11"
+    },
+    {
+      "command": "cargo test --manifest-path src-tauri/Cargo.toml --lib --offline",
+      "status": "passed",
+      "tests": 79
+    },
+    {
+      "command": "npm test",
+      "status": "passed",
+      "tests": 99,
+      "files": 8
+    },
+    {
+      "command": "npm run build:release",
+      "status": "passed"
+    }
+  ],
+  "sdk": {
+    "version": "5.5.4",
+    "version_source": "tools/cmake/version.cmake",
+    "version_source_sha256": "ce4b5269c971811c1ace487b053eea4ad1ef1f86e52f4bae1b6e967970643fd2",
+    "target": "esp32"
+  },
+  "reference_core": [
+    {
+      "path": "knowledge_base/compatibility/kb_core.c",
+      "bytes": 4512,
+      "sha256": "05359f6f1dc8a402a4420bc9549230cb20a04900c2b8544a5143fe34c5409c89"
+    },
+    {
+      "path": "knowledge_base/compatibility/kb_core.h",
+      "bytes": 1584,
+      "sha256": "752afe78294d71ecd68cb3054f572a15a769f240fd124f1d49bc844aa60d8398"
+    }
+  ],
+  "firmware_builds": [
+    {
+      "example": "button_buzzer",
+      "board_profile": "kidbright32_v13",
+      "exit_code": 0,
+      "log": "src-tauri/target/kidbright-pilot-1792105697774/button_buzzer-build.log",
+      "flashed": false,
+      "sdk_version": "5.5.4",
+      "target": "esp32",
+      "firmware": {
+        "path": "src-tauri/target/kidbright-pilot-1792105697774/button_buzzer/build/kidbright_reference.bin",
+        "bytes": 176944,
+        "sha256": "99aa4e017f1439a32424567826b39c11404738968b011f17924dcd4534fd5579"
+      },
+      "main_source": {
+        "path": "src-tauri/target/kidbright-pilot-1792105697774/button_buzzer/main/main.c",
+        "bytes": 1639,
+        "sha256": "9ee6db8976f6996218d7e881be1504a273e80dc4d80ba077a9a3a89d03939c2b"
+      },
+      "sources_match_reference": true
+    },
+    {
+      "example": "temperature_serial",
+      "board_profile": "kidbright32_rev31",
+      "exit_code": 0,
+      "log": "src-tauri/target/kidbright-pilot-1792105697774/temperature_serial-build.log",
+      "flashed": false,
+      "sdk_version": "5.5.4",
+      "target": "esp32",
+      "firmware": {
+        "path": "src-tauri/target/kidbright-pilot-1792105697774/temperature_serial/build/kidbright_reference.bin",
+        "bytes": 183600,
+        "sha256": "57890a62ae0626aa16150a101de73284708d0c8f6e93ebef31a922b950d47b7f"
+      },
+      "main_source": {
+        "path": "src-tauri/target/kidbright-pilot-1792105697774/temperature_serial/main/main.c",
+        "bytes": 1530,
+        "sha256": "57cfb940c7038b478ebbdccb8466e08888baf0ed266ab58535f0a9596c61b1f3"
+      },
+      "sources_match_reference": true
+    }
+  ],
+  "physical_board_tested": false,
+  "live_ai_provider_tested": false,
+  "original_generator_differential_tested": false,
+  "notes": [
+    "Build output under src-tauri/target is local and Git-ignored.",
+    "Test counts include existing application tests.",
+    "Behavioral repairs and unsupported peripherals are documented in the pilot guide."
+  ]
+}

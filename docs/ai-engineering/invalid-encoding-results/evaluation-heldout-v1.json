@@ -1,0 +1,587 @@
+[
+  {
+    "id": "heldout-delay-en",
+    "query": "Convert a fractional delay in seconds to validated milliseconds",
+    "language": "en",
+    "relevant_files": [
+      "compatibility/kb_core.c",
+      "compatibility/kb_core.h"
+    ]
+  },
+  {
+    "id": "heldout-delay-th",
+    "query": "???????????????????????????????????????????????????????????????????????",
+    "language": "th",
+    "relevant_files": [
+      "compatibility/kb_core.c",
+      "compatibility/kb_core.h"
+    ]
+  },
+  {
+    "id": "heldout-delay-mixed",
+    "query": "???? delay ?????????? milliseconds ????????????",
+    "language": "mixed",
+    "relevant_files": [
+      "compatibility/kb_core.c",
+      "compatibility/kb_core.h"
+    ]
+  },
+  {
+    "id": "heldout-beat-en",
+    "query": "Calculate how long a musical beat lasts from the tempo",
+    "language": "en",
+    "relevant_files": [
+      "compatibility/kb_basic.c",
+      "compatibility/kb_basic.h"
+    ]
+  },
+  {
+    "id": "heldout-beat-th",
+    "query": "???????????????????????????????????????????????????",
+    "language": "th",
+    "relevant_files": [
+      "compatibility/kb_basic.c",
+      "compatibility/kb_basic.h"
+    ]
+  },
+  {
+    "id": "heldout-beat-mixed",
+    "query": "????? duration ?????????? BPM ??? beats",
+    "language": "mixed",
+    "relevant_files": [
+      "compatibility/kb_basic.c",
+      "compatibility/kb_basic.h"
+    ]
+  },
+  {
+    "id": "heldout-frame-en",
+    "query": "Pack a sixteen by eight pixel frame for the LED display controller",
+    "language": "en",
+    "relevant_files": [
+      "compatibility/kb_basic.c",
+      "compatibility/kb_basic.h"
+    ]
+  },
+  {
+    "id": "heldout-frame-th",
+    "query": "??????????????????????????????????????????????????????????????",
+    "language": "th",
+    "relevant_files": [
+      "compatibility/kb_basic.c",
+      "compatibility/kb_basic.h"
+    ]
+  },
+  {
+    "id": "heldout-frame-mixed",
+    "query": "pack ???? LED 16x8 ????? HT16K33",
+    "language": "mixed",
+    "relevant_files": [
+      "compatibility/kb_basic.c",
+      "compatibility/kb_basic.h"
+    ]
+  },
+  {
+    "id": "heldout-button-en",
+    "query": "Play a short tone once per button press and wait until release",
+    "language": "en",
+    "relevant_files": [
+      "compatibility/button_buzzer.c"
+    ]
+  },
+  {
+    "id": "heldout-button-th",
+    "query": "?????????????????????????????????????????????????????",
+    "language": "th",
+    "relevant_files": [
+      "compatibility/button_buzzer.c"
+    ]
+  },
+  {
+    "id": "heldout-button-mixed",
+    "query": "?? S1 ???? beep ?????????? ?????? release",
+    "language": "mixed",
+    "relevant_files": [
+      "compatibility/button_buzzer.c"
+    ]
+  },
+  {
+    "id": "heldout-temperature-en",
+    "query": "Read a signed digital temperature over the sensor bus",
+    "language": "en",
+    "relevant_files": [
+      "compatibility/temperature_serial.c",
+      "compatibility/kb_core.c"
+    ]
+  },
+  {
+    "id": "heldout-temperature-th",
+    "query": "????????????????????????????????????????????????????",
+    "language": "th",
+    "relevant_files": [
+      "compatibility/temperature_serial.c",
+      "compatibility/kb_core.c"
+    ]
+  },
+  {
+    "id": "heldout-temperature-mixed",
+    "query": "???? temperature ???????? LM73 ???? I2C",
+    "language": "mixed",
+    "relevant_files": [
+      "compatibility/temperature_serial.c",
+      "compatibility/kb_core.c"
+    ]
+  },
+  {
+    "id": "heldout-pid-en",
+    "query": "Maintain proportional integral derivative state with elapsed time",
+    "language": "en",
+    "relevant_files": [
+      "compatibility/kb_core.c",
+      "compatibility/kb_core.h"
+    ]
+  },
+  {
+    "id": "heldout-pid-th",
+    "query": "???????????????????????????????????????????????????????????",
+    "language": "th",
+    "relevant_files": [
+      "compatibility/kb_core.c",
+      "compatibility/kb_core.h"
+    ]
+  },
+  {
+    "id": "heldout-pid-mixed",
+    "query": "????????? PID ???????? integral ??? previous error",
+    "language": "mixed",
+    "relevant_files": [
+      "compatibility/kb_core.c",
+      "compatibility/kb_core.h"
+    ]
+  },
+  {
+    "id": "heldout-average-en",
+    "query": "Smooth measurements using a fixed length sliding average",
+    "language": "en",
+    "relevant_files": [
+      "compatibility/kb_core.c",
+      "compatibility/kb_core.h"
+    ]
+  },
+  {
+    "id": "heldout-average-th",
+    "query": "??????????????????????????????????????????????????",
+    "language": "th",
+    "relevant_files": [
+      "compatibility/kb_core.c",
+      "compatibility/kb_core.h"
+    ]
+  },
+  {
+    "id": "heldout-average-mixed",
+    "query": "?????????????? moving average ??? window",
+    "language": "mixed",
+    "relevant_files": [
+      "compatibility/kb_core.c",
+      "compatibility/kb_core.h"
+    ]
+  },
+  {
+    "id": "heldout-joystick-en",
+    "query": "Calibrate a joystick midpoint and map its raw input range",
+    "language": "en",
+    "relevant_files": [
+      "compatibility/kb_core.c",
+      "compatibility/kb_core.h"
+    ]
+  },
+  {
+    "id": "heldout-joystick-th",
+    "query": "??????????????????????????????????????????????",
+    "language": "th",
+    "relevant_files": [
+      "compatibility/kb_core.c",
+      "compatibility/kb_core.h"
+    ]
+  },
+  {
+    "id": "heldout-joystick-mixed",
+    "query": "calibrate joystick midpoint ???? map ??? raw",
+    "language": "mixed",
+    "relevant_files": [
+      "compatibility/kb_core.c",
+      "compatibility/kb_core.h"
+    ]
+  },
+  {
+    "id": "heldout-ascii-en",
+    "query": "Encode and decode numeric wireless payloads as text rather than binary floats",
+    "language": "en",
+    "relevant_files": [
+      "compatibility/kb_core.c",
+      "compatibility/kb_core.h"
+    ]
+  },
+  {
+    "id": "heldout-ascii-th",
+    "query": "????????????????????????????????????????????????????????????????",
+    "language": "th",
+    "relevant_files": [
+      "compatibility/kb_core.c",
+      "compatibility/kb_core.h"
+    ]
+  },
+  {
+    "id": "heldout-ascii-mixed",
+    "query": "??? ESP-NOW payload ??? ASCII ?????? ?????? binary float",
+    "language": "mixed",
+    "relevant_files": [
+      "compatibility/kb_core.c",
+      "compatibility/kb_core.h"
+    ]
+  },
+  {
+    "id": "heldout-iaip-en",
+    "query": "What differs between the pink board and the acceleration equipped board",
+    "language": "en",
+    "relevant_files": [
+      "inex_ia_ip.md"
+    ]
+  },
+  {
+    "id": "heldout-iaip-th",
+    "query": "??????????????????????????????????????????????????????",
+    "language": "th",
+    "relevant_files": [
+      "inex_ia_ip.md"
+    ]
+  },
+  {
+    "id": "heldout-iaip-mixed",
+    "query": "????? KidBright32iP ??? iA ???????????? accelerometer",
+    "language": "mixed",
+    "relevant_files": [
+      "inex_ia_ip.md"
+    ]
+  },
+  {
+    "id": "heldout-pins-en",
+    "query": "Which pins are assigned to external digital input and output connectors",
+    "language": "en",
+    "relevant_files": [
+      "inex_ia_ip.md"
+    ]
+  },
+  {
+    "id": "heldout-pins-th",
+    "query": "?????????????????????????????????????????????",
+    "language": "th",
+    "relevant_files": [
+      "inex_ia_ip.md"
+    ]
+  },
+  {
+    "id": "heldout-pins-mixed",
+    "query": "IN1 IN4 OUT1 OUT2 ??? GPIO ???",
+    "language": "mixed",
+    "relevant_files": [
+      "inex_ia_ip.md"
+    ]
+  },
+  {
+    "id": "heldout-mc3479-en",
+    "query": "Find an example driver for the three axis acceleration sensor on the newer board",
+    "language": "en",
+    "relevant_files": [
+      "sensor_examples/accel_mc3479.c"
+    ]
+  },
+  {
+    "id": "heldout-mc3479-th",
+    "query": "???????????????????????????????????????????????????????",
+    "language": "th",
+    "relevant_files": [
+      "sensor_examples/accel_mc3479.c"
+    ]
+  },
+  {
+    "id": "heldout-mc3479-mixed",
+    "query": "???? acceleration ???????? MC3479 ???????? driver",
+    "language": "mixed",
+    "relevant_files": [
+      "sensor_examples/accel_mc3479.c"
+    ]
+  },
+  {
+    "id": "heldout-kxtj3-en",
+    "query": "Read axes from the older acceleration sensor using its registers",
+    "language": "en",
+    "relevant_files": [
+      "sensor_examples/accel_kxtj3.c"
+    ]
+  },
+  {
+    "id": "heldout-kxtj3-th",
+    "query": "??????????????????????????????????????????????????",
+    "language": "th",
+    "relevant_files": [
+      "sensor_examples/accel_kxtj3.c"
+    ]
+  },
+  {
+    "id": "heldout-kxtj3-mixed",
+    "query": "?????????? KXTJ3 ???? register I2C",
+    "language": "mixed",
+    "relevant_files": [
+      "sensor_examples/accel_kxtj3.c"
+    ]
+  },
+  {
+    "id": "heldout-external-adc-en",
+    "query": "Measure an external light dependent resistor with the analog converter",
+    "language": "en",
+    "relevant_files": [
+      "sensor_examples/adc_ldr_external.c"
+    ]
+  },
+  {
+    "id": "heldout-external-adc-th",
+    "query": "?????????????????????????????????????????????????",
+    "language": "th",
+    "relevant_files": [
+      "sensor_examples/adc_ldr_external.c"
+    ]
+  },
+  {
+    "id": "heldout-external-adc-mixed",
+    "query": "???? external LDR ???? ADC ??????",
+    "language": "mixed",
+    "relevant_files": [
+      "sensor_examples/adc_ldr_external.c"
+    ]
+  },
+  {
+    "id": "heldout-oled-en",
+    "query": "Connect and initialize a monochrome organic LED display over a two wire bus",
+    "language": "en",
+    "relevant_files": [
+      "oled_ssd1306.md"
+    ]
+  },
+  {
+    "id": "heldout-oled-th",
+    "query": "???????????????????????????????????????????????????????",
+    "language": "th",
+    "relevant_files": [
+      "oled_ssd1306.md"
+    ]
+  },
+  {
+    "id": "heldout-oled-mixed",
+    "query": "????? OLED SSD1306 ???? I2C ???????????????",
+    "language": "mixed",
+    "relevant_files": [
+      "oled_ssd1306.md"
+    ]
+  },
+  {
+    "id": "heldout-balance-en",
+    "query": "Find the firmware example for a self balancing robot",
+    "language": "en",
+    "relevant_files": [
+      "sensor_examples/balanced_robot.c"
+    ]
+  },
+  {
+    "id": "heldout-balance-th",
+    "query": "????????????????????????????????????????????",
+    "language": "th",
+    "relevant_files": [
+      "sensor_examples/balanced_robot.c"
+    ]
+  },
+  {
+    "id": "heldout-balance-mixed",
+    "query": "???????? self balancing robot ??????????",
+    "language": "mixed",
+    "relevant_files": [
+      "sensor_examples/balanced_robot.c"
+    ]
+  },
+  {
+    "id": "heldout-formula-en",
+    "query": "Explain the controller wiring and protocol for the steering vehicle",
+    "language": "en",
+    "relevant_files": [
+      "formula_kid_controller.md"
+    ]
+  },
+  {
+    "id": "heldout-formula-th",
+    "query": "??????????????????????????????????????????????????",
+    "language": "th",
+    "relevant_files": [
+      "formula_kid_controller.md"
+    ]
+  },
+  {
+    "id": "heldout-formula-mixed",
+    "query": "????? Formula Kid ??? protocol ?????????",
+    "language": "mixed",
+    "relevant_files": [
+      "formula_kid_controller.md"
+    ]
+  },
+  {
+    "id": "heldout-minibike-en",
+    "query": "Find the electrical and communication constraints for the miniature motorcycle",
+    "language": "en",
+    "relevant_files": [
+      "minibike.md"
+    ]
+  },
+  {
+    "id": "heldout-minibike-th",
+    "query": "???????????????????????????????????????????????????????????",
+    "language": "th",
+    "relevant_files": [
+      "minibike.md"
+    ]
+  },
+  {
+    "id": "heldout-minibike-mixed",
+    "query": "minibike ???????? hardware ?????????????",
+    "language": "mixed",
+    "relevant_files": [
+      "minibike.md"
+    ]
+  },
+  {
+    "id": "heldout-mai-en",
+    "query": "Does the camera based AI board use the same firmware toolchain as the microcontroller board",
+    "language": "en",
+    "relevant_files": [
+      "kidbright_uai.md"
+    ]
+  },
+  {
+    "id": "heldout-mai-th",
+    "query": "???????????????????????????????????????????????????????????????????????????????????",
+    "language": "th",
+    "relevant_files": [
+      "kidbright_uai.md"
+    ]
+  },
+  {
+    "id": "heldout-mai-mixed",
+    "query": "????? ?AI Linux ??? ESP-IDF ?????? KidBright32 ?????????",
+    "language": "mixed",
+    "relevant_files": [
+      "kidbright_uai.md"
+    ]
+  },
+  {
+    "id": "heldout-schematic-en",
+    "query": "How should a board revision be verified before choosing pin assignments",
+    "language": "en",
+    "relevant_files": [
+      "hardware_schematics_rules.md"
+    ]
+  },
+  {
+    "id": "heldout-schematic-th",
+    "query": "??????????????????????????????????????????????????????",
+    "language": "th",
+    "relevant_files": [
+      "hardware_schematics_rules.md"
+    ]
+  },
+  {
+    "id": "heldout-schematic-mixed",
+    "query": "?????? board revision ??? schematic ????????? pin mapping",
+    "language": "mixed",
+    "relevant_files": [
+      "hardware_schematics_rules.md"
+    ]
+  },
+  {
+    "id": "heldout-symbol-kb_matrix_pixel",
+    "query": "kb_matrix_pixel",
+    "language": "technical",
+    "relevant_files": [
+      "compatibility/kb_basic.c",
+      "compatibility/kb_basic.h"
+    ]
+  },
+  {
+    "id": "heldout-symbol-kb_matrix_shift",
+    "query": "kb_matrix_shift",
+    "language": "technical",
+    "relevant_files": [
+      "compatibility/kb_basic.c",
+      "compatibility/kb_basic.h"
+    ]
+  },
+  {
+    "id": "heldout-symbol-kb_ascii_format",
+    "query": "kb_ascii_format",
+    "language": "technical",
+    "relevant_files": [
+      "compatibility/kb_core.c",
+      "compatibility/kb_core.h"
+    ]
+  },
+  {
+    "id": "heldout-symbol-kb_joystick_init",
+    "query": "kb_joystick_init",
+    "language": "technical",
+    "relevant_files": [
+      "compatibility/kb_core.c",
+      "compatibility/kb_core.h"
+    ]
+  },
+  {
+    "id": "heldout-symbol-kb_delay_ms",
+    "query": "kb_delay_ms",
+    "language": "technical",
+    "relevant_files": [
+      "compatibility/kb_core.c",
+      "compatibility/kb_core.h"
+    ]
+  },
+  {
+    "id": "heldout-symbol-kb_music_duration",
+    "query": "kb_music_duration",
+    "language": "technical",
+    "relevant_files": [
+      "compatibility/kb_basic.c",
+      "compatibility/kb_basic.h"
+    ]
+  },
+  {
+    "id": "heldout-symbol-kb_music_frequency",
+    "query": "kb_music_frequency",
+    "language": "technical",
+    "relevant_files": [
+      "compatibility/kb_basic.c",
+      "compatibility/kb_basic.h"
+    ]
+  },
+  {
+    "id": "heldout-symbol-kb_matrix_pack",
+    "query": "kb_matrix_pack",
+    "language": "technical",
+    "relevant_files": [
+      "compatibility/kb_basic.c",
+      "compatibility/kb_basic.h"
+    ]
+  },
+  {
+    "id": "heldout-symbol-kb_matrix_digit",
+    "query": "kb_matrix_digit",
+    "language": "technical",
+    "relevant_files": [
+      "compatibility/kb_basic.c",
+      "compatibility/kb_basic.h"
+    ]
+  }
+]

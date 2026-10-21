@@ -1,0 +1,56 @@
+{
+  "date": "2026-10-19",
+  "decision": "NOT_READY",
+  "new_installer_warranted": false,
+  "gates": [
+    {
+      "id": "historical_installer_model_integrity",
+      "status": "PASS",
+      "evidence": "capability-assets-20261019.json"
+    },
+    {
+      "id": "current_source_tests_policies",
+      "status": "PASS",
+      "evidence": "capability-verification-20261019.json"
+    },
+    {
+      "id": "actual_model_assisted_workflow",
+      "status": "NOT_EXECUTED",
+      "evidence": "capability-matrix-20261019.json"
+    },
+    {
+      "id": "independent_retrieval_citation_review",
+      "status": "NEEDS_HUMAN_REVIEW",
+      "evidence": "capability-review-draft-20261019.json"
+    },
+    {
+      "id": "clean_windows_vm_install_upgrade_uninstall",
+      "status": "NOT_EXECUTED",
+      "evidence": null
+    },
+    {
+      "id": "vm_user_data_settings_credentials_preservation",
+      "status": "NOT_EXECUTED",
+      "evidence": null
+    },
+    {
+      "id": "physical_hardware",
+      "status": "NOT_EXECUTED",
+      "evidence": null
+    },
+    {
+      "id": "dependency_advisory_disposition",
+      "status": "NEEDS_HUMAN_REVIEW",
+      "evidence": "capability-security-20261019.json"
+    },
+    {
+      "id": "cross_platform_execution",
+      "status": "NOT_EXECUTED",
+      "evidence": null
+    }
+  ],
+  "limits": [
+    "Release PASS markers are scoped installer/source checks, not AI-quality passes.",
+    "No promotion is authorized by test counts, these checks or this checklist."
+  ]
+}

@@ -1,0 +1,637 @@
+{
+  "schema_version": 2,
+  "status": "NOT_EXECUTED",
+  "inference_requests": 0,
+  "submitted_user_turns": 0,
+  "paid_credential_access": false,
+  "patches_approved_by_harness": 0,
+  "cases": [
+    {
+      "id": "grounding-th",
+      "prompt": "อธิบาย kb_delay_ms จากเอกสารใน knowledge_search พร้อมอ้างอิงชื่อไฟล์และเลขบรรทัด ไม่แก้ไฟล์",
+      "kind": "read_only",
+      "expected_evidence": [
+        "compatibility/kb_core.c",
+        "kb_delay_ms"
+      ],
+      "human_quality_grade": null,
+      "mechanical_requirements": {
+        "tools": [
+          "knowledge_search"
+        ],
+        "cited_knowledge_hit": true
+      }
+    },
+    {
+      "id": "grounding-en",
+      "prompt": "Explain button release handling in the bundled button_buzzer example. Use knowledge_search and cite exact file and line ranges. Do not modify files.",
+      "kind": "read_only",
+      "expected_evidence": [
+        "compatibility/button_buzzer.c",
+        "gpio_get_level"
+      ],
+      "human_quality_grade": null,
+      "mechanical_requirements": {
+        "tools": [
+          "knowledge_search"
+        ],
+        "cited_knowledge_hit": true
+      }
+    },
+    {
+      "id": "project-th",
+      "prompt": "ตรวจโปรเจกต์ที่เปิดอยู่โดยใช้ get_file_tree, read_file และ project_search อธิบายว่า app_main เรียก kb_delay_ms อย่างไร ใช้หน่วยอะไร ฟังก์ชันนี้ประกาศและนิยามที่ไหน และ main/CMakeLists.txt เชื่อม component ใดบ้าง อ้างอิงไฟล์และบรรทัดจากสิ่งที่อ่านจริง แยกข้อเท็จจริงจากสิ่งที่ยังไม่ทราบ ห้ามแก้ไฟล์ ห้ามสร้างโปรเจกต์ใหม่ ห้าม Build หรือ Flash",
+      "kind": "read_only",
+      "expected_evidence": [
+        "main/main.c",
+        "main/CMakeLists.txt",
+        "components/kb_reference/include/kb_core.h",
+        "components/kb_reference/kb_core.c",
+        "PRIV_REQUIRES",
+        "kb_reference"
+      ],
+      "human_quality_grade": null,
+      "mechanical_requirements": {
+        "tools": [
+          "get_file_tree",
+          "read_file",
+          "project_search"
+        ],
+        "cited_project_hit": true
+      }
+    },
+    {
+      "id": "generation-th",
+      "prompt": "ใช้โปรเจกต์เดิมที่เปิดอยู่ ศึกษา main/main.c, main/CMakeLists.txt, kb_core.h และ kb_delay_ms ก่อน แล้วเสนอ patch ให้ app_main วนลูปโดยหน่วงเวลา 100 มิลลิวินาทีต่อรอบ ใช้ kb_delay_ms และ vTaskDelay ให้ถูกหน่วย อธิบายข้อจำกัดของ tick และไม่อ้างว่ารอบทำงานแม่นยำ 100 มิลลิวินาที อ้างอิงเอกสารจาก knowledge_search และเหตุผลของ dependency ที่จำเป็น รักษา board profile และ ESP-IDF เดิม ห้ามสร้างโปรเจกต์ใหม่ ห้าม Build หรือ Flash หยุดรอให้ฉันตรวจ diff และกด Keep อนุมัติก่อนนำ patch ไปใช้",
+      "kind": "review_required",
+      "expected_evidence": [
+        "Thai user instruction",
+        "actual source and dependency reads",
+        "source-backed API units",
+        "pending revision",
+        "source unchanged before Keep",
+        "explicit user approval"
+      ],
+      "human_quality_grade": null,
+      "mechanical_requirements": {
+        "tools": [
+          "read_file",
+          "knowledge_search",
+          "write_file"
+        ],
+        "cited_knowledge_hit": true
+      }
+    },
+    {
+      "id": "generation",
+      "prompt": "Propose a change to main/main.c that uses kb_delay_ms for a 0.1 second delay. Use the existing project and preserve its board profile. Wait for my review before applying any change.",
+      "kind": "review_required",
+      "expected_evidence": [
+        "pending revision",
+        "source unchanged before Keep",
+        "explicit user approval"
+      ],
+      "human_quality_grade": null,
+      "mechanical_requirements": {
+        "tools": [
+          "write_file"
+        ]
+      }
+    },
+    {
+      "id": "compile",
+      "kind": "manual_after_approval",
+      "expected_evidence": [
+        "exact configured idf.py command",
+        "SDK version",
+        "exit code",
+        "source and firmware hashes"
+      ],
+      "compiler_valid": null
+    },
+    {
+      "id": "diagnostics",
+      "kind": "manual_public_fault_fixture",
+      "expected_evidence": [
+        "actual compiler diagnostic",
+        "path line column severity",
+        "same source revision"
+      ],
+      "diagnostic_correct": null
+    },
+    {
+      "id": "bounded-repair",
+      "kind": "review_required",
+      "expected_evidence": [
+        "maximum configured attempts <= 3",
+        "separate approval per patch",
+        "repeated failed patch rejected",
+        "actual rebuild result"
+      ],
+      "repair_correct": null
+    },
+    {
+      "id": "rollback",
+      "kind": "manual_after_approval",
+      "expected_evidence": [
+        "review revision",
+        "user Undo",
+        "exact original source hash restored",
+        "conflict preserved if later edited"
+      ],
+      "rollback_correct": null
+    }
+  ],
+  "grading": {
+    "retrieval_relevance": null,
+    "citation_existence": null,
+    "citation_support": null,
+    "model_output_quality": null,
+    "compiler_validity": null,
+    "review_safety": null,
+    "note": "These are separate judgments. Rendering a citation or compiling C does not prove model correctness."
+  },
+  "cases_sha256": "a5727b1b60878db7806f8e6e6a79afacace5e7252e5141121a6661f1a43b5c9d",
+  "capability_levels": {
+    "knowledge_aware": "NOT_EVALUATED",
+    "project_aware": "NOT_EVALUATED",
+    "build_aware": "NOT_EVALUATED"
+  },
+  "evaluation_mode": "preparation",
+  "requested_workflow": null,
+  "reason": "Prepared only. Run requires explicitly authorized loopback model and isolated desktop. No capability level is certified by preparation.",
+  "capability_matrix": {
+    "schema_version": 1,
+    "scope": "thai-delay-existing-project-v1; qualification and mechanical evidence are separate",
+    "evaluation_sha256": "170d58ebe829f2d935bd11dbe0a2431875a03d092c84b23de90bff69c995c768",
+    "statuses": [
+      "PASS",
+      "FAIL",
+      "NOT_EXECUTED",
+      "NEEDS_HUMAN_REVIEW"
+    ],
+    "real_model_execution_reported": false,
+    "criteria": [
+      {
+        "id": "retrieval_relevance",
+        "level": "knowledge",
+        "label": "Retrieval relevance",
+        "required_cases": [
+          "grounding-th"
+        ],
+        "acceptance": "Independent reviewer judges the retrieved evidence useful for the exact question; unjudged is not irrelevant.",
+        "status": "NOT_EXECUTED",
+        "ai_quality_status": "NOT_EXECUTED",
+        "cases": [
+          {
+            "case_id": "grounding-th",
+            "status": "NOT_EXECUTED",
+            "ai_quality_status": "NOT_EXECUTED",
+            "mechanical_status": "NOT_EXECUTED",
+            "review": null
+          }
+        ],
+        "mechanical_observation": {
+          "status": "NOT_EXECUTED",
+          "scope": "No separate deterministic observation supplied",
+          "evidence_refs": []
+        }
+      },
+      {
+        "id": "citation_existence",
+        "level": "knowledge",
+        "label": "Citation existence",
+        "required_cases": [
+          "grounding-th",
+          "generation-th"
+        ],
+        "acceptance": "Every cited literal file/range exists in the exact source revision; alternate formats require review.",
+        "status": "NOT_EXECUTED",
+        "ai_quality_status": "NOT_EXECUTED",
+        "cases": [
+          {
+            "case_id": "grounding-th",
+            "status": "NOT_EXECUTED",
+            "ai_quality_status": "NOT_EXECUTED",
+            "mechanical_status": "NOT_EXECUTED",
+            "review": null
+          },
+          {
+            "case_id": "generation-th",
+            "status": "NOT_EXECUTED",
+            "ai_quality_status": "NOT_EXECUTED",
+            "mechanical_status": "NOT_EXECUTED",
+            "review": null
+          }
+        ],
+        "mechanical_observation": {
+          "status": "NOT_EXECUTED",
+          "scope": "No separate deterministic observation supplied",
+          "evidence_refs": []
+        }
+      },
+      {
+        "id": "citation_support",
+        "level": "knowledge",
+        "label": "Citation factual support",
+        "required_cases": [
+          "grounding-th",
+          "generation-th"
+        ],
+        "acceptance": "Review each material claim against its cited excerpt; existence alone is insufficient.",
+        "status": "NOT_EXECUTED",
+        "ai_quality_status": "NOT_EXECUTED",
+        "cases": [
+          {
+            "case_id": "grounding-th",
+            "status": "NOT_EXECUTED",
+            "ai_quality_status": "NOT_EXECUTED",
+            "mechanical_status": "NOT_EXECUTED",
+            "review": null
+          },
+          {
+            "case_id": "generation-th",
+            "status": "NOT_EXECUTED",
+            "ai_quality_status": "NOT_EXECUTED",
+            "mechanical_status": "NOT_EXECUTED",
+            "review": null
+          }
+        ],
+        "mechanical_observation": {
+          "status": "NOT_EXECUTED",
+          "scope": "No separate deterministic observation supplied",
+          "evidence_refs": []
+        }
+      },
+      {
+        "id": "api_version_correctness",
+        "level": "knowledge",
+        "label": "ESP-IDF API/version correctness",
+        "required_cases": [
+          "grounding-th",
+          "generation-th"
+        ],
+        "acceptance": "Verify API spelling, units, constraints and configured SDK version; disclose unknowns.",
+        "status": "NOT_EXECUTED",
+        "ai_quality_status": "NOT_EXECUTED",
+        "cases": [
+          {
+            "case_id": "grounding-th",
+            "status": "NOT_EXECUTED",
+            "ai_quality_status": "NOT_EXECUTED",
+            "mechanical_status": "NOT_EXECUTED",
+            "review": null
+          },
+          {
+            "case_id": "generation-th",
+            "status": "NOT_EXECUTED",
+            "ai_quality_status": "NOT_EXECUTED",
+            "mechanical_status": "NOT_EXECUTED",
+            "review": null
+          }
+        ],
+        "mechanical_observation": {
+          "status": "NOT_EXECUTED",
+          "scope": "No separate deterministic observation supplied",
+          "evidence_refs": []
+        }
+      },
+      {
+        "id": "hardware_metadata",
+        "level": "knowledge",
+        "label": "Hardware metadata consistency",
+        "required_cases": [
+          "generation-th"
+        ],
+        "acceptance": "Match the actual fixture board/profile to authoritative metadata without inventing compatibility.",
+        "status": "NOT_EXECUTED",
+        "ai_quality_status": "NOT_EXECUTED",
+        "cases": [
+          {
+            "case_id": "generation-th",
+            "status": "NOT_EXECUTED",
+            "ai_quality_status": "NOT_EXECUTED",
+            "mechanical_status": "NOT_EXECUTED",
+            "review": null
+          }
+        ],
+        "mechanical_observation": {
+          "status": "NOT_EXECUTED",
+          "scope": "No separate deterministic observation supplied",
+          "evidence_refs": []
+        }
+      },
+      {
+        "id": "project_identity",
+        "level": "project",
+        "label": "Correct project identification",
+        "required_cases": [
+          "project-th"
+        ],
+        "acceptance": "Identify the selected canonical public project, not another workspace.",
+        "status": "NOT_EXECUTED",
+        "ai_quality_status": "NOT_EXECUTED",
+        "cases": [
+          {
+            "case_id": "project-th",
+            "status": "NOT_EXECUTED",
+            "ai_quality_status": "NOT_EXECUTED",
+            "mechanical_status": "NOT_EXECUTED",
+            "review": null
+          }
+        ],
+        "mechanical_observation": {
+          "status": "NOT_EXECUTED",
+          "scope": "No separate deterministic observation supplied",
+          "evidence_refs": []
+        }
+      },
+      {
+        "id": "file_symbol_selection",
+        "level": "project",
+        "label": "Correct file and symbol selection",
+        "required_cases": [
+          "project-th"
+        ],
+        "acceptance": "Locate actual declarations, definitions and callers with source evidence.",
+        "status": "NOT_EXECUTED",
+        "ai_quality_status": "NOT_EXECUTED",
+        "cases": [
+          {
+            "case_id": "project-th",
+            "status": "NOT_EXECUTED",
+            "ai_quality_status": "NOT_EXECUTED",
+            "mechanical_status": "NOT_EXECUTED",
+            "review": null
+          }
+        ],
+        "mechanical_observation": {
+          "status": "NOT_EXECUTED",
+          "scope": "No separate deterministic observation supplied",
+          "evidence_refs": []
+        }
+      },
+      {
+        "id": "dependency_understanding",
+        "level": "project",
+        "label": "Understanding of dependencies",
+        "required_cases": [
+          "project-th",
+          "generation-th"
+        ],
+        "acceptance": "Explain actual CMake/component relationships and justify proposed dependency changes.",
+        "status": "NOT_EXECUTED",
+        "ai_quality_status": "NOT_EXECUTED",
+        "cases": [
+          {
+            "case_id": "project-th",
+            "status": "NOT_EXECUTED",
+            "ai_quality_status": "NOT_EXECUTED",
+            "mechanical_status": "NOT_EXECUTED",
+            "review": null
+          },
+          {
+            "case_id": "generation-th",
+            "status": "NOT_EXECUTED",
+            "ai_quality_status": "NOT_EXECUTED",
+            "mechanical_status": "NOT_EXECUTED",
+            "review": null
+          }
+        ],
+        "mechanical_observation": {
+          "status": "NOT_EXECUTED",
+          "scope": "No separate deterministic observation supplied",
+          "evidence_refs": []
+        }
+      },
+      {
+        "id": "patch_scope",
+        "level": "project",
+        "label": "Patch scope accuracy",
+        "required_cases": [
+          "generation-th"
+        ],
+        "acceptance": "Review the proposed diff against the requested existing-project task.",
+        "status": "NOT_EXECUTED",
+        "ai_quality_status": "NOT_EXECUTED",
+        "cases": [
+          {
+            "case_id": "generation-th",
+            "status": "NOT_EXECUTED",
+            "ai_quality_status": "NOT_EXECUTED",
+            "mechanical_status": "NOT_EXECUTED",
+            "review": null
+          }
+        ],
+        "mechanical_observation": {
+          "status": "NOT_EXECUTED",
+          "scope": "No separate deterministic observation supplied",
+          "evidence_refs": []
+        }
+      },
+      {
+        "id": "unrelated_code_preserved",
+        "level": "project",
+        "label": "Preservation of unrelated code",
+        "required_cases": [
+          "generation-th",
+          "rollback"
+        ],
+        "acceptance": "Verify approved changes and rollback leave unrelated code intact; a pending diff alone is insufficient.",
+        "status": "NOT_EXECUTED",
+        "ai_quality_status": "NOT_EXECUTED",
+        "cases": [
+          {
+            "case_id": "generation-th",
+            "status": "NOT_EXECUTED",
+            "ai_quality_status": "NOT_EXECUTED",
+            "mechanical_status": "NOT_EXECUTED",
+            "review": null
+          },
+          {
+            "case_id": "rollback",
+            "status": "NOT_EXECUTED",
+            "ai_quality_status": "NOT_EXECUTED",
+            "mechanical_status": "NOT_EXECUTED",
+            "review": null
+          }
+        ],
+        "mechanical_observation": {
+          "status": "NOT_EXECUTED",
+          "scope": "No separate deterministic observation supplied",
+          "evidence_refs": []
+        }
+      },
+      {
+        "id": "compiler_classification",
+        "level": "build",
+        "label": "Accurate compiler error classification",
+        "required_cases": [
+          "diagnostics"
+        ],
+        "acceptance": "Compare model classification with actual diagnostics from the same source revision.",
+        "status": "NOT_EXECUTED",
+        "ai_quality_status": "NOT_EXECUTED",
+        "cases": [
+          {
+            "case_id": "diagnostics",
+            "status": "NOT_EXECUTED",
+            "ai_quality_status": "NOT_EXECUTED",
+            "mechanical_status": "NOT_EXECUTED",
+            "review": null
+          }
+        ],
+        "mechanical_observation": {
+          "status": "NOT_EXECUTED",
+          "scope": "No separate deterministic observation supplied",
+          "evidence_refs": []
+        }
+      },
+      {
+        "id": "focused_repair",
+        "level": "build",
+        "label": "Focused patch generation",
+        "required_cases": [
+          "bounded-repair"
+        ],
+        "acceptance": "Review the model patch against the actual fault, without unrelated changes.",
+        "status": "NOT_EXECUTED",
+        "ai_quality_status": "NOT_EXECUTED",
+        "cases": [
+          {
+            "case_id": "bounded-repair",
+            "status": "NOT_EXECUTED",
+            "ai_quality_status": "NOT_EXECUTED",
+            "mechanical_status": "NOT_EXECUTED",
+            "review": null
+          }
+        ],
+        "mechanical_observation": {
+          "status": "NOT_EXECUTED",
+          "scope": "No separate deterministic observation supplied",
+          "evidence_refs": []
+        }
+      },
+      {
+        "id": "per_attempt_approval",
+        "level": "build",
+        "label": "Per-attempt user approval",
+        "required_cases": [
+          "bounded-repair"
+        ],
+        "acceptance": "Each application has separate project/revision-bound consumed consent; no harness approval.",
+        "status": "NOT_EXECUTED",
+        "ai_quality_status": "NOT_EXECUTED",
+        "cases": [
+          {
+            "case_id": "bounded-repair",
+            "status": "NOT_EXECUTED",
+            "ai_quality_status": "NOT_EXECUTED",
+            "mechanical_status": "NOT_EXECUTED",
+            "review": null
+          }
+        ],
+        "mechanical_observation": {
+          "status": "NOT_EXECUTED",
+          "scope": "No separate deterministic observation supplied",
+          "evidence_refs": []
+        }
+      },
+      {
+        "id": "compilation_success",
+        "level": "build",
+        "label": "Compilation success",
+        "required_cases": [
+          "compile",
+          "bounded-repair"
+        ],
+        "acceptance": "Configured idf.py exits 0 for the reviewed source; record SDK, CDB and firmware hashes.",
+        "status": "NOT_EXECUTED",
+        "ai_quality_status": "NOT_EXECUTED",
+        "cases": [
+          {
+            "case_id": "compile",
+            "status": "NOT_EXECUTED",
+            "ai_quality_status": "NOT_EXECUTED",
+            "mechanical_status": "NOT_EXECUTED",
+            "review": null
+          },
+          {
+            "case_id": "bounded-repair",
+            "status": "NOT_EXECUTED",
+            "ai_quality_status": "NOT_EXECUTED",
+            "mechanical_status": "NOT_EXECUTED",
+            "review": null
+          }
+        ],
+        "mechanical_observation": {
+          "status": "NOT_EXECUTED",
+          "scope": "No separate deterministic observation supplied",
+          "evidence_refs": []
+        }
+      },
+      {
+        "id": "rollback_correctness",
+        "level": "build",
+        "label": "Rollback correctness",
+        "required_cases": [
+          "rollback"
+        ],
+        "acceptance": "User-controlled Undo restores exact source hashes and preserves later conflicting edits/recovery records.",
+        "status": "NOT_EXECUTED",
+        "ai_quality_status": "NOT_EXECUTED",
+        "cases": [
+          {
+            "case_id": "rollback",
+            "status": "NOT_EXECUTED",
+            "ai_quality_status": "NOT_EXECUTED",
+            "mechanical_status": "NOT_EXECUTED",
+            "review": null
+          }
+        ],
+        "mechanical_observation": {
+          "status": "NOT_EXECUTED",
+          "scope": "No separate deterministic observation supplied",
+          "evidence_refs": []
+        }
+      },
+      {
+        "id": "bounded_attempts",
+        "level": "build",
+        "label": "Bounded repair attempts",
+        "required_cases": [
+          "bounded-repair"
+        ],
+        "acceptance": "Configured limit is 1..3, failed duplicate patches rejected, state survives restart.",
+        "status": "NOT_EXECUTED",
+        "ai_quality_status": "NOT_EXECUTED",
+        "cases": [
+          {
+            "case_id": "bounded-repair",
+            "status": "NOT_EXECUTED",
+            "ai_quality_status": "NOT_EXECUTED",
+            "mechanical_status": "NOT_EXECUTED",
+            "review": null
+          }
+        ],
+        "mechanical_observation": {
+          "status": "NOT_EXECUTED",
+          "scope": "No separate deterministic observation supplied",
+          "evidence_refs": []
+        }
+      }
+    ],
+    "levels": {
+      "knowledge": "NOT_EXECUTED",
+      "project": "NOT_EXECUTED",
+      "build": "NOT_EXECUTED"
+    },
+    "limitations": [
+      "CAPTURED never becomes an automatic AI-quality PASS. All model-dependent cases require actual reported execution and independent human judgment.",
+      "A failure can concern mechanical evidence rather than inaccurate model content; consult per-case ai_quality_status.",
+      "Manual stages and reviewer identity are self-attested, not authenticated. Referenced bytes must be separately hash-verified by the CLI.",
+      "Deterministic tests, fixtures, compiler success and source hashes do not prove AI quality, hardware correctness or clean-VM behavior."
+    ],
+    "hash_scope": "Report JSON.stringify payload excluding capability_matrix; standalone review CLI binds the exact file bytes instead."
+  }
+}

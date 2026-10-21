@@ -202,7 +202,8 @@ const defineVibeDarkTheme: BeforeMount = (monaco) => {
 import { useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { toast } from "./Toast";
-import { DiffEditor } from "@monaco-editor/react";
+import DiffReview from "./DiffReview";
+import CIntelligencePanel, {type CBuffer} from "./CIntelligencePanel";
 
 export interface GotoLineRequest {
     path: string;
@@ -212,10 +213,15 @@ export interface GotoLineRequest {
 }
 
 interface CodeEditorProps {
+    projectDir?: string;
+    sourceBuffers?: CBuffer[];
+    onNavigateSource?: (path:string,line:number,column:number)=>void;
     value: string;
     onChange: (value: string) => void;
     filePath: string;
     onSave?: () => void;
+    readOnly?: boolean;
+    hasUnsavedChanges?: boolean;
     isDarkMode?: boolean;
     gotoLineRequest?: GotoLineRequest | null;
     /** Build errors from GCC/CMake — displayed as red markers in the editor */
@@ -223,10 +229,15 @@ interface CodeEditorProps {
 }
 
 export default function CodeEditor({
+    projectDir = "",
+    sourceBuffers = [],
+    onNavigateSource,
     value,
     onChange,
     filePath,
     onSave,
+    readOnly = false,
+    hasUnsavedChanges = false,
     isDarkMode = true,
     gotoLineRequest = null,
     buildErrors = [],
@@ -238,6 +249,11 @@ export default function CodeEditor({
     
     // State to hold pending diff content
     const [pendingContent, setPendingContent] = useState<string | null>(null);
+    // Old code = what is on disk right now (the editor tab may already hold the AI's version).
+    const [originalContent, setOriginalContent] = useState<string | null>(null);
+    const [pendingRevision, setPendingRevision] = useState<string | null>(null);
+    const [reviewBusy, setReviewBusy] = useState(false);
+    const refreshDiffRef = useRef<() => void>(() => {});
 
     // Latest goto request, applied on mount (Monaco loads async) and on change
     const gotoRef = useRef<GotoLineRequest | null>(gotoLineRequest);
@@ -253,9 +269,13 @@ export default function CodeEditor({
 
     // Keep onSave callback fresh without recreating keybinding
     const onSaveRef = useRef(onSave);
+    const readOnlyRef = useRef(readOnly);
     useEffect(() => {
         onSaveRef.current = onSave;
     }, [onSave]);
+    useEffect(() => {
+        readOnlyRef.current = readOnly;
+    }, [readOnly]);
 
     // ── Real-time syntax linting (debounced) ──────────────────────────────
     const applyLintMarkers = useCallback(() => {
@@ -327,19 +347,26 @@ export default function CodeEditor({
 
     // Check for pending diffs when the file changes or when AI proposes one
     useEffect(() => {
+        setPendingContent(null);
+        setOriginalContent(null);
+        setPendingRevision(null);
         if (!filePath) {
             setPendingContent(null);
+            setOriginalContent(null);
             return;
         }
         
         let isMounted = true;
         
+        let request = 0;
         const checkDiff = () => {
-            invoke<string | null>("check_pending_diff", { path: filePath })
-                .then(res => {
-                    if (isMounted) {
-                        setPendingContent(res);
-                    }
+            const current = ++request;
+            invoke<{revision:string; before:string|null; proposed:string; status:string} | null>("check_pending_diff", { path: filePath })
+                .then(async res => {
+                    if (!isMounted || current !== request) return;
+                    setOriginalContent(res ? (res.before ?? "") : null);
+                    setPendingRevision(res?.status === "pending" ? res.revision : null);
+                    setPendingContent(res?.proposed ?? null);
                 })
                 .catch(err => {
                     console.error("Failed to check pending diff:", err);
@@ -347,6 +374,7 @@ export default function CodeEditor({
                     if (isMounted) setPendingContent(null);
                 });
         };
+        refreshDiffRef.current = checkDiff;
         
         checkDiff(); // Initial check
 
@@ -384,29 +412,36 @@ export default function CodeEditor({
 
         return () => { 
             isMounted = false; 
+            refreshDiffRef.current = () => {};
             if (unlisten) unlisten();
         };
     }, [filePath]);
 
     const handleAcceptDiff = async () => {
+        if (!pendingRevision || hasUnsavedChanges || reviewBusy) return;
+        setReviewBusy(true);
         try {
-            await invoke("accept_diff", { path: filePath });
+            await invoke("accept_diff", { path: filePath, expectedRevision: pendingRevision });
             setPendingContent(null);
             // The file-modified event will trigger a reload of the content from disk automatically
         } catch (err) {
             console.error("Failed to accept diff:", err);
-            toast("Failed to apply AI changes. Please try again.", "error");
-        }
+            toast(`Changes were not applied: ${String(err)}`, "error");
+            refreshDiffRef.current();
+        } finally { setReviewBusy(false); }
     };
 
     const handleRejectDiff = async () => {
+        if (!pendingRevision || hasUnsavedChanges || reviewBusy) return;
+        setReviewBusy(true);
         try {
-            await invoke("reject_diff", { path: filePath });
+            await invoke("reject_diff", { path: filePath, expectedRevision: pendingRevision });
             setPendingContent(null);
         } catch (err) {
             console.error("Failed to reject diff:", err);
-            toast("Failed to discard AI changes. Please try again.", "error");
-        }
+            toast(`Changes were not discarded: ${String(err)}`, "error");
+            refreshDiffRef.current();
+        } finally { setReviewBusy(false); }
     };
 
     const handleEditorMount: OnMount = (editor, monaco) => {
@@ -419,7 +454,7 @@ export default function CodeEditor({
             label: "Save File",
             keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS],
             run: () => {
-                onSaveRef.current?.();
+                if (!readOnlyRef.current) onSaveRef.current?.();
             },
         });
 
@@ -433,8 +468,12 @@ export default function CodeEditor({
         // Run initial lint pass immediately after mount
         setTimeout(applyLintMarkers, 100);
 
-        // Focus the editor
-        editor.focus();
+        // Monaco may finish mounting after a prompt handoff. Preserve a composer
+        // or other text field that already owns focus instead of stealing it.
+        const focused = document.activeElement;
+        if (!(focused instanceof HTMLTextAreaElement) && !(focused instanceof HTMLInputElement)) {
+            editor.focus();
+        }
     };
 
     const editorOptions = {
@@ -473,6 +512,10 @@ export default function CodeEditor({
 
     return (
         <div className="relative w-full h-full" style={{ borderTop: '1px solid var(--border-color)' }}>
+            {projectDir && onNavigateSource && /\.[ch]$/i.test(filePath) && pendingContent === null && <CIntelligencePanel
+                projectDir={projectDir} filePath={filePath} buffers={sourceBuffers}
+                getPosition={()=>editorRef.current?.getPosition()??null} onNavigate={onNavigateSource}
+            />}
             {pendingContent !== null && (
                 <div className="absolute top-4 right-8 z-10 flex gap-2 p-2 rounded-lg shadow-xl backdrop-blur-sm" style={{ backgroundColor: 'var(--bg-modal)', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-lg)' }}>
                     <div className="px-3 py-1 text-xs font-bold rounded flex items-center mr-2" style={{ backgroundColor: 'var(--pms-293-pale)', color: 'var(--accent)' }}>
@@ -480,6 +523,7 @@ export default function CodeEditor({
                     </div>
                     <button
                         onClick={handleRejectDiff}
+                        disabled={hasUnsavedChanges || reviewBusy || !pendingRevision}
                         className="px-4 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 rounded-md text-xs font-medium flex items-center gap-1.5 transition-colors shadow-sm"
                         title="Discard AI proposed changes"
                     >
@@ -487,6 +531,7 @@ export default function CodeEditor({
                     </button>
                     <button
                         onClick={handleAcceptDiff}
+                        disabled={hasUnsavedChanges || reviewBusy || !pendingRevision}
                         className="px-4 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/30 rounded-md text-xs font-medium flex items-center gap-1.5 transition-colors shadow-sm"
                         title="Accept AI proposed changes"
                     >
@@ -496,23 +541,10 @@ export default function CodeEditor({
             )}
             
             {pendingContent !== null ? (
-                <DiffEditor
-                    height="100%"
-                    language={language}
-                    original={value}
+                <DiffReview
+                    original={originalContent ?? value}
                     modified={pendingContent}
-                    theme={monacoTheme}
-                    beforeMount={defineVibeDarkTheme}
-                    options={{
-                        ...editorOptions,
-                        readOnly: false,
-                        originalEditable: false,
-                        renderSideBySide: false, // inline: red = removed line, green = added line
-                        enableSplitViewResizing: false,
-                        renderIndicators: true,
-                        ignoreTrimWhitespace: false,
-                        diffWordWrap: "off",
-                    }}
+                    isDarkMode={isDarkMode}
                 />
             ) : (
                 <Editor
@@ -522,9 +554,10 @@ export default function CodeEditor({
                     theme={monacoTheme}
                     beforeMount={defineVibeDarkTheme}
                     onMount={handleEditorMount}
-                    onChange={(val) => onChange(val ?? "")}
+                    onChange={(val) => { if (!readOnly) onChange(val ?? ""); }}
                     options={{
                         ...editorOptions,
+                        readOnly,
                         lineNumbers: "on",
                         glyphMargin: false,
                         folding: true,

@@ -33,6 +33,9 @@ export default defineConfig(async () => ({
 
   // ── Vitest configuration ────────────────────────────────────────────────────
   test: {
+    // Agent/plugin test suites can use other runners (e.g. bun:test).
+    // Only discover this application's browser tests here.
+    include: ["src/**/*.{test,spec}.{ts,tsx}"],
     // Use jsdom to simulate browser DOM APIs
     environment: "jsdom",
     // Import @testing-library/jest-dom matchers (toBeInTheDocument, etc.)

@@ -1,0 +1,47 @@
+{
+  "decision": "enable_fixed_technical_expansion_default",
+  "based_on": "18 disjoint development queries only; frozen rerun results not inspected for this decision",
+  "human_independent": false,
+  "development_queries_overlap_frozen": false,
+  "exact_api_rankings_unchanged": true,
+  "language_recall": {
+    "th": {
+      "before": 0.0,
+      "after": 0.4
+    },
+    "en": {
+      "before": 0.2,
+      "after": 0.6
+    },
+    "mixed": {
+      "before": 0.2,
+      "after": 0.4
+    },
+    "api": {
+      "before": 0.6666666666666666,
+      "after": 0.6666666666666666
+    }
+  },
+  "development_before": {
+    "mrr": 0.07870370370370369,
+    "ndcg_at_5": 0.11453368398026947,
+    "precision_at_5": 0.044444444444444446,
+    "recall_at_5": 0.2222222222222222
+  },
+  "development_after": {
+    "mrr": 0.23148148148148145,
+    "ndcg_at_5": 0.2991706739129232,
+    "precision_at_5": 0.09999999999999999,
+    "recall_at_5": 0.5
+  },
+  "fixed_expansion_weight": 0.35,
+  "no_model_change": true,
+  "protocol_deviation": "One initial API control (kb_matrix_pack) overlapped the frozen query strings. An early frozen baseline process was launched after the overlap check failed, but its results were not inspected or used for the decision. Replaced that control with i2c_master_bus_add_device and reran both development modes before this decision. No expansion vocabulary, weights, qrels or parameters changed in response to frozen results.",
+  "hashes": {
+    "src-tauri/src/intelligence/query_expansion.rs": "d4624a41ae62ac2a6f67c224806244d9c0cb2f7233692023896d035579e0019d",
+    "src-tauri/src/intelligence/retrieval.rs": "cf3b96f951a93b1f2ac261cde4c0852a1ce624bf2fd9d46ff9952d7e43622406",
+    "docs/ai-engineering/evaluation-expansion-dev-v1.json": "97ac80f710385d0998e51ae27c886142db5e4802f8d18b809a42a16bbe336292",
+    "docs/ai-engineering/evaluation-heldout-v1.json": "c75de0d838a5f0e6670c48776c67d3b5c0a98ca755f02ba09c2d548c28b55c43",
+    "docs/ai-engineering/16-integration-evaluation-plan.md": "d41ac88b7015a10f222e0ea4dfa638508bf392afc2c209bb5a7812b3c50ca242"
+  }
+}

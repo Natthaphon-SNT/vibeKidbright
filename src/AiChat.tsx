@@ -2,6 +2,9 @@ import { useState, useEffect, useRef } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { toast } from "./Toast";
+import ProjectCreationReview from "./ProjectCreationReview";
+import CompilerRepairReview from "./CompilerRepairReview";
+import PrivateContextConsent from "./PrivateContextConsent";
 
 interface Message {
     id: string;
@@ -49,18 +52,34 @@ function ApplyButton({ onApply, targetFile }: { onApply: () => void, targetFile?
 }
 
 
-function AiChat({ projectDir, onInjectCode, onApplyToFile, sendApiRef }: { projectDir: string, onInjectCode: (code: string) => void, onApplyToFile?: (filePath: string, code: string) => void, sendApiRef?: { current: ((text: string) => void) | null } }) {
+function AiChat({ projectDir, onInjectCode, onApplyToFile, sendApiRef, hasUnsavedChanges = false, draftRequest, onDraftConsumed }: { projectDir: string, onInjectCode: (code: string) => void, onApplyToFile?: (filePath: string, code: string) => void, sendApiRef?: { current: ((text: string) => void) | null }, hasUnsavedChanges?: boolean, draftRequest?: { id: number; text: string } | null, onDraftConsumed?: (id: number) => void }) {
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [streamingText, setStreamingText] = useState("");
     const [activeTools, setActiveTools] = useState<string[]>([]);
     const [showSettings, setShowSettings] = useState(false);
+    const [privateContextAllowed, setPrivateContextAllowed] = useState(false);
     const [showHistory, setShowHistory] = useState(false);
     const [activeModelBadge, setActiveModelBadge] = useState<string | null>(null);
     // Stores the full API-level conversation (including tool_calls + tool responses)
     // so that follow-up messages preserve the complete tool-call history.
     const [conversationHistory, setConversationHistory] = useState<any[]>([]);
+    useEffect(() => {
+        let mounted = true;
+        const unlisten = listen<string>("ai-project-review-resolved", event => {
+            try {
+                if (mounted && JSON.parse(event.payload).action === "undo") {
+                    // Preserve the visible discussion; discard tool results for the deleted workspace.
+                    setConversationHistory([]);
+                }
+            } catch { /* Ignore an incomplete event. */ }
+        });
+        return () => {
+            mounted = false;
+            void unlisten.then(stop => stop()).catch(() => {});
+        };
+    }, []);
 
     // Chat Sessions
     const [sessions, setSessions] = useState<ChatSession[]>([]);
@@ -85,6 +104,14 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile, sendApiRef }: { proje
     const [isIndexing, setIsIndexing] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLTextAreaElement>(null);
+    const consumedDraft = useRef<number | null>(null);
+    useEffect(() => {
+        if (!draftRequest || consumedDraft.current === draftRequest.id) return;
+        consumedDraft.current = draftRequest.id;
+        setInput(current => current.trim() ? `${current}\n\n${draftRequest.text}` : draftRequest.text);
+        onDraftConsumed?.(draftRequest.id);
+        inputRef.current?.focus();
+    }, [draftRequest, onDraftConsumed]);
 
     // Auto-resize prompt textarea
     useEffect(() => {
@@ -132,6 +159,7 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile, sendApiRef }: { proje
             setProvider(pr);
             setProviderInput(pr);
         });
+        invoke<boolean>("get_private_context_consent").then(setPrivateContextAllowed).catch(() => setPrivateContextAllowed(false));
         invoke("get_openrouter_api_key").then((key) => {
             const k = key as string;
             setOpenrouterApiKey(k);
@@ -322,12 +350,12 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile, sendApiRef }: { proje
                 await invoke("undo_ai_changes", { messageId });
             }
         } catch (e) {
-            // Graceful fallback: if no file backups exist, just log it.
-            // We still revert the chat history below.
-            console.warn("Undo file revert skipped (no backups):", e);
+            toast(String(e), "error");
+            return;
         }
-        // Always truncate messages: remove this user message and everything after it
+        // Retain the conversation if the backend could not undo the file changes.
         setMessages(prev => prev.slice(0, userMsgIndex));
+        setConversationHistory([]);
     };
 
     // Check if the AI response following a user message performed any write_file operations
@@ -382,14 +410,10 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile, sendApiRef }: { proje
         // Use conversationHistory (which retains tool_call sequences from previous turns)
         // and append only the new user message on top. This ensures follow-up requests
         // carry the full tool context that the backend needs to continue correctly.
-        let userContent = textToSend;
-        if (projectDir === ".") {
-            userContent = `[CRITICAL SYSTEM ENFORCEMENT: NO WORKSPACE IS CURRENTLY OPEN! If the user asks to create a project from scratch and there is no active workspace, you MUST call 'create_project_workspace' FIRST. You are FORBIDDEN from using 'run_command' (e.g., mkdir) or 'write_file' to create initial folders. Wait for the tool to return the selected path before writing files.]\n\n${userContent}`;
-        } else {
-            let systemContext = `[CURRENT PROJECT STATE: You are working in '${projectDir}'. `;
-            systemContext += `Always rely on explicitly declared variables. DO NOT invent macros. PROJECT RULE: A workspace is ALREADY OPEN. Edit files in this current project directly (read_file -> write_file on main/main.c etc.). Do NOT call 'create_project_workspace' and do NOT create a new project UNLESS the user explicitly asks to create/start a new project. If the user explicitly asks for a new project, call 'create_project_workspace' FIRST, then write the code.]\n\n`;
-            userContent = `${systemContext}${userContent}\n\n[CRITICAL REMINDER: If the user asks you to fix, check, or write code, you MUST use the \`read_file\` or \`write_file\` tool IMMEDIATELY. DO NOT just apologize or explain what you will do. Execute the tool NOW.]`;
-        }
+        // Native workspace guards and the system prompt own creation/edit rules.
+        // Keep the actual user text separate: synthetic project paths/logs must
+        // not bypass private-context permission by masquerading as user content.
+        const userContent = textToSend;
         const newUserApiMsg = { role: "user", content: userContent };
         const apiMessages = [...conversationHistory, newUserApiMsg];
 
@@ -429,6 +453,9 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile, sendApiRef }: { proje
             await invoke("set_openrouter_model", { model: openrouterModelInput });
             await invoke("set_google_api_key", { key: googleApiKeyInput });
             await invoke("set_google_model", { model: googleModelInput });
+            await invoke("set_private_context_consent", { allowed: privateContextAllowed });
+            // Do not carry tool results across provider/consent changes.
+            setConversationHistory([]);
 
             setApiKey(apiKeyInput);
             setBaseUrl(baseUrlInput);
@@ -1139,6 +1166,7 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile, sendApiRef }: { proje
                             </div>
                         </div>
 
+                        <PrivateContextConsent allowed={privateContextAllowed} onChange={setPrivateContextAllowed} />
                         <div className="flex gap-2">
                             <button
                                 onClick={() => setShowSettings(false)}
@@ -1273,6 +1301,9 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile, sendApiRef }: { proje
                     </div>
                 )}
             </div>
+
+            <ProjectCreationReview isBusy={isLoading} projectDir={projectDir} hasUnsavedChanges={hasUnsavedChanges} />
+            <CompilerRepairReview projectDir={projectDir} isBusy={isLoading} hasUnsavedChanges={hasUnsavedChanges} onRetry={()=>sendMessage("Continue the current compiler repair. Call compiler_diagnostics, inspect project files, and propose a different correction with write_file. Do not apply changes or start another attempt without the user's separate review approval.")} />
 
             {/* Input */}
             <div className="p-3 shrink-0" style={{ borderTop: '1px solid var(--border-color)', backgroundColor: 'var(--bg-sidebar)' }}>

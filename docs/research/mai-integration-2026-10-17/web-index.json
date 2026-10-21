@@ -1,0 +1,17 @@
+[
+  {
+    "name": "mai_plus_ide",
+    "url": "https://kidbright-mai.web.app/",
+    "error": "<urlopen error [WinError 10013] An attempt was made to access a socket in a way forbidden by its access permissions>"
+  },
+  {
+    "name": "microaithai_ide",
+    "url": "https://microaithai.com/ide",
+    "error": "<urlopen error [WinError 10013] An attempt was made to access a socket in a way forbidden by its access permissions>"
+  },
+  {
+    "name": "mai_v831_ide",
+    "url": "https://mai.kidbright.app.meca.in.th/",
+    "error": "<urlopen error [WinError 10013] An attempt was made to access a socket in a way forbidden by its access permissions>"
+  }
+]

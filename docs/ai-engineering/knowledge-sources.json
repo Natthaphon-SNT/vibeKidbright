@@ -1,0 +1,51 @@
+{
+  "compatibility/button_buzzer.c": {
+    "content_sha256": "9ee6db8976f6996218d7e881be1504a273e80dc4d80ba077a9a3a89d03939c2b",
+    "metadata": {
+      "title": "S1 press / A4 buzzer reference recipe",
+      "category": "code",
+      "language": "en",
+      "framework": "ESP-IDF",
+      "sdk_version": "5.5",
+      "target": "esp32",
+      "verification": "firmware-build-tested; physical behavior unverified"
+    }
+  },
+  "compatibility/temperature_serial.c": {
+    "content_sha256": "57cfb940c7038b478ebbdccb8466e08888baf0ed266ab58535f0a9596c61b1f3",
+    "metadata": {
+      "title": "LM73 signed temperature / I2C error reference recipe",
+      "category": "code",
+      "language": "en",
+      "framework": "ESP-IDF",
+      "sdk_version": "5.5",
+      "target": "esp32",
+      "verification": "firmware-build-tested; physical behavior unverified"
+    }
+  },
+  "compatibility/music_scale.c": {
+    "content_sha256": "7f8bcaf0a33e94e9e017eabe3cde9315134a8c215152ee4a8e63335c2331a41a",
+    "metadata": {
+      "title": "S1 C4 to C5 scale reference recipe",
+      "category": "code",
+      "language": "en",
+      "framework": "ESP-IDF",
+      "sdk_version": "5.5",
+      "target": "esp32",
+      "verification": "firmware-build-tested; physical behavior unverified"
+    }
+  },
+  "compatibility/matrix_counter.c": {
+    "content_sha256": "ab8355a593346f7a6bd70e1b12ef92cd404605303b02b181190ad43e4469de86",
+    "metadata": {
+      "title": "Numeric matrix counter for confirmed KidBright32 v1.3",
+      "category": "code",
+      "language": "en",
+      "framework": "ESP-IDF",
+      "sdk_version": "5.5",
+      "target": "esp32",
+      "board": "kidbright32_v13",
+      "verification": "firmware-build-tested; physical behavior unverified"
+    }
+  }
+}

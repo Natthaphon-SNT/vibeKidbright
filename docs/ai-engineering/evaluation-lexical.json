@@ -1,0 +1,465 @@
+{
+  "config": {
+    "batch_size": 16,
+    "candidate_k": 40,
+    "chunk_chars": 1600,
+    "dense_enabled": false,
+    "dense_weight": 0.15,
+    "lexical_weight": 1.0,
+    "max_context_chars": 12000,
+    "rrf_k": 60.0,
+    "top_k": 5
+  },
+  "dataset_sha256": "4d614988017dfef16d3ca187bd689317e291d9b1ae033598de79bb974244ad2a",
+  "date": "2026-10-17",
+  "index": {
+    "cached_embeddings": 0,
+    "chunks": 1839,
+    "embedded_chunks": 0,
+    "files_deleted": 0,
+    "files_seen": 37,
+    "files_unchanged": 0,
+    "files_updated": 37,
+    "warnings": []
+  },
+  "index_latency_ms": 4487.418,
+  "legacy_like_macro_average": {
+    "mrr": 0.6527777777777777,
+    "ndcg_at_5": 0.6922144663652275,
+    "precision_at_5": 0.30000000000000004,
+    "recall_at_5": 0.8333333333333334
+  },
+  "limits": [
+    "Small manually labelled repository smoke dataset, not an independent or exhaustive benchmark",
+    "Relevance is file-level; top 5 chunk results are deduplicated for document metrics; Precision@5 always divides by 5",
+    "Legacy LIKE and new search share the new chunk corpus, isolating ranking rather than reproducing the whole old pipeline",
+    "No LLM, remote embedding, firmware build, flash or hardware test performed by this runner",
+    "Model comparison, grounded-answer quality and measured API correctness are not evaluated"
+  ],
+  "macro_average": {
+    "mrr": 0.673611111111111,
+    "ndcg_at_5": 0.7186752468075553,
+    "precision_at_5": 0.3,
+    "recall_at_5": 0.8333333333333334
+  },
+  "mode": "lexical-only",
+  "model": null,
+  "queries": [
+    {
+      "id": "api-ledc",
+      "language": "technical",
+      "latency_ms": 2.1151999999999997,
+      "legacy_like_files": [
+        "compatibility/button_buzzer.c",
+        "compatibility/music_scale.c",
+        "formula_kid_controller.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "query": "ledc_timer_config",
+      "ranked_files": [
+        "compatibility/button_buzzer.c",
+        "compatibility/music_scale.c",
+        "sensor_examples/kidbright_full_system_demo.c",
+        "sensor_examples/kidbright_full_system_demo.c",
+        "sensor_examples/minibike_receiver.c"
+      ],
+      "relevant_files": [
+        "compatibility/button_buzzer.c",
+        "compatibility/music_scale.c"
+      ]
+    },
+    {
+      "id": "api-lm73",
+      "language": "technical",
+      "latency_ms": 1.3604,
+      "legacy_like_files": [
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h",
+        "compatibility/temperature_serial.c"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.6,
+        "recall_at_5": 1.0
+      },
+      "metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.6,
+        "recall_at_5": 1.0
+      },
+      "query": "kb_lm73_celsius",
+      "ranked_files": [
+        "compatibility/temperature_serial.c",
+        "compatibility/kb_core.h",
+        "compatibility/kb_core.c"
+      ],
+      "relevant_files": [
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h",
+        "compatibility/temperature_serial.c"
+      ]
+    },
+    {
+      "id": "api-pid",
+      "language": "technical",
+      "latency_ms": 0.8593000000000001,
+      "legacy_like_files": [
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "query": "kb_pid_step",
+      "ranked_files": [
+        "compatibility/kb_core.h",
+        "compatibility/kb_core.c"
+      ],
+      "relevant_files": [
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h"
+      ]
+    },
+    {
+      "id": "api-sma",
+      "language": "technical",
+      "latency_ms": 0.6312,
+      "legacy_like_files": [
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "query": "kb_sma_step",
+      "ranked_files": [
+        "compatibility/kb_core.h",
+        "compatibility/kb_core.c"
+      ],
+      "relevant_files": [
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h"
+      ]
+    },
+    {
+      "id": "api-joystick",
+      "language": "technical",
+      "latency_ms": 0.8669,
+      "legacy_like_files": [
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "query": "kb_joystick_read",
+      "ranked_files": [
+        "compatibility/kb_core.h",
+        "compatibility/kb_core.c"
+      ],
+      "relevant_files": [
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h"
+      ]
+    },
+    {
+      "id": "api-packet",
+      "language": "technical",
+      "latency_ms": 0.9697,
+      "legacy_like_files": [
+        "compatibility/README.md",
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 0.5,
+        "ndcg_at_5": 0.6934264036172708,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "query": "kb_ascii_parse",
+      "ranked_files": [
+        "compatibility/kb_core.h",
+        "compatibility/kb_core.c",
+        "compatibility/README.md"
+      ],
+      "relevant_files": [
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h"
+      ]
+    },
+    {
+      "id": "en-temperature",
+      "language": "en",
+      "latency_ms": 3.0206,
+      "legacy_like_files": [
+        "compatibility/README.md",
+        "support_scope.md",
+        "compatibility/temperature_serial.c",
+        "compatibility/temperature_serial.c",
+        "kidbright32iA.md"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 0.3333333333333333,
+        "ndcg_at_5": 0.5,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "metrics": {
+        "mrr": 0.25,
+        "ndcg_at_5": 0.43067655807339306,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "query": "signed temperature LM73",
+      "ranked_files": [
+        "sensor_examples/all_sensors_demo.c",
+        "sensor_examples/kidbright_full_system_demo.c",
+        "led_16x8_matrix_mapping.md",
+        "compatibility/temperature_serial.c",
+        "kidbright32iA.md"
+      ],
+      "relevant_files": [
+        "compatibility/temperature_serial.c"
+      ]
+    },
+    {
+      "id": "en-button",
+      "language": "en",
+      "latency_ms": 3.0347,
+      "legacy_like_files": [
+        "compatibility/button_buzzer.c",
+        "compatibility/README.md",
+        "compatibility/button_buzzer.c",
+        "compatibility/kb_basic.c",
+        "compatibility/kb_basic.h"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "query": "wait S1 released 440",
+      "ranked_files": [
+        "compatibility/button_buzzer.c",
+        "compatibility/music_scale.c",
+        "formula_kid_controller.md",
+        "compatibility/README.md",
+        "kidbright32iA.md"
+      ],
+      "relevant_files": [
+        "compatibility/button_buzzer.c"
+      ]
+    },
+    {
+      "id": "th-temperature",
+      "language": "th",
+      "latency_ms": 4.5813,
+      "legacy_like_files": [
+        "README.md",
+        "hardware_schematics_rules.md",
+        "inex_ia_ip.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 0.3333333333333333,
+        "ndcg_at_5": 0.5,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "metrics": {
+        "mrr": 0.3333333333333333,
+        "ndcg_at_5": 0.5,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "query": "อุณหภูมิ",
+      "ranked_files": [
+        "hardware_schematics_rules.md",
+        "kidbright32iA.md",
+        "inex_ia_ip.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md"
+      ],
+      "relevant_files": [
+        "inex_ia_ip.md"
+      ]
+    },
+    {
+      "id": "th-servo",
+      "language": "th",
+      "latency_ms": 2.7493000000000003,
+      "legacy_like_files": [
+        "kidbright32iA.md"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "เซอร์โว",
+      "ranked_files": [
+        "kidbright32iA.md"
+      ],
+      "relevant_files": [
+        "inex_ia_ip.md"
+      ]
+    },
+    {
+      "id": "mixed-i2c",
+      "language": "mixed",
+      "latency_ms": 10.184500000000002,
+      "legacy_like_files": [
+        "README.md",
+        "hardware_schematics_rules.md",
+        "inex_ia_ip.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 0.3333333333333333,
+        "ndcg_at_5": 0.3065735963827292,
+        "precision_at_5": 0.2,
+        "recall_at_5": 0.5
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "อุณหภูมิ LM73",
+      "ranked_files": [
+        "sensor_examples/temp_lm73.c",
+        "sensor_examples/all_sensors_demo.c",
+        "sensor_examples/temp_lm73.c",
+        "hardware_schematics_rules.md",
+        "compatibility/README.md"
+      ],
+      "relevant_files": [
+        "compatibility/temperature_serial.c",
+        "inex_ia_ip.md"
+      ]
+    },
+    {
+      "id": "hardware-ia",
+      "language": "technical",
+      "latency_ms": 1.0875,
+      "legacy_like_files": [
+        "README.md",
+        "all_models.md",
+        "inex_ia_ip.md",
+        "inex_ia_ip.md",
+        "inex_ia_ip.md"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 0.3333333333333333,
+        "ndcg_at_5": 0.3065735963827292,
+        "precision_at_5": 0.2,
+        "recall_at_5": 0.5
+      },
+      "metrics": {
+        "mrr": 0.5,
+        "ndcg_at_5": 0.6934264036172708,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "query": "MC3479",
+      "ranked_files": [
+        "sensor_examples/accel_mc3479.c",
+        "sensor_examples/accel_mc3479.c",
+        "inex_ia_ip.md",
+        "inex_ia_ip.md",
+        "support_scope.md"
+      ],
+      "relevant_files": [
+        "inex_ia_ip.md",
+        "support_scope.md"
+      ]
+    }
+  ],
+  "query_count": 12,
+  "schema_version": 1,
+  "scope": {
+    "architecture": "x86_64",
+    "operating_system": "windows",
+    "private_tool_export": false,
+    "source_directory": "knowledge_base (temporary copy)"
+  },
+  "unchanged_index": {
+    "latency_ms": 43.873799999999996,
+    "report": {
+      "cached_embeddings": 0,
+      "chunks": 1839,
+      "embedded_chunks": 0,
+      "files_deleted": 0,
+      "files_seen": 37,
+      "files_unchanged": 37,
+      "files_updated": 0,
+      "warnings": []
+    }
+  }
+}

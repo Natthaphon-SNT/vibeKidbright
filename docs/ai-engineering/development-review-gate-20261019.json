@@ -1,0 +1,9 @@
+{
+  "status": "DRAFT_REJECTED_AS_REQUIRED",
+  "reviewed_cases": 0,
+  "ranker_changed": false,
+  "exit_code_expected_nonzero": 1,
+  "dataset_exported": false,
+  "reason": "No reviewer; user explicitly requested keeping ranking unchanged",
+  "packet_sha256": "7b149e399b143f2b7a552d4a09f46162478c820a4f05ae7879bb765ad1844a36"
+}

@@ -1,0 +1,548 @@
+{
+  "schema_version": 1,
+  "scope": "thai-delay-existing-project-v1; qualification and mechanical evidence are separate",
+  "evaluation_sha256": "2abe0c3313ff4e63dbfcfcfb477ba388898626e24e39a0739ccd4adc9b6ea709",
+  "statuses": [
+    "PASS",
+    "FAIL",
+    "NOT_EXECUTED",
+    "NEEDS_HUMAN_REVIEW"
+  ],
+  "real_model_execution_reported": false,
+  "criteria": [
+    {
+      "id": "retrieval_relevance",
+      "level": "knowledge",
+      "label": "Retrieval relevance",
+      "required_cases": [
+        "grounding-th"
+      ],
+      "acceptance": "Independent reviewer judges the retrieved evidence useful for the exact question; unjudged is not irrelevant.",
+      "status": "NOT_EXECUTED",
+      "ai_quality_status": "NOT_EXECUTED",
+      "cases": [
+        {
+          "case_id": "grounding-th",
+          "status": "NOT_EXECUTED",
+          "ai_quality_status": "NOT_EXECUTED",
+          "mechanical_status": "NOT_EXECUTED",
+          "review": null
+        }
+      ],
+      "mechanical_observation": {
+        "status": "NOT_EXECUTED",
+        "scope": "No separate deterministic observation supplied",
+        "evidence_refs": []
+      }
+    },
+    {
+      "id": "citation_existence",
+      "level": "knowledge",
+      "label": "Citation existence",
+      "required_cases": [
+        "grounding-th",
+        "generation-th"
+      ],
+      "acceptance": "Every cited literal file/range exists in the exact source revision; alternate formats require review.",
+      "status": "NOT_EXECUTED",
+      "ai_quality_status": "NOT_EXECUTED",
+      "cases": [
+        {
+          "case_id": "grounding-th",
+          "status": "NOT_EXECUTED",
+          "ai_quality_status": "NOT_EXECUTED",
+          "mechanical_status": "NOT_EXECUTED",
+          "review": null
+        },
+        {
+          "case_id": "generation-th",
+          "status": "NOT_EXECUTED",
+          "ai_quality_status": "NOT_EXECUTED",
+          "mechanical_status": "NOT_EXECUTED",
+          "review": null
+        }
+      ],
+      "mechanical_observation": {
+        "criterion_id": "citation_existence",
+        "status": "PASS",
+        "scope": "Source/citation hash/range and invented-citation negative tests only, not factual support or model answers.",
+        "evidence_refs": [
+          {
+            "path": "src-tauri/target/capability-node-final-cli-20261019.log",
+            "sha256": "81611c011d1df5cd66e6f2a739ef4b4c3b4e7efaf2a0a597972fdd9a3c1b45d9"
+          }
+        ]
+      }
+    },
+    {
+      "id": "citation_support",
+      "level": "knowledge",
+      "label": "Citation factual support",
+      "required_cases": [
+        "grounding-th",
+        "generation-th"
+      ],
+      "acceptance": "Review each material claim against its cited excerpt; existence alone is insufficient.",
+      "status": "NOT_EXECUTED",
+      "ai_quality_status": "NOT_EXECUTED",
+      "cases": [
+        {
+          "case_id": "grounding-th",
+          "status": "NOT_EXECUTED",
+          "ai_quality_status": "NOT_EXECUTED",
+          "mechanical_status": "NOT_EXECUTED",
+          "review": null
+        },
+        {
+          "case_id": "generation-th",
+          "status": "NOT_EXECUTED",
+          "ai_quality_status": "NOT_EXECUTED",
+          "mechanical_status": "NOT_EXECUTED",
+          "review": null
+        }
+      ],
+      "mechanical_observation": {
+        "status": "NOT_EXECUTED",
+        "scope": "No separate deterministic observation supplied",
+        "evidence_refs": []
+      }
+    },
+    {
+      "id": "api_version_correctness",
+      "level": "knowledge",
+      "label": "ESP-IDF API/version correctness",
+      "required_cases": [
+        "grounding-th",
+        "generation-th"
+      ],
+      "acceptance": "Verify API spelling, units, constraints and configured SDK version; disclose unknowns.",
+      "status": "NOT_EXECUTED",
+      "ai_quality_status": "NOT_EXECUTED",
+      "cases": [
+        {
+          "case_id": "grounding-th",
+          "status": "NOT_EXECUTED",
+          "ai_quality_status": "NOT_EXECUTED",
+          "mechanical_status": "NOT_EXECUTED",
+          "review": null
+        },
+        {
+          "case_id": "generation-th",
+          "status": "NOT_EXECUTED",
+          "ai_quality_status": "NOT_EXECUTED",
+          "mechanical_status": "NOT_EXECUTED",
+          "review": null
+        }
+      ],
+      "mechanical_observation": {
+        "status": "NOT_EXECUTED",
+        "scope": "No separate deterministic observation supplied",
+        "evidence_refs": []
+      }
+    },
+    {
+      "id": "hardware_metadata",
+      "level": "knowledge",
+      "label": "Hardware metadata consistency",
+      "required_cases": [
+        "generation-th"
+      ],
+      "acceptance": "Match the actual fixture board/profile to authoritative metadata without inventing compatibility.",
+      "status": "NOT_EXECUTED",
+      "ai_quality_status": "NOT_EXECUTED",
+      "cases": [
+        {
+          "case_id": "generation-th",
+          "status": "NOT_EXECUTED",
+          "ai_quality_status": "NOT_EXECUTED",
+          "mechanical_status": "NOT_EXECUTED",
+          "review": null
+        }
+      ],
+      "mechanical_observation": {
+        "status": "NOT_EXECUTED",
+        "scope": "No separate deterministic observation supplied",
+        "evidence_refs": []
+      }
+    },
+    {
+      "id": "project_identity",
+      "level": "project",
+      "label": "Correct project identification",
+      "required_cases": [
+        "project-th"
+      ],
+      "acceptance": "Identify the selected canonical public project, not another workspace.",
+      "status": "NOT_EXECUTED",
+      "ai_quality_status": "NOT_EXECUTED",
+      "cases": [
+        {
+          "case_id": "project-th",
+          "status": "NOT_EXECUTED",
+          "ai_quality_status": "NOT_EXECUTED",
+          "mechanical_status": "NOT_EXECUTED",
+          "review": null
+        }
+      ],
+      "mechanical_observation": {
+        "criterion_id": "project_identity",
+        "status": "PASS",
+        "scope": "Public fixture manifest/path isolation checks only, not model project identification.",
+        "evidence_refs": [
+          {
+            "path": "src-tauri/target/capability-node-final-cli-20261019.log",
+            "sha256": "81611c011d1df5cd66e6f2a739ef4b4c3b4e7efaf2a0a597972fdd9a3c1b45d9"
+          }
+        ]
+      }
+    },
+    {
+      "id": "file_symbol_selection",
+      "level": "project",
+      "label": "Correct file and symbol selection",
+      "required_cases": [
+        "project-th"
+      ],
+      "acceptance": "Locate actual declarations, definitions and callers with source evidence.",
+      "status": "NOT_EXECUTED",
+      "ai_quality_status": "NOT_EXECUTED",
+      "cases": [
+        {
+          "case_id": "project-th",
+          "status": "NOT_EXECUTED",
+          "ai_quality_status": "NOT_EXECUTED",
+          "mechanical_status": "NOT_EXECUTED",
+          "review": null
+        }
+      ],
+      "mechanical_observation": {
+        "criterion_id": "file_symbol_selection",
+        "status": "PASS",
+        "scope": "Actual opened-source clangd/Monaco navigation and labelled protocol faults, not model symbol choice.",
+        "evidence_refs": [
+          {
+            "path": "src-tauri/target/capability-desktop-20261019.json",
+            "sha256": "3929c6fd1aa9594499a6df496dd4c6a8cafda6419ef8a37c86fbdfe7628bdc6a"
+          }
+        ]
+      }
+    },
+    {
+      "id": "dependency_understanding",
+      "level": "project",
+      "label": "Understanding of dependencies",
+      "required_cases": [
+        "project-th",
+        "generation-th"
+      ],
+      "acceptance": "Explain actual CMake/component relationships and justify proposed dependency changes.",
+      "status": "NOT_EXECUTED",
+      "ai_quality_status": "NOT_EXECUTED",
+      "cases": [
+        {
+          "case_id": "project-th",
+          "status": "NOT_EXECUTED",
+          "ai_quality_status": "NOT_EXECUTED",
+          "mechanical_status": "NOT_EXECUTED",
+          "review": null
+        },
+        {
+          "case_id": "generation-th",
+          "status": "NOT_EXECUTED",
+          "ai_quality_status": "NOT_EXECUTED",
+          "mechanical_status": "NOT_EXECUTED",
+          "review": null
+        }
+      ],
+      "mechanical_observation": {
+        "status": "NOT_EXECUTED",
+        "scope": "No separate deterministic observation supplied",
+        "evidence_refs": []
+      }
+    },
+    {
+      "id": "patch_scope",
+      "level": "project",
+      "label": "Patch scope accuracy",
+      "required_cases": [
+        "generation-th"
+      ],
+      "acceptance": "Review the proposed diff against the requested existing-project task.",
+      "status": "NOT_EXECUTED",
+      "ai_quality_status": "NOT_EXECUTED",
+      "cases": [
+        {
+          "case_id": "generation-th",
+          "status": "NOT_EXECUTED",
+          "ai_quality_status": "NOT_EXECUTED",
+          "mechanical_status": "NOT_EXECUTED",
+          "review": null
+        }
+      ],
+      "mechanical_observation": {
+        "criterion_id": "patch_scope",
+        "status": "PASS",
+        "scope": "Native non-source patch rejection and revision phase guards, not model patch focus.",
+        "evidence_refs": [
+          {
+            "path": "src-tauri/target/capability-rust-20261019.log",
+            "sha256": "0d311b81ee1402598fb9f048feb850d55a79b17a7f4f92b8998a5cf15cdadf04"
+          }
+        ]
+      }
+    },
+    {
+      "id": "unrelated_code_preserved",
+      "level": "project",
+      "label": "Preservation of unrelated code",
+      "required_cases": [
+        "generation-th",
+        "rollback"
+      ],
+      "acceptance": "Verify approved changes and rollback leave unrelated code intact; a pending diff alone is insufficient.",
+      "status": "NOT_EXECUTED",
+      "ai_quality_status": "NOT_EXECUTED",
+      "cases": [
+        {
+          "case_id": "generation-th",
+          "status": "NOT_EXECUTED",
+          "ai_quality_status": "NOT_EXECUTED",
+          "mechanical_status": "NOT_EXECUTED",
+          "review": null
+        },
+        {
+          "case_id": "rollback",
+          "status": "NOT_EXECUTED",
+          "ai_quality_status": "NOT_EXECUTED",
+          "mechanical_status": "NOT_EXECUTED",
+          "review": null
+        }
+      ],
+      "mechanical_observation": {
+        "criterion_id": "unrelated_code_preserved",
+        "status": "PASS",
+        "scope": "Repair fixture preserves an unrelated header across actual writes, rollback and reopened journal/session representations.",
+        "evidence_refs": [
+          {
+            "path": "src-tauri/target/capability-rust-20261019.log",
+            "sha256": "0d311b81ee1402598fb9f048feb850d55a79b17a7f4f92b8998a5cf15cdadf04"
+          }
+        ]
+      }
+    },
+    {
+      "id": "compiler_classification",
+      "level": "build",
+      "label": "Accurate compiler error classification",
+      "required_cases": [
+        "diagnostics"
+      ],
+      "acceptance": "Compare model classification with actual diagnostics from the same source revision.",
+      "status": "NOT_EXECUTED",
+      "ai_quality_status": "NOT_EXECUTED",
+      "cases": [
+        {
+          "case_id": "diagnostics",
+          "status": "NOT_EXECUTED",
+          "ai_quality_status": "NOT_EXECUTED",
+          "mechanical_status": "NOT_EXECUTED",
+          "review": null
+        }
+      ],
+      "mechanical_observation": {
+        "criterion_id": "compiler_classification",
+        "status": "PASS",
+        "scope": "Deterministic compiler diagnostic parser tests only, not actual model classification.",
+        "evidence_refs": [
+          {
+            "path": "src-tauri/target/capability-rust-20261019.log",
+            "sha256": "0d311b81ee1402598fb9f048feb850d55a79b17a7f4f92b8998a5cf15cdadf04"
+          }
+        ]
+      }
+    },
+    {
+      "id": "focused_repair",
+      "level": "build",
+      "label": "Focused patch generation",
+      "required_cases": [
+        "bounded-repair"
+      ],
+      "acceptance": "Review the model patch against the actual fault, without unrelated changes.",
+      "status": "NOT_EXECUTED",
+      "ai_quality_status": "NOT_EXECUTED",
+      "cases": [
+        {
+          "case_id": "bounded-repair",
+          "status": "NOT_EXECUTED",
+          "ai_quality_status": "NOT_EXECUTED",
+          "mechanical_status": "NOT_EXECUTED",
+          "review": null
+        }
+      ],
+      "mechanical_observation": {
+        "status": "NOT_EXECUTED",
+        "scope": "No separate deterministic observation supplied",
+        "evidence_refs": []
+      }
+    },
+    {
+      "id": "per_attempt_approval",
+      "level": "build",
+      "label": "Per-attempt user approval",
+      "required_cases": [
+        "bounded-repair"
+      ],
+      "acceptance": "Each application has separate project/revision-bound consumed consent; no harness approval.",
+      "status": "NOT_EXECUTED",
+      "ai_quality_status": "NOT_EXECUTED",
+      "cases": [
+        {
+          "case_id": "bounded-repair",
+          "status": "NOT_EXECUTED",
+          "ai_quality_status": "NOT_EXECUTED",
+          "mechanical_status": "NOT_EXECUTED",
+          "review": null
+        }
+      ],
+      "mechanical_observation": {
+        "criterion_id": "per_attempt_approval",
+        "status": "PASS",
+        "scope": "Native revision/attempt authorization and frontend project/revision-bound consumed consent regressions.",
+        "evidence_refs": [
+          {
+            "path": "src-tauri/target/capability-frontend-20261019.log",
+            "sha256": "fe151f3bb6986da0c5ba7327f5494448f9d0482cda32c43084ccfb304d498efb"
+          },
+          {
+            "path": "src-tauri/target/capability-rust-20261019.log",
+            "sha256": "0d311b81ee1402598fb9f048feb850d55a79b17a7f4f92b8998a5cf15cdadf04"
+          }
+        ]
+      }
+    },
+    {
+      "id": "compilation_success",
+      "level": "build",
+      "label": "Compilation success",
+      "required_cases": [
+        "compile",
+        "bounded-repair"
+      ],
+      "acceptance": "Configured idf.py exits 0 for the reviewed source; record SDK, CDB and firmware hashes.",
+      "status": "NOT_EXECUTED",
+      "ai_quality_status": "NOT_EXECUTED",
+      "cases": [
+        {
+          "case_id": "compile",
+          "status": "NOT_EXECUTED",
+          "ai_quality_status": "NOT_EXECUTED",
+          "mechanical_status": "NOT_EXECUTED",
+          "review": null
+        },
+        {
+          "case_id": "bounded-repair",
+          "status": "NOT_EXECUTED",
+          "ai_quality_status": "NOT_EXECUTED",
+          "mechanical_status": "NOT_EXECUTED",
+          "review": null
+        }
+      ],
+      "mechanical_observation": {
+        "criterion_id": "compilation_success",
+        "status": "PASS",
+        "scope": "Four deterministic ESP-IDF 5.5.4 fixture recompilations/relinks with raw exit 0, not model-generated code or a connected repair workflow.",
+        "evidence_refs": [
+          {
+            "path": "docs/ai-engineering/capability-firmware-20261019.json",
+            "sha256": "7b047f7087324e6c39fd66f3f6f0a728d3d25f103b64af1f18c578092b8d1c2a"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rollback_correctness",
+      "level": "build",
+      "label": "Rollback correctness",
+      "required_cases": [
+        "rollback"
+      ],
+      "acceptance": "User-controlled Undo restores exact source hashes and preserves later conflicting edits/recovery records.",
+      "status": "NOT_EXECUTED",
+      "ai_quality_status": "NOT_EXECUTED",
+      "cases": [
+        {
+          "case_id": "rollback",
+          "status": "NOT_EXECUTED",
+          "ai_quality_status": "NOT_EXECUTED",
+          "mechanical_status": "NOT_EXECUTED",
+          "review": null
+        }
+      ],
+      "mechanical_observation": {
+        "criterion_id": "rollback_correctness",
+        "status": "PASS",
+        "scope": "Real temporary-file journal rollback/conflict/recovery tests, not a connected model workflow or OS reboot.",
+        "evidence_refs": [
+          {
+            "path": "src-tauri/target/capability-rust-20261019.log",
+            "sha256": "0d311b81ee1402598fb9f048feb850d55a79b17a7f4f92b8998a5cf15cdadf04"
+          }
+        ]
+      }
+    },
+    {
+      "id": "bounded_attempts",
+      "level": "build",
+      "label": "Bounded repair attempts",
+      "required_cases": [
+        "bounded-repair"
+      ],
+      "acceptance": "Configured limit is 1..3, failed duplicate patches rejected, state survives restart.",
+      "status": "NOT_EXECUTED",
+      "ai_quality_status": "NOT_EXECUTED",
+      "cases": [
+        {
+          "case_id": "bounded-repair",
+          "status": "NOT_EXECUTED",
+          "ai_quality_status": "NOT_EXECUTED",
+          "mechanical_status": "NOT_EXECUTED",
+          "review": null
+        }
+      ],
+      "mechanical_observation": {
+        "criterion_id": "bounded_attempts",
+        "status": "PASS",
+        "scope": "Native three-attempt test plus duplicate rejection after reopened persisted representations.",
+        "evidence_refs": [
+          {
+            "path": "src-tauri/target/capability-rust-20261019.log",
+            "sha256": "0d311b81ee1402598fb9f048feb850d55a79b17a7f4f92b8998a5cf15cdadf04"
+          }
+        ]
+      }
+    }
+  ],
+  "levels": {
+    "knowledge": "NOT_EXECUTED",
+    "project": "NOT_EXECUTED",
+    "build": "NOT_EXECUTED"
+  },
+  "limitations": [
+    "CAPTURED never becomes an automatic AI-quality PASS. All model-dependent cases require actual reported execution and independent human judgment.",
+    "A failure can concern mechanical evidence rather than inaccurate model content; consult per-case ai_quality_status.",
+    "Manual stages and reviewer identity are self-attested, not authenticated. Referenced bytes must be separately hash-verified by the CLI.",
+    "Deterministic tests, fixtures, compiler success and source hashes do not prove AI quality, hardware correctness or clean-VM behavior."
+  ],
+  "hash_scope": "Exact --evidence file bytes",
+  "inputs": [
+    {
+      "path": "docs/ai-engineering/capability-prepared-20261019.json",
+      "sha256": "2abe0c3313ff4e63dbfcfcfb477ba388898626e24e39a0739ccd4adc9b6ea709"
+    },
+    {
+      "path": "docs/ai-engineering/capability-mechanical-complete-20261019.json",
+      "sha256": "e102072ae637fd5edb172647a38dde4eb36683dab70bb54cc044de76d8db53a5"
+    }
+  ]
+}

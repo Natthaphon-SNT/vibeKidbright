@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "recorded_date": "2026-10-17",
+  "timezone": "Asia/Bangkok",
+  "scope": "Reference-only update for the user-supplied Allwinner V831 KidBright muAI board; classic KidBright remains the active development phase.",
+  "sources": [
+    {
+      "kind": "user_supplied",
+      "description": "Full product specification, IDE screenshot and front/back numbered board diagram plus 23-component table supplied in chat."
+    },
+    {
+      "kind": "manufacturer_product",
+      "url": "https://inex.co.th/home/product/kidbright-%CE%BCai/",
+      "inspection": "Manufacturer specification text read via web search."
+    },
+    {
+      "kind": "manufacturer_manual",
+      "url": "https://inex.co.th/store/manual/KBmAI_Leaflet240518-opt.pdf",
+      "inspection": "12-page PDF text inspected; front/back component list corroborates built-in display, S1/S2, camera and accelerometer. PDF screenshot retrieval timed out."
+    },
+    {
+      "kind": "referenced_ide",
+      "url": "https://mai.kidbright.app.meca.in.th/",
+      "inspection": "Page reachable by web tool; extracted HTML has no application text. No interactive workflow, upload or model training tested."
+    }
+  ],
+  "corrected_claims": [
+    "Removed the claim that original muAI has no onboard display or S1/S2.",
+    "Removed display/button/camera/accelerometer presence as an exclusive Plus identification rule.",
+    "Use PCB/revision and processor markings for identity; V831/Linux is distinct from ESP32/ESP-IDF.",
+    "The supplied V831 specification establishes an accelerometer, not a gyroscope.",
+    "Original muAI USB-DEBUG wording and component-table USB-UART wording remain explicitly unresolved.",
+    "The prior alternate Plus IDE URL is retained as historical usage evidence, not current dual-model compatibility."
+  ],
+  "software_checks": [
+    {
+      "command": "npm run check:kb",
+      "status": "passed"
+    },
+    {
+      "command": "npm run check:rules",
+      "status": "passed"
+    },
+    {
+      "command": "npm run check:coverage",
+      "status": "passed"
+    },
+    {
+      "command": "npm run check:boards",
+      "status": "passed"
+    },
+    {
+      "command": "npm run check:bundle",
+      "status": "passed"
+    },
+    {
+      "command": "git -c core.safecrlf=false diff --check",
+      "status": "passed"
+    }
+  ],
+  "source_hashes": [
+    {
+      "path": "knowledge_base/kidbright_uai.md",
+      "sha256": "1dbb8c53395e79dc679bbcb14c8cdf8797e313ca031d7feb173192be26b42e58"
+    },
+    {
+      "path": "resources/knowledge_base/kidbright_uai.md",
+      "sha256": "1dbb8c53395e79dc679bbcb14c8cdf8797e313ca031d7feb173192be26b42e58"
+    },
+    {
+      "path": "knowledge_base/README.md",
+      "sha256": "c0443aadcc7cd17d38c3da83e70030c857d6a8663db3c290aa73e4cdaa38ff63"
+    },
+    {
+      "path": "resources/knowledge_base/README.md",
+      "sha256": "c0443aadcc7cd17d38c3da83e70030c857d6a8663db3c290aa73e4cdaa38ff63"
+    },
+    {
+      "path": "src-tauri/src/ai/system_prompt.txt",
+      "sha256": "0c2df2efd0bd20edcb69318df50fdb09eb1483ba8cc8074ab7aa7eaacadc2c84"
+    }
+  ],
+  "deferred_families": [
+    "kidbright_uai",
+    "kidbright_uai_plus"
+  ],
+  "runtime_or_profile_added": false,
+  "physical_board_tested": false,
+  "live_ai_provider_tested": false,
+  "installer_built": false,
+  "limits": [
+    "Documentation checks validate encoding, structure, inventory freshness and bundle consistency; no new firmware test was necessary for this reference-only change.",
+    "Previous expansion validation remains a historical source snapshot; its firmware/test results were not rewritten as evidence for this later prompt/document update.",
+    "No original image bytes were downloaded or rehashed for the user-provided screenshots.",
+    "Plus hardware and model-training details retained from earlier usage notes were not newly validated in this update."
+  ]
+}

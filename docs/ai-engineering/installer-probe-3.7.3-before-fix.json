@@ -1,0 +1,12 @@
+{
+  "error": "KbStore open error: unable to open database file: D:\\Internship-NECTEC\\vibeKidbright\\src-tauri\\target\\standalone-user-_s_cdvoz\\fresh-user-data\\intelligence-probe\\.kb_store.sqlite",
+  "probe_environment": {
+    "separate_install_directory": true,
+    "separate_working_directory": true,
+    "fresh_appdata": true,
+    "developer_paths_removed_from_environment": true,
+    "http_proxy_closed": true,
+    "os_firewall_isolation": false,
+    "fresh_virtual_machine": false
+  }
+}

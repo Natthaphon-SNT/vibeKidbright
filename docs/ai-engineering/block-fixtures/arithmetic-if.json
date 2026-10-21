@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "board_profile": "kidbright32_v13",
+  "blocks": [{
+    "type": "controls_if",
+    "values": {"IF0": {
+      "type": "logic_compare", "fields": {"OP": "EQ"},
+      "values": {
+        "A": {"type": "math_arithmetic", "fields": {"OP": "MODULO"}, "values": {
+          "A": {"type": "math_number", "fields": {"VALUE": 7}},
+          "B": {"type": "math_number", "fields": {"VALUE": 3}}
+        }},
+        "B": {"type": "math_number", "fields": {"VALUE": 1}}
+      }
+    }},
+    "statements": {
+      "DO0": [{"type": "basic_delay", "fields": {"VALUE": 0.02}}],
+      "ELSE": [{"type": "basic_delay", "fields": {"VALUE": 0.04}}]
+    }
+  }]
+}

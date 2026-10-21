@@ -1,0 +1,2422 @@
+{
+  "config": {
+    "batch_size": 16,
+    "candidate_k": 40,
+    "chunk_chars": 1600,
+    "dense_enabled": true,
+    "dense_weight": 0.15,
+    "lexical_weight": 1.0,
+    "max_context_chars": 12000,
+    "query_routing": false,
+    "rrf_k": 60.0,
+    "top_k": 5
+  },
+  "dataset": "evaluation-heldout-v1.json",
+  "dataset_sha256": "f6c8676e420ff2b7502e26a102cb71e5b8961c57f29caf712479f67b4e170049",
+  "date": "2026-10-18",
+  "index": {
+    "cached_embeddings": 254,
+    "chunks": 2026,
+    "embedded_chunks": 1772,
+    "files_deleted": 0,
+    "files_seen": 37,
+    "files_unchanged": 0,
+    "files_updated": 37,
+    "warnings": []
+  },
+  "index_latency_ms": 125336.8318,
+  "legacy_like_macro_average": {
+    "mrr": 0.2971014492753623,
+    "ndcg_at_5": 0.32219674837101264,
+    "precision_at_5": 0.13913043478260878,
+    "recall_at_5": 0.41304347826086957
+  },
+  "limits": [
+    "Agent-authored non-exhaustive file labels; not a human independent benchmark or grounded-answer evaluation",
+    "No held-out tuning; fixed weights and routing recorded before evaluation",
+    "Relevance deduplicates only the top five chunks; does not refill document ranks",
+    "No LLM/provider, firmware build, flash or hardware test by this runner"
+  ],
+  "macro_average": {
+    "mrr": 0.3386473429951691,
+    "ndcg_at_5": 0.31776227039111726,
+    "precision_at_5": 0.118840579710145,
+    "recall_at_5": 0.37681159420289856
+  },
+  "mode": "real-local-dense-plus-lexical",
+  "model": "Qdrant/all-MiniLM-L6-v2-onnx@d13954661f83248295ba75c1ed411eef3b7b936e:384:mean",
+  "model_artifact_bytes": 91115499,
+  "model_load_ms": 259.6884,
+  "queries": [
+    {
+      "id": "heldout-delay-en",
+      "language": "en",
+      "latency_ms": 150.9941,
+      "legacy_like_files": [
+        "compatibility/README.md",
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h",
+        "compatibility/music_scale.c",
+        "compatibility/kb_basic.c"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 0.5,
+        "ndcg_at_5": 0.6934264036172708,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 0.6131471927654584,
+        "precision_at_5": 0.2,
+        "recall_at_5": 0.5
+      },
+      "query": "Convert a fractional delay in seconds to validated milliseconds",
+      "ranked_files": [
+        "compatibility/kb_core.c",
+        "kidbright32iA.md",
+        "sensor_examples/formulakid_sender.c",
+        "compatibility/kb_basic.c",
+        "kidbright32iA.md"
+      ],
+      "relevant_files": [
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h"
+      ]
+    },
+    {
+      "id": "heldout-delay-th",
+      "language": "th",
+      "latency_ms": 223.2545,
+      "legacy_like_files": [],
+      "legacy_like_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "???????????????????????????????????????????????????????????????????????",
+      "ranked_files": [
+        "sensor_examples/calibrate_balancing_joystick.c",
+        "sensor_examples/kidbright_full_system_demo.c",
+        "sensor_examples/accel_kxtj3.c",
+        "sensor_examples/formulakid_sender.c",
+        "sensor_examples/balanced_robot.c"
+      ],
+      "relevant_files": [
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h"
+      ]
+    },
+    {
+      "id": "heldout-delay-mixed",
+      "language": "mixed",
+      "latency_ms": 179.9299,
+      "legacy_like_files": [
+        "compatibility/README.md",
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h",
+        "compatibility/music_scale.c",
+        "compatibility/button_buzzer.c"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 0.5,
+        "ndcg_at_5": 0.6934264036172708,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 0.6131471927654584,
+        "precision_at_5": 0.2,
+        "recall_at_5": 0.5
+      },
+      "query": "???? delay ?????????? milliseconds ????????????",
+      "ranked_files": [
+        "compatibility/kb_core.c",
+        "compatibility/kb_basic.c",
+        "skate_rev1.3.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md"
+      ],
+      "relevant_files": [
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h"
+      ]
+    },
+    {
+      "id": "heldout-beat-en",
+      "language": "en",
+      "latency_ms": 149.2201,
+      "legacy_like_files": [
+        "support_scope.md",
+        "support_scope.md",
+        "compatibility/README.md",
+        "compatibility/README.md",
+        "compatibility/README.md"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "Calculate how long a musical beat lasts from the tempo",
+      "ranked_files": [
+        "led_16x8_matrix_mapping.md",
+        "support_scope.md",
+        "support_scope.md",
+        "kidbright32iA.md",
+        "support_scope.md"
+      ],
+      "relevant_files": [
+        "compatibility/kb_basic.c",
+        "compatibility/kb_basic.h"
+      ]
+    },
+    {
+      "id": "heldout-beat-th",
+      "language": "th",
+      "latency_ms": 188.52450000000002,
+      "legacy_like_files": [],
+      "legacy_like_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "???????????????????????????????????????????????????",
+      "ranked_files": [
+        "sensor_examples/calibrate_balancing_joystick.c",
+        "sensor_examples/kidbright_full_system_demo.c",
+        "sensor_examples/formulakid_sender.c",
+        "sensor_examples/accel_kxtj3.c",
+        "sensor_examples/balanced_robot.c"
+      ],
+      "relevant_files": [
+        "compatibility/kb_basic.c",
+        "compatibility/kb_basic.h"
+      ]
+    },
+    {
+      "id": "heldout-beat-mixed",
+      "language": "mixed",
+      "latency_ms": 150.269,
+      "legacy_like_files": [
+        "compatibility/README.md",
+        "compatibility/kb_basic.c",
+        "compatibility/kb_basic.h",
+        "compatibility/README.md",
+        "compatibility/button_buzzer.c"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 0.5,
+        "ndcg_at_5": 0.6934264036172708,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 0.6131471927654584,
+        "precision_at_5": 0.2,
+        "recall_at_5": 0.5
+      },
+      "query": "????? duration ?????????? BPM ??? beats",
+      "ranked_files": [
+        "compatibility/kb_basic.c",
+        "led_16x8_matrix_mapping.md",
+        "compatibility/music_scale.c",
+        "compatibility/button_buzzer.c",
+        "formula_kid_controller.md"
+      ],
+      "relevant_files": [
+        "compatibility/kb_basic.c",
+        "compatibility/kb_basic.h"
+      ]
+    },
+    {
+      "id": "heldout-frame-en",
+      "language": "en",
+      "latency_ms": 160.17239999999998,
+      "legacy_like_files": [
+        "compatibility/README.md",
+        "compatibility/kb_basic.h",
+        "support_scope.md",
+        "compatibility/README.md",
+        "kidbright32iA.md"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 0.5,
+        "ndcg_at_5": 0.38685280723454163,
+        "precision_at_5": 0.2,
+        "recall_at_5": 0.5
+      },
+      "metrics": {
+        "mrr": 0.3333333333333333,
+        "ndcg_at_5": 0.3065735963827292,
+        "precision_at_5": 0.2,
+        "recall_at_5": 0.5
+      },
+      "query": "Pack a sixteen by eight pixel frame for the LED display controller",
+      "ranked_files": [
+        "kidbright32iA.md",
+        "sensor_examples/formulakid_sender.c",
+        "compatibility/kb_basic.h",
+        "compatibility/matrix_counter.c",
+        "kidbright32iA.md"
+      ],
+      "relevant_files": [
+        "compatibility/kb_basic.c",
+        "compatibility/kb_basic.h"
+      ]
+    },
+    {
+      "id": "heldout-frame-th",
+      "language": "th",
+      "latency_ms": 219.7696,
+      "legacy_like_files": [],
+      "legacy_like_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "??????????????????????????????????????????????????????????????",
+      "ranked_files": [
+        "sensor_examples/calibrate_balancing_joystick.c",
+        "sensor_examples/kidbright_full_system_demo.c",
+        "sensor_examples/formulakid_sender.c",
+        "sensor_examples/accel_kxtj3.c",
+        "sensor_examples/balanced_robot.c"
+      ],
+      "relevant_files": [
+        "compatibility/kb_basic.c",
+        "compatibility/kb_basic.h"
+      ]
+    },
+    {
+      "id": "heldout-frame-mixed",
+      "language": "mixed",
+      "latency_ms": 157.8511,
+      "legacy_like_files": [
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "sensor_examples/all_sensors_demo.c"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "pack ???? LED 16x8 ????? HT16K33",
+      "ranked_files": [
+        "sensor_examples/all_sensors_demo.c",
+        "led_16x8_matrix_mapping.md",
+        "led_16x8_matrix_mapping.md",
+        "sensor_examples/fomulakid_receiver.c",
+        "kidbright32iA.md"
+      ],
+      "relevant_files": [
+        "compatibility/kb_basic.c",
+        "compatibility/kb_basic.h"
+      ]
+    },
+    {
+      "id": "heldout-button-en",
+      "language": "en",
+      "latency_ms": 147.5302,
+      "legacy_like_files": [
+        "kidbright32iA.md",
+        "sensor_examples/all_sensors_demo.c",
+        "compatibility/README.md",
+        "kidbright32iA.md",
+        "led_16x8_matrix_mapping.md"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "Play a short tone once per button press and wait until release",
+      "ranked_files": [
+        "compatibility/music_scale.c",
+        "compatibility/README.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "sensor_examples/kidbright_full_system_demo.c"
+      ],
+      "relevant_files": [
+        "compatibility/button_buzzer.c"
+      ]
+    },
+    {
+      "id": "heldout-button-th",
+      "language": "th",
+      "latency_ms": 185.6604,
+      "legacy_like_files": [],
+      "legacy_like_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "?????????????????????????????????????????????????????",
+      "ranked_files": [
+        "sensor_examples/calibrate_balancing_joystick.c",
+        "sensor_examples/kidbright_full_system_demo.c",
+        "sensor_examples/formulakid_sender.c",
+        "sensor_examples/accel_kxtj3.c",
+        "sensor_examples/balanced_robot.c"
+      ],
+      "relevant_files": [
+        "compatibility/button_buzzer.c"
+      ]
+    },
+    {
+      "id": "heldout-button-mixed",
+      "language": "mixed",
+      "latency_ms": 168.74239999999998,
+      "legacy_like_files": [
+        "compatibility/README.md",
+        "compatibility/README.md",
+        "compatibility/button_buzzer.c",
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 0.5,
+        "ndcg_at_5": 0.6309297535714575,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "metrics": {
+        "mrr": 0.25,
+        "ndcg_at_5": 0.43067655807339306,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "query": "?? S1 ???? beep ?????????? ?????? release",
+      "ranked_files": [
+        "compatibility/music_scale.c",
+        "led_16x8_matrix_mapping.md",
+        "formula_kid_controller.md",
+        "formula_kid_controller.md",
+        "compatibility/button_buzzer.c"
+      ],
+      "relevant_files": [
+        "compatibility/button_buzzer.c"
+      ]
+    },
+    {
+      "id": "heldout-temperature-en",
+      "language": "en",
+      "latency_ms": 180.9555,
+      "legacy_like_files": [
+        "compatibility/README.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "support_scope.md"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "Read a signed digital temperature over the sensor bus",
+      "ranked_files": [
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "sensor_examples/kidbright_full_system_demo.c"
+      ],
+      "relevant_files": [
+        "compatibility/temperature_serial.c",
+        "compatibility/kb_core.c"
+      ]
+    },
+    {
+      "id": "heldout-temperature-th",
+      "language": "th",
+      "latency_ms": 181.3467,
+      "legacy_like_files": [],
+      "legacy_like_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "????????????????????????????????????????????????????",
+      "ranked_files": [
+        "sensor_examples/calibrate_balancing_joystick.c",
+        "sensor_examples/kidbright_full_system_demo.c",
+        "sensor_examples/formulakid_sender.c",
+        "sensor_examples/accel_kxtj3.c",
+        "sensor_examples/balanced_robot.c"
+      ],
+      "relevant_files": [
+        "compatibility/temperature_serial.c",
+        "compatibility/kb_core.c"
+      ]
+    },
+    {
+      "id": "heldout-temperature-mixed",
+      "language": "mixed",
+      "latency_ms": 172.4067,
+      "legacy_like_files": [
+        "compatibility/README.md",
+        "compatibility/temperature_serial.c",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 0.5,
+        "ndcg_at_5": 0.38685280723454163,
+        "precision_at_5": 0.2,
+        "recall_at_5": 0.5
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "???? temperature ???????? LM73 ???? I2C",
+      "ranked_files": [
+        "sensor_examples/kidbright_full_system_demo.c",
+        "sensor_examples/all_sensors_demo.c",
+        "sensor_examples/kidbright_full_system_demo.c",
+        "kidbright32iA.md",
+        "sensor_examples/all_sensors_demo.c"
+      ],
+      "relevant_files": [
+        "compatibility/temperature_serial.c",
+        "compatibility/kb_core.c"
+      ]
+    },
+    {
+      "id": "heldout-pid-en",
+      "language": "en",
+      "latency_ms": 158.09519999999998,
+      "legacy_like_files": [
+        "compatibility/README.md",
+        "compatibility/kb_core.c",
+        "compatibility/README.md",
+        "compatibility/README.md",
+        "compatibility/kb_core.h"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 0.5,
+        "ndcg_at_5": 0.6934264036172708,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 0.8772153153380493,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "query": "Maintain proportional integral derivative state with elapsed time",
+      "ranked_files": [
+        "compatibility/kb_core.c",
+        "sensor_examples/minibike_receiver.c",
+        "sensor_examples/calibrate_balancing_bike.c",
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h"
+      ],
+      "relevant_files": [
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h"
+      ]
+    },
+    {
+      "id": "heldout-pid-th",
+      "language": "th",
+      "latency_ms": 214.4178,
+      "legacy_like_files": [],
+      "legacy_like_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "???????????????????????????????????????????????????????????",
+      "ranked_files": [
+        "sensor_examples/calibrate_balancing_joystick.c",
+        "sensor_examples/kidbright_full_system_demo.c",
+        "sensor_examples/formulakid_sender.c",
+        "sensor_examples/accel_kxtj3.c",
+        "sensor_examples/balanced_robot.c"
+      ],
+      "relevant_files": [
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h"
+      ]
+    },
+    {
+      "id": "heldout-pid-mixed",
+      "language": "mixed",
+      "latency_ms": 161.62290000000002,
+      "legacy_like_files": [
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h",
+        "compatibility/README.md",
+        "sensor_examples/calibrate_balancing_bike.c",
+        "sensor_examples/minibike_receiver.c"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "metrics": {
+        "mrr": 0.3333333333333333,
+        "ndcg_at_5": 0.3065735963827292,
+        "precision_at_5": 0.2,
+        "recall_at_5": 0.5
+      },
+      "query": "????????? PID ???????? integral ??? previous error",
+      "ranked_files": [
+        "sensor_examples/calibrate_balancing_bike.c",
+        "sensor_examples/minibike_receiver.c",
+        "compatibility/kb_core.c",
+        "sensor_examples/minibike_receiver.c",
+        "sensor_examples/balanced_robot.c"
+      ],
+      "relevant_files": [
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h"
+      ]
+    },
+    {
+      "id": "heldout-average-en",
+      "language": "en",
+      "latency_ms": 151.24099999999999,
+      "legacy_like_files": [
+        "sensor_examples/adc_ldr_external.c",
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h",
+        "compatibility/kb_display_idf.c",
+        "compatibility/temperature_serial.c"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 0.5,
+        "ndcg_at_5": 0.6934264036172708,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "metrics": {
+        "mrr": 0.5,
+        "ndcg_at_5": 0.38685280723454163,
+        "precision_at_5": 0.2,
+        "recall_at_5": 0.5
+      },
+      "query": "Smooth measurements using a fixed length sliding average",
+      "ranked_files": [
+        "kidbright32iA.md",
+        "compatibility/kb_core.c",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md"
+      ],
+      "relevant_files": [
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h"
+      ]
+    },
+    {
+      "id": "heldout-average-th",
+      "language": "th",
+      "latency_ms": 184.01069999999999,
+      "legacy_like_files": [],
+      "legacy_like_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "??????????????????????????????????????????????????",
+      "ranked_files": [
+        "sensor_examples/calibrate_balancing_joystick.c",
+        "sensor_examples/kidbright_full_system_demo.c",
+        "sensor_examples/formulakid_sender.c",
+        "sensor_examples/accel_kxtj3.c",
+        "sensor_examples/balanced_robot.c"
+      ],
+      "relevant_files": [
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h"
+      ]
+    },
+    {
+      "id": "heldout-average-mixed",
+      "language": "mixed",
+      "latency_ms": 153.33540000000002,
+      "legacy_like_files": [
+        "kidbright32iA.md",
+        "sensor_examples/adc_ldr_external.c",
+        "compatibility/README.md",
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 0.25,
+        "ndcg_at_5": 0.5012658353418871,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 0.6131471927654584,
+        "precision_at_5": 0.2,
+        "recall_at_5": 0.5
+      },
+      "query": "?????????????? moving average ??? window",
+      "ranked_files": [
+        "compatibility/kb_core.c",
+        "sensor_examples/adc_ldr_external.c",
+        "formula_kid_controller.md",
+        "compatibility/README.md",
+        "kidbright32iA.md"
+      ],
+      "relevant_files": [
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h"
+      ]
+    },
+    {
+      "id": "heldout-joystick-en",
+      "language": "en",
+      "latency_ms": 156.0312,
+      "legacy_like_files": [
+        "compatibility/kb_core.h",
+        "compatibility/README.md",
+        "led_16x8_matrix_mapping.md",
+        "sensor_examples/formulakid_sender.c",
+        "support_scope.md"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 0.6131471927654584,
+        "precision_at_5": 0.2,
+        "recall_at_5": 0.5
+      },
+      "metrics": {
+        "mrr": 0.5,
+        "ndcg_at_5": 0.38685280723454163,
+        "precision_at_5": 0.2,
+        "recall_at_5": 0.5
+      },
+      "query": "Calibrate a joystick midpoint and map its raw input range",
+      "ranked_files": [
+        "compatibility/README.md",
+        "compatibility/kb_core.c",
+        "kidbright32iA.md",
+        "sensor_examples/formulakid_sender.c",
+        "hardware_schematics_rules.md"
+      ],
+      "relevant_files": [
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h"
+      ]
+    },
+    {
+      "id": "heldout-joystick-th",
+      "language": "th",
+      "latency_ms": 199.3963,
+      "legacy_like_files": [],
+      "legacy_like_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "??????????????????????????????????????????????",
+      "ranked_files": [
+        "sensor_examples/calibrate_balancing_joystick.c",
+        "sensor_examples/kidbright_full_system_demo.c",
+        "sensor_examples/formulakid_sender.c",
+        "sensor_examples/accel_kxtj3.c",
+        "sensor_examples/balanced_robot.c"
+      ],
+      "relevant_files": [
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h"
+      ]
+    },
+    {
+      "id": "heldout-joystick-mixed",
+      "language": "mixed",
+      "latency_ms": 166.08870000000002,
+      "legacy_like_files": [
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h",
+        "kidbright32iA.md",
+        "minibike.md"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 0.6131471927654584,
+        "precision_at_5": 0.2,
+        "recall_at_5": 0.5
+      },
+      "query": "calibrate joystick midpoint ???? map ??? raw",
+      "ranked_files": [
+        "compatibility/kb_core.c",
+        "hardware_schematics_rules.md",
+        "sensor_examples/formulakid_sender.c",
+        "minibike.md",
+        "minibike.md"
+      ],
+      "relevant_files": [
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h"
+      ]
+    },
+    {
+      "id": "heldout-ascii-en",
+      "language": "en",
+      "latency_ms": 167.70589999999999,
+      "legacy_like_files": [
+        "compatibility/README.md",
+        "support_scope.md",
+        "compatibility/README.md",
+        "compatibility/kb_core.h",
+        "support_scope.md"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 0.3333333333333333,
+        "ndcg_at_5": 0.3065735963827292,
+        "precision_at_5": 0.2,
+        "recall_at_5": 0.5
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "Encode and decode numeric wireless payloads as text rather than binary floats",
+      "ranked_files": [
+        "compatibility/README.md",
+        "compatibility/README.md",
+        "support_scope.md",
+        "compatibility/README.md",
+        "support_scope.md"
+      ],
+      "relevant_files": [
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h"
+      ]
+    },
+    {
+      "id": "heldout-ascii-th",
+      "language": "th",
+      "latency_ms": 180.89749999999998,
+      "legacy_like_files": [],
+      "legacy_like_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "????????????????????????????????????????????????????????????????",
+      "ranked_files": [
+        "sensor_examples/calibrate_balancing_joystick.c",
+        "sensor_examples/kidbright_full_system_demo.c",
+        "sensor_examples/formulakid_sender.c",
+        "sensor_examples/balanced_robot.c",
+        "sensor_examples/accel_kxtj3.c"
+      ],
+      "relevant_files": [
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h"
+      ]
+    },
+    {
+      "id": "heldout-ascii-mixed",
+      "language": "mixed",
+      "latency_ms": 153.0327,
+      "legacy_like_files": [
+        "compatibility/kb_core.h",
+        "minibike.md",
+        "support_scope.md",
+        "compatibility/README.md",
+        "compatibility/README.md"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 0.6131471927654584,
+        "precision_at_5": 0.2,
+        "recall_at_5": 0.5
+      },
+      "metrics": {
+        "mrr": 0.3333333333333333,
+        "ndcg_at_5": 0.3065735963827292,
+        "precision_at_5": 0.2,
+        "recall_at_5": 0.5
+      },
+      "query": "??? ESP-NOW payload ??? ASCII ?????? ?????? binary float",
+      "ranked_files": [
+        "compatibility/README.md",
+        "sensor_examples/fomulakid_receiver.c",
+        "compatibility/kb_core.h",
+        "sensor_examples/minibike_receiver.c",
+        "kidbright32iA.md"
+      ],
+      "relevant_files": [
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h"
+      ]
+    },
+    {
+      "id": "heldout-iaip-en",
+      "language": "en",
+      "latency_ms": 150.5162,
+      "legacy_like_files": [
+        "compatibility/README.md",
+        "compatibility/README.md",
+        "compatibility/README.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "What differs between the pink board and the acceleration equipped board",
+      "ranked_files": [
+        "support_scope.md",
+        "support_scope.md",
+        "kidbright32iA.md",
+        "support_scope.md",
+        "compatibility/README.md"
+      ],
+      "relevant_files": [
+        "inex_ia_ip.md"
+      ]
+    },
+    {
+      "id": "heldout-iaip-th",
+      "language": "th",
+      "latency_ms": 182.2357,
+      "legacy_like_files": [],
+      "legacy_like_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "??????????????????????????????????????????????????????",
+      "ranked_files": [
+        "sensor_examples/calibrate_balancing_joystick.c",
+        "sensor_examples/kidbright_full_system_demo.c",
+        "sensor_examples/formulakid_sender.c",
+        "sensor_examples/accel_kxtj3.c",
+        "sensor_examples/balanced_robot.c"
+      ],
+      "relevant_files": [
+        "inex_ia_ip.md"
+      ]
+    },
+    {
+      "id": "heldout-iaip-mixed",
+      "language": "mixed",
+      "latency_ms": 176.21529999999998,
+      "legacy_like_files": [
+        "inex_ia_ip.md",
+        "README.md",
+        "README.md",
+        "README.md",
+        "README.md"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "query": "????? KidBright32iP ??? iA ???????????? accelerometer",
+      "ranked_files": [
+        "inex_ia_ip.md",
+        "hardware_schematics_rules.md",
+        "sensor_examples/all_sensors_demo.c",
+        "sensor_examples/kidbright_full_system_demo.c",
+        "support_scope.md"
+      ],
+      "relevant_files": [
+        "inex_ia_ip.md"
+      ]
+    },
+    {
+      "id": "heldout-pins-en",
+      "language": "en",
+      "latency_ms": 154.5578,
+      "legacy_like_files": [
+        "kidbright32iA.md",
+        "sensor_examples/accel_mc3479.c",
+        "compatibility/README.md",
+        "compatibility/README.md",
+        "compatibility/README.md"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "Which pins are assigned to external digital input and output connectors",
+      "ranked_files": [
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "README.md"
+      ],
+      "relevant_files": [
+        "inex_ia_ip.md"
+      ]
+    },
+    {
+      "id": "heldout-pins-th",
+      "language": "th",
+      "latency_ms": 229.0043,
+      "legacy_like_files": [],
+      "legacy_like_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "?????????????????????????????????????????????",
+      "ranked_files": [
+        "sensor_examples/calibrate_balancing_joystick.c",
+        "sensor_examples/kidbright_full_system_demo.c",
+        "sensor_examples/formulakid_sender.c",
+        "sensor_examples/accel_kxtj3.c",
+        "sensor_examples/balanced_robot.c"
+      ],
+      "relevant_files": [
+        "inex_ia_ip.md"
+      ]
+    },
+    {
+      "id": "heldout-pins-mixed",
+      "language": "mixed",
+      "latency_ms": 176.7418,
+      "legacy_like_files": [
+        "README.md",
+        "hardware_schematics_rules.md",
+        "hardware_schematics_rules.md",
+        "inex_ia_ip.md",
+        "kidbright32iA.md"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 0.3333333333333333,
+        "ndcg_at_5": 0.5,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "IN1 IN4 OUT1 OUT2 ??? GPIO ???",
+      "ranked_files": [
+        "formula_kid_controller.md",
+        "README.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md"
+      ],
+      "relevant_files": [
+        "inex_ia_ip.md"
+      ]
+    },
+    {
+      "id": "heldout-mc3479-en",
+      "language": "en",
+      "latency_ms": 175.0,
+      "legacy_like_files": [
+        "compatibility/README.md",
+        "compatibility/README.md",
+        "sensor_examples/accel_mc3479.c",
+        "support_scope.md",
+        "README.md"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 0.5,
+        "ndcg_at_5": 0.6309297535714575,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "query": "Find an example driver for the three axis acceleration sensor on the newer board",
+      "ranked_files": [
+        "sensor_examples/accel_mc3479.c",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "led_16x8_matrix_mapping.md",
+        "compatibility/README.md"
+      ],
+      "relevant_files": [
+        "sensor_examples/accel_mc3479.c"
+      ]
+    },
+    {
+      "id": "heldout-mc3479-th",
+      "language": "th",
+      "latency_ms": 194.6504,
+      "legacy_like_files": [],
+      "legacy_like_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "???????????????????????????????????????????????????????",
+      "ranked_files": [
+        "sensor_examples/calibrate_balancing_joystick.c",
+        "sensor_examples/kidbright_full_system_demo.c",
+        "sensor_examples/formulakid_sender.c",
+        "sensor_examples/accel_kxtj3.c",
+        "sensor_examples/balanced_robot.c"
+      ],
+      "relevant_files": [
+        "sensor_examples/accel_mc3479.c"
+      ]
+    },
+    {
+      "id": "heldout-mc3479-mixed",
+      "language": "mixed",
+      "latency_ms": 156.69910000000002,
+      "legacy_like_files": [
+        "inex_ia_ip.md",
+        "README.md",
+        "README.md",
+        "README.md",
+        "README.md"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "???? acceleration ???????? MC3479 ???????? driver",
+      "ranked_files": [
+        "inex_ia_ip.md",
+        "sensor_examples/accel_kxtj3.c",
+        "sensor_examples/accel_kxtj3.c",
+        "sensor_examples/accel_kxtj3.c",
+        "sensor_examples/fomulakid_receiver.c"
+      ],
+      "relevant_files": [
+        "sensor_examples/accel_mc3479.c"
+      ]
+    },
+    {
+      "id": "heldout-kxtj3-en",
+      "language": "en",
+      "latency_ms": 156.7354,
+      "legacy_like_files": [
+        "kidbright32iA.md",
+        "compatibility/README.md",
+        "kidbright32iA.md",
+        "sensor_examples/accel_mc3479.c",
+        "compatibility/README.md"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "metrics": {
+        "mrr": 0.5,
+        "ndcg_at_5": 0.6309297535714575,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "query": "Read axes from the older acceleration sensor using its registers",
+      "ranked_files": [
+        "sensor_examples/accel_mc3479.c",
+        "sensor_examples/accel_kxtj3.c",
+        "sensor_examples/accel_kxtj3.c",
+        "kidbright32iA.md",
+        "kidbright32iA.md"
+      ],
+      "relevant_files": [
+        "sensor_examples/accel_kxtj3.c"
+      ]
+    },
+    {
+      "id": "heldout-kxtj3-th",
+      "language": "th",
+      "latency_ms": 222.3363,
+      "legacy_like_files": [],
+      "legacy_like_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "metrics": {
+        "mrr": 0.25,
+        "ndcg_at_5": 0.43067655807339306,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "query": "??????????????????????????????????????????????????",
+      "ranked_files": [
+        "sensor_examples/calibrate_balancing_joystick.c",
+        "sensor_examples/kidbright_full_system_demo.c",
+        "sensor_examples/formulakid_sender.c",
+        "sensor_examples/accel_kxtj3.c",
+        "sensor_examples/balanced_robot.c"
+      ],
+      "relevant_files": [
+        "sensor_examples/accel_kxtj3.c"
+      ]
+    },
+    {
+      "id": "heldout-kxtj3-mixed",
+      "language": "mixed",
+      "latency_ms": 161.8158,
+      "legacy_like_files": [
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "README.md",
+        "README.md"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "?????????? KXTJ3 ???? register I2C",
+      "ranked_files": [
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md"
+      ],
+      "relevant_files": [
+        "sensor_examples/accel_kxtj3.c"
+      ]
+    },
+    {
+      "id": "heldout-external-adc-en",
+      "language": "en",
+      "latency_ms": 179.31810000000002,
+      "legacy_like_files": [
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "support_scope.md"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "Measure an external light dependent resistor with the analog converter",
+      "ranked_files": [
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md"
+      ],
+      "relevant_files": [
+        "sensor_examples/adc_ldr_external.c"
+      ]
+    },
+    {
+      "id": "heldout-external-adc-th",
+      "language": "th",
+      "latency_ms": 180.1894,
+      "legacy_like_files": [],
+      "legacy_like_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "?????????????????????????????????????????????????",
+      "ranked_files": [
+        "sensor_examples/calibrate_balancing_joystick.c",
+        "sensor_examples/kidbright_full_system_demo.c",
+        "sensor_examples/formulakid_sender.c",
+        "sensor_examples/accel_kxtj3.c",
+        "sensor_examples/balanced_robot.c"
+      ],
+      "relevant_files": [
+        "sensor_examples/adc_ldr_external.c"
+      ]
+    },
+    {
+      "id": "heldout-external-adc-mixed",
+      "language": "mixed",
+      "latency_ms": 189.5778,
+      "legacy_like_files": [
+        "README.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "sensor_examples/adc_ldr_external.c",
+        "README.md"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 0.3333333333333333,
+        "ndcg_at_5": 0.5,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "metrics": {
+        "mrr": 0.3333333333333333,
+        "ndcg_at_5": 0.5,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "query": "???? external LDR ???? ADC ??????",
+      "ranked_files": [
+        "sensor_examples/kidbright_full_system_demo.c",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "sensor_examples/adc_ldr_external.c",
+        "kidbright32iA.md"
+      ],
+      "relevant_files": [
+        "sensor_examples/adc_ldr_external.c"
+      ]
+    },
+    {
+      "id": "heldout-oled-en",
+      "language": "en",
+      "latency_ms": 165.4235,
+      "legacy_like_files": [
+        "compatibility/README.md",
+        "kidbright32iA.md",
+        "sensor_examples/formulakid_sender.c",
+        "compatibility/README.md",
+        "compatibility/kb_display_idf.h"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "Connect and initialize a monochrome organic LED display over a two wire bus",
+      "ranked_files": [
+        "led_16x8_matrix_mapping.md",
+        "compatibility/README.md",
+        "support_scope.md",
+        "compatibility/kb_display_idf.h",
+        "kidbright32iA.md"
+      ],
+      "relevant_files": [
+        "oled_ssd1306.md"
+      ]
+    },
+    {
+      "id": "heldout-oled-th",
+      "language": "th",
+      "latency_ms": 190.5175,
+      "legacy_like_files": [],
+      "legacy_like_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "???????????????????????????????????????????????????????",
+      "ranked_files": [
+        "sensor_examples/calibrate_balancing_joystick.c",
+        "sensor_examples/kidbright_full_system_demo.c",
+        "sensor_examples/formulakid_sender.c",
+        "sensor_examples/accel_kxtj3.c",
+        "sensor_examples/balanced_robot.c"
+      ],
+      "relevant_files": [
+        "oled_ssd1306.md"
+      ]
+    },
+    {
+      "id": "heldout-oled-mixed",
+      "language": "mixed",
+      "latency_ms": 195.67940000000002,
+      "legacy_like_files": [
+        "kidbright32iA.md",
+        "minibike.md",
+        "oled_ssd1306.md",
+        "oled_ssd1306.md",
+        "hardware_schematics_rules.md"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 0.3333333333333333,
+        "ndcg_at_5": 0.5,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "query": "????? OLED SSD1306 ???? I2C ???????????????",
+      "ranked_files": [
+        "oled_ssd1306.md",
+        "oled_ssd1306.md",
+        "kidbright32iA.md",
+        "minibike.md",
+        "kidbright32iA.md"
+      ],
+      "relevant_files": [
+        "oled_ssd1306.md"
+      ]
+    },
+    {
+      "id": "heldout-balance-en",
+      "language": "en",
+      "latency_ms": 163.019,
+      "legacy_like_files": [
+        "support_scope.md",
+        "compatibility/README.md",
+        "compatibility/README.md",
+        "compatibility/README.md",
+        "compatibility/README.md"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "Find the firmware example for a self balancing robot",
+      "ranked_files": [
+        "skate_rev1.3.md",
+        "skate_rev1.3.md",
+        "skate_rev1.3.md",
+        "skate_rev1.3.md",
+        "skate_rev1.3.md"
+      ],
+      "relevant_files": [
+        "sensor_examples/balanced_robot.c"
+      ]
+    },
+    {
+      "id": "heldout-balance-th",
+      "language": "th",
+      "latency_ms": 158.73760000000001,
+      "legacy_like_files": [],
+      "legacy_like_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "metrics": {
+        "mrr": 0.2,
+        "ndcg_at_5": 0.38685280723454163,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "query": "????????????????????????????????????????????",
+      "ranked_files": [
+        "sensor_examples/calibrate_balancing_joystick.c",
+        "sensor_examples/kidbright_full_system_demo.c",
+        "sensor_examples/formulakid_sender.c",
+        "sensor_examples/accel_kxtj3.c",
+        "sensor_examples/balanced_robot.c"
+      ],
+      "relevant_files": [
+        "sensor_examples/balanced_robot.c"
+      ]
+    },
+    {
+      "id": "heldout-balance-mixed",
+      "language": "mixed",
+      "latency_ms": 166.6154,
+      "legacy_like_files": [
+        "skate_rev1.3.md",
+        "skate_rev1.3.md",
+        "skate_rev1.3.md",
+        "skate_rev1.3.md",
+        "skate_rev1.3.md"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "???????? self balancing robot ??????????",
+      "ranked_files": [
+        "skate_rev1.3.md",
+        "skate_rev1.3.md",
+        "skate_rev1.3.md",
+        "skate_rev1.3.md",
+        "skate_rev1.3.md"
+      ],
+      "relevant_files": [
+        "sensor_examples/balanced_robot.c"
+      ]
+    },
+    {
+      "id": "heldout-formula-en",
+      "language": "en",
+      "latency_ms": 158.67899999999997,
+      "legacy_like_files": [
+        "support_scope.md",
+        "compatibility/README.md",
+        "support_scope.md",
+        "compatibility/README.md",
+        "compatibility/README.md"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "Explain the controller wiring and protocol for the steering vehicle",
+      "ranked_files": [
+        "support_scope.md",
+        "support_scope.md",
+        "support_scope.md",
+        "compatibility/README.md",
+        "support_scope.md"
+      ],
+      "relevant_files": [
+        "formula_kid_controller.md"
+      ]
+    },
+    {
+      "id": "heldout-formula-th",
+      "language": "th",
+      "latency_ms": 197.93089999999998,
+      "legacy_like_files": [],
+      "legacy_like_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "??????????????????????????????????????????????????",
+      "ranked_files": [
+        "sensor_examples/calibrate_balancing_joystick.c",
+        "sensor_examples/kidbright_full_system_demo.c",
+        "sensor_examples/formulakid_sender.c",
+        "sensor_examples/accel_kxtj3.c",
+        "sensor_examples/balanced_robot.c"
+      ],
+      "relevant_files": [
+        "formula_kid_controller.md"
+      ]
+    },
+    {
+      "id": "heldout-formula-mixed",
+      "language": "mixed",
+      "latency_ms": 159.8763,
+      "legacy_like_files": [
+        "formula_kid_controller.md",
+        "support_scope.md",
+        "compatibility/README.md",
+        "compatibility/README.md",
+        "formula_kid_controller.md"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "query": "????? Formula Kid ??? protocol ?????????",
+      "ranked_files": [
+        "formula_kid_controller.md",
+        "formula_kid_controller.md",
+        "formula_kid_controller.md",
+        "hardware_schematics_rules.md",
+        "formula_kid_controller.md"
+      ],
+      "relevant_files": [
+        "formula_kid_controller.md"
+      ]
+    },
+    {
+      "id": "heldout-minibike-en",
+      "language": "en",
+      "latency_ms": 161.17229999999998,
+      "legacy_like_files": [
+        "compatibility/README.md",
+        "compatibility/README.md",
+        "compatibility/README.md",
+        "compatibility/README.md",
+        "compatibility/README.md"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "Find the electrical and communication constraints for the miniature motorcycle",
+      "ranked_files": [
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "support_scope.md",
+        "support_scope.md",
+        "compatibility/README.md"
+      ],
+      "relevant_files": [
+        "minibike.md"
+      ]
+    },
+    {
+      "id": "heldout-minibike-th",
+      "language": "th",
+      "latency_ms": 193.9656,
+      "legacy_like_files": [],
+      "legacy_like_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "???????????????????????????????????????????????????????????",
+      "ranked_files": [
+        "sensor_examples/calibrate_balancing_joystick.c",
+        "sensor_examples/kidbright_full_system_demo.c",
+        "sensor_examples/formulakid_sender.c",
+        "sensor_examples/accel_kxtj3.c",
+        "sensor_examples/balanced_robot.c"
+      ],
+      "relevant_files": [
+        "minibike.md"
+      ]
+    },
+    {
+      "id": "heldout-minibike-mixed",
+      "language": "mixed",
+      "latency_ms": 145.4683,
+      "legacy_like_files": [
+        "compatibility/README.md",
+        "hardware_schematics_rules.md",
+        "minibike.md",
+        "README.md",
+        "README.md"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 0.3333333333333333,
+        "ndcg_at_5": 0.5,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "query": "minibike ???????? hardware ?????????????",
+      "ranked_files": [
+        "minibike.md",
+        "led_16x8_matrix_mapping.md",
+        "kidbright32iA.md",
+        "sensor_examples/all_sensors_demo.c",
+        "sensor_examples/kidbright_full_system_demo.c"
+      ],
+      "relevant_files": [
+        "minibike.md"
+      ]
+    },
+    {
+      "id": "heldout-mai-en",
+      "language": "en",
+      "latency_ms": 167.3109,
+      "legacy_like_files": [
+        "support_scope.md",
+        "support_scope.md",
+        "support_scope.md",
+        "compatibility/README.md",
+        "compatibility/README.md"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "Does the camera based AI board use the same firmware toolchain as the microcontroller board",
+      "ranked_files": [
+        "support_scope.md",
+        "kidbright32iA.md",
+        "support_scope.md",
+        "support_scope.md",
+        "kidbright32iA.md"
+      ],
+      "relevant_files": [
+        "kidbright_uai.md"
+      ]
+    },
+    {
+      "id": "heldout-mai-th",
+      "language": "th",
+      "latency_ms": 260.1841,
+      "legacy_like_files": [],
+      "legacy_like_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "???????????????????????????????????????????????????????????????????????????????????",
+      "ranked_files": [
+        "sensor_examples/calibrate_balancing_joystick.c",
+        "sensor_examples/kidbright_full_system_demo.c",
+        "sensor_examples/accel_kxtj3.c",
+        "sensor_examples/formulakid_sender.c",
+        "sensor_examples/balanced_robot.c"
+      ],
+      "relevant_files": [
+        "kidbright_uai.md"
+      ]
+    },
+    {
+      "id": "heldout-mai-mixed",
+      "language": "mixed",
+      "latency_ms": 200.23489999999998,
+      "legacy_like_files": [
+        "README.md",
+        "inex_ia_ip.md",
+        "kidbright32iA.md",
+        "kidbright_uai.md",
+        "led_16x8_matrix_mapping.md"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 0.25,
+        "ndcg_at_5": 0.43067655807339306,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "metrics": {
+        "mrr": 0.3333333333333333,
+        "ndcg_at_5": 0.5,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "query": "????? ?AI Linux ??? ESP-IDF ?????? KidBright32 ?????????",
+      "ranked_files": [
+        "README.md",
+        "kidbright32iA.md",
+        "kidbright_uai.md",
+        "oled_ssd1306.md",
+        "kidbright32iA.md"
+      ],
+      "relevant_files": [
+        "kidbright_uai.md"
+      ]
+    },
+    {
+      "id": "heldout-schematic-en",
+      "language": "en",
+      "latency_ms": 169.69819999999999,
+      "legacy_like_files": [
+        "compatibility/README.md",
+        "compatibility/README.md",
+        "sensor_examples/accel_mc3479.c",
+        "kidbright32iA.md",
+        "support_scope.md"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "How should a board revision be verified before choosing pin assignments",
+      "ranked_files": [
+        "kidbright32iA.md",
+        "support_scope.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "support_scope.md"
+      ],
+      "relevant_files": [
+        "hardware_schematics_rules.md"
+      ]
+    },
+    {
+      "id": "heldout-schematic-th",
+      "language": "th",
+      "latency_ms": 184.1677,
+      "legacy_like_files": [],
+      "legacy_like_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "??????????????????????????????????????????????????????",
+      "ranked_files": [
+        "sensor_examples/calibrate_balancing_joystick.c",
+        "sensor_examples/kidbright_full_system_demo.c",
+        "sensor_examples/formulakid_sender.c",
+        "sensor_examples/accel_kxtj3.c",
+        "sensor_examples/balanced_robot.c"
+      ],
+      "relevant_files": [
+        "hardware_schematics_rules.md"
+      ]
+    },
+    {
+      "id": "heldout-schematic-mixed",
+      "language": "mixed",
+      "latency_ms": 158.7471,
+      "legacy_like_files": [
+        "support_scope.md",
+        "compatibility/README.md",
+        "compatibility/README.md",
+        "kidbright32iA.md",
+        "sensor_examples/accel_mc3479.c"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "?????? board revision ??? schematic ????????? pin mapping",
+      "ranked_files": [
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "oled_ssd1306.md",
+        "led_16x8_matrix_mapping.md",
+        "sensor_examples/kidbright_full_system_demo.c"
+      ],
+      "relevant_files": [
+        "hardware_schematics_rules.md"
+      ]
+    },
+    {
+      "id": "heldout-symbol-kb_matrix_pixel",
+      "language": "technical",
+      "latency_ms": 142.6798,
+      "legacy_like_files": [
+        "compatibility/kb_basic.c",
+        "compatibility/kb_basic.h"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "query": "kb_matrix_pixel",
+      "ranked_files": [
+        "compatibility/kb_basic.c",
+        "compatibility/kb_basic.h",
+        "compatibility/kb_basic.c",
+        "compatibility/kb_basic.c",
+        "led_16x8_matrix_mapping.md"
+      ],
+      "relevant_files": [
+        "compatibility/kb_basic.c",
+        "compatibility/kb_basic.h"
+      ]
+    },
+    {
+      "id": "heldout-symbol-kb_matrix_shift",
+      "language": "technical",
+      "latency_ms": 146.8748,
+      "legacy_like_files": [
+        "compatibility/kb_basic.c",
+        "compatibility/kb_basic.h"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "query": "kb_matrix_shift",
+      "ranked_files": [
+        "compatibility/kb_basic.c",
+        "compatibility/kb_basic.h",
+        "compatibility/kb_basic.c",
+        "compatibility/kb_basic.c",
+        "compatibility/kb_basic.c"
+      ],
+      "relevant_files": [
+        "compatibility/kb_basic.c",
+        "compatibility/kb_basic.h"
+      ]
+    },
+    {
+      "id": "heldout-symbol-kb_ascii_format",
+      "language": "technical",
+      "latency_ms": 150.2773,
+      "legacy_like_files": [
+        "compatibility/README.md",
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 0.5,
+        "ndcg_at_5": 0.6934264036172708,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 0.9197207891481876,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "query": "kb_ascii_format",
+      "ranked_files": [
+        "compatibility/kb_core.c",
+        "compatibility/README.md",
+        "compatibility/kb_core.h",
+        "compatibility/kb_basic.c",
+        "compatibility/kb_core.c"
+      ],
+      "relevant_files": [
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h"
+      ]
+    },
+    {
+      "id": "heldout-symbol-kb_joystick_init",
+      "language": "technical",
+      "latency_ms": 140.1202,
+      "legacy_like_files": [
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "query": "kb_joystick_init",
+      "ranked_files": [
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h",
+        "sensor_examples/formulakid_sender.c",
+        "sensor_examples/minibike_sender.c",
+        "hardware_schematics_rules.md"
+      ],
+      "relevant_files": [
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h"
+      ]
+    },
+    {
+      "id": "heldout-symbol-kb_delay_ms",
+      "language": "technical",
+      "latency_ms": 148.9068,
+      "legacy_like_files": [
+        "compatibility/README.md",
+        "compatibility/button_buzzer.c",
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h",
+        "compatibility/temperature_serial.c"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 0.3333333333333333,
+        "ndcg_at_5": 0.5706417189553201,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 0.9197207891481876,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "query": "kb_delay_ms",
+      "ranked_files": [
+        "compatibility/kb_core.c",
+        "compatibility/button_buzzer.c",
+        "compatibility/kb_core.h",
+        "compatibility/README.md",
+        "compatibility/temperature_serial.c"
+      ],
+      "relevant_files": [
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h"
+      ]
+    },
+    {
+      "id": "heldout-symbol-kb_music_duration",
+      "language": "technical",
+      "latency_ms": 147.6401,
+      "legacy_like_files": [
+        "compatibility/kb_basic.c",
+        "compatibility/kb_basic.h",
+        "compatibility/matrix_counter.c",
+        "compatibility/music_scale.c"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "metrics": {
+        "mrr": 0.5,
+        "ndcg_at_5": 0.6509209298071326,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "query": "kb_music_duration",
+      "ranked_files": [
+        "compatibility/matrix_counter.c",
+        "compatibility/kb_basic.c",
+        "compatibility/music_scale.c",
+        "compatibility/kb_basic.h",
+        "compatibility/kb_basic.c"
+      ],
+      "relevant_files": [
+        "compatibility/kb_basic.c",
+        "compatibility/kb_basic.h"
+      ]
+    },
+    {
+      "id": "heldout-symbol-kb_music_frequency",
+      "language": "technical",
+      "latency_ms": 148.78130000000002,
+      "legacy_like_files": [
+        "compatibility/kb_basic.c",
+        "compatibility/kb_basic.h",
+        "compatibility/music_scale.c"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 0.9197207891481876,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "query": "kb_music_frequency",
+      "ranked_files": [
+        "compatibility/kb_basic.c",
+        "compatibility/music_scale.c",
+        "compatibility/kb_basic.h",
+        "compatibility/kb_basic.c",
+        "compatibility/README.md"
+      ],
+      "relevant_files": [
+        "compatibility/kb_basic.c",
+        "compatibility/kb_basic.h"
+      ]
+    },
+    {
+      "id": "heldout-symbol-kb_matrix_pack",
+      "language": "technical",
+      "latency_ms": 159.59619999999998,
+      "legacy_like_files": [
+        "compatibility/kb_basic.c",
+        "compatibility/kb_basic.h",
+        "compatibility/kb_display_idf.c"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "query": "kb_matrix_pack",
+      "ranked_files": [
+        "compatibility/kb_basic.h",
+        "compatibility/kb_basic.c",
+        "compatibility/kb_display_idf.c",
+        "kidbright32iA.md",
+        "formula_kid_controller.md"
+      ],
+      "relevant_files": [
+        "compatibility/kb_basic.c",
+        "compatibility/kb_basic.h"
+      ]
+    },
+    {
+      "id": "heldout-symbol-kb_matrix_digit",
+      "language": "technical",
+      "latency_ms": 150.6872,
+      "legacy_like_files": [
+        "compatibility/kb_basic.c",
+        "compatibility/kb_basic.h",
+        "compatibility/matrix_counter.c"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "query": "kb_matrix_digit",
+      "ranked_files": [
+        "compatibility/kb_basic.c",
+        "compatibility/kb_basic.h",
+        "compatibility/matrix_counter.c",
+        "led_16x8_matrix_mapping.md",
+        "led_16x8_matrix_mapping.md"
+      ],
+      "relevant_files": [
+        "compatibility/kb_basic.c",
+        "compatibility/kb_basic.h"
+      ]
+    }
+  ],
+  "query_count": 69,
+  "schema_version": 1,
+  "scope": {
+    "architecture": "x86_64",
+    "operating_system": "windows",
+    "private_tool_export": false,
+    "source_directory": "knowledge_base (temporary copy)"
+  },
+  "unchanged_index": {
+    "latency_ms": 66.6228,
+    "report": {
+      "cached_embeddings": 0,
+      "chunks": 2026,
+      "embedded_chunks": 0,
+      "files_deleted": 0,
+      "files_seen": 37,
+      "files_unchanged": 37,
+      "files_updated": 0,
+      "warnings": []
+    }
+  },
+  "resources": {
+    "peak_working_set_bytes": 371933184,
+    "peak_sampled_private_bytes": 388333568,
+    "wall_seconds": 139.30464760000177,
+    "sampling_interval_ms": 100,
+    "method": "Windows GetProcessMemoryInfo, one process per ranker; single run"
+  },
+  "latency_summary_ms": {
+    "median": 166.08870000000002,
+    "p95": 219.7696
+  },
+  "language_macro_average": {
+    "en": {
+      "mrr": 0.24166666666666667,
+      "ndcg_at_5": 0.2100785736263389,
+      "precision_at_5": 0.08,
+      "recall_at_5": 0.25
+    },
+    "mixed": {
+      "mrr": 0.4791666666666667,
+      "ndcg_at_5": 0.42482062609503424,
+      "precision_at_5": 0.13,
+      "recall_at_5": 0.5
+    },
+    "technical": {
+      "mrr": 0.9444444444444444,
+      "ndcg_at_5": 0.9344536996946328,
+      "precision_at_5": 0.4,
+      "recall_at_5": 1.0
+    },
+    "th": {
+      "mrr": 0.0225,
+      "ndcg_at_5": 0.04087646826539673,
+      "precision_at_5": 0.02,
+      "recall_at_5": 0.1
+    }
+  },
+  "valid": false,
+  "invalid_reason": "Thai/mixed queries damaged by PowerShell native pipe codepage. Not a quality measurement; interrupted before completion of candidate evaluation."
+}

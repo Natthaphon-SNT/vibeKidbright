@@ -1,0 +1,55 @@
+{
+  "status": "PARTIAL",
+  "verified_source_ids": 9,
+  "new_sdk_builds_passed": 2,
+  "new_sdk_builds_total": 2,
+  "results": [
+    {
+      "example": "arithmetic_if",
+      "board_profile": "kidbright32_v13",
+      "exit_code": 0,
+      "log": "arithmetic_if-build.log",
+      "flashed": false,
+      "sdk_version": "5.5.4",
+      "target": "esp32",
+      "generated_main_sha256": "96bb97fc1a0a575edf1ac8b85a16b231b415c1837b3bd2b4a7883121f0c26f5f",
+      "firmware": {
+        "bytes": 161840,
+        "sha256": "796f0c8cae8fa2ea2494c8dd8b831b61a9ed8329b6d5b11ae68e1394c917f1b0"
+      },
+      "compile_commands_sha256": "f1162bb353afdd1295b75e1cc309a55e1a2a2e8448a31235387c226b35212fdd",
+      "physical_behavior": "unverified"
+    },
+    {
+      "example": "nested_conditions",
+      "board_profile": "kidbright32_rev31",
+      "exit_code": 0,
+      "log": "nested_conditions-build.log",
+      "flashed": false,
+      "sdk_version": "5.5.4",
+      "target": "esp32",
+      "generated_main_sha256": "b973f1353bc81ca5744ba49b9a12139d4221874e469bda867338f8cc14e5e78c",
+      "firmware": {
+        "bytes": 161840,
+        "sha256": "c04d304689c2eaa8beae159966ef7f37be3d5706b0bc76e0bdf4e2f68496306f"
+      },
+      "compile_commands_sha256": "0be7eabe8a59cd735fa751a7698a00d644c0cf15efd6c3133cca9e2f53fcea34",
+      "physical_behavior": "unverified"
+    }
+  ],
+  "existing_fixture_source_regressions": [
+    {
+      "fixture": "repeat_delay",
+      "current_generated_main_matches_previous_build_evidence": true,
+      "sha256": "ace975b65bbe205264e118b80d1c0da08a56088e9bf661a68a7c10eb9e4f961e"
+    },
+    {
+      "fixture": "forever_delay",
+      "current_generated_main_matches_previous_build_evidence": true,
+      "sha256": "513c690c3b412a1a24918256f7f423cf5f9e2ed4b7493969792b33678010a435"
+    }
+  ],
+  "llm_generated": false,
+  "physical_behavior": "unverified",
+  "source_evidence": "block-source-evidence.json"
+}

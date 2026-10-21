@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-17",
+  "scope": "Learning workspace frontend; local practice datasets and UI navigation only.",
+  "manual": {
+    "sha256": "f7855e8840715729c6684cd069bdfaa2995667309931af6752eb8e11fd2085e7",
+    "reference": "User-supplied Kidbright uAi PLUS manual, 89 pages; local hash rechecked."
+  },
+  "tests": {
+    "command": "npm test -- --reporter=dot",
+    "test_files_passed": 12,
+    "tests_passed": 145
+  },
+  "browser": {
+    "engine": "Google Chrome via Playwright",
+    "native_integration": "Tauri replies stubbed in browser harness only; no production mocks added.",
+    "viewport_checks": [
+      {
+        "width": 1536,
+        "documentOverflow": false,
+        "workspaceOverflow": false
+      },
+      {
+        "width": 1280,
+        "documentOverflow": false,
+        "workspaceOverflow": false
+      },
+      {
+        "width": 1024,
+        "documentOverflow": false,
+        "workspaceOverflow": false
+      },
+      {
+        "width": 800,
+        "documentOverflow": false,
+        "workspaceOverflow": false
+      }
+    ],
+    "page_errors": [],
+    "interactive_checks": [
+      "local file preview",
+      "class reassignment",
+      "training remains unavailable"
+    ],
+    "forbidden_commands_observed": []
+  },
+  "limits": {
+    "hardware_tested": false,
+    "training_service_integrated": false,
+    "native_mai_deployment_integrated": false,
+    "active_profiles_added": 0,
+    "installer_built_or_installed": false,
+    "practice_data_persisted_to_project": false,
+    "workspace_languages": [
+      "th",
+      "en"
+    ]
+  },
+  "files": [
+    {
+      "path": "src/App.tsx",
+      "bytes": 105786,
+      "sha256": "20acae78aa43718de32282d9afdf37d4e04b1003f4ea29f5edd96cc65efaeb93"
+    },
+    {
+      "path": "src/LearningWorkspace.tsx",
+      "bytes": 32575,
+      "sha256": "702038f3460094837d5ccb87a8574a4bdd2a5a0587a567cdf00e55b9e0e6f541"
+    },
+    {
+      "path": "src/LearningWorkspace.css",
+      "bytes": 19314,
+      "sha256": "84cf6d302407631522b9edad8567cb00304fba0f015134f02cb8276fdb0f264a"
+    },
+    {
+      "path": "src/test/learningWorkspace.test.tsx",
+      "bytes": 5492,
+      "sha256": "11768433355b39598f2c4c9e556fbc3ea645865f561f1207fa8aa1a7e6c90d6f"
+    },
+    {
+      "path": "src/test/projectSidebar.test.tsx",
+      "bytes": 13922,
+      "sha256": "74f38d569a2db38720d7dabe325f09edd4abfa18d4335798df83b4f4968b5e2b"
+    },
+    {
+      "path": "src/test/buildWorkflow.test.tsx",
+      "bytes": 12079,
+      "sha256": "314b6cacbada3e90cb198fbb8c98864eb94652a2d94a568b2db5fd614662c137"
+    },
+    {
+      "path": "docs/previews/mai-plus-workspace-2026-10-17.png",
+      "bytes": 146008,
+      "sha256": "4fa9e90a3b1735725e5c649eb8e9e70bbb03b41e92deed4635481e4e6b8492d0"
+    },
+    {
+      "path": "docs/previews/mai-plus-training-2026-10-17.png",
+      "bytes": 134979,
+      "sha256": "15bc894ffaaa32c47dce44419058c3ffd1a9a03c4abd20e1515897387f776f98"
+    },
+    {
+      "path": "docs/previews/mai-plus-dark-2026-10-17.png",
+      "bytes": 148323,
+      "sha256": "a75bae99021f9b9f9640b8501d94398361fc684ceea39d0fbe22c77818dd6b47"
+    },
+    {
+      "path": "docs/previews/mai-plus-compact-2026-10-17.png",
+      "bytes": 114358,
+      "sha256": "f7e9d0443138d22080de3e2a6d356f02b9d92c47d6856470213e9144dbc5ebe0"
+    }
+  ],
+  "release_validation": {
+    "command": "npm run build:release",
+    "exit_code": 0,
+    "checks_passed": [
+      "knowledge sync",
+      "board catalog",
+      "coverage inventory",
+      "rule inventory",
+      "public files",
+      "bundle resources",
+      "TypeScript",
+      "Vite production build"
+    ],
+    "warnings": [
+      "Vite mixed static/dynamic event import",
+      "Vite large editor bundle"
+    ],
+    "desktop_installer_built": false
+  }
+}

@@ -1,4 +1,6 @@
 # KidBright Minibike — Hardware Rules & Firmware Reference
+> **ขอบเขต:** เอกสารนี้เป็นชุด L298N + binary_int32 แบบเฉพาะของ repository ไม่ใช่การแปลงตรงของปลั๊กอิน minibike เดิมที่ใช้ BDC/BLDC และ ASCII ESP-NOW ดู `compatibility/README.md` ก่อนเลือกบอร์ดหรือโปรโตคอล ห้ามนำสองชุดมาปนกัน
+> การแก้ SH1106 ในรอบ audit นี้อยู่ใน Markdown/prompt; ไฟล์ C ตัวอย่างเก่ายังต้องตรวจและพอร์ต initialization ก่อนใช้จริง ไม่ใช่ผล build/hardware ที่รับรองแล้ว อ่าน `support_scope.md` ประกอบ
 > ระบบรถจักรยานทรงตัว (Self-Balancing Bike) ควบคุมผ่านจอย KidBright Controller V1  
 > สื่อสารด้วย **ESP-NOW** (ไม่ใช้ WiFi AP)  
 > ESP-IDF v5.x เท่านั้น — ห้ามใช้ Arduino Framework
@@ -30,7 +32,7 @@
 | ชิ้นส่วน | รายละเอียด |
 |---------|-----------|
 | MCU | ESP32 bare module |
-| Joystick | 2 แกน (X/Y), อ่านผ่าน ADC1 Legacy API |
+| Joystick | 2 แกน (X/Y), ตัวอย่าง sender ปัจจุบันใช้ ADC oneshot |
 | สวิตช์ | SW1 (GPIO16), SW2 (GPIO14) — Active LOW |
 | จอแสดงผล | **OLED SH1106** 128×64 px, I2C `0x3C` |
 | การสื่อสาร | ESP-NOW channel 1, WiFi STA (ไม่ต่อ AP) |
@@ -64,8 +66,8 @@ oled_cmd(0xD5); oled_cmd(0x80); // clock div
 oled_cmd(0xA8); oled_cmd(0x3F); // mux ratio 64
 oled_cmd(0xD3); oled_cmd(0x00); // display offset
 oled_cmd(0x40);                  // start line 0
-oled_cmd(0x8D); oled_cmd(0x14); // charge pump on  ← SH1106 ใช้ 0x8D (SSD1306=0xAD)
-oled_cmd(0x20); oled_cmd(0x00); // horizontal addressing
+oled_cmd(0xAD); oled_cmd(0x8B); // SH1106 DC-DC on; verify module supply circuit
+// SH1106 uses page addressing; do not send SSD1306 horizontal-addressing 0x20/0x21/0x22 commands.
 oled_cmd(0xA1);                  // seg remap
 oled_cmd(0xC8);                  // com scan direction
 oled_cmd(0xDA); oled_cmd(0x12); // com pins
@@ -96,10 +98,11 @@ oled_cmd(0x10);          // higher column = 0
 
 > ❌ **ห้าม** ใช้ lower column = `0x00` เหมือน SSD1306 — จะทำให้ภาพเลื่อน 2 pixel
 
-### 2.4 ADC API — Legacy (driver/adc.h)
+### 2.4 ADC API — ตัวอย่างเก่าเทียบกับ SDK ปัจจุบัน
 
-> ⚠️ **CRITICAL:** Sender ใช้ **Legacy ADC API** (`driver/adc.h` + `esp_adc_cal.h`)  
-> **ไม่ใช่** `esp_adc/adc_oneshot.h`
+> โค้ด `sensor_examples/minibike_sender.c` ปัจจุบันใช้ `esp_adc/adc_oneshot.h`
+> snippet legacy ด้านล่างเป็นประวัติการเรียก API เพื่อใช้ตรวจพอร์ต ไม่ใช่คำสั่งให้เปลี่ยนกลับไปใช้ legacy
+> เลือก driver family ตาม SDK และคง calibration/mapping ของ joystick ที่ผู้ใช้เลือก
 
 ```c
 // Headers
@@ -147,7 +150,7 @@ joy_x = (int)constrain_val(-joy_x, -100, 100);
 ```c
 void app_main(void) {
     gpio_init_pins();   // SW1/SW2
-    adc_init();         // ADC1 legacy
+    adc_init();         // ADC API selected for the installed SDK
     oled_init();        // I2C + SH1106 init  ← ต้องก่อน espnow
     espnow_init();      // WiFi STA + ESP-NOW
     xTaskCreate(controller_task, "controller_task", 4096, NULL, 5, NULL);
@@ -158,8 +161,8 @@ void app_main(void) {
 ```c
 static volatile bool s_espnow_ready = false;
 // set จาก send callback
-static void on_sent(const uint8_t *mac_addr, esp_now_send_status_t status) {
-    (void)mac_addr;
+static void on_sent(const esp_now_send_info_t *tx_info, esp_now_send_status_t status) {
+    (void)tx_info;
     s_espnow_ready = (status == ESP_NOW_SEND_SUCCESS);
 }
 ```
@@ -315,10 +318,10 @@ esp_now_add_peer(&peer);        // channel=1, encrypt=false
 ### 4.5 Send/Receive Callback Signatures
 
 ```c
-// Sender (ESP-IDF v5.4.x)
-static void on_sent(const uint8_t *mac_addr, esp_now_send_status_t status)
+// Sender (ESP-IDF 5.5; earlier SDKs have a different MAC-pointer signature)
+static void on_sent(const esp_now_send_info_t *tx_info, esp_now_send_status_t status)
 {
-    (void)mac_addr;
+    (void)tx_info;
     s_espnow_ready = (status == ESP_NOW_SEND_SUCCESS);
 }
 
@@ -370,9 +373,9 @@ vTaskDelay(pdMS_TO_TICKS(20));
 ```cmake
 idf_component_register(SRCS "main.c"
     INCLUDE_DIRS "."
-    PRIV_REQUIRES driver esp_wifi nvs_flash esp_event esp_netif)
+    PRIV_REQUIRES driver esp_adc esp_wifi nvs_flash esp_event esp_netif)
 ```
-> Sender ใช้ legacy ADC (อยู่ใน `driver`) และ I2C (`driver`) — **ไม่ต้องใส่ `esp_adc`**
+> สำหรับ sender ปัจจุบันที่ใช้ ADC oneshot ต้องประกาศ dependency `esp_adc`; ถ้าเลือก legacy I2C ต้องใช้ family เดียวกันตลอด firmware
 
 ### Receiver
 ```cmake
@@ -414,7 +417,7 @@ idf_component_register(SRCS "main.c"
 ## ส่วนที่ 8: กฎบังคับสำหรับ AI (MANDATORY RULES)
 
 ### DO ✅
-- ใช้ Legacy ADC (`driver/adc.h`, `adc1_get_raw()`) สำหรับ Sender
+- ใช้ ADC API ที่ตรงกับ SDK; sender ปัจจุบันใช้ oneshot อย่าเปลี่ยนเป็น legacy จากชื่อบอร์ด
 - ใช้ `ADC1_CHANNEL_6` (GPIO34) และ `ADC1_CHANNEL_7` (GPIO35)
 - ใช้ `ADC_ATTEN_DB_11` สำหรับ attenuation
 - ใช้ OLED SH1106 ด้วย column offset `0x02` เสมอ
@@ -426,8 +429,7 @@ idf_component_register(SRCS "main.c"
 - hardcode MAC address ของรถใน sender
 
 ### DON'T ❌
-- ❌ ห้ามใช้ `esp_adc/adc_oneshot.h` สำหรับ Sender — ใช้ legacy API
-- ❌ ห้ามใช้ `ADC_CHANNEL_6/7` (oneshot) — ใช้ `ADC1_CHANNEL_6/7` (legacy)
+- ❌ ห้ามผสมชนิด channel/API คนละ driver family; oneshot ใช้ `ADC_CHANNEL_6/7` ส่วน legacy มีชื่อแบบ `ADC1_CHANNEL_6/7`
 - ❌ ห้ามใช้ column lower = `0x00` กับ SH1106 — ต้อง `0x02`
 - ❌ ห้ามใช้ SSD1306 init sequence กับ SH1106 (charge pump command ต่างกัน)
 - ❌ ห้ามส่ง `float` ผ่าน ESP-NOW
@@ -441,7 +443,7 @@ idf_component_register(SRCS "main.c"
 
 | ไฟล์ | คำอธิบาย |
 |------|---------|
-| `minibike_sender.c` | Controller (ADC legacy + OLED SH1106 + ESP-NOW TX) |
+| `minibike_sender.c` | Controller (ADC oneshot + OLED reference + ESP-NOW TX), ต้องตรวจ SDK และ controller init ก่อนใช้จริง |
 | `minibike_receiver.c` | Receiver (PID + L298N + Servo + ESP-NOW RX) |
 | `calibrate_balancing_joystick.c` | Calibrate tool — ดู raw ADC บน OLED SH1106 |
 | `calibrate_balancing_bike.c` | Tune PID balance (ไม่มี ESP-NOW) |

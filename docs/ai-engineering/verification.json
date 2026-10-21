@@ -1,0 +1,1201 @@
+{
+  "schema_version": 2,
+  "started": "2026-10-17",
+  "verified_local_date": "2026-10-19",
+  "timezone": "Asia/Bangkok",
+  "os": "Windows",
+  "architecture": "AMD64",
+  "overall_status": "PARTIAL",
+  "scope": "Offline preparation/runbook deliverables completed with unchanged implementation. User confirms no endpoint/model/test credentials this round; no API follow-up, probing or inference. Actual-model/native budget/cost/scope/request capture remain unqualified; no release promotion.",
+  "tests": {
+    "frontend": {
+      "command": "npm test -- --reporter=dot",
+      "files": 19,
+      "passed": 183,
+      "failed": 0,
+      "exit_code": 0,
+      "verified_local_date": "2026-10-19",
+      "rerun_in_workflow_increment": false,
+      "rerun_in_diagnosis_increment": true,
+      "rerun_in_evidence_increment": true,
+      "rerun_in_capability_increment": true,
+      "rerun_in_prompt_ui_increment": true,
+      "log": {
+        "path": "src-tauri/target/prompt-ui-tests-final-20261019.log",
+        "sha256": "aa87693753b63d63e8b41ef8659eb96763be6bc6cf3c06e3519617472bd9c94a",
+        "bytes": 2042
+      },
+      "rerun_in_ip_workflow_increment": true,
+      "rerun_in_ip_matrix_evidence_increment": false,
+      "rerun_in_actual_model_readiness_increment": false,
+      "rerun_in_ten_request_readiness_increment": false,
+      "rerun_in_offline_closeout_increment": false
+    },
+    "rust": {
+      "command": "cargo test --manifest-path src-tauri/Cargo.toml --offline --locked --all-targets --quiet",
+      "library_passed": 199,
+      "example_passed": 10,
+      "passed": 209,
+      "failed": 0,
+      "exit_code": 0,
+      "scope": "Current source, offline locked all-targets tests",
+      "verified_local_date": "2026-10-19",
+      "rerun_in_workflow_increment": false,
+      "rerun_in_diagnosis_increment": true,
+      "rerun_in_evidence_increment": true,
+      "rerun_in_capability_increment": true,
+      "rerun_in_prompt_ui_increment": false,
+      "rerun_in_ip_workflow_increment": true,
+      "log": {
+        "path": "src-tauri/target/ip-matrix-rust-20261019.log",
+        "sha256": "76b1302bba912135debedb8bb62fa7240f80d84f10c74ac61f376abcdd05929d",
+        "bytes": 12840
+      },
+      "rerun_in_ip_matrix_evidence_increment": true,
+      "rerun_in_actual_model_readiness_increment": false,
+      "rerun_in_ten_request_readiness_increment": false,
+      "rerun_in_offline_closeout_increment": false
+    },
+    "python_review": {
+      "command": "python -m unittest discover -s scripts/tests -v",
+      "passed": 24,
+      "failed": 0,
+      "exit_code": 0,
+      "includes": [
+        "retrieval review",
+        "actual Block JSON schema",
+        "real-Vibe harness safety",
+        "fixed ranking diagnosis",
+        "review corpus integrity",
+        "owned fault-process timeout",
+        "exclusive evidence outputs"
+      ],
+      "verified_local_date": "2026-10-19",
+      "rerun_in_diagnosis_increment": true,
+      "rerun_in_evidence_increment": true,
+      "rerun_in_capability_increment": true,
+      "rerun_in_prompt_ui_increment": false,
+      "rerun_in_ip_workflow_increment": true,
+      "rerun_in_ip_matrix_evidence_increment": false,
+      "rerun_in_actual_model_readiness_increment": true,
+      "log": {
+        "path": "src-tauri/target/offline-closeout-python-20261019.log",
+        "sha256": "25b1f1afc2c9252b07b5347a45049b35c5a986922411d1435378ce8cb4b61565",
+        "bytes": 8986
+      },
+      "rerun_in_ten_request_readiness_increment": true,
+      "rerun_in_offline_closeout_increment": true
+    },
+    "host_c": {
+      "command": "npm run test:compat",
+      "assertions": 490,
+      "exit_code": 0,
+      "verified_local_date": "2026-10-19",
+      "rerun_in_workflow_increment": false,
+      "rerun_in_diagnosis_increment": true,
+      "rerun_in_evidence_increment": true,
+      "rerun_in_capability_increment": true,
+      "rerun_in_prompt_ui_increment": false,
+      "rerun_in_ip_workflow_increment": true,
+      "rerun_in_ip_matrix_evidence_increment": false,
+      "rerun_in_actual_model_readiness_increment": false,
+      "rerun_in_ten_request_readiness_increment": false,
+      "rerun_in_offline_closeout_increment": false
+    },
+    "workflow_source_evidence": {
+      "command": "node --test scripts/tests/vibe-evidence.test.mjs scripts/tests/capability-matrix.test.mjs",
+      "passed": 12,
+      "failed": 0,
+      "exit_code": 0,
+      "verified_local_date": "2026-10-19",
+      "scope": "Source/trace and capability-gate unit/CLI tests; positive reviewer/model examples are synthetic fixtures only",
+      "rerun_in_diagnosis_increment": true,
+      "rerun_in_evidence_increment": true,
+      "rerun_in_capability_increment": true,
+      "rerun_in_prompt_ui_increment": false,
+      "rerun_in_ip_workflow_increment": false,
+      "rerun_in_ip_matrix_evidence_increment": false,
+      "rerun_in_actual_model_readiness_increment": false,
+      "rerun_in_ten_request_readiness_increment": false,
+      "rerun_in_offline_closeout_increment": false
+    },
+    "winget_scopes": {
+      "passed": 7,
+      "exit_code": 0,
+      "offline": true,
+      "command": "powershell -NoProfile -File scripts/tests/winget-token.tests.ps1",
+      "log": {
+        "path": "src-tauri/target/prompt-ui-winget-tests-20261019.log",
+        "sha256": "e676666dda493245ce03a6a964f9d1f0752b946d9800b5d33f8a683b5a6cd030",
+        "bytes": 168
+      },
+      "rerun_in_ip_workflow_increment": false,
+      "rerun_in_ip_matrix_evidence_increment": false,
+      "rerun_in_actual_model_readiness_increment": false,
+      "rerun_in_ten_request_readiness_increment": false,
+      "rerun_in_offline_closeout_increment": false
+    },
+    "actual_model_offline_node": {
+      "passed": 12,
+      "exit_code": 0,
+      "command": "node --test scripts/tests/*.test.mjs",
+      "log": {
+        "path": "src-tauri/target/offline-closeout-node-20261019.log",
+        "sha256": "2f8762cec75dabe141f014b89242f809fe8a3003679c9179a82d216f064706f4",
+        "bytes": 2584
+      },
+      "scope": "Synthetic offline evidence/matrix tests; not model workflow",
+      "rerun_in_ten_request_readiness_increment": true,
+      "rerun_in_offline_closeout_increment": true
+    }
+  },
+  "checks": {
+    "build_release": {
+      "command": "npm run tauri -- build --no-bundle --config src-tauri/tauri.windows.conf.json -- --offline --locked",
+      "exit_code": 0,
+      "includes": [
+        "runtime",
+        "standalone",
+        "KB sync",
+        "board catalog",
+        "block inventory",
+        "rule inventory",
+        "public",
+        "bundle",
+        "TypeScript",
+        "Vite"
+      ],
+      "scope": "Current no-bundle development application, not firmware or installer qualification",
+      "log": {
+        "path": "src-tauri/target/ip-matrix-desktop-build-20261019.log",
+        "sha256": "5199067fd09d48e2f445b845314694408df68fd24e2a5c18658b8cd873199d88",
+        "bytes": 31470
+      }
+    },
+    "final_standalone_policy": {
+      "exit_code": 0,
+      "includes_normalized_public_provenance": true
+    },
+    "final_rules": {
+      "exit_code": 0,
+      "documents": 85,
+      "invalid_utf8": 0,
+      "unclosed_fences": 0,
+      "code_fences": 334,
+      "verified_local_date": "2026-10-19",
+      "source_knowledge_documents": 14,
+      "bundled_knowledge_documents": 14,
+      "fences_by_language": {
+        "c": 233,
+        "cmake": 8,
+        "cpp": 10,
+        "json": 3,
+        "mermaid": 4,
+        "powershell": 16,
+        "rust": 1,
+        "sh": 10,
+        "text": 14,
+        "ts": 1,
+        "unspecified": 34
+      },
+      "invalid_utf8_documents": 0
+    },
+    "git_diff_check": {
+      "exit_code": 0
+    },
+    "production_workflows": {
+      "command": "node scripts/check-production-workflows.mjs --report docs/ai-engineering/ip-workflow-production-ui-20261019.json",
+      "exit_code": 0,
+      "native_backend_stubbed": true,
+      "live_provider": false,
+      "report": "ip-workflow-production-ui-20261019.json",
+      "verified_local_date": "2026-10-19"
+    },
+    "preserved_nsis_baseline": {
+      "command": "npm run tauri -- build --bundles nsis -- --offline --locked",
+      "exit_code": 0,
+      "report": "installer-validation-3.7.3.json",
+      "scope": "Historical verified artifact, byte-identical; not a build of the current source"
+    },
+    "preserved_installer_probe": {
+      "command": "python scripts/test-standalone-install.py --installed-directory src-tauri/target/standalone-extracted-3.7.3-final --report docs/ai-engineering/installer-preservation-probe.json",
+      "exit_code": 0,
+      "report": "installer-preservation-probe.json",
+      "new_user_session_scratch": true,
+      "fresh_vm": false,
+      "existing_user_credentials_read": false
+    },
+    "retrieval_summary": {
+      "command": "python scripts/review-retrieval.py summarize",
+      "exit_code": 0,
+      "report": "retrieval-stratified-review.json",
+      "reran_models": false,
+      "tuned_parameters": false
+    },
+    "board_guide_ui": {
+      "command": "node scripts/check-production-workflows.mjs --report docs/ai-engineering/board-guide-ui-probe.json",
+      "exit_code": 0,
+      "report": "board-guide-ui-probe.json",
+      "native_backend_stubbed": true,
+      "live_provider": false,
+      "actual_browser_dialog": true
+    },
+    "local_unbundled_windows_build": {
+      "command": "npm run tauri -- build --no-bundle --config src-tauri/tauri.windows.conf.json",
+      "exit_code": 0,
+      "report": "board-guide-build.json",
+      "installer_built": false,
+      "installed_app_replaced": false
+    },
+    "rust_release_configuration": {
+      "command": "cargo check --manifest-path src-tauri/Cargo.toml --offline --locked --release --bin vibe-kidbright --quiet",
+      "exit_code": 0
+    },
+    "desktop_semantic_integration": {
+      "command": "node scripts/probe-desktop-semantic.mjs",
+      "exit_code": 0,
+      "observations": 21,
+      "native_backend_stubbed": false,
+      "scope": "Debug native app, production React/CSP, real WebView2/Tauri/clangd/Monaco; no installed-release qualification",
+      "report": "desktop-semantic-integration.json"
+    },
+    "final_public_policy": {
+      "command": "npm run check:public",
+      "exit_code": 0
+    },
+    "rust_release_current": {
+      "command": "cargo check --manifest-path src-tauri/Cargo.toml --offline --locked --release --bin vibe-kidbright --quiet",
+      "exit_code": 0,
+      "verified_local_date": "2026-10-19",
+      "log": {
+        "path": "src-tauri/target/capability-release-rust-20261019.log",
+        "sha256": "e4f76bfe7a16e272ec593bbe17a183da215d8573d05b1a13f6bbd765ee128e2d",
+        "bytes": 9348
+      }
+    }
+  },
+  "retrieval": {
+    "current_comparison": "retrieval-fixed-measurement-20261019.json",
+    "queries": 69,
+    "dataset_sha256": "c75de0d838a5f0e6670c48776c67d3b5c0a98ca755f02ba09c2d548c28b55c43",
+    "human_independent_annotation": false,
+    "historical_development_scores": "verification-before-2026-10-18.json",
+    "candidate_or_parameter_selected_on_final_set": false,
+    "model_replaced": false,
+    "performance_scope": "Fresh single-host fixed-policy five-mode runs; no reviewed labels, tuning, statistically controlled timing or candidate installer size qualification",
+    "historical_comparison": "evaluation-heldout-comparison.json",
+    "historical_runs": [
+      {
+        "mode": "lexical",
+        "report": "evaluation-heldout-lexical.json",
+        "metrics": {
+          "mrr": 0.322463768115942,
+          "ndcg_at_5": 0.3027054878445835,
+          "precision_at_5": 0.11304347826086962,
+          "recall_at_5": 0.34782608695652173
+        },
+        "latency_ms": {
+          "median": 4.0150999999999994,
+          "p95": 9.6
+        },
+        "resources": {
+          "peak_working_set_bytes": 19394560,
+          "peak_sampled_private_bytes": 7946240,
+          "wall_seconds": 2.1169045999995433,
+          "sampling_interval_ms": 100,
+          "method": "Windows GetProcessMemoryInfo, one process per ranker; single run"
+        },
+        "index_ms": 1073.198,
+        "model_bytes": 0
+      },
+      {
+        "mode": "bundled",
+        "report": "evaluation-heldout-bundled.json",
+        "metrics": {
+          "mrr": 0.38888888888888895,
+          "ndcg_at_5": 0.34875715276580155,
+          "precision_at_5": 0.11594202898550732,
+          "recall_at_5": 0.36231884057971014
+        },
+        "latency_ms": {
+          "median": 168.8231,
+          "p95": 192.7343
+        },
+        "resources": {
+          "peak_working_set_bytes": 388841472,
+          "peak_sampled_private_bytes": 648929280,
+          "wall_seconds": 135.99046289999387,
+          "sampling_interval_ms": 100,
+          "method": "Windows GetProcessMemoryInfo, one process per ranker; single run"
+        },
+        "index_ms": 122319.4186,
+        "model_bytes": 91115499
+      },
+      {
+        "mode": "bundled-routed",
+        "report": "evaluation-heldout-bundled-routed.json",
+        "metrics": {
+          "mrr": 0.35507246376811596,
+          "ndcg_at_5": 0.33153221583117476,
+          "precision_at_5": 0.11594202898550732,
+          "recall_at_5": 0.36231884057971014
+        },
+        "latency_ms": {
+          "median": 186.598,
+          "p95": 230.50390000000002
+        },
+        "resources": {
+          "peak_working_set_bytes": 389017600,
+          "peak_sampled_private_bytes": 649338880,
+          "wall_seconds": 143.40987019999739,
+          "sampling_interval_ms": 100,
+          "method": "Windows GetProcessMemoryInfo, one process per ranker; single run"
+        },
+        "index_ms": 129332.8378,
+        "model_bytes": 91115499
+      },
+      {
+        "mode": "multilingual-e5-small",
+        "report": "evaluation-heldout-multilingual-e5-small.json",
+        "metrics": {
+          "mrr": 0.38768115942028986,
+          "ndcg_at_5": 0.3670720430132047,
+          "precision_at_5": 0.13043478260869573,
+          "recall_at_5": 0.427536231884058
+        },
+        "latency_ms": {
+          "median": 216.2179,
+          "p95": 453.1291
+        },
+        "resources": {
+          "peak_working_set_bytes": 1418936320,
+          "peak_sampled_private_bytes": 1535107072,
+          "wall_seconds": 282.6568352999966,
+          "sampling_interval_ms": 100,
+          "method": "Windows GetProcessMemoryInfo, one process per ranker; single run"
+        },
+        "index_ms": 257450.533,
+        "model_bytes": 135394008
+      },
+      {
+        "mode": "multilingual-minilm",
+        "report": "evaluation-heldout-multilingual-minilm.json",
+        "metrics": {
+          "mrr": 0.3635265700483092,
+          "ndcg_at_5": 0.3342913524175959,
+          "precision_at_5": 0.12173913043478267,
+          "recall_at_5": 0.391304347826087
+        },
+        "latency_ms": {
+          "median": 152.60660000000001,
+          "p95": 182.9094
+        },
+        "resources": {
+          "peak_working_set_bytes": 1422368768,
+          "peak_sampled_private_bytes": 1540988928,
+          "wall_seconds": 332.9129858000015,
+          "sampling_interval_ms": 100,
+          "method": "Windows GetProcessMemoryInfo, one process per ranker; single run"
+        },
+        "index_ms": 309207.5693,
+        "model_bytes": 135394365
+      }
+    ],
+    "runs": [
+      {
+        "mode": "original",
+        "report": "expansion-heldout-baseline.json",
+        "metrics": {
+          "mrr": 0.38888888888888895,
+          "ndcg_at_5": 0.34875715276580155,
+          "precision_at_5": 0.11594202898550732,
+          "recall_at_5": 0.36231884057971014
+        },
+        "language": {
+          "en": {
+            "queries": 20,
+            "metrics": {
+              "mrr": 0.24166666666666667,
+              "ndcg_at_5": 0.2100785736263389,
+              "precision_at_5": 0.08,
+              "recall_at_5": 0.25
+            },
+            "latency_ms": {
+              "median": 329.5236,
+              "p95": 387.93539999999996
+            }
+          },
+          "mixed": {
+            "queries": 20,
+            "metrics": {
+              "mrr": 0.625,
+              "ndcg_at_5": 0.5226294385530916,
+              "precision_at_5": 0.13,
+              "recall_at_5": 0.5
+            },
+            "latency_ms": {
+              "median": 330.23985,
+              "p95": 425.65540000000004
+            }
+          },
+          "technical": {
+            "queries": 9,
+            "metrics": {
+              "mrr": 0.9444444444444444,
+              "ndcg_at_5": 0.9344536996946328,
+              "precision_at_5": 0.4,
+              "recall_at_5": 1.0
+            },
+            "latency_ms": {
+              "median": 293.0083,
+              "p95": 355.40509999999995
+            }
+          },
+          "th": {
+            "queries": 20,
+            "metrics": {
+              "mrr": 0.05,
+              "ndcg_at_5": 0.05,
+              "precision_at_5": 0.01,
+              "recall_at_5": 0.05
+            },
+            "latency_ms": {
+              "median": 289.0893,
+              "p95": 343.4155
+            }
+          }
+        }
+      },
+      {
+        "mode": "verified-technical-expansion",
+        "report": "expansion-heldout-expanded.json",
+        "metrics": {
+          "mrr": 0.40096618357487923,
+          "ndcg_at_5": 0.36161009200108474,
+          "precision_at_5": 0.12173913043478267,
+          "recall_at_5": 0.38405797101449274
+        },
+        "language": {
+          "en": {
+            "queries": 20,
+            "metrics": {
+              "mrr": 0.21666666666666667,
+              "ndcg_at_5": 0.19876385434979305,
+              "precision_at_5": 0.08,
+              "recall_at_5": 0.25
+            },
+            "latency_ms": {
+              "median": 151.6661,
+              "p95": 166.39399999999998
+            }
+          },
+          "mixed": {
+            "queries": 20,
+            "metrics": {
+              "mrr": 0.625,
+              "ndcg_at_5": 0.5226294385530916,
+              "precision_at_5": 0.13,
+              "recall_at_5": 0.5
+            },
+            "latency_ms": {
+              "median": 162.09415,
+              "p95": 192.3337
+            }
+          },
+          "technical": {
+            "queries": 9,
+            "metrics": {
+              "mrr": 0.9444444444444444,
+              "ndcg_at_5": 0.9344536996946328,
+              "precision_at_5": 0.4,
+              "recall_at_5": 1.0
+            },
+            "latency_ms": {
+              "median": 136.00490000000002,
+              "p95": 143.30689999999998
+            }
+          },
+          "th": {
+            "queries": 20,
+            "metrics": {
+              "mrr": 0.11666666666666667,
+              "ndcg_at_5": 0.10565735963827291,
+              "precision_at_5": 0.030000000000000002,
+              "recall_at_5": 0.125
+            },
+            "latency_ms": {
+              "median": 132.69095,
+              "p95": 164.0482
+            }
+          }
+        }
+      }
+    ]
+  },
+  "resolved_during_verification": [
+    "Incorrect relative path to recipe metadata include corrected",
+    "Missing command-policy import in test module corrected",
+    "Generated coverage/rule inventory refreshed after prompt/document changes",
+    "Review proposals/backups moved from volatile state to revision-bound durable journals with exact-content rollback/recovery",
+    "SDK cancellation, timeout and Windows descendant termination integrated with workspace leases and AI Stop",
+    "Initial held-out Thai text damaged by native shell codepage restored to original intended text; invalid measurements retained separately, never reported as valid",
+    "DOMPurify override mismatch and actionable selected Windows dependency advisories remediated without changing bundled embeddings",
+    "Fresh extracted-binary self-check discovered missing scratch index directory; fixed, rebuilt and successfully re-probed",
+    "Automatic private absolute project-path wrapping removed from user chat; provider metadata and SDK context gated",
+    "Retained cancellation received before asynchronous semantic request registration; bounded early-stop tombstones prevent starting the cancelled request",
+    "Actual SDK probe revealed extended Windows path prefixes and a legitimate generated cflags response file; normalized paths and narrowly validated that response while preserving actual flags",
+    "Added optional local definition/reference UI with exact-CDB/trusted-driver validation, unsaved snapshots, workspace exclusion and contained process cleanup",
+    "Wrapped tool evidence as data in both provider transports and checked reserved history markers against actual message roles",
+    "Added three pre-replacement atomic JSON failure checkpoints, repair-phase authorization and actual interactive grandchild termination regressions",
+    "Extended exact verified source Block contracts to nine IDs, exposed offline schema, built two new C fixtures and verified old generated sources unchanged",
+    "Kept frozen qrels/model/NSIS unchanged; reported stratified historical measurements and rejected drafts as independent review evidence",
+    "Replaced off-screen sidebar-only checklist toggling with a bundled offline native modal guide; production browser verified both entry points, focus, Escape/backdrop, board/language selection, editor navigation and unchanged source/review state",
+    "Source-verified bounded technical query expansion, original-query/API/filter preservation and separate development gate with disclosed overlap correction",
+    "Real Windows desktop/Monaco navigation, unsaved/project switching/cancellation/timeouts and private root rejection under production frontend/CSP",
+    "Fixed managed-marker-only readiness blocking a valid configured SDK; actual React terminal SDK build completes without Flash or fake marker",
+    "Actual Block schema/version rejection, four regenerated/recompiled/relinked C fixtures and portable C assertions",
+    "Prepared credential-safe opt-in application model harness; actual desktop preflight passes with zero inference"
+  ],
+  "warnings": [
+    "Rust legacy/helper dead-code warnings and Vite mixed event import/large editor chunk warnings remain",
+    "Retrieval comparison remains assistant-labelled and reproduced with fixed policy; no new production accuracy improvement or independently reviewed qrels",
+    "No real model available; evidence wrappers/fixtures do not prove prompt-injection immunity or provider quality",
+    "Entire multi-platform Cargo.lock retains 10 advisory records across 8 packages; selected Windows matches are maintenance notices, not universal security clearance",
+    "Current source is unreleased and is not contained in the preserved NSIS 3.7.3 artifact",
+    "Application-level recovery and bounded subprocess cleanup do not certify power-loss, hostile OS actors or all platforms",
+    "Fixed expansion improves two frozen query recalls but Thai recall remains 0.1250 and English MRR decreases; no further frozen-set tuning",
+    "Actual desktop qualifies debug-native production-frontend interactions only; no F12 provider, inferred headers, all-project semantics or installed lifecycle qualification",
+    "Real model harness automates read-only collection/preflight; generation/compiler/repair/Undo remain approval-gated manual protocol cases"
+  ],
+  "not_executed": [
+    "Real LLM inference/generation/citation quality/repair/rollback evaluation",
+    "Independent human relevance review",
+    "Clean VM GUI install/upgrade/rollback/uninstall/user-data preservation tests",
+    "Other SDK versions, macOS/Unix execution and physical boards/Flash",
+    "New installer, version promotion, staging/commit/push/publish/deploy"
+  ],
+  "requirements": {
+    "system_architecture": "PARTIAL",
+    "hybrid_rag": "PARTIAL",
+    "knowledge_base_data": "PARTIAL",
+    "code_aware_chunking": "PARTIAL",
+    "compiler_validation_auto_fix": "PARTIAL",
+    "technology_integration": "PARTIAL",
+    "development_phases": "PARTIAL",
+    "evaluation_quality": "PARTIAL"
+  },
+  "phase_f_generic_block_conversion": "PARTIAL; typed normalized nine-ID pilot; generic Blockly/XML, variables/hardware expressions and all-board/physical behavior unsupported or unverified",
+  "source_sha256": {
+    ".github/workflows/winget-release.yml": "59638a5311230a945081c02359307c9ca4e0e0ddf16e3517df1fd9afcbf45dfe",
+    "Readme.md": "b9dc7e223a5652b901a657f5fc39f3cd1c3710e609ffc3afafec91a1db316d15",
+    "docs/KIDBRIGHT_BLOCK_COVERAGE_2026-10-16.md": "4e66d5f4ec59f729d29e4d8ddce0c57cb60eafdf9926272ee77d603b3ae63063",
+    "docs/MAI_PLUS_WORKSPACE_UI_2026-10-17.md": "9dfe742b83e1cc541743eba101fc23d5de016361311049ca4106b61d3600fdd2",
+    "docs/WINGET_RELEASE_SETUP.md": "4635fa1819252b8e9d4c6a2f853ab503e90b65eaf5c0420da7a309b859fdfe01",
+    "docs/ai-engineering/00-repository-audit.md": "d632fc08eca15f09e4f034a75ebbc0b630191cad1fb163994e84a5c5492d4431",
+    "docs/ai-engineering/01-architecture.md": "fa29b3fa2d7de934096a4a17d163776f4dcccc8f90bfcd3d9dfe07cdc1e229a8",
+    "docs/ai-engineering/02-hybrid-rag.md": "08b582522ecb396a3f1d3c5719a438d632e3f6c169ec927dc08917a45f43db9a",
+    "docs/ai-engineering/03-knowledge-base.md": "d30f0961bbfdd150bf52bee5d77c15d62a2baa55452ef2abf0e9c1905d6e8299",
+    "docs/ai-engineering/04-code-intelligence.md": "65207da122c1e2c30f0f7ea37af06571533fd897b4c3d15f343544be823076a2",
+    "docs/ai-engineering/05-compiler-validation.md": "54ab0f6274737f06962b2a26649fade802679097035ee23d3bcbe1224a698d69",
+    "docs/ai-engineering/06-technology-decisions.md": "99bd97473486f23bdabfa5917a15cf8e34e7bff8d696fe757f21d26103b40cd2",
+    "docs/ai-engineering/07-implementation-progress.md": "4aec287d7b091e349838ece72b81d33f5bdcde8571ee89a5ea755b08b0953b9d",
+    "docs/ai-engineering/08-evaluation.md": "49fe8e53a5bb99b9316c1cab94a018e21fd0364758e4a3b599263b4d13a64af4",
+    "docs/ai-engineering/09-known-limitations.md": "99f2ec0ab4e25063868352c9ac130f4642b7834e9270a26d99b1ab7bc7130b0f",
+    "docs/ai-engineering/10-block-to-c.md": "3f66ad72c0354ae51c781615e814cdc8ddde4957259d55e8b6f0d87d3f21c623",
+    "docs/ai-engineering/11-safety-recovery.md": "df6415695e5446008256eca8015db9dc0e053a33395d980577bcc98e3b1de729",
+    "docs/ai-engineering/12-dependency-security.md": "ab0de676b55716ab9292b644ab9809f025786a1d6383e9f52ec8e1cc1b549bad",
+    "docs/ai-engineering/13-independent-evaluation.md": "2d6729a13e83df8d4f9b43ad217d903729a8617e2d504826cd85b05908b3e67f",
+    "docs/ai-engineering/14-continuation-report.md": "fbda5100f9ec43dbfbe3064ae36166d4104d9ccd095f3080a699311b61215d6b",
+    "docs/ai-engineering/15-board-guide-ui.md": "73cd72caab9170ab99a22089ee021abaf712d3241dd95490f82643dc6c76bd9f",
+    "docs/ai-engineering/16-integration-evaluation-plan.md": "d41ac88b7015a10f222e0ea4dfa638508bf392afc2c209bb5a7812b3c50ca242",
+    "docs/ai-engineering/17-integration-report.md": "9b59f17b697cdea9b9359af66c3e8ddacd69b8b974831558f427f973c4467f67",
+    "docs/ai-engineering/18-capability-milestone.md": "f3cb351c4ae4ca1fe7e0f2b5fd4624235ba2803fc8b7e1579995866bde775bb4",
+    "docs/ai-engineering/19-diagnosis-plan.md": "e1d4daff7e30e72b3dc4065cb73ea9559bffd45cc9750a2ad35251e966550da4",
+    "docs/ai-engineering/20-diagnosis-and-hardening-report.md": "f9f8a60f66333d7cec53b58c68d3369a4c7f75fa69a2a58d190a5e4bad3380de",
+    "docs/ai-engineering/21-evidence-integrity-plan.md": "dd28af4c5ad41c23abfa7a921209e45e6f4656881dbca62a4159820ff04cfd21",
+    "docs/ai-engineering/22-evidence-integrity-report.md": "4bc7f9dbe1d5b586ec9f8eb192eb8f01618e7523717d41221d50ab0afeb1e927",
+    "docs/ai-engineering/23-capability-validation-protocol.md": "48914aa2dc03f7a76e5c4103568842bdbace09eebac156d13b62a37dfe3a3f1c",
+    "docs/ai-engineering/24-capability-validation-report.md": "f5679119a9da2af7f98d73ea1bd4e203a2a8633ea58084b7944f51ef5354b6e0",
+    "docs/ai-engineering/25-prompt-examples-and-winget.md": "92f8ab3dff4b4a86d8ddfb75d2bf62c8dd5d7b0a9fea211b523c5f2b0102b24b",
+    "docs/ai-engineering/26-ip-custom-draft-workflow.md": "87e4a1ee6f34b7a07894883ffe9692f503b8a433d98d48857b84c69615bfd117",
+    "docs/ai-engineering/27-ip-matrix-user-evidence.md": "9fd66066a22009a4292a953ec6b79dbd573b478fbfc9275a766635bdbd8d7534",
+    "docs/ai-engineering/28-actual-model-readiness-and-evidence.md": "f27c06cf03374697faea66d897ba76b257d139a384424e81a024205388b1d2c3",
+    "docs/ai-engineering/29-bounded-authorization-target-pending.md": "02f6ee3739e6efaecd7184c8ed6c5991660f85707579c1b23ddbaaa9e86a46a3",
+    "docs/ai-engineering/30-offline-closeout-and-runbook.md": "9d49e2a8b15fc870a7b16fa1cf5d6b95289063a02252e619b6d22e3245952b4b",
+    "docs/ai-engineering/actual-model-changes-20261019.json": "5382f665b76765b1f8b36ee47539d2e571c9259e69895d90cb99dd4874a4e81d",
+    "docs/ai-engineering/actual-model-pilot-source-readiness-20261019.json": "982d8f0f8aa67fa5e65807a75ea02a176699935179094b8f68a968c1344a3e17",
+    "docs/ai-engineering/actual-model-retrieval-readiness-20261019.json": "54f48dd743b9fc6d3f79389fddb79950d06359d60ff6e8d2709d611d88cbcd2e",
+    "docs/ai-engineering/actual-model-verification-20261019.json": "4e15f4ce113924f59b1cd8d4adfa8bee33444838a42bc0f900db4de3166f2772",
+    "docs/ai-engineering/block-compilation.json": "1f2c2e1cca7b18f1e62e638ef1cfd163db832f4396c9b59925ec7505ef59c15a",
+    "docs/ai-engineering/block-expansion-compilation.json": "45ef8b60fb9fa980c4dfd8ae4ca33ca6aa244a65efe19a2ba4d223a38f7f8664",
+    "docs/ai-engineering/block-fixtures/arithmetic-if.json": "b9a26bbdbecf0830e810c16cf11d29aef8bf42658bf34d9d70a21b96a358ce1b",
+    "docs/ai-engineering/block-fixtures/forever-delay.json": "86fb7cee2a832101fa19bab3cc01fb72b8b6fff4eb87ae6fd17ae83d640e6459",
+    "docs/ai-engineering/block-fixtures/nested-conditions.json": "5475ca29e324244d2c17379290ba34235547f4a1f228fcdfc716c629a323dc9b",
+    "docs/ai-engineering/block-fixtures/repeat-delay.json": "f07269d95aeb8f818b4a4aa52b71ddd5a66a29a78910afce1f54a275bccfe027",
+    "docs/ai-engineering/block-integration-regression.json": "81427ce15ee50b76b2f8b05320424ce0f0618a45a5b9f2fabbab64cb0e658490",
+    "docs/ai-engineering/block-mapping.schema.json": "8486af2afa469e337113c59f682c34b74dd7d38de315c04967bc050d99894975",
+    "docs/ai-engineering/block-source-evidence.json": "e25e4d8fd50d5378f9498ef8e824568ff2f79e4a2588a64f98a832a196b9486e",
+    "docs/ai-engineering/board-guide-build.json": "8b68be0c004b65956e6319a9cc0673a68be7b751b036743ae844b2ecb8a5e73f",
+    "docs/ai-engineering/board-guide-change-manifest.json": "1634eb000c58d51716dba1d60835f1e8a1024b1477b47dbb5bafdb0beb88e4a1",
+    "docs/ai-engineering/board-guide-ui-probe.json": "3df663993b368d10ed25de1dd2c2afbb575ab88ce28437baecf0a082fd2de9be",
+    "docs/ai-engineering/bundled-source-hashes.json": "07f6752bc4184e8f1d8948b072396b482992b03b1f8e07c55c1c48a8bcb1781f",
+    "docs/ai-engineering/capability-assets-20261019.json": "99ea922f6acc168694b108451c2a430aea54e8e18b9249cb32e85da50e956ff3",
+    "docs/ai-engineering/capability-changes-20261019.json": "0022fe74a3bc754a4d9208da51b08876d3487a3950bed99a47a6cd3d98cdc65b",
+    "docs/ai-engineering/capability-desktop-20261019.json": "e975704c14b7f43bd5698c34b2e1a95d2ca0ce5dc7144d460db8520fce527a87",
+    "docs/ai-engineering/capability-firmware-20261019.json": "7b047f7087324e6c39fd66f3f6f0a728d3d25f103b64af1f18c578092b8d1c2a",
+    "docs/ai-engineering/capability-matrix-20261019.json": "b13c4a82e6e8b04d61eff03a60e311524d96bfa7c179c226f6e32d67438436bb",
+    "docs/ai-engineering/capability-matrix-current-20261019.json": "11f1741229a734cfd9009aa8a5360288d364f2c94a39551d4a9063af94ac221c",
+    "docs/ai-engineering/capability-mechanical-20261019.json": "49116011007a8395cb6eb22e0948e3da1b0bba42acaa2756cbffc0e52ae8db78",
+    "docs/ai-engineering/capability-mechanical-complete-20261019.json": "e102072ae637fd5edb172647a38dde4eb36683dab70bb54cc044de76d8db53a5",
+    "docs/ai-engineering/capability-prepared-20261019.json": "2abe0c3313ff4e63dbfcfcfb477ba388898626e24e39a0739ccd4adc9b6ea709",
+    "docs/ai-engineering/capability-production-ui-20261019.json": "53ae86338c8d22eba72265d031c376f9965c8b4bfdcaccb9302c45a2efb015de",
+    "docs/ai-engineering/capability-release-readiness-20261019.json": "3a45384c2642cb87e33077cb621957263fc211a01802fdab7fb4d39ea9e73ec5",
+    "docs/ai-engineering/capability-retrieval-readiness-20261019.json": "fcd096c8492726e16808f5f2671770fe06486b3a0c9fec7af78b5d283348ccb8",
+    "docs/ai-engineering/capability-review-draft-20261019.json": "392a1973c862edbd35b935ddf66ceb297170486a5cb4bcf58c5c235cb8f5753a",
+    "docs/ai-engineering/capability-security-20261019.json": "a4a7d8519a230d4f5e5f906cea214ed93fa4ab0b8b92f2af3b2aa4a0b73378b0",
+    "docs/ai-engineering/capability-verification-20261019.json": "817b100460c5d5f74530cca2fe57d22c447dceaf2bd6d0fa78f8d2a67dc5c486",
+    "docs/ai-engineering/clangd-evaluation.json": "75b51b3617946f71ab91f022381234463020f87a8d6c0f0502d889731019ca0c",
+    "docs/ai-engineering/continuation-changes.json": "daea8c0976a943f92036aaf02ab632fc3763765465bb09aa689698614868df23",
+    "docs/ai-engineering/dependency-security-diagnosis-20261019.json": "44f036cd5d952af4baed668fddc3fae9510cfc25c29b0c7ad3f158ec9bbe3373",
+    "docs/ai-engineering/desktop-semantic-integration.json": "b2b3bec676afd2f7f36c9793f9549ea6cf03a1a964ef2c3423ba53568ae3fb0d",
+    "docs/ai-engineering/development-review-gate-20261019.json": "295580bf183eae014ea7118a4370b81d6cf301f8f944f85853665f29787f0204",
+    "docs/ai-engineering/diagnosis-changes-20261019.json": "64a86b6365fd0637acb71ad9abef50e8d6894d772f227fee21ec461992b0bc08",
+    "docs/ai-engineering/diagnosis-verification-20261019.json": "7701bcdac593afd8a938dd11b78f4ebaace26b9e340d8cd9d842b7ce39092bef",
+    "docs/ai-engineering/evaluation-expansion-dev-v1.json": "97ac80f710385d0998e51ae27c886142db5e4802f8d18b809a42a16bbe336292",
+    "docs/ai-engineering/evaluation-heldout-bundled-routed.json": "3bcba45fd8f6ee1af88299b27e584de0de8729ea753112d4eac7dfe0c3e4fdd1",
+    "docs/ai-engineering/evaluation-heldout-bundled.json": "b6190b25ef7ed7ab09b80c19f52da26463b22912098e29f82d5c02300bc18885",
+    "docs/ai-engineering/evaluation-heldout-comparison.json": "6129705b58b11c495f5c11c667f8c833ba2463f6003adb68b7576c6bd33803f1",
+    "docs/ai-engineering/evaluation-heldout-lexical.json": "315fda85417609c400848b0b4ec47caf2d7392cfcdfc6f6d48ede1f7ebf3adad",
+    "docs/ai-engineering/evaluation-heldout-multilingual-e5-small.json": "e1668de964acc1dc827752353ba02885824d2d022352de0e4098233531892bb7",
+    "docs/ai-engineering/evaluation-heldout-multilingual-minilm.json": "d07eb433c43188096678043f4d58e01bf7f8b8fb4c0fde487b01b07f4a0d536d",
+    "docs/ai-engineering/evaluation-heldout-v1-freeze.json": "12e71c090f81c7a064dd3a1110d11e84768891bd82a5c1e0fc158c91e4baf690",
+    "docs/ai-engineering/evaluation-heldout-v1.json": "c75de0d838a5f0e6670c48776c67d3b5c0a98ca755f02ba09c2d548c28b55c43",
+    "docs/ai-engineering/evaluation-hybrid.json": "1f3fe6be81b275108b8719f63a547c22878040676f693c4bf5d0db38d6d10e04",
+    "docs/ai-engineering/evaluation-lexical.json": "d92e41bdba74c208c7607ca7a453953657b124920ca67b49736ddec601d770d6",
+    "docs/ai-engineering/evaluation-queries.json": "4d614988017dfef16d3ca187bd689317e291d9b1ae033598de79bb974244ad2a",
+    "docs/ai-engineering/evidence-assets-20261019.json": "7d44e8405220583e3a2fd251a862fb75759454afa8ea9a9f47594fbd8cbd87b5",
+    "docs/ai-engineering/evidence-changes-20261019.json": "3e157fe9bce24fbf1c2c1e007aaad85e1d27cb328ca4a6351eb07851e0b8bd3c",
+    "docs/ai-engineering/evidence-desktop-20261019.json": "cdc24074f92999d39f3fc04b71504266334fb9c095cfbc3af6c35c5af159e92c",
+    "docs/ai-engineering/evidence-firmware-20261019.json": "af85a163b579d1bc8940a49c13d8bf26725877a18ccfd2209b7490b1b308b4eb",
+    "docs/ai-engineering/evidence-prepared-20261019.json": "3860e1f0e00bb629a87637e4396c0c399f225a737858846a08c21d77ad543d42",
+    "docs/ai-engineering/evidence-security-20261019.json": "53e2aabd470222dee4630916a9a23dfa95ff5739c07a90c74deb44a9c69378be",
+    "docs/ai-engineering/evidence-verification-20261019.json": "03b7cc33ffd65e9b556be764b940caeba2c7413cc055e1fc31e4c1c5d0aef2be",
+    "docs/ai-engineering/expansion-development-baseline.json": "bd06e17229c63e8cecf595392479bfd3dce746842506b18954ebda1a6ce36548",
+    "docs/ai-engineering/expansion-development-decision.json": "d9b0d03a54dfad26e2de99ae41b9c0fdb431154716ec4331d3ba236eb9b6bcc1",
+    "docs/ai-engineering/expansion-development-expanded.json": "6fe6218b9b60c824890ef155e93257cb507ba19fb448fefa4be54e92ff0cb09a",
+    "docs/ai-engineering/expansion-heldout-baseline.json": "69875f2e24586d56ea40bb5fe5359e0391922047aa27fbe9f6a733570e2f0fd9",
+    "docs/ai-engineering/expansion-heldout-expanded.json": "d3c391dead6f63296236de099621102760a0a024afda3bea68b3f8e3a2937de0",
+    "docs/ai-engineering/firmware-diagnosis-20261019.json": "c10ebc23975ba19da93a9798ba42b5a4f474f5d2dceb8a4d56c4c585fec4b22a",
+    "docs/ai-engineering/independent-retrieval-review.json": "2b42bef59b02f5f8db05124cf893b99fdf7339ad75b493f1f6e8176e7d68d138",
+    "docs/ai-engineering/installer-preservation-probe.json": "2fb8fc134f418b3961072e66732b5f578680179c52d2ac71393c5fe812741f89",
+    "docs/ai-engineering/installer-preservation-review.json": "e4cd47d1eeb820ece04f28d885e579b654f9b00b920fc29fa53fcacf9ec47017",
+    "docs/ai-engineering/installer-probe-3.7.3-before-fix.json": "d17bd02a76f2d99e2e828491e376016d5d6f15cd145ee7df8595fb219dce918d",
+    "docs/ai-engineering/installer-probe-3.7.3.json": "2fb8fc134f418b3961072e66732b5f578680179c52d2ac71393c5fe812741f89",
+    "docs/ai-engineering/installer-validation-3.7.3.json": "58b0377aa66c575254e0b6c1f3c9a4a6aa15f4bf624f68743397c63fcd3d20f9",
+    "docs/ai-engineering/integration-changes.json": "f0d7076afa0e6f2a6a316d87098661c44176800a7455752516a4d8fbedcc3c06",
+    "docs/ai-engineering/integration-verification.json": "dab14c7c4a79a1edc157e09c4f1db6d4eb7ed377b1fd724fe0f1a0bf29dc1f66",
+    "docs/ai-engineering/invalid-encoding-results/evaluation-heldout-bundled-routed.json": "37018c8a9ef4e4a82623bb7853a574e9974f7e733dd2732e0c18ae1902da04ca",
+    "docs/ai-engineering/invalid-encoding-results/evaluation-heldout-bundled.json": "7178b97219beac07d058a6d6b0d16eae5210b85ae4dc4998abb5e74bb08fd512",
+    "docs/ai-engineering/invalid-encoding-results/evaluation-heldout-lexical.json": "09cc5be17d58eaaf76a86e85e89355aa3a8c6f33bc203ff5d6f9237dbccd2dd4",
+    "docs/ai-engineering/invalid-encoding-results/evaluation-heldout-v1-freeze.json": "71c57897db956fd5f2a2efd1110447de8133100c2771545bd9fbd6ec7cb27f8a",
+    "docs/ai-engineering/invalid-encoding-results/evaluation-heldout-v1.json": "f6c8676e420ff2b7502e26a102cb71e5b8961c57f29caf712479f67b4e170049",
+    "docs/ai-engineering/ip-matrix-changes-20261019.json": "ad3db5d6bf2df8e8ddfc0cf0670d9e215113d0ba5d4db58002adbe932a1a552f",
+    "docs/ai-engineering/ip-matrix-verification-20261019.json": "b4ac84a85439118afee2af0c92bfc8f584140941e13640708eb59598f1ff6875",
+    "docs/ai-engineering/ip-workflow-changes-20261019.json": "6a05781439a9d2b9d253e92dffcafb2290b75513139b300e6862ccf7dc00c01a",
+    "docs/ai-engineering/ip-workflow-production-ui-20261019.json": "52a89990d539e4721182ca43a4e5fa556410d5826a1226b5c605a6d18a961fee",
+    "docs/ai-engineering/ip-workflow-verification-20261019.json": "4d47d5325c227855488411e321bcb8f283d6d6dcd80b77d093079dd473d0cafe",
+    "docs/ai-engineering/knowledge-sources.json": "8a07d88df990025200b853fc371104d866e9bf4e7dd90af66b2995b364ab40e4",
+    "docs/ai-engineering/model-availability-diagnosis-20261019.json": "38bbc66706ec65cbdec53404815ec46839e8129c09174e9f0ea8122ba286f5a3",
+    "docs/ai-engineering/model-availability-integration.json": "89e26d0c9fc947b58d40d294ab69c4a9d6aedceb888fb98d45491895b227bf20",
+    "docs/ai-engineering/model-availability-workflow-20261019.json": "924e61a3e6cfb89adeb2d527e0990b71aa3940d92be0246f7d54706230fcac7d",
+    "docs/ai-engineering/npm-audit-production.json": "683a1da8caf50c67fecc531fd727d76786e6db3202d0dac45e2364445208b9f9",
+    "docs/ai-engineering/npm-audit.json": "683a1da8caf50c67fecc531fd727d76786e6db3202d0dac45e2364445208b9f9",
+    "docs/ai-engineering/offline-closeout-status-20261019.json": "238bc5106529e82cd3dea77149d9bce7a175674cdef7982037816bf12d37d1de",
+    "docs/ai-engineering/offline-closeout-verification-20261019.json": "6f073c494221abd733ca39ffbb793936611d2ec3bc87526ae6a9b88b0399229d",
+    "docs/ai-engineering/production-diagnosis-ui-20261019.json": "3df663993b368d10ed25de1dd2c2afbb575ab88ce28437baecf0a082fd2de9be",
+    "docs/ai-engineering/production-evidence-ui-20261019.json": "0a0180549b0359fe291e6d5ee583959c0d078ba8389e24a11a8f867abc330dc7",
+    "docs/ai-engineering/production-evidence-ui-final-20261019.json": "53ae86338c8d22eba72265d031c376f9965c8b4bfdcaccb9302c45a2efb015de",
+    "docs/ai-engineering/production-integration-ui.json": "3df663993b368d10ed25de1dd2c2afbb575ab88ce28437baecf0a082fd2de9be",
+    "docs/ai-engineering/production-workflow-development.json": "35ec755ebb143e4f9234d999e6c625b6208461f26042909d2f2b3a95afd35bc3",
+    "docs/ai-engineering/production-workflow-probe.json": "939a5e89048fa0aeccaafa65e288ef12963e86da14390c6214b7677e44c8420d",
+    "docs/ai-engineering/prompt-ui-changes-20261019.json": "e77d023c74b9faa215d4fd1a9ec70b02926ac24b26ee3e54aa2b9ec4508591be",
+    "docs/ai-engineering/prompt-ui-production-20261019.json": "52a89990d539e4721182ca43a4e5fa556410d5826a1226b5c605a6d18a961fee",
+    "docs/ai-engineering/prompt-ui-verification-20261019.json": "6ed84e84e2a2557be20413a8f6e7765ec0dad24f5d7954388d0c064f3a7c1a4a",
+    "docs/ai-engineering/query-expansion-comparison.json": "4011cb735ff540db70faca572bb07b489df971df969e4a7741e9f3a52289957f",
+    "docs/ai-engineering/real-llm-evaluation.json": "6c8990486fb3ac78c4f37519122838dc02f2208c7c12c8f76ea081d71b2c3a3f",
+    "docs/ai-engineering/real-vibe-coder-cases.json": "a5727b1b60878db7806f8e6e6a79afacace5e7252e5141121a6661f1a43b5c9d",
+    "docs/ai-engineering/real-vibe-coder-prepared.json": "b8c79043cce40096e6728a8e1a5045e9ec2bb61adf15621990809bd8711367d2",
+    "docs/ai-engineering/release-preservation-diagnosis-20261019.json": "aca24bdcc65c8740d7d5f59a0fcd5574494e177e981de4dc4d47cb9af58c332a",
+    "docs/ai-engineering/retrieval-development-review-20261019.json": "7b149e399b143f2b7a552d4a09f46162478c820a4f05ae7879bb765ad1844a36",
+    "docs/ai-engineering/retrieval-diagnosis-20261019.json": "05f8897613ff6ae43356f40522b618a7a4bdbf7af4fb7201d400f690aca4f865",
+    "docs/ai-engineering/retrieval-fixed-measurement-20261019.json": "f88a7da5bb63feb4d62c50939afe72b8ec1ee4e26422015e9afea783b12beda8",
+    "docs/ai-engineering/retrieval-output-safety-20261019.json": "f9bfc7e6ed7f7a0ac7a61f235a46e72aeabd74753ec49c6abc0751b3c0b3bf52",
+    "docs/ai-engineering/retrieval-stratified-review.json": "0db23adab2ea60de96810bfd4972e68bbb7c6c302ac1a888ed661f42e9245609",
+    "docs/ai-engineering/rust-advisory-audit.json": "3f1e099e30a3d4a92b333ab83a2fcddb6b70bbda897dc7af7ee0fb4ef8dcc0e7",
+    "docs/ai-engineering/rust-advisory-before.json": "4bc25921ba7b437bcad27919cc1853bc4d066745760941f1a94b773494e71c31",
+    "docs/ai-engineering/semantic-adapter-evaluation.json": "4241b74e33dbe757932d00262925f7273d14efad47da47af0f1efae044a502d6",
+    "docs/ai-engineering/semantic-hardening-20261019.json": "50d41e014e434df2acbe9225a82cdc074c2c2a80dac4d18f186a552a9570a9fb",
+    "docs/ai-engineering/semantic-integration-adapter.json": "cdfeac5b2a50ecde924be5c428c2b347b6c8cf4d4485038db837c516dca1e2ec",
+    "docs/ai-engineering/ten-request-authorization-readiness-20261019.json": "fec6bc9344688e51c82fd89b29536ce77dc9c11dd315cfcb39a156a6343934f5",
+    "docs/ai-engineering/ten-request-changes-20261019.json": "7dec96e402c1dfd6304155447adf56c84f8f7297eeca6c902b239c04d4bc54ae",
+    "docs/ai-engineering/ten-request-verification-20261019.json": "56d53ba249221d8ea37cbee600c2940d0e180141262f2a8cdfb16197e0fb9052",
+    "docs/ai-engineering/verification-before-2026-10-18.json": "da946c75d0cdb66eda9018688fa55421eb95d45db8a4455c2026ccd69984a44f",
+    "docs/ai-engineering/verification-nsis-3.7.3.json": "7c0f0dc49a593dac777299ad014bba185deefe8851af723a45bf6d34d01b7992",
+    "docs/ai-engineering/workflow-changes-20261019.json": "6cd9b402c6cc5c8ebd1e49fb7c98c9e09c7dfdf20e3552971c6d2677d9d5d102",
+    "docs/ai-engineering/workflow-desktop-preflight-20261019.json": "da40ae48240c1a19407e14f1742d2701c3510668f75a596be6e1dd98860eb441",
+    "docs/ai-engineering/workflow-prepared-20261019.json": "e3778d8223897c87d2997d54b8ec8e088d9b2f431731a7bc8f26a49f0b9d3ec3",
+    "docs/ai-engineering/workflow-verification-20261019.json": "5d083dea903b9b4cbde3bb40ab50c36ec3d68a7d96c32bee27b7a766792c576b",
+    "docs/previews/board-guide-compact-dark.png": "64d8020cd4627789d235f3fc5b3715c06314b2d1139f95b9de7376770eb7eca3",
+    "docs/previews/board-guide-en-mai.png": "e4e7772552bfbbd5e1cd00849718e9cbbb0aad702c478f6ef6fd86a2c46c669f",
+    "docs/previews/board-guide-th-plus.png": "10e47297db8d0a97c6443e8b46bd283333bf1c5df28830e7b253648f2a534628",
+    "docs/previews/desktop-semantic-integration.png": "dacb47588f482f1e1581e6222b4cbb97a6d4b7c49940e1ae0910223b754663d4",
+    "docs/previews/prompt-examples-en-dark.png": "9309d617a5d4575e347bc604774ffbedfe89cc196821b0b8aafc0b54a29b1285",
+    "docs/previews/prompt-examples-th.png": "83ad5f558902d59b8123dee58ff3fc9073b4016ed16b09ad464df5bc65502a31",
+    "docs/research/kidbright-coverage-2026-10-16.json": "b0f3ae0a2c62c464e86b9ede42d6fba77a1d3ec243fed4f4dc4ec853f918c954",
+    "docs/research/rule-documents-2026-10-16.json": "5815ef36cda91f883f93d5501112faf936059bafd239fa2d09532636ebed5861",
+    "knowledge_base/all_models.md": "c408745c35c3455added1766e54b53d99ed1a072f20bd0c6afcba027d4aacc25",
+    "knowledge_base/compatibility/README.md": "02b74e3b3a9aeec6ee4ed3a100adb4e8ec92096dcda32bdc86819570c9d8ad51",
+    "knowledge_base/compatibility/board_catalog.json": "ff4a2bc5268d27b2f57be45b3e606743b389ccd176d646ca43c23e522081042e",
+    "knowledge_base/inex_ia_ip.md": "f6836b75e4f4a04ad764b6c3098838afe7cfa7dd782306d8e2693779f598ed00",
+    "knowledge_base/sensor_examples/kidbright32ip_matrix_az_user_passed.c": "571963f3bf8b174a344de48d67fd613648790f659e3215b85c48d6a571fbf2b8",
+    "knowledge_base/support_scope.md": "2303a4b4b3604d9a2c60cc3492c670c2214b09cc30953b3574a361266bd317b1",
+    "package-lock.json": "26a6de9ec117de7cb2a7b10a19c295a9a85689bfa143f1323ee7b217fc3fe5d6",
+    "package.json": "efabda7c4e78f82fef5b4399b9ab56615d87730906abf3899e57ad8b07ba4ffa",
+    "resources/embedding/LICENSE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "resources/embedding/UPSTREAM.txt": "2c47a70b94fe29e24841acf0e177949f1c9aa543e450d43af7e872ea81e43501",
+    "resources/embedding/manifest.json": "6e2c396405d9b56abefe09dfe375bc8396b7df95ddb13df5faf726ed0dfbadc4",
+    "resources/embedding/model-config.json": "1b4d8e2a3988377ed8b519a31d8d31025a25f1c5f8606998e8014111438efcd7",
+    "resources/embedding/model.onnx": "bbd7b466f6d58e646fdc2bd5fd67b2f5e93c0b687011bd4548c420f7bd46f0c5",
+    "resources/embedding/special_tokens_map.json": "5d5b662e421ea9fac075174bb0688ee0d9431699900b90662acd44b2a350503a",
+    "resources/embedding/tokenizer.json": "851ca67100d372ca3ae031a6abd168f53489eebfd7d89523f35c5c9b4d372c3c",
+    "resources/embedding/tokenizer_config.json": "abda01c8c14c5151ae498aceb30db406d6b91242c394fd88d3b6fd5a63a101e6",
+    "resources/knowledge_base/all_models.md": "c408745c35c3455added1766e54b53d99ed1a072f20bd0c6afcba027d4aacc25",
+    "resources/knowledge_base/compatibility/README.md": "02b74e3b3a9aeec6ee4ed3a100adb4e8ec92096dcda32bdc86819570c9d8ad51",
+    "resources/knowledge_base/inex_ia_ip.md": "f6836b75e4f4a04ad764b6c3098838afe7cfa7dd782306d8e2693779f598ed00",
+    "resources/knowledge_base/sensor_examples/kidbright32ip_matrix_az_user_passed.c": "571963f3bf8b174a344de48d67fd613648790f659e3215b85c48d6a571fbf2b8",
+    "resources/knowledge_base/support_scope.md": "2303a4b4b3604d9a2c60cc3492c670c2214b09cc30953b3574a361266bd317b1",
+    "scripts/audit-kidbright-coverage.mjs": "3c62537a3a5b386bd76d11aaa92ca9bb57cc26275031f1096c0a88e89c04b559",
+    "scripts/audit-kidbright-functions.py": "a9f0321aa13d2c045d42f0f609f5d4952d7bea3d4ad365b59684d49b2b2a6969",
+    "scripts/audit-rule-documents.mjs": "2a282b933d119ba997156692375c854451b5cce3b5f1769843b8493dca328080",
+    "scripts/audit-rust-dependencies.py": "03ff8635cfb04a5778c407409a42be58f92243c7261b6270e7aebc03bb163a9b",
+    "scripts/build-kidbright-examples.py": "70bed14dd0ed11c793c9f81770a8ed98091b2c94ddebd4a2ff7bc182cca15a5c",
+    "scripts/check-kidbright-board-catalog.mjs": "974c240b31c390e951b2bf615d3b8e55b4078d8f632dd7841ca786ff2a939c28",
+    "scripts/check-production-workflows.mjs": "f95ab4f5ff2b8c7b1c37b6c2573342b9ddd3952ef1fdbf9b5e90e7a8d0c82279",
+    "scripts/check-public.mjs": "d4055c048669428dea5b3b12991d94ba9419beef2ae4c5286f0784ce55b64d92",
+    "scripts/check-standalone.mjs": "1ea9852aca01adf6e38300c2ab3f1ac204f708588208d67ef630a2b3fa4103f9",
+    "scripts/check-winget-token.ps1": "d5d6a475999a39734150cf9f23945ac9c44ab581389947c34fb3e53631c078d4",
+    "scripts/diagnose-retrieval.py": "3f314a5b02ac0fa98694ec742dceb13b3528bb03a54a14fa190f8b2fb6482255",
+    "scripts/evaluate-capabilities.mjs": "0c5f3cab21ebda19f1537ccae1fb74170a25644b37d9efc3fbaa9139c5468ec7",
+    "scripts/evaluate-clangd.py": "e42da86b4293f145ea3bb63c6a988039542364efc24920f4136ddbf4ff43dd17",
+    "scripts/evaluate-retrieval.py": "42e6d9630d1175bc7900b1652051e09c3cd7e9bb0b398b50e1785af2081dc7cf",
+    "scripts/evaluate-vibe-coder-real.mjs": "c6c24c216e139b231dd95f6a2a10c7d85e4e2aa5002b4b554165a622bca5a3b8",
+    "scripts/lib/capability-matrix.mjs": "97de40378c3832226138c037875e18be66b5c5bf6c32a203b10c78da2a6a60be",
+    "scripts/lib/vibe-evidence.mjs": "ff023f4646c0d75a7a40d51733397dedcaeb4774d439a677d81854cb98a32b1b",
+    "scripts/prepare-retrieval-candidates.py": "1b04e1a253629a6df91830c2a78a13b6eb5af9d4205ce2d7185a2ab6fac983bc",
+    "scripts/prepare-runtime.mjs": "a9768315a98ac4d57e60215a25a99694370346be5eaf05d2227c279fbc45bdea",
+    "scripts/probe-board-guide.mjs": "39debd232298f93e9417affd8cde321a68b56aa5421e875adc8f1b3a4bc1e714",
+    "scripts/probe-desktop-semantic.mjs": "46d23e093046d3240f2f589768c6319af4c4a495076c8acf381f42ffe803fe72",
+    "scripts/probe-prompt-examples.mjs": "33b29926d8a786105916ab4d597916e6a9da07a9b9c7adafa8c61409c7602c9c",
+    "scripts/repair-evaluation-encoding.py": "242d94061c753a6cdd8588c43a549d93c95faa67762ce86bf43e9aacdd89a89d",
+    "scripts/review-retrieval.py": "bfb8111558de500d0434dac8f28a3c5c6b70a19859e488841e5bcf5b610f8fdd",
+    "scripts/summarize-query-expansion.py": "b7a746214c5cb42377644245caed335d318caa1a0e9971df7d2dd6461e8659a1",
+    "scripts/sync-knowledge-base.mjs": "6471166b5d9c9d7997168ca59795b5cba08f286b2fd5b0f8d958f040d98e9a11",
+    "scripts/test-kidbright-compat.mjs": "15437106f967eeeeb5e9f55f9de0493d12920583db948886c295a88558400e4c",
+    "scripts/test-standalone-install.py": "7cfcca328f199dfc842129c3367c78cde3eee57597f9b0b02bf5425525d6fcd6",
+    "scripts/tests/capability-matrix.test.mjs": "999382c580142249c5a116368004a7381178f7ce043f8ea18edaa5b8bea82002",
+    "scripts/tests/requirements.txt": "e0d645218a6449b4e50beb8c62f80fa25c481e76e7785ecb52f5b3983d10a38d",
+    "scripts/tests/test_block_contract.py": "8c61fe7e9dbf508e62a50fabba82275e655e49421da5c8973d556c0125785542",
+    "scripts/tests/test_real_vibe_harness.py": "9c62d3f8416ae025f85bc197e271a4f861149b0b72df90cb84079fe21262a2ec",
+    "scripts/tests/test_retrieval_diagnosis.py": "def914d2870aedf25a893e4f72bafa98b1ccd523cc1f77a404a7ac2ccd1085ec",
+    "scripts/tests/test_retrieval_review.py": "04dd98a655667b5ed3e6f5c4a15af4984a9986d3b4c306c481e6f3d0f4c3be51",
+    "scripts/tests/test_retrieval_runner.py": "35d4ad0a7c5801a5ec0eb65032cd07ead35f905ba8433079d9d61f25e0e8f047",
+    "scripts/tests/vibe-evidence.test.mjs": "522bee16d142e6d7fc1dfda3a790448506a5a94256c85c18baf3e2c7d87f94d1",
+    "scripts/tests/winget-token.tests.ps1": "362eb3ee0467990abeed2fbfd56e69ee6b81d7e503ce6df7d48efb277cc86d9b",
+    "src-tauri/Cargo.lock": "eb87460f9044180f98ac7f761a446bdef2579e1f2be8c6e16f9ba07d04f34a1b",
+    "src-tauri/Cargo.toml": "41937edaf3ffadf6298736e7069b64a35a7e0fdd74fef43ddabd30d18514ebea",
+    "src-tauri/build.rs": "10653c53fdefb7e3dee3654ab791f5e2146e734955ed0671172cd8f506cfa69f",
+    "src-tauri/examples/desktop-evaluation.manifest": "708bff8872b2502137891dcbb140f403c3e98977661dd15f818c760b881723f2",
+    "src-tauri/examples/desktop_evaluation.rs": "6780ef718fc211f43e4a7c68cdf7147caa2def6514998061290cd133e801e3b0",
+    "src-tauri/examples/export_block_fixture.rs": "ff70ba2515f4173e52d489be1ffb9f6a30c89cfc4df9894551c7550a02a32a2e",
+    "src-tauri/examples/export_kidbright_reference.rs": "ce9446cb63162cc69180b0244a60e012902e19fe7bc7867805860bf489b7947c",
+    "src-tauri/examples/knowledge_eval.rs": "2397cd061ee30afe065711796d7ad14926cf6a5aae98bc7df7eb9c26267acbac",
+    "src-tauri/examples/range_lsp_fixture.rs": "c23dd4c58b473729ad993a50731f636f960a854b564c884ad5472e94d17faa04",
+    "src-tauri/examples/semantic_probe.rs": "f311ffd3bbb0cf95fd2d5c19dee7357a0a0a1614ef0f0279ebcb9f68c0362304",
+    "src-tauri/examples/stalling_lsp_fixture.rs": "582f68d74eaa8d65ff2307c66eef777588319320c81ff01e762f0c34c9d3a64d",
+    "src-tauri/src/ai/change_journal.rs": "849809abf39188f19921f7958d9b56f914401ce04d012837883d5da2d85c9e17",
+    "src-tauri/src/ai/compatibility.rs": "c53ab5724a6e9137e476f009ee72d6db4273c470b0b67e7f72afd891ae22bf8d",
+    "src-tauri/src/ai/config.rs": "ae0c19d990bcf82a5fea3a5673b320d9186478b254da2171cd85937ce35bf595",
+    "src-tauri/src/ai/evidence.rs": "ad585303f4584aec08fac8ba8bd6434e8baf0567dba808fcfbb1e6b37b43432c",
+    "src-tauri/src/ai/kb.rs": "ca2b6f6436e76f4f2821784fcff9ded1bad98ad738a7abac87b8d51507a8d94f",
+    "src-tauri/src/ai/language.rs": "15f99fd08dd035b7b80124a22b03c1b234a653664cef2c8a156eaac91b0ff2d4",
+    "src-tauri/src/ai/mod.rs": "64f7b358d9781bbd2da46b8045ed9506d0fc9539ad8fc662bdfa7ae8ab1fa75f",
+    "src-tauri/src/ai/orchestration.rs": "e7e5983a20a21cde43e199f23843bb6cda7f98b4f01e7cb2ae714dfee1aa9461",
+    "src-tauri/src/ai/privacy.rs": "86bc604bd5df21e38d89e975295f02c25004c8ea307497c4355d7c5d11c85c30",
+    "src-tauri/src/ai/project_review.rs": "b891678f6cd831acfe9eef3df86c864ac9a5dfdbfa85eaf7708b45f06d660fb3",
+    "src-tauri/src/ai/providers.rs": "55ba2fae4d0146621252ea25268cfdaa971a43a6c864a5a8ce0ef76ba1f975b0",
+    "src-tauri/src/ai/repair.rs": "92706b8148eba7f29be9d0e07b06b2668d1a7c8c85204f2088f2facc4b8535bc",
+    "src-tauri/src/ai/system_prompt.txt": "f70ea53f0e6cc7709d5ec2491bfb806340662e2910bbd3b300b8bdf8b8f7977c",
+    "src-tauri/src/ai/tools.rs": "9abf235813aa26deb2f305b4670e9b21c30da4c53d57ff8c0379716531344f8f",
+    "src-tauri/src/ai/wiki.rs": "c9c9770124af24c97c41a60db3d9bbb894af3c5b3419fbcd0a475f58f392253f",
+    "src-tauri/src/ai_chat.rs": "aea04df2618485505d70f3abd93a639ddb8c2dbc736771b8f9e5c1d0827aec24",
+    "src-tauri/src/archive.rs": "375f6b61fe90cbf4dc4637b0431d168b7275878d597c7a1b83d04cd621af9e09",
+    "src-tauri/src/esp_idf.rs": "62728b30693db31b4e17da2ce159ff74bba8f812a58a9dd1fdced193e9573a5c",
+    "src-tauri/src/installation.rs": "603f88462cfac743b5c6c03638c3a7f7801c2fb36eddbb3146952ce7aabaa9d6",
+    "src-tauri/src/intelligence/block_to_c.rs": "49f92ef8f75244e0d6eccf1ad0f921772019040858fb56e520c7ebe544027d9c",
+    "src-tauri/src/intelligence/c_parser.rs": "f48969b82d9017b514b8e1a3185280d7cd9eccaa302914bcd285bd31308e1eaa",
+    "src-tauri/src/intelligence/chunking.rs": "cb6150dc1a0eb2abfffda4ad91a65e64bbd7aa789505634152822269b36e4672",
+    "src-tauri/src/intelligence/diagnostics.rs": "33cec0962525325270986f0194372e95be0fe028f9f0875b098fd90d83b67de9",
+    "src-tauri/src/intelligence/evaluation.rs": "610ea85c64a551a13d620e6a4601b06457c6afa768cfb952fba0c8096287df6f",
+    "src-tauri/src/intelligence/mod.rs": "a28e5f6f752009660ec1b8bd03484f12a3eec45667f034a2a82130f5a0ef1d42",
+    "src-tauri/src/intelligence/project.rs": "5b060468f797eee875849f05465d648e3f177ff2a7edf92f20c899e2b00b8827",
+    "src-tauri/src/intelligence/query_expansion.rs": "d4624a41ae62ac2a6f67c224806244d9c0cb2f7233692023896d035579e0019d",
+    "src-tauri/src/intelligence/retrieval.rs": "cf3b96f951a93b1f2ac261cde4c0852a1ce624bf2fd9d46ff9952d7e43622406",
+    "src-tauri/src/intelligence/semantic.rs": "f42cc28ad9197b0617c88e1a53e24d81342025236a6804868a86d675b7afef9b",
+    "src-tauri/src/kb_embed.rs": "be085e810caa915e60337ec08ef40b0908add370e35408e2da5cb9b710a116ef",
+    "src-tauri/src/kb_store.rs": "65da19701073a4ac8aa89c065a69071853bdff66238165be0c7919530c3e6c8f",
+    "src-tauri/src/lib.rs": "1b51d9a3b39e8e15119fffa436731f84e1d05127c4060d8de5f89e05ab412dc8",
+    "src-tauri/src/main.rs": "cccbfc53a48eee9695ad2254b5e49f36d1c13a9b34cb52938a296a11f728791c",
+    "src-tauri/src/sdk_process.rs": "cc1bbd081eb8bd53f0e6ab2676b18a9db165899b55c04a715325e80036093b89",
+    "src-tauri/src/toolchain.rs": "a6e8b8935c774a2b9b274176a3398a807bb8c1be2ff8bc59257377b733325e80",
+    "src-tauri/target/actual-model-blind-review-20261019/manifest.json": "54f48dd743b9fc6d3f79389fddb79950d06359d60ff6e8d2709d611d88cbcd2e",
+    "src-tauri/target/actual-model-matrix-20261019.json": "d9563a1bc16264cddd54474c189bd8bb5f386416a9236c562b8312aa0c926890",
+    "src-tauri/target/actual-model-prepared-20261019.json": "676692739b73393e4c5511075bca12205a8ed9982ef063d27fd2202ca89b70c4",
+    "src-tauri/target/actual-model-review-draft-20261019.json": "7d126ad158bd08d5fe0475bd3fce6d2e9be8679924ce5c746c2fc622a3ee33a1",
+    "src-tauri/target/actual-model-scoped-source-20261019.patch": "54b008516073d0748144becc6116a3cff54f102f055d531647dd1a61c9e27c63",
+    "src-tauri/target/check-prompt-winget-workflow.py": "bf18049a6179f6bc6c55ecfa46753bfc997e83194406e9dcf76ad0bf9f2f6338",
+    "src-tauri/target/offline-closeout-20261019/manual-stage-draft.json": "d50066733b0f2ec0744ba2055480f67813918b35e357d5d6d25f615e8b24dca0",
+    "src-tauri/target/offline-closeout-20261019/matrix.json": "6805cff9e7fbad88aa535301d2f44f5a500deadb15930321a27483682d137495",
+    "src-tauri/target/offline-closeout-20261019/prepared.json": "676692739b73393e4c5511075bca12205a8ed9982ef063d27fd2202ca89b70c4",
+    "src-tauri/target/offline-closeout-20261019/review-draft.json": "4a917dc0b6007dea94b228d2cc68cc4006cdf70471cde9f55cbe30e90cde0b11",
+    "src-tauri/target/prepare-actual-model-offline-evidence.py": "6cfe8cdb1f0e2350a7b5602b7ae5c3288e8b953295c30c4b384345fbd0ebb1a2",
+    "src-tauri/tauri.conf.json": "1d5278776cd13e1e80439719320f1dc615e9ecd1e07192fb54f7b522d6ba0c96",
+    "src-tauri/tauri.windows.conf.json": "b83b14703ae5a82e3e99e38ddee5ad255fe549e77bb748a6825c18f13ae9534e",
+    "src/AiChat.tsx": "94f36cb2434ffeda032663906f02a5ca419d75006e24f635364332cd566b4673",
+    "src/App.css": "83def7d6844afee5d49a2a1b16083444fb14ba25ce5eed761351876163b3e053",
+    "src/App.tsx": "499a0c188a107a99852e909b6b9d68573b04e842ce006ad7612e5962e3928fbf",
+    "src/BoardPreparationGuide.tsx": "dcf86f43e378dff3c14673dee82951fa749d4bf7ac22b77033b425669fa79c94",
+    "src/BuildErrorList.tsx": "eec8c3fc02d410132c988cac213771c39d80307b20c4f136eea1e1f8d0c9fa6b",
+    "src/CIntelligencePanel.tsx": "586e1830259c4a5eb617f60963cbdca80416fc75dbd6763c5775bdac003681cc",
+    "src/CodeEditor.tsx": "817284148169f3f013b3376edba4c42a92b7953026890d33923f4c6c8e4a3e50",
+    "src/CompilerRepairReview.tsx": "71da51c544a037e966bc54e1d18675c30c1e1562be958a7e9d85464504a84577",
+    "src/DiffReview.tsx": "5163a2dd6d1ade07326b2ed3c6f426d3528e010110f67720322cda00751ec779",
+    "src/LearningWorkspace.css": "a6455eee8576973c988bb4c6c90025725a2d8998d0ba67e6b6e2031a3640b9ad",
+    "src/LearningWorkspace.tsx": "38c3b9e8847c07744a12c4441886a6d1fd5715174e47710d62c51b1ed345460e",
+    "src/PrivateContextConsent.tsx": "2871cce6150f10fd53711e86abfcd66921a49e8ef6af8d2b828ec43881f7c91c",
+    "src/ProjectCreationReview.tsx": "115f581a91b8adbe2a0a7b4cc54f23b63e40eadce705ae7a78176331d23e3bb0",
+    "src/SetupRepairButton.tsx": "8d3568be2ed8946c7ad772e9c2e0d4a34bc0af0f81d587d7f7f7030eec8c3979",
+    "src/Toast.tsx": "c2f905df79b6759ece1049c7cee9392085e5ef1e1b02d6305159275857e055a6",
+    "src/ToolchainSetup.tsx": "ad242395c025276bbf9a3fc09d898b659cab8a8753489b2346e4db5539996449",
+    "src/WikiView.tsx": "53fe668c7fece3ffcf82b840079066559d1ecbda46b1d4945e60c3d2961a60d7",
+    "src/buildFlash.ts": "355f24ee70ce33374f869193297ff054fa2e9f00dac64c098bd09d6bb08b3078",
+    "src/errorHints.ts": "4d609afcb0c26e459c8acb3d253431d0cf88d4fbaa0f7fcf77e8d4d590481af3",
+    "src/index.css": "85fd2c86c873a35917adb912c57c7aa26672bf948dd77d55d13369a5ea1da2ec",
+    "src/main.tsx": "3eebbee8ab58cc8e596bd7b8278ce84a4337b912d59e5cca725f534d21f1e160",
+    "src/projectFiles.ts": "de2e83d4d31ce2f5d0345d52c226066d20b8d6a7bb684d04474f42f7012ea6cd",
+    "src/syntaxLinter.ts": "c8c307cecbaa38ccd1ebf319f5a198dcb0c1a17f391559af29b2a8b2ee5cb21e",
+    "src/test/aiPromptDraft.test.tsx": "7f4bfcdbf1d6557b32e4a1c1572c4606e5f0dca479b1f47cba307598ca9f0f99",
+    "src/test/buildErrorList.test.tsx": "0047705e1fbb6ba42e60dd64122b6cc3aafd9e9c7fddc52b1a8e72b3d12b5f50",
+    "src/test/buildFlash.test.ts": "8a7f57ca1ecb0a995b8ee94dd9a0c0f7686d94f28e0968f1e0e2555ea8f49ee0",
+    "src/test/buildWorkflow.test.tsx": "89844fe19074685435ea092c20eaaf81534bbe2753aefff4f1516916423d1425",
+    "src/test/cIntelligencePanel.test.tsx": "e46128e8cd8aeb06effd47be20757e89c24ac0137b9dd7cb79d12b203bc124cd",
+    "src/test/codeEditorDiff.test.tsx": "3761fa6cb1bd14105bfd92b4e5a50651d7be27bf54d3c19d64f68b2e0143185c",
+    "src/test/compilerRepairReview.test.tsx": "153649ec49f61edac84638d2e30d77964f538e4e6c1040545b1e93abb6a376ad",
+    "src/test/diffReview.test.ts": "bb76fe83fdf7bd598a2e2892b8852a9a3f97f32cd7a4ab81eff2031a11364574",
+    "src/test/errorHints.test.ts": "8f3bf13004189443e5ddc3f7f9e2c4ab9d765c3721e3a27b44068e522c447c2f",
+    "src/test/learningWorkspace.test.tsx": "97ceafae25f5b6f1eca57df1efbe9f60124bfda9a1c3a07544696e5aa8af666b",
+    "src/test/privateContextConsent.test.tsx": "c440d2b99e0833ea280ed55914b58f5b3618767ded7ae8695da7c8579f5bbce6",
+    "src/test/projectCreationReview.test.tsx": "0aa760181aed1e84ce5410d97418989294bc4ea60879c508f53695770fd8a008",
+    "src/test/projectFiles.test.ts": "f6bafad1f2be6deebc1993a675058f14d83cfa97ae10433801367e56d2e52dc9",
+    "src/test/projectSidebar.test.tsx": "45d759eafc22c47655cddf00e5de1ed1921ec9847fef46943b44625abd642e8a",
+    "src/test/setup.ts": "c4b8ce62f56d13ee7c47ab8263787fa484b3aec730f099b2d2fa57e56c98efaf",
+    "src/test/setupRepairButton.test.tsx": "c3f29a214f013f85292af390643a87087529fbcd8d01d0d33fcd67b1414e8179",
+    "src/test/toast.test.tsx": "3c286250c24018d4a2810e9d16aa81acd2ab3f0b5edf58276a5193a2a5831bed",
+    "src/test/toolchainFirstLaunch.test.tsx": "354c509affb840c4fc59fa5b0feab9cee5c587075c61145dfca0e559c3ee822a",
+    "src/test/utils.test.ts": "442c5c37cef2640e5db5588b3c15bb35672aa704e26002d5f5818102c124fa3f",
+    "src/test/wikiView.test.tsx": "5808c94fd530485d7530cd173ba1c0adf6f1a7d25f83550dd308274dec092db1",
+    "src/utils.ts": "3f1a5190875965ca984bae644c4a86d68b5bdd1d7681606086bb0cedcdc55bcf",
+    "src/vite-env.d.ts": "424faf9241dd699dda995b367ed36665732da1e6ec1f33b2fd40394488ecac92",
+    "docs/ai-engineering/offline-closeout-changes-20261019.json": "d7b8bcf3a4d74b5077f69a43b7a7987d802d268f67bc5aeeb17c8cca19892f09"
+  },
+  "baseline_evidence": {
+    "report": "verification-before-2026-10-18.json",
+    "all_recorded_source_hashes_matched_at_start": true,
+    "dirty_tree_inspected_before_changes": true,
+    "continuation_baseline": "verification-nsis-3.7.3.json",
+    "continuation_start_all_146_source_hashes_matched": true,
+    "continuation_start_installer_hash_matched": true
+  },
+  "retrieval_heldout": {
+    "report": "query-expansion-comparison.json",
+    "queries": 69,
+    "dataset_sha256": "c75de0d838a5f0e6670c48776c67d3b5c0a98ca755f02ba09c2d548c28b55c43",
+    "tuned_on_heldout": false,
+    "model_replaced": false,
+    "stratified_report": "retrieval-stratified-review.json",
+    "new_human_reviewed_cases": 0,
+    "independent_review_packet": "independent-retrieval-review.json",
+    "weights_or_routing_default_changed": true,
+    "technical_expansion_default_changed": true,
+    "base_rrf_and_model_weights_unchanged": true,
+    "query_routing_default_unchanged": true,
+    "development_queries": 18,
+    "development_decision": "expansion-development-decision.json",
+    "protocol_deviation_disclosed": true,
+    "diagnosis_increment": {
+      "report": "retrieval-fixed-measurement-20261019.json",
+      "ranker_model_corpus_unchanged": true,
+      "query_count": 69,
+      "frozen_sha256": "c75de0d838a5f0e6670c48776c67d3b5c0a98ca755f02ba09c2d548c28b55c43",
+      "tuning_on_frozen_labels": false,
+      "reviewed_development_cases": 0,
+      "user_requested_keep_ranking": true,
+      "production_ranking_drift_ids": [],
+      "new_model_selected": false
+    }
+  },
+  "block_conversion": {
+    "status": "PARTIAL",
+    "verified_ids": 9,
+    "actual_archive_rechecked": true,
+    "firmware_builds_passed": 4,
+    "physical_verification": false,
+    "report": "capability-firmware-20261019.json",
+    "new_firmware_builds_passed": 4,
+    "new_firmware_builds_total": 4,
+    "old_generated_main_sources_byte_identical": 4,
+    "sdk_versions_tested": [
+      "5.5.4"
+    ]
+  },
+  "clangd": {
+    "report": "src-tauri/target/capability-semantic-adapter-20261019.json",
+    "actual_sdk_cdb": true,
+    "native_queries_executed": 6,
+    "projects": 2,
+    "unsaved_definitions_tested": true,
+    "source_written": false,
+    "optional_editor_panel_integrated": true,
+    "actual_desktop_ipc_qualified": true,
+    "header_and_all_project_completeness": false,
+    "background_index": false,
+    "baseline_exploration": "clangd-evaluation.json",
+    "desktop_report": "capability-desktop-20261019.json",
+    "desktop_scope": "Exercised debug-native Windows paths only; no installed-release/header-inference/all-project certification",
+    "desktop_observations": 39
+  },
+  "workflow_probe": {
+    "report": "ip-workflow-production-ui-20261019.json",
+    "production_react_csp_checked": true,
+    "native_backend_stubbed": true,
+    "live_llm": false
+  },
+  "security": {
+    "npm_report": "capability-security-20261019.json",
+    "full_npm_advisories": 0,
+    "rust_before_report": "rust-advisory-before.json",
+    "rust_current_report": "capability-security-20261019.json",
+    "rust_remaining_packages": 8,
+    "rust_remaining_advisory_records": 10,
+    "windows_selected_maintenance_findings": 2,
+    "windows_selected_nonmaintenance_advisory_matches": 0,
+    "all_lockfile_clean": false,
+    "remediation_status": "Actionable recorded selected Windows findings patched; remaining Linux paths/maintenance and cross-platform tests unresolved",
+    "cargo_lock_sha256": "eb87460f9044180f98ac7f761a446bdef2579e1f2be8c6e16f9ba07d04f34a1b",
+    "npm_lock_sha256": "26a6de9ec117de7cb2a7b10a19c295a9a85689bfa143f1323ee7b217fc3fe5d6",
+    "lockfiles_unchanged_since_nsis": true,
+    "fresh_full_osv_batch_this_increment": true,
+    "primary_advisory_pages_rechecked": [
+      "RUSTSEC-2025-0057",
+      "RUSTSEC-2024-0436",
+      "RUSTSEC-2026-0194"
+    ],
+    "actual_llm_prompt_injection_resistance_measured": false,
+    "transport_and_approval_regressions_tested": true,
+    "debug_evaluation_credentials_disabled": true,
+    "current_full_advisory_database_audit_executed": true
+  },
+  "release": {
+    "version": "3.7.3",
+    "nsis_built": true,
+    "security_updated_installer_verified": true,
+    "artifact_report": "installer-validation-3.7.3.json",
+    "artifact_sha256": "d09d0f9418d94059e801fc43a38241314757c686e5060e26596a806ba56ae7c1",
+    "published": false,
+    "deployed": false,
+    "clean_machine_gui_verified": false,
+    "new_installer_built": false,
+    "working_tree_changes_bundled": false,
+    "preserved_installer_report": "capability-assets-20261019.json",
+    "installer_source_manifest": "verification-nsis-3.7.3.json",
+    "version_promoted": false,
+    "local_unbundled_executable_built": true,
+    "local_executable_report": "ip-matrix-verification-20261019.json",
+    "packaged_candidate_warranted": false,
+    "decision_report": "30-offline-closeout-and-runbook.md",
+    "local_executable_scope": "Current no-bundle development application and public knowledge sidecar rebuilt; installed app and historical NSIS unchanged",
+    "current_readiness_status": "NOT_READY"
+  },
+  "source_manifest_scope": "Current baseline plus capability framework/evidence; verification.json excluded to avoid self-reference. capability-changes-20261019.json records current changes; all previous release/increment evidence is historical.",
+  "real_llm": {
+    "report": "src-tauri/target/offline-closeout-20261019/prepared.json",
+    "status": "NOT_EXECUTED",
+    "inference_requests": 0,
+    "reason": "User confirms no endpoint/model/test credentials for this round and directs offline closeout without repeated API questions. Run remains blocked pending actual target and verified budget/cost/scope/capture safeguards.",
+    "patches_applied": 0,
+    "quality_metrics": null,
+    "availability_report": "offline-closeout-status-20261019.json",
+    "harness": "scripts/evaluate-vibe-coder-real.mjs",
+    "desktop_no_inference_preflight_passed": true,
+    "capability_levels": {
+      "knowledge_aware": "NOT_EVALUATED",
+      "project_aware": "NOT_EVALUATED",
+      "build_aware": "NOT_EVALUATED"
+    },
+    "desktop_evidence_report": "capability-desktop-20261019.json",
+    "synthetic_marker_is_model_evidence": false,
+    "desktop_no_inference_preflight_rerun_this_increment": false,
+    "authorization_report": "ten-request-authorization-readiness-20261019.json",
+    "historical_availability_report": "model-availability-diagnosis-20261019.json"
+  },
+  "development_report": "30-offline-closeout-and-runbook.md",
+  "latest_ui_fix": {
+    "report": "15-board-guide-ui.md",
+    "changes": "board-guide-change-manifest.json",
+    "families": 3,
+    "languages": [
+      "th",
+      "en"
+    ],
+    "frontend_cases_added": 6,
+    "project_state_preserved": true,
+    "new_native_commands": 0,
+    "installed_desktop_ipc_qualified": false
+  },
+  "previous_development_report": "29-bounded-authorization-target-pending.md",
+  "integration_command_ledger": "integration-verification.json",
+  "local_exact_commands": {
+    "path": "src-tauri/target/integration-executed-commands.local.json",
+    "sha256": "ada197f867d2db958e8e959699a120a5e90688af6673535fe36e8d80103587c0"
+  },
+  "previous_integration_report": "17-integration-report.md",
+  "latest_workflow_increment": {
+    "report": "workflow-verification-20261019.json",
+    "changes": "workflow-changes-20261019.json",
+    "capability_levels": {
+      "knowledge_aware": "NOT_EVALUATED",
+      "project_aware": "NOT_EVALUATED",
+      "build_aware": "NOT_EVALUATED"
+    },
+    "production_source_changed": false,
+    "native_preflight_synthetic_only": true,
+    "full_desktop_attempt_failed_and_retained": true,
+    "source_hashes_matched_at_start": 207,
+    "no_board_or_block_expansion": true,
+    "no_rc_prepared": true
+  },
+  "latest_diagnosis_increment": {
+    "report": "diagnosis-verification-20261019.json",
+    "changes": "diagnosis-changes-20261019.json",
+    "baseline_files_matched": 216,
+    "production_ranker_changed": false,
+    "production_model_changed": false,
+    "user_keep_ranking": true,
+    "reviewed_development_cases": 0,
+    "capability_levels": {
+      "knowledge_aware": "NOT_EVALUATED",
+      "project_aware": "NOT_EVALUATED",
+      "build_aware": "NOT_EVALUATED"
+    }
+  },
+  "latest_evidence_increment": {
+    "report": "evidence-verification-20261019.json",
+    "changes": "evidence-changes-20261019.json",
+    "baseline_sources_matched": 242,
+    "production_ranker_or_model_changed": false,
+    "all_capability_levels": "NOT_EVALUATED",
+    "all_eight_requirements": "PARTIAL",
+    "repair_consent_bound_and_consumed": true,
+    "desktop_observations": 32,
+    "actual_llm_inference": 0
+  },
+  "capability_matrix": {
+    "report": "src-tauri/target/offline-closeout-20261019/matrix.json",
+    "levels": {
+      "knowledge": "NOT_EXECUTED",
+      "project": "NOT_EXECUTED",
+      "build": "NOT_EXECUTED"
+    },
+    "ai_quality_criteria_not_executed": 16,
+    "separate_mechanical_observations_passed": 0,
+    "independent_human_judgments": 0,
+    "legacy_level_fields_retained": true,
+    "current_workflow_mechanical_criteria_not_executed": 16,
+    "prior_mechanical_observations_scope": "10 historical observations retained in capability-matrix-20261019.json; not transferred to fresh pilot"
+  },
+  "latest_capability_increment": {
+    "report": "capability-verification-20261019.json",
+    "changes": "capability-changes-20261019.json",
+    "baseline_sources_matched": 253,
+    "ranking_model_unchanged": true,
+    "actual_llm_requests": 0,
+    "all_eight_requirements": "PARTIAL"
+  },
+  "latest_prompt_ui_increment": {
+    "report": "prompt-ui-verification-20261019.json",
+    "changes": "prompt-ui-changes-20261019.json",
+    "workflow_remote_status": "NOT_EXECUTED",
+    "token_scope_update_required_by_owner": true,
+    "production_browser_fixtures_passed": true,
+    "native_desktop_rerun": false,
+    "actual_llm_requests": 0,
+    "ranking_model_unchanged": true,
+    "new_installer": false,
+    "all_eight_requirements": "PARTIAL"
+  },
+  "latest_ip_workflow_increment": {
+    "report": "ip-workflow-verification-20261019.json",
+    "changes": "ip-workflow-changes-20261019.json",
+    "model_conversation": "NOT_EXECUTED",
+    "custom_drafting_allowed_without_fake_profile": true,
+    "private_reads_still_guarded": true,
+    "all_eight_requirements": "PARTIAL"
+  },
+  "latest_ip_matrix_evidence_increment": {
+    "report": "ip-matrix-verification-20261019.json",
+    "changes": "ip-matrix-changes-20261019.json",
+    "physical_result_kind": "USER_REPORTED_PASS",
+    "agent_hardware_result": "NOT_EXECUTED",
+    "all_eight_requirements": "PARTIAL"
+  },
+  "latest_actual_model_readiness_increment": {
+    "report": "actual-model-verification-20261019.json",
+    "changes": "actual-model-changes-20261019.json",
+    "actual_model_requests": 0,
+    "independent_judgments": 0,
+    "all_sixteen_actual_criteria": "NOT_EXECUTED",
+    "all_eight_requirements": "PARTIAL",
+    "release": "NOT_READY"
+  },
+  "latest_ten_request_readiness_increment": {
+    "report": "ten-request-verification-20261019.json",
+    "changes": "ten-request-changes-20261019.json",
+    "user_http_ceiling": 10,
+    "user_usd_ceiling": 1,
+    "concrete_target_supplied": false,
+    "run_mode_fail_closed": true,
+    "actual_model_requests": 0,
+    "all_sixteen_actual_criteria": "NOT_EXECUTED",
+    "all_eight_requirements": "PARTIAL",
+    "release": "NOT_READY"
+  },
+  "latest_offline_closeout_increment": {
+    "report": "offline-closeout-verification-20261019.json",
+    "changes": "offline-closeout-changes-20261019.json",
+    "preparation_deliverables": "PREPARED",
+    "actual_model_status": "NOT_EXECUTED",
+    "api_questions": 0,
+    "implementation_changed": false,
+    "all_eight_requirements": "PARTIAL",
+    "release": "NOT_READY"
+  }
+}

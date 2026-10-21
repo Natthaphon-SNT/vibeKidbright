@@ -1,0 +1,90 @@
+{
+  "scope": "Board guide UI fix compared with the preceding verification source manifest. Newly recorded does not imply every untracked file was created in this increment. Generated rule audit inventories and verification itself excluded from this diff.",
+  "before_verification_sha256": "fe339469fed6dae9bdedcfa05e8fbe42582aabb758eba12487b1e920b502b0e5",
+  "files": [
+    {
+      "path": "docs/MAI_PLUS_WORKSPACE_UI_2026-10-17.md",
+      "before_sha256": null,
+      "after_sha256": "9dfe742b83e1cc541743eba101fc23d5de016361311049ca4106b61d3600fdd2",
+      "status": "newly_recorded_in_manifest"
+    },
+    {
+      "path": "docs/ai-engineering/14-continuation-report.md",
+      "before_sha256": "5bde86cd3b3add3879545779194c85687eb34b926292a7cc68b18f6fb91ecb98",
+      "after_sha256": "fbda5100f9ec43dbfbe3064ae36166d4104d9ccd095f3080a699311b61215d6b",
+      "status": "modified"
+    },
+    {
+      "path": "docs/ai-engineering/15-board-guide-ui.md",
+      "before_sha256": null,
+      "after_sha256": "73cd72caab9170ab99a22089ee021abaf712d3241dd95490f82643dc6c76bd9f",
+      "status": "newly_recorded_in_manifest"
+    },
+    {
+      "path": "docs/ai-engineering/board-guide-build.json",
+      "before_sha256": null,
+      "after_sha256": "8b68be0c004b65956e6319a9cc0673a68be7b751b036743ae844b2ecb8a5e73f",
+      "status": "newly_recorded_in_manifest"
+    },
+    {
+      "path": "docs/ai-engineering/board-guide-ui-probe.json",
+      "before_sha256": null,
+      "after_sha256": "3df663993b368d10ed25de1dd2c2afbb575ab88ce28437baecf0a082fd2de9be",
+      "status": "newly_recorded_in_manifest"
+    },
+    {
+      "path": "docs/previews/board-guide-compact-dark.png",
+      "before_sha256": null,
+      "after_sha256": "5a79761013d82bfcec27d98c60b91470abb2f126b59e39799680c3b9d6ef851a",
+      "status": "newly_recorded_in_manifest"
+    },
+    {
+      "path": "docs/previews/board-guide-en-mai.png",
+      "before_sha256": null,
+      "after_sha256": "345112fc2f24720ab2d7b303aeafa0ec818b904164c97ae1e804ee84dcdbbc4e",
+      "status": "newly_recorded_in_manifest"
+    },
+    {
+      "path": "docs/previews/board-guide-th-plus.png",
+      "before_sha256": null,
+      "after_sha256": "82801d0c1d8cb6fcd4f8de76b638eeb3b8379356e0ecda1444caa16adf57e63d",
+      "status": "newly_recorded_in_manifest"
+    },
+    {
+      "path": "scripts/check-production-workflows.mjs",
+      "before_sha256": "80dfde4a1d8aa53817b201168696dd103a6b3a87fd39904863c4a35dcf46e6e1",
+      "after_sha256": "d6513de77a964dced698a354c7fb0e9ccf8b9c5681114ddc863f3ff33a25c47a",
+      "status": "modified"
+    },
+    {
+      "path": "scripts/probe-board-guide.mjs",
+      "before_sha256": null,
+      "after_sha256": "39debd232298f93e9417affd8cde321a68b56aa5421e875adc8f1b3a4bc1e714",
+      "status": "newly_recorded_in_manifest"
+    },
+    {
+      "path": "src/BoardPreparationGuide.tsx",
+      "before_sha256": null,
+      "after_sha256": "dcf86f43e378dff3c14673dee82951fa749d4bf7ac22b77033b425669fa79c94",
+      "status": "newly_recorded_in_manifest"
+    },
+    {
+      "path": "src/LearningWorkspace.css",
+      "before_sha256": "84cf6d302407631522b9edad8567cb00304fba0f015134f02cb8276fdb0f264a",
+      "after_sha256": "e780603831b63edf098b415042eaa76465fc168c21f67ddd67af9b3089307021",
+      "status": "modified"
+    },
+    {
+      "path": "src/LearningWorkspace.tsx",
+      "before_sha256": "702038f3460094837d5ccb87a8574a4bdd2a5a0587a567cdf00e55b9e0e6f541",
+      "after_sha256": "fbeec1607ec38c5d4e3fef89c2a4fba54a59c17674037138733dac5e1ca54ba6",
+      "status": "modified"
+    },
+    {
+      "path": "src/test/learningWorkspace.test.tsx",
+      "before_sha256": "11768433355b39598f2c4c9e556fbc3ea645865f561f1207fa8aa1a7e6c90d6f",
+      "after_sha256": "650671aede5627310b02092ab55a10ad8b8b80d3920585ba076313e7593c2d10",
+      "status": "modified"
+    }
+  ]
+}

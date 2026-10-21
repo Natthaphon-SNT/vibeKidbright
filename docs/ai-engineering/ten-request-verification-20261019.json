@@ -1,0 +1,149 @@
+{
+  "date": "2026-10-19",
+  "scope": "Bounded user permission recorded, target placeholders unresolved; existing offline harness run mode made fail-closed pending native request/cost enforcement. No actual-model execution.",
+  "baseline": {
+    "path": "src-tauri/target/ten-request-baseline-20261019.json",
+    "sha256": "5e443fd1e51e5b4d668d568915a60c5d8082f2db5c44a4a4324cc654646ddbec",
+    "bytes": 72762
+  },
+  "baseline_verified_before_changes": true,
+  "baseline_files_matched": 318,
+  "git_status": {
+    "path": "src-tauri/target/ten-request-start-status-20261019.txt",
+    "sha256": "ddbf09a9452a4eaf5ef0eaa264a211f10a7ec124738cd1d9f9e3fe4df555b0e1",
+    "bytes": 11434
+  },
+  "git_diffstat": {
+    "path": "src-tauri/target/ten-request-start-diffstat-20261019.txt",
+    "sha256": "aed0b1eb40f2177a4d2d2deb109a89d7669f86d91ddc9209b6573943d7024a0c",
+    "bytes": 5844
+  },
+  "authorization": {
+    "path": "docs/ai-engineering/ten-request-authorization-readiness-20261019.json",
+    "sha256": "fec6bc9344688e51c82fd89b29536ce77dc9c11dd315cfcb39a156a6343934f5",
+    "bytes": 1685
+  },
+  "commands": [
+    {
+      "command": "python -m unittest discover -s scripts/tests -p test_real_vibe_harness.py -v",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/ten-request-harness-tests-final-20261019.log",
+        "sha256": "cf6b1d559b417d98e34300e6038161548d718181104471a52d2e3c891a0d8cf1",
+        "bytes": 3768
+      }
+    },
+    {
+      "command": "python -m unittest discover -s scripts/tests -v",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/ten-request-python-20261019.log",
+        "sha256": "dbb9b4301a79e026dec92b741075f126170fc2cc97be056a225fe839de444373",
+        "bytes": 8986
+      }
+    },
+    {
+      "command": "node --test scripts/tests/*.test.mjs",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/ten-request-node-20261019.log",
+        "sha256": "90c4d464dc8d05d3a72772fee0cd21158104845f80b370df95eb4af9dc0ff1f1",
+        "bytes": 2590
+      }
+    },
+    {
+      "command": "node scripts/audit-rule-documents.mjs",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/ten-request-rules-inventory-final-20261019.log",
+        "sha256": "a99e1bdd41a1ad215cc2936a647ec8afd395ea17c3ca80df4dea3d36a2998d2a",
+        "bytes": 574
+      }
+    },
+    {
+      "command": "npm run check:rules",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/ten-request-rules-check-final-20261019.log",
+        "sha256": "7a34da2ef7244d735344831599cadd35422963fdb351593e953d5c9d1e8fcde2",
+        "bytes": 752
+      }
+    },
+    {
+      "command": "npm run check:public",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/ten-request-public-final-20261019.log",
+        "sha256": "f3cc4564d57036efeb696a7c0d3f8957e1c72505f6fba24e4581d207366cc042",
+        "bytes": 290
+      }
+    },
+    {
+      "command": "npm run check:standalone",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/ten-request-standalone-20261019.log",
+        "sha256": "882c2e7160084ebbe400f85ba9a7ffab8782405d187430e2100945c8fca53fc8",
+        "bytes": 408
+      }
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/ten-request-diff-check-final-20261019.log",
+        "sha256": "a4c637612e97799334ce3637bcfa212a05f498cbd42e0049a45d17e9a873618a",
+        "bytes": 8724
+      }
+    }
+  ],
+  "tests": {
+    "python": 24,
+    "targeted_harness_subset": 8,
+    "node": 12
+  },
+  "initial_failed_targeted_run": {
+    "exit_code": 1,
+    "log": {
+      "path": "src-tauri/target/ten-request-harness-tests-20261019.log",
+      "sha256": "18fdad72cbf642ce52d341efc33a7363ad2208a7a8ff5627f1b295927b64cf59",
+      "bytes": 6526
+    },
+    "reason": "Existing-report test expected EEXIST; the new budget gate rejects run mode earlier. Both early refusal and exclusive preparation byte-preservation are now checked."
+  },
+  "actual_model_requests": 0,
+  "metadata_probes": 0,
+  "actual_model_successes": 0,
+  "actual_model_failures": 0,
+  "pilot_api_cost_usd": 0,
+  "patch_approvals_or_applies": 0,
+  "capability_matrix_unchanged": {
+    "path": "src-tauri/target/actual-model-matrix-20261019.json",
+    "sha256": "d9563a1bc16264cddd54474c189bd8bb5f386416a9236c562b8312aa0c926890",
+    "bytes": 15057
+  },
+  "all_sixteen_actual_criteria": "NOT_EXECUTED",
+  "independent_judgments": 0,
+  "bundled_corpus_unchanged_files": 42,
+  "model_ranker_frozen_set_block_ids_lockfiles_sdk_configuration_changed": false,
+  "historical_nsis": {
+    "path": "src-tauri/target/release/bundle/nsis/VibeKidbright IDE_3.7.3_x64-setup.exe",
+    "sha256": "d09d0f9418d94059e801fc43a38241314757c686e5060e26596a806ba56ae7c1",
+    "bytes": 316758944
+  },
+  "new_installer_or_app_build": false,
+  "release": "NOT_READY",
+  "requirements": {
+    "system_architecture": "PARTIAL",
+    "hybrid_rag": "PARTIAL",
+    "knowledge_base_data": "PARTIAL",
+    "code_aware_chunking": "PARTIAL",
+    "compiler_validation_auto_fix": "PARTIAL",
+    "technology_integration": "PARTIAL",
+    "development_phases": "PARTIAL",
+    "evaluation_quality": "PARTIAL"
+  },
+  "no_production_configuration_or_credentials_access": true,
+  "committed_pushed_published_deployed": false,
+  "remaining_blockers": "29-bounded-authorization-target-pending.md"
+}

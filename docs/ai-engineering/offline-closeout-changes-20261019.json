@@ -1,0 +1,60 @@
+{
+  "date": "2026-10-19",
+  "baseline": {
+    "path": "src-tauri/target/offline-closeout-baseline-20261019.json",
+    "sha256": "90d8394039f7e8d3ecab1b4f6f26bba001fc9a8689840d944f9c796373b341b5",
+    "bytes": 74398
+  },
+  "baseline_verified_before_changes": true,
+  "scope": "Previous 322-file source/evidence manifest plus new closeout documents/artifacts; no runtime source changes. Pre-existing dirty work is preserved, not attributed wholesale. Self/verification.json hashes excluded.",
+  "files": [
+    {
+      "path": "docs/ai-engineering/30-offline-closeout-and-runbook.md",
+      "before_sha256": null,
+      "after_sha256": "9d49e2a8b15fc870a7b16fa1cf5d6b95289063a02252e619b6d22e3245952b4b",
+      "comparison": "newly_recorded"
+    },
+    {
+      "path": "docs/ai-engineering/offline-closeout-status-20261019.json",
+      "before_sha256": null,
+      "after_sha256": "238bc5106529e82cd3dea77149d9bce7a175674cdef7982037816bf12d37d1de",
+      "comparison": "newly_recorded"
+    },
+    {
+      "path": "docs/ai-engineering/offline-closeout-verification-20261019.json",
+      "before_sha256": null,
+      "after_sha256": "6f073c494221abd733ca39ffbb793936611d2ec3bc87526ae6a9b88b0399229d",
+      "comparison": "newly_recorded"
+    },
+    {
+      "path": "docs/research/rule-documents-2026-10-16.json",
+      "before_sha256": "7152cba585fc463b8fef8fac4ca1b96342d857f0731cb2c74f04dc1bd12528af",
+      "after_sha256": "5815ef36cda91f883f93d5501112faf936059bafd239fa2d09532636ebed5861",
+      "comparison": "changed_from_verified_baseline"
+    },
+    {
+      "path": "src-tauri/target/offline-closeout-20261019/manual-stage-draft.json",
+      "before_sha256": null,
+      "after_sha256": "d50066733b0f2ec0744ba2055480f67813918b35e357d5d6d25f615e8b24dca0",
+      "comparison": "newly_recorded"
+    },
+    {
+      "path": "src-tauri/target/offline-closeout-20261019/matrix.json",
+      "before_sha256": null,
+      "after_sha256": "6805cff9e7fbad88aa535301d2f44f5a500deadb15930321a27483682d137495",
+      "comparison": "newly_recorded"
+    },
+    {
+      "path": "src-tauri/target/offline-closeout-20261019/prepared.json",
+      "before_sha256": null,
+      "after_sha256": "676692739b73393e4c5511075bca12205a8ed9982ef063d27fd2202ca89b70c4",
+      "comparison": "newly_recorded"
+    },
+    {
+      "path": "src-tauri/target/offline-closeout-20261019/review-draft.json",
+      "before_sha256": null,
+      "after_sha256": "4a917dc0b6007dea94b228d2cc68cc4006cdf70471cde9f55cbe30e90cde0b11",
+      "comparison": "newly_recorded"
+    }
+  ]
+}

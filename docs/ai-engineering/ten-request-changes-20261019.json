@@ -1,0 +1,48 @@
+{
+  "date": "2026-10-19",
+  "baseline": {
+    "path": "src-tauri/target/ten-request-baseline-20261019.json",
+    "sha256": "5e443fd1e51e5b4d668d568915a60c5d8082f2db5c44a4a4324cc654646ddbec",
+    "bytes": 72762
+  },
+  "baseline_verified_before_changes": true,
+  "scope": "Prior 318-file recorded baseline plus new evidence, not the whole pre-existing Git diff. Newly recorded does not imply newly created. Self/verification.json excluded.",
+  "files": [
+    {
+      "path": "docs/ai-engineering/29-bounded-authorization-target-pending.md",
+      "before_sha256": null,
+      "after_sha256": "02f6ee3739e6efaecd7184c8ed6c5991660f85707579c1b23ddbaaa9e86a46a3",
+      "comparison": "newly_recorded"
+    },
+    {
+      "path": "docs/ai-engineering/ten-request-authorization-readiness-20261019.json",
+      "before_sha256": null,
+      "after_sha256": "fec6bc9344688e51c82fd89b29536ce77dc9c11dd315cfcb39a156a6343934f5",
+      "comparison": "newly_recorded"
+    },
+    {
+      "path": "docs/ai-engineering/ten-request-verification-20261019.json",
+      "before_sha256": null,
+      "after_sha256": "56d53ba249221d8ea37cbee600c2940d0e180141262f2a8cdfb16197e0fb9052",
+      "comparison": "newly_recorded"
+    },
+    {
+      "path": "docs/research/rule-documents-2026-10-16.json",
+      "before_sha256": "4503fc84f02ea84df62892b564243ce8a1c618ccfade1f8bdd0ff7d3a856f020",
+      "after_sha256": "7152cba585fc463b8fef8fac4ca1b96342d857f0731cb2c74f04dc1bd12528af",
+      "comparison": "changed_from_verified_baseline"
+    },
+    {
+      "path": "scripts/evaluate-vibe-coder-real.mjs",
+      "before_sha256": "7cd53bb6ea8cffb3f1def2fa5961fb11fb05f6ebd6805b146b5938399994ee16",
+      "after_sha256": "c6c24c216e139b231dd95f6a2a10c7d85e4e2aa5002b4b554165a622bca5a3b8",
+      "comparison": "changed_from_verified_baseline"
+    },
+    {
+      "path": "scripts/tests/test_real_vibe_harness.py",
+      "before_sha256": "3a19dad0eb19e0a64b24361fb8036ccea4433c4ee4252afcd7543af9770dbd71",
+      "after_sha256": "9c62d3f8416ae025f85bc197e271a4f861149b0b72df90cb84079fe21262a2ec",
+      "comparison": "changed_from_verified_baseline"
+    }
+  ]
+}

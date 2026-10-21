@@ -1,0 +1,98 @@
+{
+  "local_date": "2026-10-19",
+  "baseline": "src-tauri/target/verification-workflow-start.json",
+  "baseline_sha256": "057433502f1b29f4c8bcd9c9615c81b20f93f426b3de5ab09d76651fe96bf2a2",
+  "scope": "Current workflow tooling/documentation evidence compared with the matched 207-file starting manifest. Newly recorded is not proof of file creation time. Historical integration/NSIS reports preserved. This file and verification.json exclude themselves.",
+  "files": [
+    {
+      "path": "docs/ai-engineering/07-implementation-progress.md",
+      "before_sha256": "c0cdb602b11fed70f3c57c9b56ffc6c772e9337b015fc6fc6672a431e6e972bc",
+      "after_sha256": "79d3aee993e452c3ebe2bb85157ce45e01ad0626d73bbaee191212ef199c9ef0",
+      "status": "modified"
+    },
+    {
+      "path": "docs/ai-engineering/09-known-limitations.md",
+      "before_sha256": "21e35b76a96d38896277dc5afdf7c199521045d0f485adf6fcabda42c03c83ff",
+      "after_sha256": "0991da9c3a921e574c63dc3e60b025c9e5cb36f065270aa0f8493a7057e8bba2",
+      "status": "modified"
+    },
+    {
+      "path": "docs/ai-engineering/13-independent-evaluation.md",
+      "before_sha256": "857fabd1bd01dad1265a453d7c01ed1cc7942d6dec61994aebdfeff8803b4f4a",
+      "after_sha256": "af4079adb8499d0b7f32e58250ed75d8a5d0f32117d57d1885e8787c30b3ff33",
+      "status": "modified"
+    },
+    {
+      "path": "docs/ai-engineering/18-capability-milestone.md",
+      "before_sha256": null,
+      "after_sha256": "f3cb351c4ae4ca1fe7e0f2b5fd4624235ba2803fc8b7e1579995866bde775bb4",
+      "status": "newly_recorded"
+    },
+    {
+      "path": "docs/ai-engineering/model-availability-workflow-20261019.json",
+      "before_sha256": null,
+      "after_sha256": "924e61a3e6cfb89adeb2d527e0990b71aa3940d92be0246f7d54706230fcac7d",
+      "status": "newly_recorded"
+    },
+    {
+      "path": "docs/ai-engineering/real-vibe-coder-cases.json",
+      "before_sha256": "1335b6ae125c517ce1f099343c9d14be58b99b827ef9d4894a7a8d8084a0e9ca",
+      "after_sha256": "e71e99c81c7dcb381f6bc9a96d963db9fdf49dfb7c00aa6f79cfebc010fdbf73",
+      "status": "modified"
+    },
+    {
+      "path": "docs/ai-engineering/workflow-desktop-preflight-20261019.json",
+      "before_sha256": null,
+      "after_sha256": "da40ae48240c1a19407e14f1742d2701c3510668f75a596be6e1dd98860eb441",
+      "status": "newly_recorded"
+    },
+    {
+      "path": "docs/ai-engineering/workflow-prepared-20261019.json",
+      "before_sha256": null,
+      "after_sha256": "e3778d8223897c87d2997d54b8ec8e088d9b2f431731a7bc8f26a49f0b9d3ec3",
+      "status": "newly_recorded"
+    },
+    {
+      "path": "docs/ai-engineering/workflow-verification-20261019.json",
+      "before_sha256": null,
+      "after_sha256": "5d083dea903b9b4cbde3bb40ab50c36ec3d68a7d96c32bee27b7a766792c576b",
+      "status": "newly_recorded"
+    },
+    {
+      "path": "docs/research/rule-documents-2026-10-16.json",
+      "before_sha256": null,
+      "after_sha256": "bbe0ae9800a419bdf76611cc66cd677b354f0a26e8b453bc11e6428878b23d8c",
+      "status": "newly_recorded"
+    },
+    {
+      "path": "scripts/evaluate-vibe-coder-real.mjs",
+      "before_sha256": "7ecd727a02239746846c4b329713d5147380a88374f929307532dc6e31b7a14d",
+      "after_sha256": "aa3c6564cb4561795a4816da2a1a55d29b6c608df58bf153a5675dbefff9012a",
+      "status": "modified"
+    },
+    {
+      "path": "scripts/lib/vibe-evidence.mjs",
+      "before_sha256": null,
+      "after_sha256": "0080d09ba1453dd73e993121b4f1805222e71c9086e5cfa8642c41d7a4027ffe",
+      "status": "newly_recorded"
+    },
+    {
+      "path": "scripts/probe-desktop-semantic.mjs",
+      "before_sha256": "fef3eb81c956efbadf0561d55e2606ff831f5da6149e84d2baa001392c90f8aa",
+      "after_sha256": "ee8e3320a914e02a251b990a380ce1aeeef3bbad8d8f01fffeb227af4b391892",
+      "status": "modified"
+    },
+    {
+      "path": "scripts/tests/test_real_vibe_harness.py",
+      "before_sha256": "6a75bf858c1c29f7bde5ad964d7cfcd64f890bff286d0d631cb25dad6b1618b4",
+      "after_sha256": "8e17d6e8da3a73979d3873f28daf44eeb0bb34e4d276748a9e5e68e3e014bb8f",
+      "status": "modified"
+    },
+    {
+      "path": "scripts/tests/vibe-evidence.test.mjs",
+      "before_sha256": null,
+      "after_sha256": "4a8886a08731d38ed083b22766659a41ebb1416254c296a4310df37d79b1e2b5",
+      "status": "newly_recorded"
+    }
+  ]
+}

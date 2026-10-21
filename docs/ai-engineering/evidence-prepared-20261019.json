@@ -1,0 +1,162 @@
+{
+  "schema_version": 2,
+  "status": "NOT_EXECUTED",
+  "inference_requests": 0,
+  "submitted_user_turns": 0,
+  "paid_credential_access": false,
+  "patches_approved_by_harness": 0,
+  "cases": [
+    {
+      "id": "grounding-th",
+      "prompt": "อธิบาย kb_delay_ms จากเอกสารใน knowledge_search พร้อมอ้างอิงชื่อไฟล์และเลขบรรทัด ไม่แก้ไฟล์",
+      "kind": "read_only",
+      "expected_evidence": [
+        "compatibility/kb_core.c",
+        "kb_delay_ms"
+      ],
+      "human_quality_grade": null,
+      "mechanical_requirements": {
+        "tools": [
+          "knowledge_search"
+        ],
+        "cited_knowledge_hit": true
+      }
+    },
+    {
+      "id": "grounding-en",
+      "prompt": "Explain button release handling in the bundled button_buzzer example. Use knowledge_search and cite exact file and line ranges. Do not modify files.",
+      "kind": "read_only",
+      "expected_evidence": [
+        "compatibility/button_buzzer.c",
+        "gpio_get_level"
+      ],
+      "human_quality_grade": null,
+      "mechanical_requirements": {
+        "tools": [
+          "knowledge_search"
+        ],
+        "cited_knowledge_hit": true
+      }
+    },
+    {
+      "id": "project-th",
+      "prompt": "ตรวจโปรเจกต์ที่เปิดอยู่โดยใช้ get_file_tree, read_file และ project_search อธิบายว่า app_main เรียก kb_delay_ms อย่างไร ใช้หน่วยอะไร ฟังก์ชันนี้ประกาศและนิยามที่ไหน และ main/CMakeLists.txt เชื่อม component ใดบ้าง อ้างอิงไฟล์และบรรทัดจากสิ่งที่อ่านจริง แยกข้อเท็จจริงจากสิ่งที่ยังไม่ทราบ ห้ามแก้ไฟล์ ห้ามสร้างโปรเจกต์ใหม่ ห้าม Build หรือ Flash",
+      "kind": "read_only",
+      "expected_evidence": [
+        "main/main.c",
+        "main/CMakeLists.txt",
+        "components/kb_reference/include/kb_core.h",
+        "components/kb_reference/kb_core.c",
+        "PRIV_REQUIRES",
+        "kb_reference"
+      ],
+      "human_quality_grade": null,
+      "mechanical_requirements": {
+        "tools": [
+          "get_file_tree",
+          "read_file",
+          "project_search"
+        ],
+        "cited_project_hit": true
+      }
+    },
+    {
+      "id": "generation-th",
+      "prompt": "ใช้โปรเจกต์เดิมที่เปิดอยู่ ศึกษา main/main.c, main/CMakeLists.txt, kb_core.h และ kb_delay_ms ก่อน แล้วเสนอ patch ให้ app_main วนลูปโดยหน่วงเวลา 100 มิลลิวินาทีต่อรอบ ใช้ kb_delay_ms และ vTaskDelay ให้ถูกหน่วย อธิบายข้อจำกัดของ tick และไม่อ้างว่ารอบทำงานแม่นยำ 100 มิลลิวินาที อ้างอิงเอกสารจาก knowledge_search และเหตุผลของ dependency ที่จำเป็น รักษา board profile และ ESP-IDF เดิม ห้ามสร้างโปรเจกต์ใหม่ ห้าม Build หรือ Flash หยุดรอให้ฉันตรวจ diff และกด Keep อนุมัติก่อนนำ patch ไปใช้",
+      "kind": "review_required",
+      "expected_evidence": [
+        "Thai user instruction",
+        "actual source and dependency reads",
+        "source-backed API units",
+        "pending revision",
+        "source unchanged before Keep",
+        "explicit user approval"
+      ],
+      "human_quality_grade": null,
+      "mechanical_requirements": {
+        "tools": [
+          "read_file",
+          "knowledge_search",
+          "write_file"
+        ],
+        "cited_knowledge_hit": true
+      }
+    },
+    {
+      "id": "generation",
+      "prompt": "Propose a change to main/main.c that uses kb_delay_ms for a 0.1 second delay. Use the existing project and preserve its board profile. Wait for my review before applying any change.",
+      "kind": "review_required",
+      "expected_evidence": [
+        "pending revision",
+        "source unchanged before Keep",
+        "explicit user approval"
+      ],
+      "human_quality_grade": null,
+      "mechanical_requirements": {
+        "tools": [
+          "write_file"
+        ]
+      }
+    },
+    {
+      "id": "compile",
+      "kind": "manual_after_approval",
+      "expected_evidence": [
+        "exact configured idf.py command",
+        "SDK version",
+        "exit code",
+        "source and firmware hashes"
+      ],
+      "compiler_valid": null
+    },
+    {
+      "id": "diagnostics",
+      "kind": "manual_public_fault_fixture",
+      "expected_evidence": [
+        "actual compiler diagnostic",
+        "path line column severity",
+        "same source revision"
+      ],
+      "diagnostic_correct": null
+    },
+    {
+      "id": "bounded-repair",
+      "kind": "review_required",
+      "expected_evidence": [
+        "maximum configured attempts <= 3",
+        "separate approval per patch",
+        "repeated failed patch rejected",
+        "actual rebuild result"
+      ],
+      "repair_correct": null
+    },
+    {
+      "id": "rollback",
+      "kind": "manual_after_approval",
+      "expected_evidence": [
+        "review revision",
+        "user Undo",
+        "exact original source hash restored",
+        "conflict preserved if later edited"
+      ],
+      "rollback_correct": null
+    }
+  ],
+  "grading": {
+    "retrieval_relevance": null,
+    "citation_existence": null,
+    "citation_support": null,
+    "model_output_quality": null,
+    "compiler_validity": null,
+    "review_safety": null,
+    "note": "These are separate judgments. Rendering a citation or compiling C does not prove model correctness."
+  },
+  "cases_sha256": "a5727b1b60878db7806f8e6e6a79afacace5e7252e5141121a6661f1a43b5c9d",
+  "capability_levels": {
+    "knowledge_aware": "NOT_EVALUATED",
+    "project_aware": "NOT_EVALUATED",
+    "build_aware": "NOT_EVALUATED"
+  },
+  "requested_workflow": null,
+  "reason": "Prepared only. Run requires explicitly authorized loopback model and isolated desktop. No capability level is certified by preparation."
+}

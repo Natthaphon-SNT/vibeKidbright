@@ -1,0 +1,131 @@
+{
+  "date": "2026-10-19",
+  "workflow_id": "thai-delay-existing-project-v1",
+  "cases_file": {
+    "path": "docs/ai-engineering/real-vibe-coder-cases.json",
+    "sha256": "a5727b1b60878db7806f8e6e6a79afacace5e7252e5141121a6661f1a43b5c9d",
+    "bytes": 7198
+  },
+  "fixtures": {
+    "repeat_delay": [
+      {
+        "path": "src-tauri/target/block-c-evaluation-20261018/repeat_delay/.vibekidbright/project.json",
+        "sha256": "953598fa4d2ab1fe4ba46c829eaf35d76e31dc3ec5f30846fd4608ce51215736",
+        "bytes": 374
+      },
+      {
+        "path": "src-tauri/target/block-c-evaluation-20261018/repeat_delay/CMakeLists.txt",
+        "sha256": "24f6fc78a1006464d6825425d2ce6ff3a12022c8f774759d8b4f8088af48d32f",
+        "bytes": 118
+      },
+      {
+        "path": "src-tauri/target/block-c-evaluation-20261018/repeat_delay/components/kb_reference/CMakeLists.txt",
+        "sha256": "d3e111e44361bca036b4583b951e54b901496ed00429291c79ac1926011eb175",
+        "bytes": 64
+      },
+      {
+        "path": "src-tauri/target/block-c-evaluation-20261018/repeat_delay/components/kb_reference/include/kb_core.h",
+        "sha256": "752afe78294d71ecd68cb3054f572a15a769f240fd124f1d49bc844aa60d8398",
+        "bytes": 1584
+      },
+      {
+        "path": "src-tauri/target/block-c-evaluation-20261018/repeat_delay/components/kb_reference/kb_core.c",
+        "sha256": "05359f6f1dc8a402a4420bc9549230cb20a04900c2b8544a5143fe34c5409c89",
+        "bytes": 4512
+      },
+      {
+        "path": "src-tauri/target/block-c-evaluation-20261018/repeat_delay/main/CMakeLists.txt",
+        "sha256": "40c63b8ba0b0903f1dc9b3da8ba55ae8d372be183d79642ad74dc1a8588d308e",
+        "bytes": 204
+      },
+      {
+        "path": "src-tauri/target/block-c-evaluation-20261018/repeat_delay/main/kb_board.h",
+        "sha256": "f8b043655135aa2a67ae236f7c26530a1398219efe474b201594a41a30c6d35e",
+        "bytes": 215
+      },
+      {
+        "path": "src-tauri/target/block-c-evaluation-20261018/repeat_delay/main/main.c",
+        "sha256": "ace975b65bbe205264e118b80d1c0da08a56088e9bf661a68a7c10eb9e4f961e",
+        "bytes": 496
+      },
+      {
+        "path": "src-tauri/target/block-c-evaluation-20261018/repeat_delay/sdkconfig",
+        "sha256": "ded0a83d67695ca201f0b4aec1b8a8d633490c9633a848b65d82d47a361cd561",
+        "bytes": 68194
+      },
+      {
+        "path": "src-tauri/target/block-c-evaluation-20261018/repeat_delay/sdkconfig.defaults",
+        "sha256": "1ac64f587ebfc0ac672551c8dde4b2682a8c241633d5b7a941cabaa71347e99a",
+        "bytes": 50
+      }
+    ],
+    "forever_delay": [
+      {
+        "path": "src-tauri/target/block-c-evaluation-20261018/forever_delay/.vibekidbright/project.json",
+        "sha256": "4d2e3d963de74ac0c862b77e8077ed2c59937b707120b912d954f9d8ff10de35",
+        "bytes": 376
+      },
+      {
+        "path": "src-tauri/target/block-c-evaluation-20261018/forever_delay/CMakeLists.txt",
+        "sha256": "24f6fc78a1006464d6825425d2ce6ff3a12022c8f774759d8b4f8088af48d32f",
+        "bytes": 118
+      },
+      {
+        "path": "src-tauri/target/block-c-evaluation-20261018/forever_delay/components/kb_reference/CMakeLists.txt",
+        "sha256": "d3e111e44361bca036b4583b951e54b901496ed00429291c79ac1926011eb175",
+        "bytes": 64
+      },
+      {
+        "path": "src-tauri/target/block-c-evaluation-20261018/forever_delay/components/kb_reference/include/kb_core.h",
+        "sha256": "752afe78294d71ecd68cb3054f572a15a769f240fd124f1d49bc844aa60d8398",
+        "bytes": 1584
+      },
+      {
+        "path": "src-tauri/target/block-c-evaluation-20261018/forever_delay/components/kb_reference/kb_core.c",
+        "sha256": "05359f6f1dc8a402a4420bc9549230cb20a04900c2b8544a5143fe34c5409c89",
+        "bytes": 4512
+      },
+      {
+        "path": "src-tauri/target/block-c-evaluation-20261018/forever_delay/main/CMakeLists.txt",
+        "sha256": "40c63b8ba0b0903f1dc9b3da8ba55ae8d372be183d79642ad74dc1a8588d308e",
+        "bytes": 204
+      },
+      {
+        "path": "src-tauri/target/block-c-evaluation-20261018/forever_delay/main/kb_board.h",
+        "sha256": "1659cbe62698123f28153ceb09873005ad97cee717938d3691413976a8c87336",
+        "bytes": 217
+      },
+      {
+        "path": "src-tauri/target/block-c-evaluation-20261018/forever_delay/main/main.c",
+        "sha256": "513c690c3b412a1a24918256f7f423cf5f9e2ed4b7493969792b33678010a435",
+        "bytes": 335
+      },
+      {
+        "path": "src-tauri/target/block-c-evaluation-20261018/forever_delay/sdkconfig",
+        "sha256": "ded0a83d67695ca201f0b4aec1b8a8d633490c9633a848b65d82d47a361cd561",
+        "bytes": 68194
+      },
+      {
+        "path": "src-tauri/target/block-c-evaluation-20261018/forever_delay/sdkconfig.defaults",
+        "sha256": "1ac64f587ebfc0ac672551c8dde4b2682a8c241633d5b7a941cabaa71347e99a",
+        "bytes": 50
+      }
+    ]
+  },
+  "source_scope": "Only generated source/config/profile hashes. No SDK or production provider configuration was read.",
+  "pilot_initial_turns": [
+    "grounding-th",
+    "project-th",
+    "generation-th"
+  ],
+  "remaining_required_stages": [
+    "compile",
+    "diagnostics",
+    "bounded-repair",
+    "rollback"
+  ],
+  "model_requests": 0,
+  "executed_stages": [],
+  "approval_actions": 0,
+  "limitation": "A 3-turn collection stops at pending review; it does not complete Build-aware criteria. Later stages need real user approval and hash-bound native/compiler/model evidence. Harness does not enforce/count native HTTP requests or capture the full serialized provider request."
+}

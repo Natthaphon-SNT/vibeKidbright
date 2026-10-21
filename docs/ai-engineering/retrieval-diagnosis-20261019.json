@@ -1,0 +1,4479 @@
+{
+  "queries": [
+    {
+      "id": "heldout-delay-en",
+      "query": "Convert a fractional delay in seconds to validated milliseconds",
+      "language": "en",
+      "kinds": [
+        "natural_language"
+      ],
+      "qrels": [
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "compatibility/kb_core.c",
+        "kidbright32iA.md",
+        "sensor_examples/formulakid_sender.c",
+        "compatibility/kb_basic.c",
+        "kidbright32iA.md"
+      ],
+      "after_files": [
+        "kidbright32iA.md",
+        "compatibility/kb_core.c",
+        "kidbright32iA.md",
+        "sensor_examples/formulakid_sender.c",
+        "compatibility/kb_basic.c"
+      ],
+      "before_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 0.6131471927654584,
+        "precision_at_5": 0.2,
+        "recall_at_5": 0.5
+      },
+      "after_metrics": {
+        "mrr": 0.5,
+        "ndcg_at_5": 0.38685280723454163,
+        "precision_at_5": 0.2,
+        "recall_at_5": 0.5
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": -0.5,
+        "ndcg_at_5": -0.22629438553091674,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [
+          "delay"
+        ],
+        "exact_api": false,
+        "language": "en",
+        "original": "Convert a fractional delay in seconds to validated milliseconds",
+        "terms": [
+          "vTaskDelay",
+          "pdMS_TO_TICKS"
+        ]
+      },
+      "duplicate_file_slots": 1,
+      "diagnostic_flags": [
+        "duplicate_file_slots",
+        "reciprocal_rank_regression"
+      ],
+      "before_latency_ms": 217.505,
+      "after_latency_ms": 163.3028
+    },
+    {
+      "id": "heldout-delay-th",
+      "query": "แปลงเวลาหน่วงจากวินาทีที่มีทศนิยมเป็นมิลลิวินาทีและตรวจค่าที่ไม่ถูกต้อง",
+      "language": "th",
+      "kinds": [
+        "natural_language"
+      ],
+      "qrels": [
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "kidbright_uai.md",
+        "all_models.md",
+        "README.md",
+        "all_models.md",
+        "iKB-1.md"
+      ],
+      "after_files": [
+        "kidbright_uai.md",
+        "all_models.md",
+        "README.md",
+        "all_models.md",
+        "iKB-1.md"
+      ],
+      "before_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "after_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": false,
+        "language": "th",
+        "original": "แปลงเวลาหน่วงจากวินาทีที่มีทศนิยมเป็นมิลลิวินาทีและตรวจค่าที่ไม่ถูกต้อง",
+        "terms": []
+      },
+      "duplicate_file_slots": 1,
+      "diagnostic_flags": [
+        "no_qrel_hit_in_returned_top5",
+        "duplicate_file_slots",
+        "thai_query_without_fixed_alias_match"
+      ],
+      "before_latency_ms": 328.8595,
+      "after_latency_ms": 127.9449
+    },
+    {
+      "id": "heldout-delay-mixed",
+      "query": "แปลง delay วินาทีเป็น milliseconds พร้อมเช็คค่า",
+      "language": "mixed",
+      "kinds": [
+        "mixed_language"
+      ],
+      "qrels": [
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "compatibility/kb_core.c",
+        "compatibility/kb_basic.c",
+        "skate_rev1.3.md",
+        "kidbright32iA.md",
+        "skate_rev1.3.md"
+      ],
+      "after_files": [
+        "compatibility/kb_core.c",
+        "kidbright32iA.md",
+        "compatibility/kb_basic.c",
+        "compatibility/music_scale.c",
+        "skate_rev1.3.md"
+      ],
+      "before_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 0.6131471927654584,
+        "precision_at_5": 0.2,
+        "recall_at_5": 0.5
+      },
+      "after_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 0.6131471927654584,
+        "precision_at_5": 0.2,
+        "recall_at_5": 0.5
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [
+          "delay"
+        ],
+        "exact_api": false,
+        "language": "mixed",
+        "original": "แปลง delay วินาทีเป็น milliseconds พร้อมเช็คค่า",
+        "terms": [
+          "vTaskDelay",
+          "pdMS_TO_TICKS"
+        ]
+      },
+      "duplicate_file_slots": 0,
+      "diagnostic_flags": [],
+      "before_latency_ms": 366.2911,
+      "after_latency_ms": 139.70360000000002
+    },
+    {
+      "id": "heldout-beat-en",
+      "query": "Calculate how long a musical beat lasts from the tempo",
+      "language": "en",
+      "kinds": [
+        "natural_language"
+      ],
+      "qrels": [
+        "compatibility/kb_basic.c",
+        "compatibility/kb_basic.h"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "led_16x8_matrix_mapping.md",
+        "support_scope.md",
+        "support_scope.md",
+        "kidbright32iA.md",
+        "support_scope.md"
+      ],
+      "after_files": [
+        "led_16x8_matrix_mapping.md",
+        "support_scope.md",
+        "support_scope.md",
+        "kidbright32iA.md",
+        "support_scope.md"
+      ],
+      "before_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "after_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": false,
+        "language": "en",
+        "original": "Calculate how long a musical beat lasts from the tempo",
+        "terms": []
+      },
+      "duplicate_file_slots": 2,
+      "diagnostic_flags": [
+        "no_qrel_hit_in_returned_top5",
+        "duplicate_file_slots"
+      ],
+      "before_latency_ms": 319.072,
+      "after_latency_ms": 153.3788
+    },
+    {
+      "id": "heldout-beat-th",
+      "query": "คำนวณความยาวตัวโน้ตจากความเร็วของเพลงและจำนวนจังหวะ",
+      "language": "th",
+      "kinds": [
+        "natural_language"
+      ],
+      "qrels": [
+        "compatibility/kb_basic.c",
+        "compatibility/kb_basic.h"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "kidbright_uai.md",
+        "all_models.md",
+        "README.md",
+        "all_models.md",
+        "iKB-1.md"
+      ],
+      "after_files": [
+        "kidbright_uai.md",
+        "all_models.md",
+        "README.md",
+        "all_models.md",
+        "iKB-1.md"
+      ],
+      "before_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "after_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": false,
+        "language": "th",
+        "original": "คำนวณความยาวตัวโน้ตจากความเร็วของเพลงและจำนวนจังหวะ",
+        "terms": []
+      },
+      "duplicate_file_slots": 1,
+      "diagnostic_flags": [
+        "no_qrel_hit_in_returned_top5",
+        "duplicate_file_slots",
+        "thai_query_without_fixed_alias_match"
+      ],
+      "before_latency_ms": 137.57539999999997,
+      "after_latency_ms": 131.1441
+    },
+    {
+      "id": "heldout-beat-mixed",
+      "query": "คำนวณ duration ของโน้ตจาก BPM และ beats",
+      "language": "mixed",
+      "kinds": [
+        "mixed_language"
+      ],
+      "qrels": [
+        "compatibility/kb_basic.c",
+        "compatibility/kb_basic.h"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "compatibility/kb_basic.c",
+        "led_16x8_matrix_mapping.md",
+        "compatibility/music_scale.c",
+        "compatibility/button_buzzer.c",
+        "sensor_examples/formulakid_sender.c"
+      ],
+      "after_files": [
+        "compatibility/kb_basic.c",
+        "led_16x8_matrix_mapping.md",
+        "compatibility/music_scale.c",
+        "compatibility/button_buzzer.c",
+        "sensor_examples/formulakid_sender.c"
+      ],
+      "before_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 0.6131471927654584,
+        "precision_at_5": 0.2,
+        "recall_at_5": 0.5
+      },
+      "after_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 0.6131471927654584,
+        "precision_at_5": 0.2,
+        "recall_at_5": 0.5
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": false,
+        "language": "mixed",
+        "original": "คำนวณ duration ของโน้ตจาก BPM และ beats",
+        "terms": []
+      },
+      "duplicate_file_slots": 0,
+      "diagnostic_flags": [],
+      "before_latency_ms": 264.624,
+      "after_latency_ms": 155.45690000000002
+    },
+    {
+      "id": "heldout-frame-en",
+      "query": "Pack a sixteen by eight pixel frame for the LED display controller",
+      "language": "en",
+      "kinds": [
+        "natural_language"
+      ],
+      "qrels": [
+        "compatibility/kb_basic.c",
+        "compatibility/kb_basic.h"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "kidbright32iA.md",
+        "sensor_examples/formulakid_sender.c",
+        "compatibility/kb_basic.h",
+        "compatibility/matrix_counter.c",
+        "kidbright32iA.md"
+      ],
+      "after_files": [
+        "kidbright32iA.md",
+        "sensor_examples/formulakid_sender.c",
+        "compatibility/kb_basic.h",
+        "compatibility/matrix_counter.c",
+        "kidbright32iA.md"
+      ],
+      "before_metrics": {
+        "mrr": 0.3333333333333333,
+        "ndcg_at_5": 0.3065735963827292,
+        "precision_at_5": 0.2,
+        "recall_at_5": 0.5
+      },
+      "after_metrics": {
+        "mrr": 0.3333333333333333,
+        "ndcg_at_5": 0.3065735963827292,
+        "precision_at_5": 0.2,
+        "recall_at_5": 0.5
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": false,
+        "language": "en",
+        "original": "Pack a sixteen by eight pixel frame for the LED display controller",
+        "terms": []
+      },
+      "duplicate_file_slots": 1,
+      "diagnostic_flags": [
+        "duplicate_file_slots"
+      ],
+      "before_latency_ms": 387.93539999999996,
+      "after_latency_ms": 144.2131
+    },
+    {
+      "id": "heldout-frame-th",
+      "query": "จัดข้อมูลพิกเซลสิบหกคอลัมน์แปดแถวเป็นแพ็กเก็ตส่งให้ตัวควบคุมจอ",
+      "language": "th",
+      "kinds": [
+        "natural_language"
+      ],
+      "qrels": [
+        "compatibility/kb_basic.c",
+        "compatibility/kb_basic.h"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "kidbright_uai.md",
+        "all_models.md",
+        "README.md",
+        "all_models.md",
+        "iKB-1.md"
+      ],
+      "after_files": [
+        "kidbright_uai.md",
+        "all_models.md",
+        "README.md",
+        "all_models.md",
+        "iKB-1.md"
+      ],
+      "before_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "after_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": false,
+        "language": "th",
+        "original": "จัดข้อมูลพิกเซลสิบหกคอลัมน์แปดแถวเป็นแพ็กเก็ตส่งให้ตัวควบคุมจอ",
+        "terms": []
+      },
+      "duplicate_file_slots": 1,
+      "diagnostic_flags": [
+        "no_qrel_hit_in_returned_top5",
+        "duplicate_file_slots",
+        "thai_query_without_fixed_alias_match"
+      ],
+      "before_latency_ms": 349.58529999999996,
+      "after_latency_ms": 131.6473
+    },
+    {
+      "id": "heldout-frame-mixed",
+      "query": "pack เฟรม LED 16x8 ไปยัง HT16K33",
+      "language": "mixed",
+      "kinds": [
+        "mixed_language"
+      ],
+      "qrels": [
+        "compatibility/kb_basic.c",
+        "compatibility/kb_basic.h"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "led_16x8_matrix_mapping.md",
+        "led_16x8_matrix_mapping.md",
+        "sensor_examples/all_sensors_demo.c",
+        "kidbright32iA.md",
+        "led_16x8_matrix_mapping.md"
+      ],
+      "after_files": [
+        "led_16x8_matrix_mapping.md",
+        "led_16x8_matrix_mapping.md",
+        "sensor_examples/all_sensors_demo.c",
+        "led_16x8_matrix_mapping.md",
+        "led_16x8_matrix_mapping.md"
+      ],
+      "before_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "after_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [
+          "matrix"
+        ],
+        "exact_api": false,
+        "language": "mixed",
+        "original": "pack เฟรม LED 16x8 ไปยัง HT16K33",
+        "terms": [
+          "HT16K33",
+          "kb_matrix_pack"
+        ]
+      },
+      "duplicate_file_slots": 3,
+      "diagnostic_flags": [
+        "no_qrel_hit_in_returned_top5",
+        "duplicate_file_slots"
+      ],
+      "before_latency_ms": 203.5549,
+      "after_latency_ms": 162.8204
+    },
+    {
+      "id": "heldout-button-en",
+      "query": "Play a short tone once per button press and wait until release",
+      "language": "en",
+      "kinds": [
+        "natural_language"
+      ],
+      "qrels": [
+        "compatibility/button_buzzer.c"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "compatibility/music_scale.c",
+        "compatibility/README.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "sensor_examples/kidbright_full_system_demo.c"
+      ],
+      "after_files": [
+        "kidbright32iA.md",
+        "compatibility/music_scale.c",
+        "compatibility/README.md",
+        "kidbright32iA.md",
+        "sensor_examples/kidbright_full_system_demo.c"
+      ],
+      "before_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "after_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [
+          "button",
+          "buzzer"
+        ],
+        "exact_api": false,
+        "language": "en",
+        "original": "Play a short tone once per button press and wait until release",
+        "terms": [
+          "gpio_get_level",
+          "KB_SW1_GPIO",
+          "ledc_set_freq",
+          "ledc_set_duty"
+        ]
+      },
+      "duplicate_file_slots": 1,
+      "diagnostic_flags": [
+        "no_qrel_hit_in_returned_top5",
+        "duplicate_file_slots"
+      ],
+      "before_latency_ms": 348.1628,
+      "after_latency_ms": 153.9161
+    },
+    {
+      "id": "heldout-button-th",
+      "query": "กดปุ่มแล้วส่งเสียงหนึ่งครั้งจากนั้นรอให้ปล่อยปุ่มก่อน",
+      "language": "th",
+      "kinds": [
+        "natural_language"
+      ],
+      "qrels": [
+        "compatibility/button_buzzer.c"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "kidbright_uai.md",
+        "all_models.md",
+        "README.md",
+        "all_models.md",
+        "iKB-1.md"
+      ],
+      "after_files": [
+        "sensor_examples/all_sensors_demo.c",
+        "sensor_examples/kidbright_full_system_demo.c",
+        "sensor_examples/fomulakid_receiver.c",
+        "formula_kid_controller.md",
+        "kidbright32iA.md"
+      ],
+      "before_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "after_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [
+          "buzzer"
+        ],
+        "exact_api": false,
+        "language": "th",
+        "original": "กดปุ่มแล้วส่งเสียงหนึ่งครั้งจากนั้นรอให้ปล่อยปุ่มก่อน",
+        "terms": [
+          "ledc_set_freq",
+          "ledc_set_duty"
+        ]
+      },
+      "duplicate_file_slots": 0,
+      "diagnostic_flags": [
+        "no_qrel_hit_in_returned_top5"
+      ],
+      "before_latency_ms": 269.9582,
+      "after_latency_ms": 134.0247
+    },
+    {
+      "id": "heldout-button-mixed",
+      "query": "กด S1 แล้ว beep ครั้งเดียว ต้องรอ release",
+      "language": "mixed",
+      "kinds": [
+        "mixed_language"
+      ],
+      "qrels": [
+        "compatibility/button_buzzer.c"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "led_16x8_matrix_mapping.md",
+        "formula_kid_controller.md",
+        "compatibility/music_scale.c",
+        "formula_kid_controller.md",
+        "compatibility/kb_core.c"
+      ],
+      "after_files": [
+        "led_16x8_matrix_mapping.md",
+        "formula_kid_controller.md",
+        "compatibility/music_scale.c",
+        "formula_kid_controller.md",
+        "compatibility/kb_core.c"
+      ],
+      "before_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "after_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": false,
+        "language": "mixed",
+        "original": "กด S1 แล้ว beep ครั้งเดียว ต้องรอ release",
+        "terms": []
+      },
+      "duplicate_file_slots": 1,
+      "diagnostic_flags": [
+        "no_qrel_hit_in_returned_top5",
+        "duplicate_file_slots"
+      ],
+      "before_latency_ms": 264.19910000000004,
+      "after_latency_ms": 161.36790000000002
+    },
+    {
+      "id": "heldout-temperature-en",
+      "query": "Read a signed digital temperature over the sensor bus",
+      "language": "en",
+      "kinds": [
+        "natural_language"
+      ],
+      "qrels": [
+        "compatibility/temperature_serial.c",
+        "compatibility/kb_core.c"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "sensor_examples/kidbright_full_system_demo.c"
+      ],
+      "after_files": [
+        "sensor_examples/kidbright_full_system_demo.c",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md"
+      ],
+      "before_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "after_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [
+          "temperature"
+        ],
+        "exact_api": false,
+        "language": "en",
+        "original": "Read a signed digital temperature over the sensor bus",
+        "terms": [
+          "LM73",
+          "i2c_master_transmit_receive"
+        ]
+      },
+      "duplicate_file_slots": 3,
+      "diagnostic_flags": [
+        "no_qrel_hit_in_returned_top5",
+        "duplicate_file_slots"
+      ],
+      "before_latency_ms": 360.7125,
+      "after_latency_ms": 151.422
+    },
+    {
+      "id": "heldout-temperature-th",
+      "query": "อ่านอุณหภูมิผ่านบัสเซนเซอร์โดยแปลงค่าติดลบได้ถูกต้อง",
+      "language": "th",
+      "kinds": [
+        "natural_language"
+      ],
+      "qrels": [
+        "compatibility/temperature_serial.c",
+        "compatibility/kb_core.c"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "kidbright_uai.md",
+        "all_models.md",
+        "README.md",
+        "all_models.md",
+        "iKB-1.md"
+      ],
+      "after_files": [
+        "compatibility/temperature_serial.c",
+        "sensor_examples/kidbright_full_system_demo.c",
+        "sensor_examples/all_sensors_demo.c",
+        "sensor_examples/kidbright_full_system_demo.c",
+        "sensor_examples/temp_lm73.c"
+      ],
+      "before_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "after_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 0.6131471927654584,
+        "precision_at_5": 0.2,
+        "recall_at_5": 0.5
+      },
+      "delta": {
+        "recall_at_5": 0.5,
+        "mrr": 1.0,
+        "ndcg_at_5": 0.6131471927654584,
+        "precision_at_5": 0.2
+      },
+      "expansion_plan": {
+        "concepts": [
+          "temperature"
+        ],
+        "exact_api": false,
+        "language": "th",
+        "original": "อ่านอุณหภูมิผ่านบัสเซนเซอร์โดยแปลงค่าติดลบได้ถูกต้อง",
+        "terms": [
+          "LM73",
+          "i2c_master_transmit_receive"
+        ]
+      },
+      "duplicate_file_slots": 1,
+      "diagnostic_flags": [
+        "duplicate_file_slots"
+      ],
+      "before_latency_ms": 264.5314,
+      "after_latency_ms": 132.5467
+    },
+    {
+      "id": "heldout-temperature-mixed",
+      "query": "อ่าน temperature ติดลบจาก LM73 ผ่าน I2C",
+      "language": "mixed",
+      "kinds": [
+        "mixed_language"
+      ],
+      "qrels": [
+        "compatibility/temperature_serial.c",
+        "compatibility/kb_core.c"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "sensor_examples/kidbright_full_system_demo.c",
+        "sensor_examples/kidbright_full_system_demo.c",
+        "sensor_examples/all_sensors_demo.c",
+        "kidbright32iA.md",
+        "sensor_examples/all_sensors_demo.c"
+      ],
+      "after_files": [
+        "sensor_examples/kidbright_full_system_demo.c",
+        "sensor_examples/kidbright_full_system_demo.c",
+        "sensor_examples/all_sensors_demo.c",
+        "sensor_examples/all_sensors_demo.c",
+        "kidbright32iA.md"
+      ],
+      "before_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "after_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [
+          "temperature",
+          "i2c"
+        ],
+        "exact_api": false,
+        "language": "mixed",
+        "original": "อ่าน temperature ติดลบจาก LM73 ผ่าน I2C",
+        "terms": [
+          "LM73",
+          "i2c_master_transmit_receive",
+          "i2c_new_master_bus",
+          "i2c_master_transmit"
+        ]
+      },
+      "duplicate_file_slots": 2,
+      "diagnostic_flags": [
+        "no_qrel_hit_in_returned_top5",
+        "duplicate_file_slots"
+      ],
+      "before_latency_ms": 159.9788,
+      "after_latency_ms": 167.5413
+    },
+    {
+      "id": "heldout-pid-en",
+      "query": "Maintain proportional integral derivative state with elapsed time",
+      "language": "en",
+      "kinds": [
+        "natural_language"
+      ],
+      "qrels": [
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "compatibility/kb_core.c",
+        "sensor_examples/minibike_receiver.c",
+        "sensor_examples/calibrate_balancing_bike.c",
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h"
+      ],
+      "after_files": [
+        "compatibility/kb_core.c",
+        "sensor_examples/minibike_receiver.c",
+        "sensor_examples/calibrate_balancing_bike.c",
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h"
+      ],
+      "before_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 0.8772153153380493,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "after_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 0.8772153153380493,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": false,
+        "language": "en",
+        "original": "Maintain proportional integral derivative state with elapsed time",
+        "terms": []
+      },
+      "duplicate_file_slots": 1,
+      "diagnostic_flags": [
+        "duplicate_file_slots"
+      ],
+      "before_latency_ms": 342.7056,
+      "after_latency_ms": 146.9145
+    },
+    {
+      "id": "heldout-pid-th",
+      "query": "เก็บสถานะตัวควบคุมสัดส่วนสะสมและอนุพันธ์โดยใช้เวลาที่ผ่านไป",
+      "language": "th",
+      "kinds": [
+        "natural_language"
+      ],
+      "qrels": [
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "kidbright_uai.md",
+        "all_models.md",
+        "README.md",
+        "all_models.md",
+        "iKB-1.md"
+      ],
+      "after_files": [
+        "kidbright_uai.md",
+        "all_models.md",
+        "README.md",
+        "all_models.md",
+        "iKB-1.md"
+      ],
+      "before_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "after_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": false,
+        "language": "th",
+        "original": "เก็บสถานะตัวควบคุมสัดส่วนสะสมและอนุพันธ์โดยใช้เวลาที่ผ่านไป",
+        "terms": []
+      },
+      "duplicate_file_slots": 1,
+      "diagnostic_flags": [
+        "no_qrel_hit_in_returned_top5",
+        "duplicate_file_slots",
+        "thai_query_without_fixed_alias_match"
+      ],
+      "before_latency_ms": 145.16670000000002,
+      "after_latency_ms": 132.8982
+    },
+    {
+      "id": "heldout-pid-mixed",
+      "query": "ตัวควบคุม PID ต้องเก็บ integral และ previous error",
+      "language": "mixed",
+      "kinds": [
+        "mixed_language"
+      ],
+      "qrels": [
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "sensor_examples/calibrate_balancing_bike.c",
+        "compatibility/kb_core.c",
+        "sensor_examples/minibike_receiver.c",
+        "sensor_examples/minibike_receiver.c",
+        "skate_rev1.3.md"
+      ],
+      "after_files": [
+        "sensor_examples/calibrate_balancing_bike.c",
+        "compatibility/kb_core.c",
+        "sensor_examples/minibike_receiver.c",
+        "sensor_examples/minibike_receiver.c",
+        "skate_rev1.3.md"
+      ],
+      "before_metrics": {
+        "mrr": 0.5,
+        "ndcg_at_5": 0.38685280723454163,
+        "precision_at_5": 0.2,
+        "recall_at_5": 0.5
+      },
+      "after_metrics": {
+        "mrr": 0.5,
+        "ndcg_at_5": 0.38685280723454163,
+        "precision_at_5": 0.2,
+        "recall_at_5": 0.5
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": false,
+        "language": "mixed",
+        "original": "ตัวควบคุม PID ต้องเก็บ integral และ previous error",
+        "terms": []
+      },
+      "duplicate_file_slots": 1,
+      "diagnostic_flags": [
+        "duplicate_file_slots"
+      ],
+      "before_latency_ms": 158.3225,
+      "after_latency_ms": 163.2758
+    },
+    {
+      "id": "heldout-average-en",
+      "query": "Smooth measurements using a fixed length sliding average",
+      "language": "en",
+      "kinds": [
+        "natural_language"
+      ],
+      "qrels": [
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "kidbright32iA.md",
+        "compatibility/kb_core.c",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md"
+      ],
+      "after_files": [
+        "kidbright32iA.md",
+        "compatibility/kb_core.c",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md"
+      ],
+      "before_metrics": {
+        "mrr": 0.5,
+        "ndcg_at_5": 0.38685280723454163,
+        "precision_at_5": 0.2,
+        "recall_at_5": 0.5
+      },
+      "after_metrics": {
+        "mrr": 0.5,
+        "ndcg_at_5": 0.38685280723454163,
+        "precision_at_5": 0.2,
+        "recall_at_5": 0.5
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": false,
+        "language": "en",
+        "original": "Smooth measurements using a fixed length sliding average",
+        "terms": []
+      },
+      "duplicate_file_slots": 3,
+      "diagnostic_flags": [
+        "duplicate_file_slots"
+      ],
+      "before_latency_ms": 322.7119,
+      "after_latency_ms": 151.9102
+    },
+    {
+      "id": "heldout-average-th",
+      "query": "ลดความแกว่งของค่าที่วัดด้วยค่าเฉลี่ยเลื่อนหน้าต่าง",
+      "language": "th",
+      "kinds": [
+        "natural_language"
+      ],
+      "qrels": [
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "kidbright_uai.md",
+        "all_models.md",
+        "README.md",
+        "all_models.md",
+        "iKB-1.md"
+      ],
+      "after_files": [
+        "kidbright_uai.md",
+        "all_models.md",
+        "README.md",
+        "all_models.md",
+        "iKB-1.md"
+      ],
+      "before_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "after_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": false,
+        "language": "th",
+        "original": "ลดความแกว่งของค่าที่วัดด้วยค่าเฉลี่ยเลื่อนหน้าต่าง",
+        "terms": []
+      },
+      "duplicate_file_slots": 1,
+      "diagnostic_flags": [
+        "no_qrel_hit_in_returned_top5",
+        "duplicate_file_slots",
+        "thai_query_without_fixed_alias_match"
+      ],
+      "before_latency_ms": 343.4155,
+      "after_latency_ms": 133.91819999999998
+    },
+    {
+      "id": "heldout-average-mixed",
+      "query": "กรองสัญญาณด้วย moving average แบบ window",
+      "language": "mixed",
+      "kinds": [
+        "mixed_language"
+      ],
+      "qrels": [
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "compatibility/kb_core.c",
+        "sensor_examples/adc_ldr_external.c",
+        "compatibility/README.md",
+        "formula_kid_controller.md",
+        "kidbright32iA.md"
+      ],
+      "after_files": [
+        "compatibility/kb_core.c",
+        "sensor_examples/adc_ldr_external.c",
+        "compatibility/README.md",
+        "formula_kid_controller.md",
+        "kidbright32iA.md"
+      ],
+      "before_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 0.6131471927654584,
+        "precision_at_5": 0.2,
+        "recall_at_5": 0.5
+      },
+      "after_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 0.6131471927654584,
+        "precision_at_5": 0.2,
+        "recall_at_5": 0.5
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": false,
+        "language": "mixed",
+        "original": "กรองสัญญาณด้วย moving average แบบ window",
+        "terms": []
+      },
+      "duplicate_file_slots": 0,
+      "diagnostic_flags": [],
+      "before_latency_ms": 395.5594,
+      "after_latency_ms": 192.3337
+    },
+    {
+      "id": "heldout-joystick-en",
+      "query": "Calibrate a joystick midpoint and map its raw input range",
+      "language": "en",
+      "kinds": [
+        "natural_language"
+      ],
+      "qrels": [
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "compatibility/README.md",
+        "compatibility/kb_core.c",
+        "kidbright32iA.md",
+        "sensor_examples/formulakid_sender.c",
+        "hardware_schematics_rules.md"
+      ],
+      "after_files": [
+        "compatibility/README.md",
+        "compatibility/kb_core.c",
+        "kidbright32iA.md",
+        "sensor_examples/formulakid_sender.c",
+        "hardware_schematics_rules.md"
+      ],
+      "before_metrics": {
+        "mrr": 0.5,
+        "ndcg_at_5": 0.38685280723454163,
+        "precision_at_5": 0.2,
+        "recall_at_5": 0.5
+      },
+      "after_metrics": {
+        "mrr": 0.5,
+        "ndcg_at_5": 0.38685280723454163,
+        "precision_at_5": 0.2,
+        "recall_at_5": 0.5
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": false,
+        "language": "en",
+        "original": "Calibrate a joystick midpoint and map its raw input range",
+        "terms": []
+      },
+      "duplicate_file_slots": 0,
+      "diagnostic_flags": [],
+      "before_latency_ms": 288.47,
+      "after_latency_ms": 174.1162
+    },
+    {
+      "id": "heldout-joystick-th",
+      "query": "ปรับเทียบจุดกึ่งกลางคันโยกและแปลงช่วงค่าอินพุต",
+      "language": "th",
+      "kinds": [
+        "natural_language"
+      ],
+      "qrels": [
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "kidbright_uai.md",
+        "all_models.md",
+        "README.md",
+        "all_models.md",
+        "iKB-1.md"
+      ],
+      "after_files": [
+        "kidbright_uai.md",
+        "all_models.md",
+        "README.md",
+        "all_models.md",
+        "iKB-1.md"
+      ],
+      "before_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "after_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": false,
+        "language": "th",
+        "original": "ปรับเทียบจุดกึ่งกลางคันโยกและแปลงช่วงค่าอินพุต",
+        "terms": []
+      },
+      "duplicate_file_slots": 1,
+      "diagnostic_flags": [
+        "no_qrel_hit_in_returned_top5",
+        "duplicate_file_slots",
+        "thai_query_without_fixed_alias_match"
+      ],
+      "before_latency_ms": 166.2534,
+      "after_latency_ms": 164.0482
+    },
+    {
+      "id": "heldout-joystick-mixed",
+      "query": "calibrate joystick midpoint แล้ว map ค่า raw",
+      "language": "mixed",
+      "kinds": [
+        "mixed_language"
+      ],
+      "qrels": [
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "compatibility/kb_core.c",
+        "hardware_schematics_rules.md",
+        "minibike.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md"
+      ],
+      "after_files": [
+        "compatibility/kb_core.c",
+        "hardware_schematics_rules.md",
+        "minibike.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md"
+      ],
+      "before_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 0.6131471927654584,
+        "precision_at_5": 0.2,
+        "recall_at_5": 0.5
+      },
+      "after_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 0.6131471927654584,
+        "precision_at_5": 0.2,
+        "recall_at_5": 0.5
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": false,
+        "language": "mixed",
+        "original": "calibrate joystick midpoint แล้ว map ค่า raw",
+        "terms": []
+      },
+      "duplicate_file_slots": 1,
+      "diagnostic_flags": [
+        "duplicate_file_slots"
+      ],
+      "before_latency_ms": 395.2744,
+      "after_latency_ms": 178.7934
+    },
+    {
+      "id": "heldout-ascii-en",
+      "query": "Encode and decode numeric wireless payloads as text rather than binary floats",
+      "language": "en",
+      "kinds": [
+        "natural_language"
+      ],
+      "qrels": [
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "compatibility/README.md",
+        "compatibility/README.md",
+        "support_scope.md",
+        "compatibility/README.md",
+        "support_scope.md"
+      ],
+      "after_files": [
+        "compatibility/README.md",
+        "compatibility/README.md",
+        "support_scope.md",
+        "compatibility/README.md",
+        "support_scope.md"
+      ],
+      "before_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "after_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": false,
+        "language": "en",
+        "original": "Encode and decode numeric wireless payloads as text rather than binary floats",
+        "terms": []
+      },
+      "duplicate_file_slots": 3,
+      "diagnostic_flags": [
+        "no_qrel_hit_in_returned_top5",
+        "duplicate_file_slots"
+      ],
+      "before_latency_ms": 327.71070000000003,
+      "after_latency_ms": 166.39399999999998
+    },
+    {
+      "id": "heldout-ascii-th",
+      "query": "เข้ารหัสและถอดข้อมูลตัวเลขไร้สายเป็นข้อความแทนการส่งทศนิยมไบนารี",
+      "language": "th",
+      "kinds": [
+        "natural_language"
+      ],
+      "qrels": [
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "kidbright_uai.md",
+        "all_models.md",
+        "README.md",
+        "all_models.md",
+        "iKB-1.md"
+      ],
+      "after_files": [
+        "kidbright_uai.md",
+        "all_models.md",
+        "README.md",
+        "all_models.md",
+        "iKB-1.md"
+      ],
+      "before_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "after_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": false,
+        "language": "th",
+        "original": "เข้ารหัสและถอดข้อมูลตัวเลขไร้สายเป็นข้อความแทนการส่งทศนิยมไบนารี",
+        "terms": []
+      },
+      "duplicate_file_slots": 1,
+      "diagnostic_flags": [
+        "no_qrel_hit_in_returned_top5",
+        "duplicate_file_slots",
+        "thai_query_without_fixed_alias_match"
+      ],
+      "before_latency_ms": 308.2204,
+      "after_latency_ms": 173.6964
+    },
+    {
+      "id": "heldout-ascii-mixed",
+      "query": "ส่ง ESP-NOW payload แบบ ASCII ตัวเลข ไม่ใช่ binary float",
+      "language": "mixed",
+      "kinds": [
+        "mixed_language"
+      ],
+      "qrels": [
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "compatibility/kb_core.h",
+        "minibike.md",
+        "kidbright32iA.md",
+        "compatibility/README.md",
+        "iKB-1.md"
+      ],
+      "after_files": [
+        "compatibility/kb_core.h",
+        "minibike.md",
+        "kidbright32iA.md",
+        "compatibility/README.md",
+        "iKB-1.md"
+      ],
+      "before_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 0.6131471927654584,
+        "precision_at_5": 0.2,
+        "recall_at_5": 0.5
+      },
+      "after_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 0.6131471927654584,
+        "precision_at_5": 0.2,
+        "recall_at_5": 0.5
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": false,
+        "language": "mixed",
+        "original": "ส่ง ESP-NOW payload แบบ ASCII ตัวเลข ไม่ใช่ binary float",
+        "terms": []
+      },
+      "duplicate_file_slots": 0,
+      "diagnostic_flags": [],
+      "before_latency_ms": 171.0109,
+      "after_latency_ms": 203.1686
+    },
+    {
+      "id": "heldout-iaip-en",
+      "query": "What differs between the pink board and the acceleration equipped board",
+      "language": "en",
+      "kinds": [
+        "natural_language",
+        "hardware"
+      ],
+      "qrels": [
+        "inex_ia_ip.md"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "support_scope.md",
+        "support_scope.md",
+        "kidbright32iA.md",
+        "support_scope.md",
+        "compatibility/README.md"
+      ],
+      "after_files": [
+        "support_scope.md",
+        "support_scope.md",
+        "kidbright32iA.md",
+        "support_scope.md",
+        "compatibility/README.md"
+      ],
+      "before_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "after_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": false,
+        "language": "en",
+        "original": "What differs between the pink board and the acceleration equipped board",
+        "terms": []
+      },
+      "duplicate_file_slots": 2,
+      "diagnostic_flags": [
+        "no_qrel_hit_in_returned_top5",
+        "duplicate_file_slots"
+      ],
+      "before_latency_ms": 357.0043,
+      "after_latency_ms": 154.7293
+    },
+    {
+      "id": "heldout-iaip-th",
+      "query": "บอร์ดสีชมพูกับบอร์ดที่มีเซนเซอร์ความเร่งต่างกันอย่างไร",
+      "language": "th",
+      "kinds": [
+        "natural_language",
+        "hardware"
+      ],
+      "qrels": [
+        "inex_ia_ip.md"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "kidbright_uai.md",
+        "all_models.md",
+        "README.md",
+        "all_models.md",
+        "iKB-1.md"
+      ],
+      "after_files": [
+        "kidbright_uai.md",
+        "all_models.md",
+        "README.md",
+        "all_models.md",
+        "iKB-1.md"
+      ],
+      "before_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "after_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": false,
+        "language": "th",
+        "original": "บอร์ดสีชมพูกับบอร์ดที่มีเซนเซอร์ความเร่งต่างกันอย่างไร",
+        "terms": []
+      },
+      "duplicate_file_slots": 1,
+      "diagnostic_flags": [
+        "no_qrel_hit_in_returned_top5",
+        "duplicate_file_slots",
+        "thai_query_without_fixed_alias_match"
+      ],
+      "before_latency_ms": 317.8962,
+      "after_latency_ms": 148.2911
+    },
+    {
+      "id": "heldout-iaip-mixed",
+      "query": "เทียบ KidBright32iP กับ iA เรื่องแสงและ accelerometer",
+      "language": "mixed",
+      "kinds": [
+        "mixed_language",
+        "hardware"
+      ],
+      "qrels": [
+        "inex_ia_ip.md"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "inex_ia_ip.md",
+        "minibike.md",
+        "hardware_schematics_rules.md",
+        "inex_ia_ip.md",
+        "kidbright32iA.md"
+      ],
+      "after_files": [
+        "inex_ia_ip.md",
+        "minibike.md",
+        "hardware_schematics_rules.md",
+        "inex_ia_ip.md",
+        "kidbright32iA.md"
+      ],
+      "before_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "after_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [
+          "light"
+        ],
+        "exact_api": false,
+        "language": "mixed",
+        "original": "เทียบ KidBright32iP กับ iA เรื่องแสงและ accelerometer",
+        "terms": [
+          "adc_oneshot_read",
+          "LDR"
+        ]
+      },
+      "duplicate_file_slots": 1,
+      "diagnostic_flags": [
+        "duplicate_file_slots"
+      ],
+      "before_latency_ms": 379.9518,
+      "after_latency_ms": 160.0311
+    },
+    {
+      "id": "heldout-pins-en",
+      "query": "Which pins are assigned to external digital input and output connectors",
+      "language": "en",
+      "kinds": [
+        "natural_language",
+        "hardware"
+      ],
+      "qrels": [
+        "inex_ia_ip.md"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "README.md"
+      ],
+      "after_files": [
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "README.md"
+      ],
+      "before_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "after_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": false,
+        "language": "en",
+        "original": "Which pins are assigned to external digital input and output connectors",
+        "terms": []
+      },
+      "duplicate_file_slots": 3,
+      "diagnostic_flags": [
+        "no_qrel_hit_in_returned_top5",
+        "duplicate_file_slots"
+      ],
+      "before_latency_ms": 156.0415,
+      "after_latency_ms": 134.1466
+    },
+    {
+      "id": "heldout-pins-th",
+      "query": "พอร์ตอินพุตและเอาต์พุตดิจิทัลภายนอกต่อกับขาใด",
+      "language": "th",
+      "kinds": [
+        "natural_language",
+        "hardware"
+      ],
+      "qrels": [
+        "inex_ia_ip.md"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "kidbright_uai.md",
+        "all_models.md",
+        "README.md",
+        "all_models.md",
+        "iKB-1.md"
+      ],
+      "after_files": [
+        "kidbright_uai.md",
+        "all_models.md",
+        "README.md",
+        "all_models.md",
+        "iKB-1.md"
+      ],
+      "before_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "after_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": false,
+        "language": "th",
+        "original": "พอร์ตอินพุตและเอาต์พุตดิจิทัลภายนอกต่อกับขาใด",
+        "terms": []
+      },
+      "duplicate_file_slots": 1,
+      "diagnostic_flags": [
+        "no_qrel_hit_in_returned_top5",
+        "duplicate_file_slots",
+        "thai_query_without_fixed_alias_match"
+      ],
+      "before_latency_ms": 211.57059999999998,
+      "after_latency_ms": 121.7644
+    },
+    {
+      "id": "heldout-pins-mixed",
+      "query": "IN1 IN4 OUT1 OUT2 ใช้ GPIO ไหน",
+      "language": "mixed",
+      "kinds": [
+        "mixed_language",
+        "hardware"
+      ],
+      "qrels": [
+        "inex_ia_ip.md"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "formula_kid_controller.md",
+        "README.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md"
+      ],
+      "after_files": [
+        "formula_kid_controller.md",
+        "README.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md"
+      ],
+      "before_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "after_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": false,
+        "language": "mixed",
+        "original": "IN1 IN4 OUT1 OUT2 ใช้ GPIO ไหน",
+        "terms": []
+      },
+      "duplicate_file_slots": 2,
+      "diagnostic_flags": [
+        "no_qrel_hit_in_returned_top5",
+        "duplicate_file_slots"
+      ],
+      "before_latency_ms": 425.65540000000004,
+      "after_latency_ms": 164.0698
+    },
+    {
+      "id": "heldout-mc3479-en",
+      "query": "Find an example driver for the three axis acceleration sensor on the newer board",
+      "language": "en",
+      "kinds": [
+        "natural_language",
+        "hardware"
+      ],
+      "qrels": [
+        "sensor_examples/accel_mc3479.c"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "sensor_examples/accel_mc3479.c",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "led_16x8_matrix_mapping.md",
+        "compatibility/README.md"
+      ],
+      "after_files": [
+        "sensor_examples/accel_mc3479.c",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "led_16x8_matrix_mapping.md",
+        "compatibility/README.md"
+      ],
+      "before_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "after_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": false,
+        "language": "en",
+        "original": "Find an example driver for the three axis acceleration sensor on the newer board",
+        "terms": []
+      },
+      "duplicate_file_slots": 1,
+      "diagnostic_flags": [
+        "duplicate_file_slots"
+      ],
+      "before_latency_ms": 264.08189999999996,
+      "after_latency_ms": 143.4407
+    },
+    {
+      "id": "heldout-mc3479-th",
+      "query": "ขอตัวอย่างอ่านความเร่งสามแกนของบอร์ดรุ่นที่ใช้ชิปเอ็มซี",
+      "language": "th",
+      "kinds": [
+        "natural_language",
+        "hardware"
+      ],
+      "qrels": [
+        "sensor_examples/accel_mc3479.c"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "kidbright_uai.md",
+        "all_models.md",
+        "README.md",
+        "all_models.md",
+        "iKB-1.md"
+      ],
+      "after_files": [
+        "kidbright_uai.md",
+        "all_models.md",
+        "README.md",
+        "all_models.md",
+        "iKB-1.md"
+      ],
+      "before_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "after_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": false,
+        "language": "th",
+        "original": "ขอตัวอย่างอ่านความเร่งสามแกนของบอร์ดรุ่นที่ใช้ชิปเอ็มซี",
+        "terms": []
+      },
+      "duplicate_file_slots": 1,
+      "diagnostic_flags": [
+        "no_qrel_hit_in_returned_top5",
+        "duplicate_file_slots",
+        "thai_query_without_fixed_alias_match"
+      ],
+      "before_latency_ms": 333.9271,
+      "after_latency_ms": 128.8406
+    },
+    {
+      "id": "heldout-mc3479-mixed",
+      "query": "อ่าน acceleration เซนเซอร์ MC3479 ตัวอย่าง driver",
+      "language": "mixed",
+      "kinds": [
+        "mixed_language",
+        "hardware"
+      ],
+      "qrels": [
+        "sensor_examples/accel_mc3479.c"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "README.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "inex_ia_ip.md",
+        "kidbright32iA.md"
+      ],
+      "after_files": [
+        "README.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "inex_ia_ip.md",
+        "kidbright32iA.md"
+      ],
+      "before_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "after_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": false,
+        "language": "mixed",
+        "original": "อ่าน acceleration เซนเซอร์ MC3479 ตัวอย่าง driver",
+        "terms": []
+      },
+      "duplicate_file_slots": 2,
+      "diagnostic_flags": [
+        "no_qrel_hit_in_returned_top5",
+        "duplicate_file_slots"
+      ],
+      "before_latency_ms": 410.76059999999995,
+      "after_latency_ms": 154.6975
+    },
+    {
+      "id": "heldout-kxtj3-en",
+      "query": "Read axes from the older acceleration sensor using its registers",
+      "language": "en",
+      "kinds": [
+        "natural_language",
+        "hardware"
+      ],
+      "qrels": [
+        "sensor_examples/accel_kxtj3.c"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "sensor_examples/accel_mc3479.c",
+        "sensor_examples/accel_kxtj3.c",
+        "sensor_examples/accel_kxtj3.c",
+        "kidbright32iA.md",
+        "kidbright32iA.md"
+      ],
+      "after_files": [
+        "sensor_examples/accel_mc3479.c",
+        "sensor_examples/accel_kxtj3.c",
+        "sensor_examples/accel_kxtj3.c",
+        "kidbright32iA.md",
+        "kidbright32iA.md"
+      ],
+      "before_metrics": {
+        "mrr": 0.5,
+        "ndcg_at_5": 0.6309297535714575,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "after_metrics": {
+        "mrr": 0.5,
+        "ndcg_at_5": 0.6309297535714575,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": false,
+        "language": "en",
+        "original": "Read axes from the older acceleration sensor using its registers",
+        "terms": []
+      },
+      "duplicate_file_slots": 2,
+      "diagnostic_flags": [
+        "duplicate_file_slots"
+      ],
+      "before_latency_ms": 288.4006,
+      "after_latency_ms": 144.5877
+    },
+    {
+      "id": "heldout-kxtj3-th",
+      "query": "อ่านค่าแกนจากรีจิสเตอร์ของเซนเซอร์ความเร่งรุ่นเก่า",
+      "language": "th",
+      "kinds": [
+        "natural_language",
+        "hardware"
+      ],
+      "qrels": [
+        "sensor_examples/accel_kxtj3.c"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "kidbright_uai.md",
+        "all_models.md",
+        "README.md",
+        "all_models.md",
+        "iKB-1.md"
+      ],
+      "after_files": [
+        "kidbright_uai.md",
+        "all_models.md",
+        "README.md",
+        "all_models.md",
+        "iKB-1.md"
+      ],
+      "before_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "after_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": false,
+        "language": "th",
+        "original": "อ่านค่าแกนจากรีจิสเตอร์ของเซนเซอร์ความเร่งรุ่นเก่า",
+        "terms": []
+      },
+      "duplicate_file_slots": 1,
+      "diagnostic_flags": [
+        "no_qrel_hit_in_returned_top5",
+        "duplicate_file_slots",
+        "thai_query_without_fixed_alias_match"
+      ],
+      "before_latency_ms": 169.3238,
+      "after_latency_ms": 138.516
+    },
+    {
+      "id": "heldout-kxtj3-mixed",
+      "query": "อ่านค่าแกน KXTJ3 ผ่าน register I2C",
+      "language": "mixed",
+      "kinds": [
+        "mixed_language",
+        "hardware"
+      ],
+      "qrels": [
+        "sensor_examples/accel_kxtj3.c"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md"
+      ],
+      "after_files": [
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md"
+      ],
+      "before_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "after_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [
+          "i2c"
+        ],
+        "exact_api": false,
+        "language": "mixed",
+        "original": "อ่านค่าแกน KXTJ3 ผ่าน register I2C",
+        "terms": [
+          "i2c_new_master_bus",
+          "i2c_master_transmit"
+        ]
+      },
+      "duplicate_file_slots": 4,
+      "diagnostic_flags": [
+        "no_qrel_hit_in_returned_top5",
+        "duplicate_file_slots"
+      ],
+      "before_latency_ms": 400.9293,
+      "after_latency_ms": 167.0852
+    },
+    {
+      "id": "heldout-external-adc-en",
+      "query": "Measure an external light dependent resistor with the analog converter",
+      "language": "en",
+      "kinds": [
+        "natural_language",
+        "hardware"
+      ],
+      "qrels": [
+        "sensor_examples/adc_ldr_external.c"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md"
+      ],
+      "after_files": [
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md"
+      ],
+      "before_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "after_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": false,
+        "language": "en",
+        "original": "Measure an external light dependent resistor with the analog converter",
+        "terms": []
+      },
+      "duplicate_file_slots": 4,
+      "diagnostic_flags": [
+        "no_qrel_hit_in_returned_top5",
+        "duplicate_file_slots"
+      ],
+      "before_latency_ms": 376.5527,
+      "after_latency_ms": 155.51590000000002
+    },
+    {
+      "id": "heldout-external-adc-th",
+      "query": "อ่านตัวต้านทานแปรตามแสงภายนอกด้วยวงจรแปลงแอนะล็อก",
+      "language": "th",
+      "kinds": [
+        "natural_language",
+        "hardware"
+      ],
+      "qrels": [
+        "sensor_examples/adc_ldr_external.c"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "kidbright_uai.md",
+        "all_models.md",
+        "README.md",
+        "all_models.md",
+        "iKB-1.md"
+      ],
+      "after_files": [
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "sensor_examples/kidbright_full_system_demo.c",
+        "kidbright32iA.md"
+      ],
+      "before_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "after_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [
+          "light"
+        ],
+        "exact_api": false,
+        "language": "th",
+        "original": "อ่านตัวต้านทานแปรตามแสงภายนอกด้วยวงจรแปลงแอนะล็อก",
+        "terms": [
+          "adc_oneshot_read",
+          "LDR"
+        ]
+      },
+      "duplicate_file_slots": 3,
+      "diagnostic_flags": [
+        "no_qrel_hit_in_returned_top5",
+        "duplicate_file_slots"
+      ],
+      "before_latency_ms": 209.8189,
+      "after_latency_ms": 153.74470000000002
+    },
+    {
+      "id": "heldout-external-adc-mixed",
+      "query": "อ่าน external LDR ผ่าน ADC แบบแยก",
+      "language": "mixed",
+      "kinds": [
+        "mixed_language",
+        "hardware"
+      ],
+      "qrels": [
+        "sensor_examples/adc_ldr_external.c"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "sensor_examples/adc_ldr_external.c",
+        "hardware_schematics_rules.md",
+        "inex_ia_ip.md",
+        "sensor_examples/adc_ldr_external.c",
+        "sensor_examples/adc_ldr_external.c"
+      ],
+      "after_files": [
+        "sensor_examples/adc_ldr_external.c",
+        "sensor_examples/adc_ldr_external.c",
+        "sensor_examples/kidbright_full_system_demo.c",
+        "sensor_examples/adc_ldr_external.c",
+        "kidbright32iA.md"
+      ],
+      "before_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "after_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [
+          "light"
+        ],
+        "exact_api": false,
+        "language": "mixed",
+        "original": "อ่าน external LDR ผ่าน ADC แบบแยก",
+        "terms": [
+          "adc_oneshot_read",
+          "LDR"
+        ]
+      },
+      "duplicate_file_slots": 2,
+      "diagnostic_flags": [
+        "duplicate_file_slots"
+      ],
+      "before_latency_ms": 181.1351,
+      "after_latency_ms": 149.3681
+    },
+    {
+      "id": "heldout-oled-en",
+      "query": "Connect and initialize a monochrome organic LED display over a two wire bus",
+      "language": "en",
+      "kinds": [
+        "natural_language",
+        "hardware"
+      ],
+      "qrels": [
+        "oled_ssd1306.md"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "led_16x8_matrix_mapping.md",
+        "compatibility/README.md",
+        "support_scope.md",
+        "compatibility/kb_display_idf.h",
+        "kidbright32iA.md"
+      ],
+      "after_files": [
+        "led_16x8_matrix_mapping.md",
+        "compatibility/README.md",
+        "support_scope.md",
+        "compatibility/kb_display_idf.h",
+        "kidbright32iA.md"
+      ],
+      "before_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "after_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": false,
+        "language": "en",
+        "original": "Connect and initialize a monochrome organic LED display over a two wire bus",
+        "terms": []
+      },
+      "duplicate_file_slots": 0,
+      "diagnostic_flags": [
+        "no_qrel_hit_in_returned_top5"
+      ],
+      "before_latency_ms": 383.1435,
+      "after_latency_ms": 134.7253
+    },
+    {
+      "id": "heldout-oled-th",
+      "query": "ต่อจอภาพขาวดำแบบโอแอลอีดีด้วยบัสสองสายและเริ่มต้นใช้งาน",
+      "language": "th",
+      "kinds": [
+        "natural_language",
+        "hardware"
+      ],
+      "qrels": [
+        "oled_ssd1306.md"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "kidbright_uai.md",
+        "all_models.md",
+        "README.md",
+        "all_models.md",
+        "iKB-1.md"
+      ],
+      "after_files": [
+        "sensor_examples/minibike_sender.c",
+        "compatibility/kb_display_idf.c",
+        "compatibility/kb_display_idf.c",
+        "oled_ssd1306.md",
+        "oled_ssd1306.md"
+      ],
+      "before_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "after_metrics": {
+        "mrr": 0.3333333333333333,
+        "ndcg_at_5": 0.5,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "delta": {
+        "recall_at_5": 1.0,
+        "mrr": 0.3333333333333333,
+        "ndcg_at_5": 0.5,
+        "precision_at_5": 0.2
+      },
+      "expansion_plan": {
+        "concepts": [
+          "i2c"
+        ],
+        "exact_api": false,
+        "language": "th",
+        "original": "ต่อจอภาพขาวดำแบบโอแอลอีดีด้วยบัสสองสายและเริ่มต้นใช้งาน",
+        "terms": [
+          "i2c_new_master_bus",
+          "i2c_master_transmit"
+        ]
+      },
+      "duplicate_file_slots": 2,
+      "diagnostic_flags": [
+        "duplicate_file_slots"
+      ],
+      "before_latency_ms": 330.8943,
+      "after_latency_ms": 129.4965
+    },
+    {
+      "id": "heldout-oled-mixed",
+      "query": "ต่อจอ OLED SSD1306 ผ่าน I2C ต้องตั้งค่าอะไร",
+      "language": "mixed",
+      "kinds": [
+        "mixed_language",
+        "hardware"
+      ],
+      "qrels": [
+        "oled_ssd1306.md"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "oled_ssd1306.md",
+        "oled_ssd1306.md",
+        "oled_ssd1306.md",
+        "kidbright32iA.md",
+        "oled_ssd1306.md"
+      ],
+      "after_files": [
+        "oled_ssd1306.md",
+        "oled_ssd1306.md",
+        "oled_ssd1306.md",
+        "kidbright32iA.md",
+        "oled_ssd1306.md"
+      ],
+      "before_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "after_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [
+          "i2c"
+        ],
+        "exact_api": false,
+        "language": "mixed",
+        "original": "ต่อจอ OLED SSD1306 ผ่าน I2C ต้องตั้งค่าอะไร",
+        "terms": [
+          "i2c_new_master_bus",
+          "i2c_master_transmit"
+        ]
+      },
+      "duplicate_file_slots": 3,
+      "diagnostic_flags": [
+        "duplicate_file_slots"
+      ],
+      "before_latency_ms": 280.3886,
+      "after_latency_ms": 139.0139
+    },
+    {
+      "id": "heldout-balance-en",
+      "query": "Find the firmware example for a self balancing robot",
+      "language": "en",
+      "kinds": [
+        "natural_language",
+        "hardware"
+      ],
+      "qrels": [
+        "sensor_examples/balanced_robot.c"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "skate_rev1.3.md",
+        "skate_rev1.3.md",
+        "skate_rev1.3.md",
+        "skate_rev1.3.md",
+        "skate_rev1.3.md"
+      ],
+      "after_files": [
+        "skate_rev1.3.md",
+        "skate_rev1.3.md",
+        "skate_rev1.3.md",
+        "skate_rev1.3.md",
+        "skate_rev1.3.md"
+      ],
+      "before_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "after_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": false,
+        "language": "en",
+        "original": "Find the firmware example for a self balancing robot",
+        "terms": []
+      },
+      "duplicate_file_slots": 4,
+      "diagnostic_flags": [
+        "no_qrel_hit_in_returned_top5",
+        "duplicate_file_slots"
+      ],
+      "before_latency_ms": 145.5086,
+      "after_latency_ms": 146.96110000000002
+    },
+    {
+      "id": "heldout-balance-th",
+      "query": "ขอตัวอย่างเฟิร์มแวร์หุ่นยนต์รักษาสมดุลทรงตัว",
+      "language": "th",
+      "kinds": [
+        "natural_language",
+        "hardware"
+      ],
+      "qrels": [
+        "sensor_examples/balanced_robot.c"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "kidbright_uai.md",
+        "all_models.md",
+        "README.md",
+        "all_models.md",
+        "iKB-1.md"
+      ],
+      "after_files": [
+        "kidbright_uai.md",
+        "all_models.md",
+        "README.md",
+        "all_models.md",
+        "iKB-1.md"
+      ],
+      "before_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "after_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": false,
+        "language": "th",
+        "original": "ขอตัวอย่างเฟิร์มแวร์หุ่นยนต์รักษาสมดุลทรงตัว",
+        "terms": []
+      },
+      "duplicate_file_slots": 1,
+      "diagnostic_flags": [
+        "no_qrel_hit_in_returned_top5",
+        "duplicate_file_slots",
+        "thai_query_without_fixed_alias_match"
+      ],
+      "before_latency_ms": 331.0974,
+      "after_latency_ms": 116.0066
+    },
+    {
+      "id": "heldout-balance-mixed",
+      "query": "ตัวอย่าง self balancing robot โค้ดควบคุม",
+      "language": "mixed",
+      "kinds": [
+        "mixed_language",
+        "hardware"
+      ],
+      "qrels": [
+        "sensor_examples/balanced_robot.c"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "skate_rev1.3.md",
+        "skate_rev1.3.md",
+        "skate_rev1.3.md",
+        "skate_rev1.3.md",
+        "minibike.md"
+      ],
+      "after_files": [
+        "skate_rev1.3.md",
+        "skate_rev1.3.md",
+        "skate_rev1.3.md",
+        "skate_rev1.3.md",
+        "minibike.md"
+      ],
+      "before_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "after_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": false,
+        "language": "mixed",
+        "original": "ตัวอย่าง self balancing robot โค้ดควบคุม",
+        "terms": []
+      },
+      "duplicate_file_slots": 3,
+      "diagnostic_flags": [
+        "no_qrel_hit_in_returned_top5",
+        "duplicate_file_slots"
+      ],
+      "before_latency_ms": 358.44,
+      "after_latency_ms": 135.3551
+    },
+    {
+      "id": "heldout-formula-en",
+      "query": "Explain the controller wiring and protocol for the steering vehicle",
+      "language": "en",
+      "kinds": [
+        "natural_language",
+        "hardware"
+      ],
+      "qrels": [
+        "formula_kid_controller.md"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "support_scope.md",
+        "support_scope.md",
+        "support_scope.md",
+        "compatibility/README.md",
+        "support_scope.md"
+      ],
+      "after_files": [
+        "support_scope.md",
+        "support_scope.md",
+        "support_scope.md",
+        "compatibility/README.md",
+        "support_scope.md"
+      ],
+      "before_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "after_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": false,
+        "language": "en",
+        "original": "Explain the controller wiring and protocol for the steering vehicle",
+        "terms": []
+      },
+      "duplicate_file_slots": 3,
+      "diagnostic_flags": [
+        "no_qrel_hit_in_returned_top5",
+        "duplicate_file_slots"
+      ],
+      "before_latency_ms": 351.3816,
+      "after_latency_ms": 150.0072
+    },
+    {
+      "id": "heldout-formula-th",
+      "query": "อธิบายการต่อวงจรรีโมตและรูปแบบสื่อสารของรถฟอร์มูลา",
+      "language": "th",
+      "kinds": [
+        "natural_language",
+        "hardware"
+      ],
+      "qrels": [
+        "formula_kid_controller.md"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "kidbright_uai.md",
+        "all_models.md",
+        "README.md",
+        "all_models.md",
+        "iKB-1.md"
+      ],
+      "after_files": [
+        "kidbright_uai.md",
+        "all_models.md",
+        "README.md",
+        "all_models.md",
+        "iKB-1.md"
+      ],
+      "before_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "after_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": false,
+        "language": "th",
+        "original": "อธิบายการต่อวงจรรีโมตและรูปแบบสื่อสารของรถฟอร์มูลา",
+        "terms": []
+      },
+      "duplicate_file_slots": 1,
+      "diagnostic_flags": [
+        "no_qrel_hit_in_returned_top5",
+        "duplicate_file_slots",
+        "thai_query_without_fixed_alias_match"
+      ],
+      "before_latency_ms": 129.9303,
+      "after_latency_ms": 127.3071
+    },
+    {
+      "id": "heldout-formula-mixed",
+      "query": "รีโมต Formula Kid ใช้ protocol และขาอะไร",
+      "language": "mixed",
+      "kinds": [
+        "mixed_language",
+        "hardware"
+      ],
+      "qrels": [
+        "formula_kid_controller.md"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "formula_kid_controller.md",
+        "formula_kid_controller.md",
+        "skate_rev1.3.md",
+        "formula_kid_controller.md",
+        "formula_kid_controller.md"
+      ],
+      "after_files": [
+        "formula_kid_controller.md",
+        "formula_kid_controller.md",
+        "skate_rev1.3.md",
+        "formula_kid_controller.md",
+        "formula_kid_controller.md"
+      ],
+      "before_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "after_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": false,
+        "language": "mixed",
+        "original": "รีโมต Formula Kid ใช้ protocol และขาอะไร",
+        "terms": []
+      },
+      "duplicate_file_slots": 3,
+      "diagnostic_flags": [
+        "duplicate_file_slots"
+      ],
+      "before_latency_ms": 338.0388,
+      "after_latency_ms": 169.8003
+    },
+    {
+      "id": "heldout-minibike-en",
+      "query": "Find the electrical and communication constraints for the miniature motorcycle",
+      "language": "en",
+      "kinds": [
+        "natural_language",
+        "hardware"
+      ],
+      "qrels": [
+        "minibike.md"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "support_scope.md",
+        "support_scope.md",
+        "compatibility/README.md"
+      ],
+      "after_files": [
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "support_scope.md",
+        "support_scope.md",
+        "compatibility/README.md"
+      ],
+      "before_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "after_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": false,
+        "language": "en",
+        "original": "Find the electrical and communication constraints for the miniature motorcycle",
+        "terms": []
+      },
+      "duplicate_file_slots": 2,
+      "diagnostic_flags": [
+        "no_qrel_hit_in_returned_top5",
+        "duplicate_file_slots"
+      ],
+      "before_latency_ms": 331.3365,
+      "after_latency_ms": 152.3155
+    },
+    {
+      "id": "heldout-minibike-th",
+      "query": "ข้อจำกัดวงจรไฟฟ้าและการสื่อสารของมอเตอร์ไซค์จำลองมีอะไรบ้าง",
+      "language": "th",
+      "kinds": [
+        "natural_language",
+        "hardware"
+      ],
+      "qrels": [
+        "minibike.md"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "kidbright_uai.md",
+        "all_models.md",
+        "README.md",
+        "all_models.md",
+        "iKB-1.md"
+      ],
+      "after_files": [
+        "kidbright_uai.md",
+        "all_models.md",
+        "README.md",
+        "all_models.md",
+        "iKB-1.md"
+      ],
+      "before_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "after_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": false,
+        "language": "th",
+        "original": "ข้อจำกัดวงจรไฟฟ้าและการสื่อสารของมอเตอร์ไซค์จำลองมีอะไรบ้าง",
+        "terms": []
+      },
+      "duplicate_file_slots": 1,
+      "diagnostic_flags": [
+        "no_qrel_hit_in_returned_top5",
+        "duplicate_file_slots",
+        "thai_query_without_fixed_alias_match"
+      ],
+      "before_latency_ms": 230.2311,
+      "after_latency_ms": 132.8352
+    },
+    {
+      "id": "heldout-minibike-mixed",
+      "query": "minibike ข้อจำกัด hardware และการสื่อสาร",
+      "language": "mixed",
+      "kinds": [
+        "mixed_language",
+        "hardware"
+      ],
+      "qrels": [
+        "minibike.md"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "minibike.md",
+        "kidbright32iA.md",
+        "led_16x8_matrix_mapping.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md"
+      ],
+      "after_files": [
+        "minibike.md",
+        "kidbright32iA.md",
+        "led_16x8_matrix_mapping.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md"
+      ],
+      "before_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "after_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": false,
+        "language": "mixed",
+        "original": "minibike ข้อจำกัด hardware และการสื่อสาร",
+        "terms": []
+      },
+      "duplicate_file_slots": 2,
+      "diagnostic_flags": [
+        "duplicate_file_slots"
+      ],
+      "before_latency_ms": 194.5124,
+      "after_latency_ms": 148.6441
+    },
+    {
+      "id": "heldout-mai-en",
+      "query": "Does the camera based AI board use the same firmware toolchain as the microcontroller board",
+      "language": "en",
+      "kinds": [
+        "natural_language",
+        "hardware"
+      ],
+      "qrels": [
+        "kidbright_uai.md"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "support_scope.md",
+        "kidbright32iA.md",
+        "support_scope.md",
+        "support_scope.md",
+        "kidbright32iA.md"
+      ],
+      "after_files": [
+        "support_scope.md",
+        "kidbright32iA.md",
+        "support_scope.md",
+        "support_scope.md",
+        "kidbright32iA.md"
+      ],
+      "before_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "after_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": false,
+        "language": "en",
+        "original": "Does the camera based AI board use the same firmware toolchain as the microcontroller board",
+        "terms": []
+      },
+      "duplicate_file_slots": 3,
+      "diagnostic_flags": [
+        "no_qrel_hit_in_returned_top5",
+        "duplicate_file_slots"
+      ],
+      "before_latency_ms": 396.87309999999997,
+      "after_latency_ms": 155.1311
+    },
+    {
+      "id": "heldout-mai-th",
+      "query": "บอร์ดปัญญาประดิษฐ์ที่มีกล้องใช้เครื่องมือคอมไพล์เหมือนบอร์ดไมโครคอนโทรลเลอร์หรือไม่",
+      "language": "th",
+      "kinds": [
+        "natural_language",
+        "hardware"
+      ],
+      "qrels": [
+        "kidbright_uai.md"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "kidbright_uai.md",
+        "all_models.md",
+        "README.md",
+        "all_models.md",
+        "iKB-1.md"
+      ],
+      "after_files": [
+        "kidbright_uai.md",
+        "all_models.md",
+        "README.md",
+        "all_models.md",
+        "iKB-1.md"
+      ],
+      "before_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "after_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": false,
+        "language": "th",
+        "original": "บอร์ดปัญญาประดิษฐ์ที่มีกล้องใช้เครื่องมือคอมไพล์เหมือนบอร์ดไมโครคอนโทรลเลอร์หรือไม่",
+        "terms": []
+      },
+      "duplicate_file_slots": 1,
+      "diagnostic_flags": [
+        "duplicate_file_slots",
+        "thai_query_without_fixed_alias_match"
+      ],
+      "before_latency_ms": 342.9233,
+      "after_latency_ms": 135.8339
+    },
+    {
+      "id": "heldout-mai-mixed",
+      "query": "บอร์ด μAI Linux ใช้ ESP-IDF เหมือน KidBright32 หรือเปล่า",
+      "language": "mixed",
+      "kinds": [
+        "mixed_language",
+        "hardware"
+      ],
+      "qrels": [
+        "kidbright_uai.md"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "kidbright_uai.md",
+        "oled_ssd1306.md",
+        "kidbright_uai.md",
+        "README.md",
+        "minibike.md"
+      ],
+      "after_files": [
+        "kidbright_uai.md",
+        "oled_ssd1306.md",
+        "kidbright_uai.md",
+        "README.md",
+        "minibike.md"
+      ],
+      "before_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "after_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": false,
+        "language": "mixed",
+        "original": "บอร์ด μAI Linux ใช้ ESP-IDF เหมือน KidBright32 หรือเปล่า",
+        "terms": []
+      },
+      "duplicate_file_slots": 1,
+      "diagnostic_flags": [
+        "duplicate_file_slots"
+      ],
+      "before_latency_ms": 322.4409,
+      "after_latency_ms": 178.13219999999998
+    },
+    {
+      "id": "heldout-schematic-en",
+      "query": "How should a board revision be verified before choosing pin assignments",
+      "language": "en",
+      "kinds": [
+        "natural_language",
+        "hardware"
+      ],
+      "qrels": [
+        "hardware_schematics_rules.md"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "kidbright32iA.md",
+        "support_scope.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "support_scope.md"
+      ],
+      "after_files": [
+        "kidbright32iA.md",
+        "support_scope.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "support_scope.md"
+      ],
+      "before_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "after_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": false,
+        "language": "en",
+        "original": "How should a board revision be verified before choosing pin assignments",
+        "terms": []
+      },
+      "duplicate_file_slots": 3,
+      "diagnostic_flags": [
+        "no_qrel_hit_in_returned_top5",
+        "duplicate_file_slots"
+      ],
+      "before_latency_ms": 141.112,
+      "after_latency_ms": 131.80030000000002
+    },
+    {
+      "id": "heldout-schematic-th",
+      "query": "ต้องตรวจสอบรุ่นย่อยของบอร์ดจากหลักฐานใดก่อนกำหนดขาวงจร",
+      "language": "th",
+      "kinds": [
+        "natural_language",
+        "hardware"
+      ],
+      "qrels": [
+        "hardware_schematics_rules.md"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "kidbright_uai.md",
+        "all_models.md",
+        "README.md",
+        "all_models.md",
+        "iKB-1.md"
+      ],
+      "after_files": [
+        "kidbright_uai.md",
+        "all_models.md",
+        "README.md",
+        "all_models.md",
+        "iKB-1.md"
+      ],
+      "before_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "after_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": false,
+        "language": "th",
+        "original": "ต้องตรวจสอบรุ่นย่อยของบอร์ดจากหลักฐานใดก่อนกำหนดขาวงจร",
+        "terms": []
+      },
+      "duplicate_file_slots": 1,
+      "diagnostic_flags": [
+        "no_qrel_hit_in_returned_top5",
+        "duplicate_file_slots",
+        "thai_query_without_fixed_alias_match"
+      ],
+      "before_latency_ms": 317.35089999999997,
+      "after_latency_ms": 126.59509999999999
+    },
+    {
+      "id": "heldout-schematic-mixed",
+      "query": "ยืนยัน board revision จาก schematic ก่อนเลือก pin mapping",
+      "language": "mixed",
+      "kinds": [
+        "mixed_language",
+        "hardware"
+      ],
+      "qrels": [
+        "hardware_schematics_rules.md"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "hardware_schematics_rules.md",
+        "iKB-1.md",
+        "kidbright32iA.md",
+        "README.md",
+        "kidbright32iA.md"
+      ],
+      "after_files": [
+        "hardware_schematics_rules.md",
+        "iKB-1.md",
+        "kidbright32iA.md",
+        "README.md",
+        "kidbright32iA.md"
+      ],
+      "before_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "after_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": false,
+        "language": "mixed",
+        "original": "ยืนยัน board revision จาก schematic ก่อนเลือก pin mapping",
+        "terms": []
+      },
+      "duplicate_file_slots": 1,
+      "diagnostic_flags": [
+        "duplicate_file_slots"
+      ],
+      "before_latency_ms": 428.8462,
+      "after_latency_ms": 145.2535
+    },
+    {
+      "id": "heldout-symbol-kb_matrix_pixel",
+      "query": "kb_matrix_pixel",
+      "language": "technical",
+      "kinds": [
+        "exact_symbol"
+      ],
+      "qrels": [
+        "compatibility/kb_basic.c",
+        "compatibility/kb_basic.h"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "compatibility/kb_basic.c",
+        "compatibility/kb_basic.h",
+        "compatibility/kb_basic.c",
+        "compatibility/kb_basic.c",
+        "led_16x8_matrix_mapping.md"
+      ],
+      "after_files": [
+        "compatibility/kb_basic.c",
+        "compatibility/kb_basic.h",
+        "compatibility/kb_basic.c",
+        "compatibility/kb_basic.c",
+        "led_16x8_matrix_mapping.md"
+      ],
+      "before_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "after_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": true,
+        "language": "en",
+        "original": "kb_matrix_pixel",
+        "terms": []
+      },
+      "duplicate_file_slots": 2,
+      "diagnostic_flags": [
+        "duplicate_file_slots"
+      ],
+      "before_latency_ms": 293.0083,
+      "after_latency_ms": 137.33319999999998
+    },
+    {
+      "id": "heldout-symbol-kb_matrix_shift",
+      "query": "kb_matrix_shift",
+      "language": "technical",
+      "kinds": [
+        "exact_symbol"
+      ],
+      "qrels": [
+        "compatibility/kb_basic.c",
+        "compatibility/kb_basic.h"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "compatibility/kb_basic.c",
+        "compatibility/kb_basic.h",
+        "compatibility/kb_basic.c",
+        "compatibility/kb_basic.c",
+        "compatibility/kb_basic.c"
+      ],
+      "after_files": [
+        "compatibility/kb_basic.c",
+        "compatibility/kb_basic.h",
+        "compatibility/kb_basic.c",
+        "compatibility/kb_basic.c",
+        "compatibility/kb_basic.c"
+      ],
+      "before_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "after_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": true,
+        "language": "en",
+        "original": "kb_matrix_shift",
+        "terms": []
+      },
+      "duplicate_file_slots": 3,
+      "diagnostic_flags": [
+        "duplicate_file_slots"
+      ],
+      "before_latency_ms": 138.9948,
+      "after_latency_ms": 143.30689999999998
+    },
+    {
+      "id": "heldout-symbol-kb_ascii_format",
+      "query": "kb_ascii_format",
+      "language": "technical",
+      "kinds": [
+        "exact_symbol"
+      ],
+      "qrels": [
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "compatibility/kb_core.c",
+        "compatibility/README.md",
+        "compatibility/kb_core.h",
+        "compatibility/kb_basic.c",
+        "compatibility/kb_core.c"
+      ],
+      "after_files": [
+        "compatibility/kb_core.c",
+        "compatibility/README.md",
+        "compatibility/kb_core.h",
+        "compatibility/kb_basic.c",
+        "compatibility/kb_core.c"
+      ],
+      "before_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 0.9197207891481876,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "after_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 0.9197207891481876,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": true,
+        "language": "en",
+        "original": "kb_ascii_format",
+        "terms": []
+      },
+      "duplicate_file_slots": 1,
+      "diagnostic_flags": [
+        "duplicate_file_slots"
+      ],
+      "before_latency_ms": 178.1348,
+      "after_latency_ms": 127.5126
+    },
+    {
+      "id": "heldout-symbol-kb_joystick_init",
+      "query": "kb_joystick_init",
+      "language": "technical",
+      "kinds": [
+        "exact_symbol"
+      ],
+      "qrels": [
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h",
+        "sensor_examples/formulakid_sender.c",
+        "sensor_examples/minibike_sender.c",
+        "hardware_schematics_rules.md"
+      ],
+      "after_files": [
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h",
+        "sensor_examples/formulakid_sender.c",
+        "sensor_examples/minibike_sender.c",
+        "hardware_schematics_rules.md"
+      ],
+      "before_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "after_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": true,
+        "language": "en",
+        "original": "kb_joystick_init",
+        "terms": []
+      },
+      "duplicate_file_slots": 0,
+      "diagnostic_flags": [],
+      "before_latency_ms": 355.40509999999995,
+      "after_latency_ms": 134.4754
+    },
+    {
+      "id": "heldout-symbol-kb_delay_ms",
+      "query": "kb_delay_ms",
+      "language": "technical",
+      "kinds": [
+        "exact_symbol"
+      ],
+      "qrels": [
+        "compatibility/kb_core.c",
+        "compatibility/kb_core.h"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "compatibility/kb_core.c",
+        "compatibility/button_buzzer.c",
+        "compatibility/kb_core.h",
+        "compatibility/README.md",
+        "compatibility/temperature_serial.c"
+      ],
+      "after_files": [
+        "compatibility/kb_core.c",
+        "compatibility/button_buzzer.c",
+        "compatibility/kb_core.h",
+        "compatibility/README.md",
+        "compatibility/temperature_serial.c"
+      ],
+      "before_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 0.9197207891481876,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "after_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 0.9197207891481876,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": true,
+        "language": "en",
+        "original": "kb_delay_ms",
+        "terms": []
+      },
+      "duplicate_file_slots": 0,
+      "diagnostic_flags": [],
+      "before_latency_ms": 358.1676,
+      "after_latency_ms": 136.00490000000002
+    },
+    {
+      "id": "heldout-symbol-kb_music_duration",
+      "query": "kb_music_duration",
+      "language": "technical",
+      "kinds": [
+        "exact_symbol"
+      ],
+      "qrels": [
+        "compatibility/kb_basic.c",
+        "compatibility/kb_basic.h"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "compatibility/matrix_counter.c",
+        "compatibility/kb_basic.c",
+        "compatibility/music_scale.c",
+        "compatibility/kb_basic.h",
+        "compatibility/kb_basic.c"
+      ],
+      "after_files": [
+        "compatibility/matrix_counter.c",
+        "compatibility/kb_basic.c",
+        "compatibility/music_scale.c",
+        "compatibility/kb_basic.h",
+        "compatibility/kb_basic.c"
+      ],
+      "before_metrics": {
+        "mrr": 0.5,
+        "ndcg_at_5": 0.6509209298071326,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "after_metrics": {
+        "mrr": 0.5,
+        "ndcg_at_5": 0.6509209298071326,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": true,
+        "language": "en",
+        "original": "kb_music_duration",
+        "terms": []
+      },
+      "duplicate_file_slots": 1,
+      "diagnostic_flags": [
+        "duplicate_file_slots"
+      ],
+      "before_latency_ms": 354.1662,
+      "after_latency_ms": 138.6747
+    },
+    {
+      "id": "heldout-symbol-kb_music_frequency",
+      "query": "kb_music_frequency",
+      "language": "technical",
+      "kinds": [
+        "exact_symbol"
+      ],
+      "qrels": [
+        "compatibility/kb_basic.c",
+        "compatibility/kb_basic.h"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "compatibility/kb_basic.c",
+        "compatibility/music_scale.c",
+        "compatibility/kb_basic.h",
+        "compatibility/kb_basic.c",
+        "compatibility/README.md"
+      ],
+      "after_files": [
+        "compatibility/kb_basic.c",
+        "compatibility/music_scale.c",
+        "compatibility/kb_basic.h",
+        "compatibility/kb_basic.c",
+        "compatibility/README.md"
+      ],
+      "before_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 0.9197207891481876,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "after_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 0.9197207891481876,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": true,
+        "language": "en",
+        "original": "kb_music_frequency",
+        "terms": []
+      },
+      "duplicate_file_slots": 1,
+      "diagnostic_flags": [
+        "duplicate_file_slots"
+      ],
+      "before_latency_ms": 175.2877,
+      "after_latency_ms": 145.313
+    },
+    {
+      "id": "heldout-symbol-kb_matrix_pack",
+      "query": "kb_matrix_pack",
+      "language": "technical",
+      "kinds": [
+        "exact_symbol"
+      ],
+      "qrels": [
+        "compatibility/kb_basic.c",
+        "compatibility/kb_basic.h"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "compatibility/kb_basic.h",
+        "compatibility/kb_basic.c",
+        "compatibility/kb_display_idf.c",
+        "kidbright32iA.md",
+        "formula_kid_controller.md"
+      ],
+      "after_files": [
+        "compatibility/kb_basic.h",
+        "compatibility/kb_basic.c",
+        "compatibility/kb_display_idf.c",
+        "kidbright32iA.md",
+        "formula_kid_controller.md"
+      ],
+      "before_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "after_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": true,
+        "language": "en",
+        "original": "kb_matrix_pack",
+        "terms": []
+      },
+      "duplicate_file_slots": 0,
+      "diagnostic_flags": [],
+      "before_latency_ms": 187.6963,
+      "after_latency_ms": 133.70190000000002
+    },
+    {
+      "id": "heldout-symbol-kb_matrix_digit",
+      "query": "kb_matrix_digit",
+      "language": "technical",
+      "kinds": [
+        "exact_symbol"
+      ],
+      "qrels": [
+        "compatibility/kb_basic.c",
+        "compatibility/kb_basic.h"
+      ],
+      "missing_qrel_files": [],
+      "before_files": [
+        "compatibility/kb_basic.c",
+        "compatibility/kb_basic.h",
+        "compatibility/matrix_counter.c",
+        "led_16x8_matrix_mapping.md",
+        "led_16x8_matrix_mapping.md"
+      ],
+      "after_files": [
+        "compatibility/kb_basic.c",
+        "compatibility/kb_basic.h",
+        "compatibility/matrix_counter.c",
+        "led_16x8_matrix_mapping.md",
+        "led_16x8_matrix_mapping.md"
+      ],
+      "before_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "after_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0
+      },
+      "delta": {
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "precision_at_5": 0.0
+      },
+      "expansion_plan": {
+        "concepts": [],
+        "exact_api": true,
+        "language": "en",
+        "original": "kb_matrix_digit",
+        "terms": []
+      },
+      "duplicate_file_slots": 1,
+      "diagnostic_flags": [
+        "duplicate_file_slots"
+      ],
+      "before_latency_ms": 344.3642,
+      "after_latency_ms": 135.8657
+    }
+  ],
+  "language": {
+    "en": {
+      "queries": 20,
+      "before": {
+        "recall_at_5": 0.25,
+        "mrr": 0.24166666666666667,
+        "ndcg_at_5": 0.2100785736263389,
+        "precision_at_5": 0.08
+      },
+      "after": {
+        "recall_at_5": 0.25,
+        "mrr": 0.21666666666666667,
+        "ndcg_at_5": 0.19876385434979305,
+        "precision_at_5": 0.08
+      },
+      "regressed_mrr_cases": [
+        "heldout-delay-en"
+      ],
+      "latency_ms": {
+        "before": {
+          "median": 329.5236,
+          "p95": 387.93539999999996
+        },
+        "after": {
+          "median": 151.6661,
+          "p95": 166.39399999999998
+        }
+      }
+    },
+    "mixed": {
+      "queries": 20,
+      "before": {
+        "recall_at_5": 0.5,
+        "mrr": 0.625,
+        "ndcg_at_5": 0.5226294385530916,
+        "precision_at_5": 0.13
+      },
+      "after": {
+        "recall_at_5": 0.5,
+        "mrr": 0.625,
+        "ndcg_at_5": 0.5226294385530916,
+        "precision_at_5": 0.13
+      },
+      "regressed_mrr_cases": [],
+      "latency_ms": {
+        "before": {
+          "median": 330.23985,
+          "p95": 425.65540000000004
+        },
+        "after": {
+          "median": 162.09415,
+          "p95": 192.3337
+        }
+      }
+    },
+    "technical": {
+      "queries": 9,
+      "before": {
+        "recall_at_5": 1.0,
+        "mrr": 0.9444444444444444,
+        "ndcg_at_5": 0.9344536996946328,
+        "precision_at_5": 0.4
+      },
+      "after": {
+        "recall_at_5": 1.0,
+        "mrr": 0.9444444444444444,
+        "ndcg_at_5": 0.9344536996946328,
+        "precision_at_5": 0.4
+      },
+      "regressed_mrr_cases": [],
+      "latency_ms": {
+        "before": {
+          "median": 293.0083,
+          "p95": 355.40509999999995
+        },
+        "after": {
+          "median": 136.00490000000002,
+          "p95": 143.30689999999998
+        }
+      }
+    },
+    "th": {
+      "queries": 20,
+      "before": {
+        "recall_at_5": 0.05,
+        "mrr": 0.05,
+        "ndcg_at_5": 0.05,
+        "precision_at_5": 0.01
+      },
+      "after": {
+        "recall_at_5": 0.125,
+        "mrr": 0.11666666666666667,
+        "ndcg_at_5": 0.10565735963827291,
+        "precision_at_5": 0.030000000000000002
+      },
+      "regressed_mrr_cases": [],
+      "latency_ms": {
+        "before": {
+          "median": 289.0893,
+          "p95": 343.4155
+        },
+        "after": {
+          "median": 132.69095,
+          "p95": 164.0482
+        }
+      }
+    }
+  },
+  "query_kinds": {
+    "exact_symbol": {
+      "queries": 9,
+      "before": {
+        "recall_at_5": 1.0,
+        "mrr": 0.9444444444444444,
+        "ndcg_at_5": 0.9344536996946328,
+        "precision_at_5": 0.4
+      },
+      "after": {
+        "recall_at_5": 1.0,
+        "mrr": 0.9444444444444444,
+        "ndcg_at_5": 0.9344536996946328,
+        "precision_at_5": 0.4
+      },
+      "regressed_mrr_cases": [],
+      "latency_ms": {
+        "before": {
+          "median": 293.0083,
+          "p95": 355.40509999999995
+        },
+        "after": {
+          "median": 136.00490000000002,
+          "p95": 143.30689999999998
+        }
+      }
+    },
+    "natural_language": {
+      "queries": 40,
+      "before": {
+        "recall_at_5": 0.15,
+        "mrr": 0.14583333333333334,
+        "ndcg_at_5": 0.13003928681316945,
+        "precision_at_5": 0.045000000000000005
+      },
+      "after": {
+        "recall_at_5": 0.1875,
+        "mrr": 0.16666666666666666,
+        "ndcg_at_5": 0.152210606994033,
+        "precision_at_5": 0.055
+      },
+      "regressed_mrr_cases": [
+        "heldout-delay-en"
+      ],
+      "latency_ms": {
+        "before": {
+          "median": 318.4841,
+          "p95": 383.1435
+        },
+        "after": {
+          "median": 143.8269,
+          "p95": 166.39399999999998
+        }
+      }
+    },
+    "mixed_language": {
+      "queries": 20,
+      "before": {
+        "recall_at_5": 0.5,
+        "mrr": 0.625,
+        "ndcg_at_5": 0.5226294385530916,
+        "precision_at_5": 0.13
+      },
+      "after": {
+        "recall_at_5": 0.5,
+        "mrr": 0.625,
+        "ndcg_at_5": 0.5226294385530916,
+        "precision_at_5": 0.13
+      },
+      "regressed_mrr_cases": [],
+      "latency_ms": {
+        "before": {
+          "median": 330.23985,
+          "p95": 425.65540000000004
+        },
+        "after": {
+          "median": 162.09415,
+          "p95": 192.3337
+        }
+      }
+    },
+    "compiler_error": {
+      "queries": 0,
+      "metrics": null,
+      "latency_ms": null,
+      "coverage_gap": true
+    },
+    "hardware": {
+      "queries": 33,
+      "before": {
+        "recall_at_5": 0.30303030303030304,
+        "mrr": 0.2878787878787879,
+        "ndcg_at_5": 0.29184635616883203,
+        "precision_at_5": 0.06060606060606061
+      },
+      "after": {
+        "recall_at_5": 0.3333333333333333,
+        "mrr": 0.29797979797979796,
+        "ndcg_at_5": 0.30699787132034717,
+        "precision_at_5": 0.06666666666666667
+      },
+      "regressed_mrr_cases": [],
+      "latency_ms": {
+        "before": {
+          "median": 330.8943,
+          "p95": 410.76059999999995
+        },
+        "after": {
+          "median": 145.2535,
+          "p95": 167.0852
+        }
+      }
+    }
+  },
+  "flags": {
+    "duplicate_file_slots": 59,
+    "reciprocal_rank_regression": 1,
+    "no_qrel_hit_in_returned_top5": 37,
+    "thai_query_without_fixed_alias_match": 16
+  },
+  "limits": [
+    "Diagnosis of fixed historical runs only, not a new accuracy measurement or ranker change",
+    "All qrels are assistant-authored and non-exhaustive; flags are observations, not established causal failure labels",
+    "Kinds overlap; hardware membership is the previously declared topic set, not inferred hardware compatibility",
+    "No compiler-error probes exist in this frozen set; do not fabricate category metrics",
+    "No refill after duplicate top-five chunks; missing counterpart files may still share relevant evidence",
+    "Single-host historical latency is uncontrolled; paired expansion RAM was not measured",
+    "Corpus contains examples/helpers and incomplete authoritative SDK documentation",
+    "Do not derive expansion vocabulary or tune ranker parameters from these final labels"
+  ],
+  "status": "DIAGNOSED_NOT_HUMAN_REVIEWED",
+  "dataset_sha256": "c75de0d838a5f0e6670c48776c67d3b5c0a98ca755f02ba09c2d548c28b55c43",
+  "ranker_changed": false,
+  "historical_multilingual_resources": [
+    {
+      "mode": "lexical",
+      "report": "evaluation-heldout-lexical.json",
+      "metrics": {
+        "mrr": 0.322463768115942,
+        "ndcg_at_5": 0.3027054878445835,
+        "precision_at_5": 0.11304347826086962,
+        "recall_at_5": 0.34782608695652173
+      },
+      "latency_ms": {
+        "median": 4.0150999999999994,
+        "p95": 9.6
+      },
+      "resources": {
+        "peak_working_set_bytes": 19394560,
+        "peak_sampled_private_bytes": 7946240,
+        "wall_seconds": 2.1169045999995433,
+        "sampling_interval_ms": 100,
+        "method": "Windows GetProcessMemoryInfo, one process per ranker; single run"
+      },
+      "index_ms": 1073.198,
+      "model_bytes": 0
+    },
+    {
+      "mode": "bundled",
+      "report": "evaluation-heldout-bundled.json",
+      "metrics": {
+        "mrr": 0.38888888888888895,
+        "ndcg_at_5": 0.34875715276580155,
+        "precision_at_5": 0.11594202898550732,
+        "recall_at_5": 0.36231884057971014
+      },
+      "latency_ms": {
+        "median": 168.8231,
+        "p95": 192.7343
+      },
+      "resources": {
+        "peak_working_set_bytes": 388841472,
+        "peak_sampled_private_bytes": 648929280,
+        "wall_seconds": 135.99046289999387,
+        "sampling_interval_ms": 100,
+        "method": "Windows GetProcessMemoryInfo, one process per ranker; single run"
+      },
+      "index_ms": 122319.4186,
+      "model_bytes": 91115499
+    },
+    {
+      "mode": "bundled-routed",
+      "report": "evaluation-heldout-bundled-routed.json",
+      "metrics": {
+        "mrr": 0.35507246376811596,
+        "ndcg_at_5": 0.33153221583117476,
+        "precision_at_5": 0.11594202898550732,
+        "recall_at_5": 0.36231884057971014
+      },
+      "latency_ms": {
+        "median": 186.598,
+        "p95": 230.50390000000002
+      },
+      "resources": {
+        "peak_working_set_bytes": 389017600,
+        "peak_sampled_private_bytes": 649338880,
+        "wall_seconds": 143.40987019999739,
+        "sampling_interval_ms": 100,
+        "method": "Windows GetProcessMemoryInfo, one process per ranker; single run"
+      },
+      "index_ms": 129332.8378,
+      "model_bytes": 91115499
+    },
+    {
+      "mode": "multilingual-e5-small",
+      "report": "evaluation-heldout-multilingual-e5-small.json",
+      "metrics": {
+        "mrr": 0.38768115942028986,
+        "ndcg_at_5": 0.3670720430132047,
+        "precision_at_5": 0.13043478260869573,
+        "recall_at_5": 0.427536231884058
+      },
+      "latency_ms": {
+        "median": 216.2179,
+        "p95": 453.1291
+      },
+      "resources": {
+        "peak_working_set_bytes": 1418936320,
+        "peak_sampled_private_bytes": 1535107072,
+        "wall_seconds": 282.6568352999966,
+        "sampling_interval_ms": 100,
+        "method": "Windows GetProcessMemoryInfo, one process per ranker; single run"
+      },
+      "index_ms": 257450.533,
+      "model_bytes": 135394008
+    },
+    {
+      "mode": "multilingual-minilm",
+      "report": "evaluation-heldout-multilingual-minilm.json",
+      "metrics": {
+        "mrr": 0.3635265700483092,
+        "ndcg_at_5": 0.3342913524175959,
+        "precision_at_5": 0.12173913043478267,
+        "recall_at_5": 0.391304347826087
+      },
+      "latency_ms": {
+        "median": 152.60660000000001,
+        "p95": 182.9094
+      },
+      "resources": {
+        "peak_working_set_bytes": 1422368768,
+        "peak_sampled_private_bytes": 1540988928,
+        "wall_seconds": 332.9129858000015,
+        "sampling_interval_ms": 100,
+        "method": "Windows GetProcessMemoryInfo, one process per ranker; single run"
+      },
+      "index_ms": 309207.5693,
+      "model_bytes": 135394365
+    }
+  ],
+  "source_sha256": {
+    "scripts/diagnose-retrieval.py": "3f314a5b02ac0fa98694ec742dceb13b3528bb03a54a14fa190f8b2fb6482255",
+    "docs/ai-engineering/evaluation-heldout-v1.json": "c75de0d838a5f0e6670c48776c67d3b5c0a98ca755f02ba09c2d548c28b55c43",
+    "docs/ai-engineering/expansion-heldout-baseline.json": "69875f2e24586d56ea40bb5fe5359e0391922047aa27fbe9f6a733570e2f0fd9",
+    "docs/ai-engineering/expansion-heldout-expanded.json": "d3c391dead6f63296236de099621102760a0a024afda3bea68b3f8e3a2937de0"
+  }
+}

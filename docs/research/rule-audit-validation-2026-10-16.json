@@ -1,0 +1,131 @@
+{
+  "schema_version": 1,
+  "audit_date": "2026-10-16",
+  "timezone": "Asia/Bangkok",
+  "conclusion": "Incomplete board/function/block compatibility; corrected evidenced rule conflicts and added latest-user language-source routing.",
+  "checks": [
+    {
+      "command": "cargo test --manifest-path src-tauri/Cargo.toml --lib --offline",
+      "exit_code": 0,
+      "passed_tests": 88,
+      "language_tests_included": 9
+    },
+    {
+      "command": "npm run build:release",
+      "exit_code": 0,
+      "includes": [
+        "kb_sync",
+        "block_inventory_freshness",
+        "document_inventory_freshness",
+        "public_files",
+        "bundle_files",
+        "typescript",
+        "vite_build"
+      ]
+    },
+    {
+      "command": "node scripts/audit-kidbright-coverage.mjs --check",
+      "exit_code": 0,
+      "inventory_ids": 560,
+      "archive_main_definition_union": 343,
+      "web_definition_union": 235,
+      "ids_with_partial_scoped_evidence": 20,
+      "full_block_equivalence_proven": 0
+    },
+    {
+      "command": "node scripts/audit-rule-documents.mjs --check",
+      "exit_code": 0,
+      "summary": {
+        "documents": 42,
+        "source_knowledge_documents": 13,
+        "bundled_knowledge_documents": 13,
+        "code_fences": 321,
+        "fences_by_language": {
+          "bash": 3,
+          "c": 235,
+          "cmake": 8,
+          "cpp": 10,
+          "mermaid": 2,
+          "powershell": 14,
+          "rust": 1,
+          "text": 12,
+          "ts": 1,
+          "unspecified": 35
+        },
+        "invalid_utf8_documents": 0,
+        "unclosed_fences": 0
+      },
+      "markdown_bundle_mismatches": []
+    },
+    {
+      "command": "python scripts/audit-kidbright-functions.py --archive-root <verified-source-cache>",
+      "exit_code": 0,
+      "captured_files_hash_matched": 410,
+      "method_candidates": 694,
+      "core_exported_functions": 8
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0
+    }
+  ],
+  "inputs": [
+    {
+      "path": "src-tauri/src/ai/system_prompt.txt",
+      "sha256": "774b350bffc7757bf368b501b5e03ab8928ecad7b8c7e0965191273557724fd1"
+    },
+    {
+      "path": "src-tauri/src/ai/language.rs",
+      "sha256": "0f52945b7599ace79702b216d9fc6f7691563db481e5d361128eb9a716bdba09"
+    },
+    {
+      "path": "knowledge_base/support_scope.md",
+      "sha256": "0fcdf0e8137164ad6c39d47ebc763996c01ca27fcf14364838da501385762609"
+    },
+    {
+      "path": "scripts/audit-rule-documents.mjs",
+      "sha256": "2a282b933d119ba997156692375c854451b5cce3b5f1769843b8493dca328080"
+    },
+    {
+      "path": "scripts/audit-kidbright-coverage.mjs",
+      "sha256": "a1980aff7d429e760644d211bda81965a921b07d043dd1323776a7d0b3503236"
+    },
+    {
+      "path": "scripts/audit-kidbright-functions.py",
+      "sha256": "d9adb542eb3103c27ca05a40c77df50726b7c53d985dbcad4e3223ca9183a5da"
+    },
+    {
+      "path": "docs/KIDBRIGHT_RULES_COMPLETENESS_AUDIT_2026-10-16.md",
+      "sha256": "6920e54dd7c4ac185033c17769e243431b5d18019399d88937584bdcf81e3e62"
+    },
+    {
+      "path": "docs/research/kidbright-coverage-2026-10-16.json",
+      "sha256": "071087a18f57d50850028525b699546777bf44a060fcaeca2f14806cc6bac0ad"
+    },
+    {
+      "path": "docs/research/kidbright-function-audit-2026-10-16.json",
+      "sha256": "539a0f49dc21f6b2b8b07ecf2eec68e70bdc38e11aeaf434f2d214b0e422341c"
+    },
+    {
+      "path": "docs/research/board-rule-audit-2026-10-16.json",
+      "sha256": "08bc2277a901afb54f25ca173985fb2baf9ac315da51d8a41f615b3cd2477fef"
+    },
+    {
+      "path": "docs/research/rule-documents-2026-10-16.json",
+      "sha256": "9c03aee42f88886d2781c73da4b215ba25804f2235a0364f5fbdb1b8f782e08f"
+    }
+  ],
+  "current_bundled_kb_files": 34,
+  "live_multilingual_model_generation_tested": false,
+  "physical_board_tested": false,
+  "hardware_flashed": false,
+  "original_source_executed": false,
+  "unresolved_board_conflicts_remain": true,
+  "limits": [
+    "Document/code-fence enumeration is not independent compilation or semantic proof.",
+    "Block source counts refer to the captured Desktop/Simulator snapshots, not all future releases.",
+    "Function counts are static parser candidates, not a percentage of supported methods.",
+    "Known scoped C behavior and two firmware builds are prior pilot evidence; no firmware rebuild or hardware run was needed for this audit.",
+    "Language checks prove source selection and policy construction, not model fluency in every language."
+  ]
+}

@@ -321,3 +321,9 @@ code, pre, .font-mono {
   50%  { opacity: 0.4; }
   100% { opacity: 1; }
 }
+/* -- AI diff review: red = removed, green = added (works regardless of Monaco theme) -- */
+.monaco-diff-editor .line-insert, .monaco-diff-editor .gutter-insert { background-color: rgba(46,160,67,0.22) !important; }
+.monaco-diff-editor .line-delete, .monaco-diff-editor .gutter-delete { background-color: rgba(248,81,73,0.22) !important; }
+.monaco-diff-editor .char-insert { background-color: rgba(46,160,67,0.45) !important; }
+.monaco-diff-editor .char-delete { background-color: rgba(248,81,73,0.45) !important; }
+.monaco-diff-editor .line-delete .view-line, .monaco-diff-editor .view-zones .line-delete { background-color: rgba(248,81,73,0.18) !important; }

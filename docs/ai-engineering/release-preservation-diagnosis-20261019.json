@@ -1,0 +1,53 @@
+{
+  "date": "2026-10-19",
+  "installer": {
+    "bytes": 316758944,
+    "sha256": "d09d0f9418d94059e801fc43a38241314757c686e5060e26596a806ba56ae7c1",
+    "rebuilt": false
+  },
+  "production_embedding_files": [
+    {
+      "file": "LICENSE.txt",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "matches_preserved_extraction": true
+    },
+    {
+      "file": "manifest.json",
+      "sha256": "6e2c396405d9b56abefe09dfe375bc8396b7df95ddb13df5faf726ed0dfbadc4",
+      "matches_preserved_extraction": true
+    },
+    {
+      "file": "model-config.json",
+      "sha256": "1b4d8e2a3988377ed8b519a31d8d31025a25f1c5f8606998e8014111438efcd7",
+      "matches_preserved_extraction": true
+    },
+    {
+      "file": "model.onnx",
+      "sha256": "bbd7b466f6d58e646fdc2bd5fd67b2f5e93c0b687011bd4548c420f7bd46f0c5",
+      "matches_preserved_extraction": true
+    },
+    {
+      "file": "special_tokens_map.json",
+      "sha256": "5d5b662e421ea9fac075174bb0688ee0d9431699900b90662acd44b2a350503a",
+      "matches_preserved_extraction": true
+    },
+    {
+      "file": "tokenizer.json",
+      "sha256": "851ca67100d372ca3ae031a6abd168f53489eebfd7d89523f35c5c9b4d372c3c",
+      "matches_preserved_extraction": true
+    },
+    {
+      "file": "tokenizer_config.json",
+      "sha256": "abda01c8c14c5151ae498aceb30db406d6b91242c394fd88d3b6fd5a63a101e6",
+      "matches_preserved_extraction": true
+    },
+    {
+      "file": "UPSTREAM.txt",
+      "sha256": "2c47a70b94fe29e24841acf0e177949f1c9aa543e450d43af7e872ea81e43501",
+      "matches_preserved_extraction": true
+    }
+  ],
+  "model_changed": false,
+  "version_promoted": false,
+  "new_installer_or_rc": false
+}

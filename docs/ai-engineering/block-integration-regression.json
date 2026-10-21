@@ -1,0 +1,120 @@
+{
+  "status": "PARTIAL",
+  "verified_ids": 9,
+  "mapping_schema_version": 1,
+  "sdk_version_tested": "5.5.4",
+  "other_sdk_versions_tested": [],
+  "firmware_builds_passed": 4,
+  "results": [
+    {
+      "example": "repeat_delay",
+      "board_profile": "kidbright32_v13",
+      "exit_code": 0,
+      "log": "repeat_delay-build.log",
+      "flashed": false,
+      "sdk_version": "5.5.4",
+      "target": "esp32",
+      "generation_command": [
+        "D:\\Internship-NECTEC\\vibeKidbright\\src-tauri\\target\\debug\\examples\\export_block_fixture.exe",
+        "D:\\Internship-NECTEC\\vibeKidbright\\docs\\ai-engineering\\block-fixtures\\repeat-delay.json",
+        "D:\\Internship-NECTEC\\vibeKidbright\\src-tauri\\target\\block-regeneration-1792330028\\repeat_delay"
+      ],
+      "generation_exit_code": 0,
+      "fixture_sha256": "f07269d95aeb8f818b4a4aa52b71ddd5a66a29a78910afce1f54a275bccfe027",
+      "regenerated_main_matches_built": true,
+      "main_sha256": "ace975b65bbe205264e118b80d1c0da08a56088e9bf661a68a7c10eb9e4f961e",
+      "firmware_sha256": "dd006555fb2f9fd08e87f247cacae65eb973f52bad1e6f1dfdf65b9d17ed7edd",
+      "compile_commands_sha256": "2dcf65e17e5595a509fef4e1d27f89a87477c0d59962279a4f91afe65cd3d5c7",
+      "build_log_path": "src-tauri/target/block-c-evaluation-20261018/repeat_delay-build.log",
+      "build_log_sha256": "f535465acbd23d4f7b86cc698dbcef0b874945f644619f8c9d26e086ba9bd5e6",
+      "main_object_recompiled": true,
+      "elf_relinked": true
+    },
+    {
+      "example": "forever_delay",
+      "board_profile": "kidbright32_rev31",
+      "exit_code": 0,
+      "log": "forever_delay-build.log",
+      "flashed": false,
+      "sdk_version": "5.5.4",
+      "target": "esp32",
+      "generation_command": [
+        "D:\\Internship-NECTEC\\vibeKidbright\\src-tauri\\target\\debug\\examples\\export_block_fixture.exe",
+        "D:\\Internship-NECTEC\\vibeKidbright\\docs\\ai-engineering\\block-fixtures\\forever-delay.json",
+        "D:\\Internship-NECTEC\\vibeKidbright\\src-tauri\\target\\block-regeneration-1792330028\\forever_delay"
+      ],
+      "generation_exit_code": 0,
+      "fixture_sha256": "86fb7cee2a832101fa19bab3cc01fb72b8b6fff4eb87ae6fd17ae83d640e6459",
+      "regenerated_main_matches_built": true,
+      "main_sha256": "513c690c3b412a1a24918256f7f423cf5f9e2ed4b7493969792b33678010a435",
+      "firmware_sha256": "b9cb407f0bc71f89eb242e279d50617158bfd5194e7b17849ddec5025c77d46a",
+      "compile_commands_sha256": "5965109f84635465829d5da6c6743ca94608cac3f0618ee36ff8b27561c22eb9",
+      "build_log_path": "src-tauri/target/block-c-evaluation-20261018/forever_delay-build.log",
+      "build_log_sha256": "1124688953a1e3952298891149b998b3619e07f4f0d16ec9478ab75a38b6c38c",
+      "main_object_recompiled": true,
+      "elf_relinked": true
+    },
+    {
+      "example": "arithmetic_if",
+      "board_profile": "kidbright32_v13",
+      "exit_code": 0,
+      "log": "arithmetic_if-build.log",
+      "flashed": false,
+      "sdk_version": "5.5.4",
+      "target": "esp32",
+      "generation_command": [
+        "D:\\Internship-NECTEC\\vibeKidbright\\src-tauri\\target\\debug\\examples\\export_block_fixture.exe",
+        "D:\\Internship-NECTEC\\vibeKidbright\\docs\\ai-engineering\\block-fixtures\\arithmetic-if.json",
+        "D:\\Internship-NECTEC\\vibeKidbright\\src-tauri\\target\\block-regeneration-1792330028\\arithmetic_if"
+      ],
+      "generation_exit_code": 0,
+      "fixture_sha256": "b9a26bbdbecf0830e810c16cf11d29aef8bf42658bf34d9d70a21b96a358ce1b",
+      "regenerated_main_matches_built": true,
+      "main_sha256": "96bb97fc1a0a575edf1ac8b85a16b231b415c1837b3bd2b4a7883121f0c26f5f",
+      "firmware_sha256": "796f0c8cae8fa2ea2494c8dd8b831b61a9ed8329b6d5b11ae68e1394c917f1b0",
+      "compile_commands_sha256": "f1162bb353afdd1295b75e1cc309a55e1a2a2e8448a31235387c226b35212fdd",
+      "build_log_path": "src-tauri/target/block-expansion-20261018/arithmetic_if-build.log",
+      "build_log_sha256": "0c814b4bd71fbdcd2ddb8c0d774709ce1925a283506c4ffb4c578af8d0c7ed02",
+      "main_object_recompiled": true,
+      "elf_relinked": true
+    },
+    {
+      "example": "nested_conditions",
+      "board_profile": "kidbright32_rev31",
+      "exit_code": 0,
+      "log": "nested_conditions-build.log",
+      "flashed": false,
+      "sdk_version": "5.5.4",
+      "target": "esp32",
+      "generation_command": [
+        "D:\\Internship-NECTEC\\vibeKidbright\\src-tauri\\target\\debug\\examples\\export_block_fixture.exe",
+        "D:\\Internship-NECTEC\\vibeKidbright\\docs\\ai-engineering\\block-fixtures\\nested-conditions.json",
+        "D:\\Internship-NECTEC\\vibeKidbright\\src-tauri\\target\\block-regeneration-1792330028\\nested_conditions"
+      ],
+      "generation_exit_code": 0,
+      "fixture_sha256": "5475ca29e324244d2c17379290ba34235547f4a1f228fcdfc716c629a323dc9b",
+      "regenerated_main_matches_built": true,
+      "main_sha256": "b973f1353bc81ca5744ba49b9a12139d4221874e469bda867338f8cc14e5e78c",
+      "firmware_sha256": "c04d304689c2eaa8beae159966ef7f37be3d5706b0bc76e0bdf4e2f68496306f",
+      "compile_commands_sha256": "0be7eabe8a59cd735fa751a7698a00d644c0cf15efd6c3133cca9e2f53fcea34",
+      "build_log_path": "src-tauri/target/block-expansion-20261018/nested_conditions-build.log",
+      "build_log_sha256": "7a48127b841915a337c13bbeef4f360105f9285a52e738d8826ae43b25b6ba84",
+      "main_object_recompiled": true,
+      "elf_relinked": true
+    }
+  ],
+  "host_c_checks": {
+    "core": 122,
+    "matrix_music": 368,
+    "command": "npm run test:compat",
+    "exit_code": 0
+  },
+  "generic_blockly_xml_supported": false,
+  "flashed": false,
+  "physical_behavior": "UNVERIFIED",
+  "source_sha256": {
+    "src-tauri/src/intelligence/block_to_c.rs": "927bf9f89a491fd1f1c0dc9fd457a579d89484d97208529651b3ad1f6620ca77",
+    "docs/ai-engineering/block-mapping.schema.json": "8486af2afa469e337113c59f682c34b74dd7d38de315c04967bc050d99894975",
+    "docs/ai-engineering/block-source-evidence.json": "e25e4d8fd50d5378f9498ef8e824568ff2f79e4a2588a64f98a832a196b9486e"
+  }
+}

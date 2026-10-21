@@ -1,0 +1,31 @@
+{
+  "date": "2026-10-18",
+  "scope": "Local unreleased executable with current frontend; no installer/promotion or installed-desktop click qualification",
+  "command": "npm run tauri -- build --no-bundle --config src-tauri/tauri.windows.conf.json",
+  "exit_code": 0,
+  "before_build_release_checks_passed": true,
+  "frontend_tests": {
+    "passed": 176,
+    "files": 18,
+    "exit_code": 0
+  },
+  "executable": {
+    "path": "src-tauri/target/release/vibe-kidbright.exe",
+    "bytes": 47412736,
+    "sha256": "9a11d2ad6849cdfa6ddf28ec2f456be141230c23449cd15b3a157b3d4d3d355c"
+  },
+  "build_input_frontend_sha256": "a4ff51a573def4a1196df2cac2f68fe9eab91f342acf0ae6e75633f2fbd43f00",
+  "source_sha256": {
+    "src/BoardPreparationGuide.tsx": "dcf86f43e378dff3c14673dee82951fa749d4bf7ac22b77033b425669fa79c94",
+    "src/LearningWorkspace.tsx": "fbeec1607ec38c5d4e3fef89c2a4fba54a59c17674037138733dac5e1ca54ba6",
+    "src/LearningWorkspace.css": "e780603831b63edf098b415042eaa76465fc168c21f67ddd67af9b3089307021",
+    "src/test/learningWorkspace.test.tsx": "650671aede5627310b02092ab55a10ad8b8b80d3920585ba076313e7593c2d10",
+    "scripts/probe-board-guide.mjs": "39debd232298f93e9417affd8cde321a68b56aa5421e875adc8f1b3a4bc1e714",
+    "scripts/check-production-workflows.mjs": "d6513de77a964dced698a354c7fb0e9ccf8b9c5681114ddc863f3ff33a25c47a"
+  },
+  "preserved_nsis_sha256": "d09d0f9418d94059e801fc43a38241314757c686e5060e26596a806ba56ae7c1",
+  "installed_app_replaced": false,
+  "new_installer_built": false,
+  "local_dev_server_updated_module_served": true,
+  "desktop_webview_click_test_executed": false
+}

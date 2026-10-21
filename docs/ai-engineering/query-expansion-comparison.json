@@ -1,0 +1,150 @@
+{
+  "status": "MEASURED_NOT_INDEPENDENTLY_REVIEWED",
+  "dataset_sha256": "c75de0d838a5f0e6670c48776c67d3b5c0a98ca755f02ba09c2d548c28b55c43",
+  "query_count": 69,
+  "model_unchanged": true,
+  "production_embedding_model_replaced": false,
+  "vocabulary_or_weight_tuned_after_frozen_run": false,
+  "development_decision": "expansion-development-decision.json",
+  "runner_executable_sha256": "a2abf5dbdb253aa900201585ba92e43168fb1d9cce21aa98a503927cb6bf5232",
+  "runner_source_sha256": "0a90cc6d15f8aa556f18df05a061e6ecd42e9c42c31d995e9544e9d5d01b2cb1",
+  "original_queries_and_qrels_preserved": true,
+  "exact_api_queries": 9,
+  "exact_api_rankings_unchanged": true,
+  "before": {
+    "macro": {
+      "mrr": 0.38888888888888895,
+      "ndcg_at_5": 0.34875715276580155,
+      "precision_at_5": 0.11594202898550732,
+      "recall_at_5": 0.36231884057971014
+    },
+    "language": {
+      "en": {
+        "queries": 20,
+        "metrics": {
+          "mrr": 0.24166666666666667,
+          "ndcg_at_5": 0.2100785736263389,
+          "precision_at_5": 0.08,
+          "recall_at_5": 0.25
+        },
+        "latency_ms": {
+          "median": 329.5236,
+          "p95": 387.93539999999996
+        }
+      },
+      "mixed": {
+        "queries": 20,
+        "metrics": {
+          "mrr": 0.625,
+          "ndcg_at_5": 0.5226294385530916,
+          "precision_at_5": 0.13,
+          "recall_at_5": 0.5
+        },
+        "latency_ms": {
+          "median": 330.23985,
+          "p95": 425.65540000000004
+        }
+      },
+      "technical": {
+        "queries": 9,
+        "metrics": {
+          "mrr": 0.9444444444444444,
+          "ndcg_at_5": 0.9344536996946328,
+          "precision_at_5": 0.4,
+          "recall_at_5": 1.0
+        },
+        "latency_ms": {
+          "median": 293.0083,
+          "p95": 355.40509999999995
+        }
+      },
+      "th": {
+        "queries": 20,
+        "metrics": {
+          "mrr": 0.05,
+          "ndcg_at_5": 0.05,
+          "precision_at_5": 0.01,
+          "recall_at_5": 0.05
+        },
+        "latency_ms": {
+          "median": 289.0893,
+          "p95": 343.4155
+        }
+      }
+    },
+    "index_ms": 155313.3069
+  },
+  "after": {
+    "macro": {
+      "mrr": 0.40096618357487923,
+      "ndcg_at_5": 0.36161009200108474,
+      "precision_at_5": 0.12173913043478267,
+      "recall_at_5": 0.38405797101449274
+    },
+    "language": {
+      "en": {
+        "queries": 20,
+        "metrics": {
+          "mrr": 0.21666666666666667,
+          "ndcg_at_5": 0.19876385434979305,
+          "precision_at_5": 0.08,
+          "recall_at_5": 0.25
+        },
+        "latency_ms": {
+          "median": 151.6661,
+          "p95": 166.39399999999998
+        }
+      },
+      "mixed": {
+        "queries": 20,
+        "metrics": {
+          "mrr": 0.625,
+          "ndcg_at_5": 0.5226294385530916,
+          "precision_at_5": 0.13,
+          "recall_at_5": 0.5
+        },
+        "latency_ms": {
+          "median": 162.09415,
+          "p95": 192.3337
+        }
+      },
+      "technical": {
+        "queries": 9,
+        "metrics": {
+          "mrr": 0.9444444444444444,
+          "ndcg_at_5": 0.9344536996946328,
+          "precision_at_5": 0.4,
+          "recall_at_5": 1.0
+        },
+        "latency_ms": {
+          "median": 136.00490000000002,
+          "p95": 143.30689999999998
+        }
+      },
+      "th": {
+        "queries": 20,
+        "metrics": {
+          "mrr": 0.11666666666666667,
+          "ndcg_at_5": 0.10565735963827291,
+          "precision_at_5": 0.030000000000000002,
+          "recall_at_5": 0.125
+        },
+        "latency_ms": {
+          "median": 132.69095,
+          "p95": 164.0482
+        }
+      }
+    },
+    "index_ms": 111510.1681
+  },
+  "paired_recall_regressions": [],
+  "paired_recall_improvements": 2,
+  "limits": [
+    "Assistant-authored non-exhaustive file labels; no human-independent accuracy claim",
+    "Single runs on a development host with concurrent tasks; latency is diagnostic, not controlled performance evidence",
+    "No new per-process RAM sampling in this paired run; historical model/resource comparison remains separate",
+    "Unfiltered frozen evaluation includes unknown board/SDK metadata, not compatibility proof; native regression separately tests strict filters",
+    "Expanded query channel is lexical only; original query embedding, text and API search are unchanged",
+    "Protocol deviation and corrected disjoint development controls are disclosed in development decision"
+  ]
+}

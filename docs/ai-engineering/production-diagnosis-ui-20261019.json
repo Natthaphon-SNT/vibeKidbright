@@ -1,0 +1,37 @@
+{
+  "production_dist": true,
+  "strict_production_csp": true,
+  "native_backend_stubbed": true,
+  "model_response_fixture": true,
+  "live_provider": false,
+  "knowledge_citation_rendered": true,
+  "code_edit_reviewed": true,
+  "source_unchanged_before_keep": true,
+  "revision_bound_keep": true,
+  "automatic_project_path_export": false,
+  "board_preparation_guide": {
+    "native_dialog_top_layer": true,
+    "thai_and_english": true,
+    "board_families": 3,
+    "both_entry_points": true,
+    "escape_focus_restored": true,
+    "background_focus_blocked": true,
+    "troubleshooting_expands": true,
+    "backdrop_close": true,
+    "editor_navigation": true,
+    "desktop_and_compact_viewports": true,
+    "dark_theme": true,
+    "source_and_review_unchanged": true,
+    "mutation_commands": 0,
+    "screenshots": [
+      "docs/previews/board-guide-th-plus.png",
+      "docs/previews/board-guide-en-mai.png",
+      "docs/previews/board-guide-compact-dark.png"
+    ],
+    "scope": "Actual production React/CSS and browser dialog under production CSP; native startup/provider replies are fixtures. No hardware, installed desktop IPC or installer lifecycle claim."
+  },
+  "external_requests_attempted": [],
+  "page_errors": [],
+  "scope": "Actual compiled React UI with in-memory event/native fixture; actual native Engine/journal and installer probes are separate evidence; current development dist, not a replacement NSIS qualification",
+  "production_index_sha256": "a4ff51a573def4a1196df2cac2f68fe9eab91f342acf0ae6e75633f2fbd43f00"
+}

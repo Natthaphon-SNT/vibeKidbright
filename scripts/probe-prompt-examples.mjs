@@ -1,0 +1,44 @@
+import {mkdir} from 'node:fs/promises';
+import {resolve} from 'node:path';
+export async function probePromptExamples(page,root) {
+    const assert=(value,message)=>{if(!value)throw new Error(message);};
+    const learning=page.locator('.learning-workspace');
+    const before=await page.evaluate(()=>({state:window.__workflowProbe.state(),calls:window.__workflowProbe.commands.length}));
+    const input=page.getByPlaceholder('Ask about your code...');
+    await input.fill('Existing unsent idea');
+    await page.locator('nav[aria-label="Workspace views"] button').first().click();
+    await learning.getByRole('button',{name:'TH',exact:true}).click();
+    await learning.getByRole('button',{name:'KidBright32',exact:true}).click();
+    const picker=learning.getByLabel('เลือกตัวอย่างพรอมท์');
+    await picker.selectOption('temperature');
+    const draft=learning.getByLabel('ปรับโจทย์ของคุณ');
+    assert((await draft.inputValue()).includes('Serial'),'Prompt selection did not load temperature example');
+    const custom='สร้างโปรเจกต์ใหม่ classroom_temperature สำหรับบอร์ดที่ฉันระบุ อ่านอุณหภูมิทุก 2 วินาที รอฉันตรวจโค้ดก่อน';
+    await draft.fill(custom);
+    await picker.selectOption('display');await picker.selectOption('temperature');
+    assert(await draft.inputValue()===custom,'Topic switch discarded the edited draft');
+    await mkdir(resolve(root,'docs/previews'),{recursive:true});
+    await learning.locator('.lw-classic').screenshot({path:resolve(root,'docs/previews/prompt-examples-th.png')});
+    await learning.getByRole('button',{name:'นำไปใช้ใน Vibe Coder',exact:true}).click();
+    await input.waitFor();
+    await page.waitForFunction(value=>document.querySelector('textarea[placeholder="Ask about your code..."]')?.value===value,'Existing unsent idea\n\n'+custom);
+    assert(await input.evaluate(node=>node===document.activeElement),'Prompt handoff did not focus the composer');
+    await page.locator('nav[aria-label="Workspace views"] button').first().click();
+    await learning.getByRole('button',{name:'EN',exact:true}).click();
+    await learning.getByLabel('Choose a prompt example').selectOption('display');
+    assert((await learning.getByLabel('Make the idea yours').inputValue()).includes('Scroll HELLO'),'Untouched example did not localize');
+    await page.setViewportSize({width:900,height:800});
+    await page.evaluate(()=>document.documentElement.setAttribute('data-theme','dark'));
+    const card=learning.locator('.lw-classic');
+    await page.waitForFunction(()=>getComputedStyle(document.querySelector('.lw-classic')).backgroundColor==='rgb(24, 24, 27)');
+    assert(await card.evaluate(node=>node.scrollWidth<=node.clientWidth+1),'Prompt card overflows compact width');
+    await card.screenshot({path:resolve(root,'docs/previews/prompt-examples-en-dark.png')});
+    await learning.getByRole('button',{name:'Use in Vibe Coder',exact:true}).click();
+    assert((await input.inputValue()).startsWith('Existing unsent idea\n\n'+custom+'\n\n'),'Second sample replaced the existing draft');
+    const after=await page.evaluate(()=>({state:window.__workflowProbe.state(),commands:window.__workflowProbe.commands}));
+    assert(JSON.stringify(before.state)===JSON.stringify(after.state),'Prompt selection changed source/review state');
+    assert(!after.commands.slice(before.calls).some(({cmd})=>/^(send_ai_message|accept_diff|write_project_file|run_idf_command|flash_project)$/.test(cmd)),'Prompt selection triggered execution');
+    await input.fill('');await page.evaluate(()=>document.documentElement.setAttribute('data-theme','light'));await page.setViewportSize({width:1440,height:1000});
+    return {dropdown:true,editable_drafts_preserved:true,thai_english:true,dark_compact:true,existing_composer_draft_preserved:true,composer_focused:true,automatic_inference:false,source_review_unchanged:true,
+        screenshots:['docs/previews/prompt-examples-th.png','docs/previews/prompt-examples-en-dark.png'],scope:'Compiled production React/CSP with explicitly mocked native/provider startup. No live model, source edits or real WinGet submission.'};
+}

@@ -11,6 +11,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { invoke } from "@tauri-apps/api/core";
+import DOMPurify from "dompurify";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -27,12 +28,8 @@ interface WikiArticle {
 
 interface AiSettings {
   provider: "openai" | "local" | "openrouter" | "google";
-  apiKey: string;
-  baseUrl: string;
   model: string;
-  openrouterApiKey: string;
   openrouterModel: string;
-  googleApiKey: string;
   googleModel: string;
 }
 
@@ -54,7 +51,7 @@ function saveArticles(articles: WikiArticle[]) {
 
 // ── Simple Markdown → HTML renderer ─────────────────────────────────────────
 
-function renderMarkdown(md: string): string {
+export function renderMarkdown(md: string): string {
   if (!md) return "";
   let html = md
     // Code blocks
@@ -88,61 +85,14 @@ function renderMarkdown(md: string): string {
     .replace(/\n\n+/g, "<br/><br/>")
     .replace(/\n/g, "<br/>");
 
-  return html;
+  return DOMPurify.sanitize(html, { FORBID_TAGS: ["img", "iframe", "form", "style"], FORBID_ATTR: ["srcset"] });
 }
 
 // ── AI Caller ─────────────────────────────────────────────────────────────────
 
-async function callAI(settings: AiSettings, systemPrompt: string, userPrompt: string): Promise<string> {
-  let url = "";
-  let headers: Record<string, string> = { "Content-Type": "application/json" };
-  let model = "";
-  let body: Record<string, unknown>;
-
-  if (settings.provider === "google") {
-    // Google Gemini API
-    url = `https://generativelanguage.googleapis.com/v1beta/models/${settings.googleModel}:generateContent?key=${settings.googleApiKey}`;
-    body = {
-      contents: [{ parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }] }],
-      generationConfig: { maxOutputTokens: 2048 }
-    };
-    const resp = await fetch(url, { method: "POST", headers, body: JSON.stringify(body) });
-    if (!resp.ok) throw new Error(`Google API error: ${resp.status} ${await resp.text()}`);
-    const data = await resp.json();
-    return data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
-  }
-
-  if (settings.provider === "openrouter") {
-    url = "https://openrouter.ai/api/v1/chat/completions";
-    model = settings.openrouterModel;
-    headers["Authorization"] = `Bearer ${settings.openrouterApiKey}`;
-    headers["HTTP-Referer"] = "https://vibekidbright.app";
-  } else if (settings.provider === "local") {
-    url = `${settings.baseUrl}/chat/completions`;
-    model = settings.model;
-  } else {
-    url = `${settings.baseUrl}/chat/completions`;
-    model = settings.model;
-    headers["Authorization"] = `Bearer ${settings.apiKey}`;
-  }
-
-  body = {
-    model,
-    messages: [
-      { role: "system", content: systemPrompt },
-      { role: "user", content: userPrompt }
-    ],
-    max_tokens: 2048,
-    temperature: 0.3
-  };
-
-  const resp = await fetch(url, { method: "POST", headers, body: JSON.stringify(body) });
-  if (!resp.ok) throw new Error(`API error: ${resp.status} ${await resp.text()}`);
-  const data = await resp.json();
-  return data.choices?.[0]?.message?.content ?? "";
+async function callAI(systemPrompt: string, userPrompt: string): Promise<string> {
+  return invoke<string>("wiki_ai_request", { systemPrompt, userPrompt });
 }
-
-// ── WikiView Component ────────────────────────────────────────────────────────
 
 export default function WikiView() {
   const [articles, setArticles] = useState<WikiArticle[]>([]);
@@ -160,12 +110,8 @@ export default function WikiView() {
   const [aiError, setAiError] = useState<string>("");
   const [aiSettings, setAiSettings] = useState<AiSettings>({
     provider: "openai",
-    apiKey: "",
-    baseUrl: "https://api.openai.com/v1",
     model: "gpt-4o",
-    openrouterApiKey: "",
     openrouterModel: "google/gemini-2.5-flash:free",
-    googleApiKey: "",
     googleModel: "gemini-2.5-flash",
   });
 
@@ -185,22 +131,14 @@ export default function WikiView() {
     // Load AI settings from Tauri backend
     Promise.all([
       invoke("get_provider").catch(() => "openai"),
-      invoke("get_api_key").catch(() => ""),
-      invoke("get_base_url").catch(() => "https://api.openai.com/v1"),
       invoke("get_model").catch(() => "gpt-4o"),
-      invoke("get_openrouter_api_key").catch(() => ""),
       invoke("get_openrouter_model").catch(() => "google/gemini-2.5-flash:free"),
-      invoke("get_google_api_key").catch(() => ""),
       invoke("get_google_model").catch(() => "gemini-2.5-flash"),
-    ]).then(([provider, apiKey, baseUrl, model, orKey, orModel, gKey, gModel]) => {
+    ]).then(([provider, model, orModel, gModel]) => {
       setAiSettings({
         provider: (provider as string) as AiSettings["provider"],
-        apiKey: apiKey as string,
-        baseUrl: baseUrl as string,
         model: model as string,
-        openrouterApiKey: orKey as string,
         openrouterModel: orModel as string,
-        googleApiKey: gKey as string,
         googleModel: gModel as string,
       });
     });
@@ -328,7 +266,7 @@ export default function WikiView() {
     try {
       const systemPrompt = `คุณเป็น AI ผู้ช่วยจัดการ Knowledge Base Wiki สำหรับ KidBright ESP32 IDE
 ตอบเป็นภาษาไทยหรืออังกฤษขึ้นอยู่กับเนื้อหา ตอบกระชับ ชัดเจน และเป็นประโยชน์`;
-      const result = await callAI(aiSettings, systemPrompt, prompt);
+      const result = await callAI(systemPrompt, prompt);
       setAiResult(result);
 
       // Auto-update summary in article
@@ -398,7 +336,7 @@ export default function WikiView() {
     try {
       const systemPrompt = `คุณเป็นผู้เขียนบทความ Wiki สำหรับ KidBright ESP32 IDE เขียนเป็น Markdown ที่ชัดเจน มีตัวอย่างโค้ด และอ้างอิง [[บทความอื่น]] ด้วย Wiki-link syntax`;
       const userPrompt = `เขียนบทความ Wiki สำหรับหัวข้อ: "${title}"\n\nบทความที่มีอยู่แล้วใน Wiki:\n${existingContext || "(ยังไม่มีบทความ)"}\n\nเขียนบทความที่ครบถ้วนเป็น Markdown (ใช้ [[ชื่อบทความ]] สำหรับ Wiki-link)`;
-      const result = await callAI(aiSettings, systemPrompt, userPrompt);
+      const result = await callAI(systemPrompt, userPrompt);
 
       // Auto-create article
       const now = Date.now();
@@ -437,7 +375,6 @@ export default function WikiView() {
 
   // ── Styles ────────────────────────────────────────────────────────────────
   const css = `
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
     .wiki-scrollbar::-webkit-scrollbar { width: 5px; }
     .wiki-scrollbar::-webkit-scrollbar-track { background: transparent; }
     .wiki-scrollbar::-webkit-scrollbar-thumb { background: rgba(59,130,246,0.25); border-radius: 100px; }

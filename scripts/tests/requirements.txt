@@ -1,0 +1,2 @@
+# Development schema tests only; never an installed application dependency.
+jsonschema==4.26.0

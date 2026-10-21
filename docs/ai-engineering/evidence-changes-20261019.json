@@ -1,0 +1,179 @@
+{
+  "date": "2026-10-19",
+  "baseline": {
+    "path": "src-tauri/target/verification-navigation-start-20261019.json",
+    "sha256": "e926506a0beedb1eafa2f85d04646f653314c286e4bf65ba99c76f1a78bb0489",
+    "bytes": 56265
+  },
+  "scope": "Only recorded 242-file baseline plus increment evidence. Pre-existing Git changes are not attributed. Current board-guide previews refreshed by browser smoke; historical reports/installers retained. verification.json and this manifest exclude themselves to avoid self-reference.",
+  "files": [
+    {
+      "path": "docs/ai-engineering/04-code-intelligence.md",
+      "before_sha256": "3ccc7b7e9c9df9f08ebf464312992dd2fd554b5c29af239f3564cf08a1a4f58f",
+      "after_sha256": "02c29dd1720bc65a18cccaff04b54691571cda0b5a5ffde649d3df983495c412",
+      "comparison": "changed_from_baseline"
+    },
+    {
+      "path": "docs/ai-engineering/05-compiler-validation.md",
+      "before_sha256": "a95113fb47f3ca88fef3ef95ca61523bf0af524829f1f017eea9f0ee145094f3",
+      "after_sha256": "6dec57e67c32cf5ce0bd45fb5370a5d0223f7399ad7b0575a11b73ac9e29969d",
+      "comparison": "changed_from_baseline"
+    },
+    {
+      "path": "docs/ai-engineering/07-implementation-progress.md",
+      "before_sha256": "4eafc927cb2522b1b6b232de16acff32e23bc55cc640fad604bf56a9b5d8b713",
+      "after_sha256": "f5dd08a4525e2918b45ea3e4bfd8c0175f73c77fce067beb80b0fe8256c4ed15",
+      "comparison": "changed_from_baseline"
+    },
+    {
+      "path": "docs/ai-engineering/08-evaluation.md",
+      "before_sha256": "16ecac44c0605db8e7d8ee8934ecc5ef3be5e4c1e295d3b741571a281d7f70b9",
+      "after_sha256": "1c7cbbdc7d56ce50a37f9b020f19e928d4e651b1dd86ba72ab643c0f4135a247",
+      "comparison": "changed_from_baseline"
+    },
+    {
+      "path": "docs/ai-engineering/09-known-limitations.md",
+      "before_sha256": "a05f2c3aaa2f8734b53776025e7ff01bfe7b7d7b7517d1d7b5dee50652777948",
+      "after_sha256": "79a2d76c3ed5f0dd07b610de3327b076757d2f9ffd91e57b7dc6d47801fec108",
+      "comparison": "changed_from_baseline"
+    },
+    {
+      "path": "docs/ai-engineering/12-dependency-security.md",
+      "before_sha256": "782b5f3dc642bc2195862fd305578d032159bc38fac5809e2fade49cd43df32d",
+      "after_sha256": "ab0de676b55716ab9292b644ab9809f025786a1d6383e9f52ec8e1cc1b549bad",
+      "comparison": "changed_from_baseline"
+    },
+    {
+      "path": "docs/ai-engineering/21-evidence-integrity-plan.md",
+      "before_sha256": null,
+      "after_sha256": "dd28af4c5ad41c23abfa7a921209e45e6f4656881dbca62a4159820ff04cfd21",
+      "comparison": "newly_recorded_not_creation_proof"
+    },
+    {
+      "path": "docs/ai-engineering/22-evidence-integrity-report.md",
+      "before_sha256": null,
+      "after_sha256": "4bc7f9dbe1d5b586ec9f8eb192eb8f01618e7523717d41221d50ab0afeb1e927",
+      "comparison": "newly_recorded_not_creation_proof"
+    },
+    {
+      "path": "docs/ai-engineering/evidence-assets-20261019.json",
+      "before_sha256": null,
+      "after_sha256": "7d44e8405220583e3a2fd251a862fb75759454afa8ea9a9f47594fbd8cbd87b5",
+      "comparison": "newly_recorded_not_creation_proof"
+    },
+    {
+      "path": "docs/ai-engineering/evidence-desktop-20261019.json",
+      "before_sha256": null,
+      "after_sha256": "cdc24074f92999d39f3fc04b71504266334fb9c095cfbc3af6c35c5af159e92c",
+      "comparison": "newly_recorded_not_creation_proof"
+    },
+    {
+      "path": "docs/ai-engineering/evidence-firmware-20261019.json",
+      "before_sha256": null,
+      "after_sha256": "af85a163b579d1bc8940a49c13d8bf26725877a18ccfd2209b7490b1b308b4eb",
+      "comparison": "newly_recorded_not_creation_proof"
+    },
+    {
+      "path": "docs/ai-engineering/evidence-prepared-20261019.json",
+      "before_sha256": null,
+      "after_sha256": "3860e1f0e00bb629a87637e4396c0c399f225a737858846a08c21d77ad543d42",
+      "comparison": "newly_recorded_not_creation_proof"
+    },
+    {
+      "path": "docs/ai-engineering/evidence-security-20261019.json",
+      "before_sha256": null,
+      "after_sha256": "53e2aabd470222dee4630916a9a23dfa95ff5739c07a90c74deb44a9c69378be",
+      "comparison": "newly_recorded_not_creation_proof"
+    },
+    {
+      "path": "docs/ai-engineering/evidence-verification-20261019.json",
+      "before_sha256": null,
+      "after_sha256": "03b7cc33ffd65e9b556be764b940caeba2c7413cc055e1fc31e4c1c5d0aef2be",
+      "comparison": "newly_recorded_not_creation_proof"
+    },
+    {
+      "path": "docs/ai-engineering/production-evidence-ui-20261019.json",
+      "before_sha256": null,
+      "after_sha256": "0a0180549b0359fe291e6d5ee583959c0d078ba8389e24a11a8f867abc330dc7",
+      "comparison": "newly_recorded_not_creation_proof"
+    },
+    {
+      "path": "docs/ai-engineering/production-evidence-ui-final-20261019.json",
+      "before_sha256": null,
+      "after_sha256": "53ae86338c8d22eba72265d031c376f9965c8b4bfdcaccb9302c45a2efb015de",
+      "comparison": "newly_recorded_not_creation_proof"
+    },
+    {
+      "path": "docs/ai-engineering/real-vibe-coder-cases.json",
+      "before_sha256": "e71e99c81c7dcb381f6bc9a96d963db9fdf49dfb7c00aa6f79cfebc010fdbf73",
+      "after_sha256": "a5727b1b60878db7806f8e6e6a79afacace5e7252e5141121a6661f1a43b5c9d",
+      "comparison": "changed_from_baseline"
+    },
+    {
+      "path": "docs/previews/board-guide-compact-dark.png",
+      "before_sha256": "64d8020cd4627789d235f3fc5b3715c06314b2d1139f95b9de7376770eb7eca3",
+      "after_sha256": "d832a8ce761fd40028959e0df4826a7d91da515dcfcdb57d38f37f0d0508f433",
+      "comparison": "changed_from_baseline"
+    },
+    {
+      "path": "docs/previews/board-guide-en-mai.png",
+      "before_sha256": "345112fc2f24720ab2d7b303aeafa0ec818b904164c97ae1e804ee84dcdbbc4e",
+      "after_sha256": "e4e7772552bfbbd5e1cd00849718e9cbbb0aad702c478f6ef6fd86a2c46c669f",
+      "comparison": "changed_from_baseline"
+    },
+    {
+      "path": "docs/previews/board-guide-th-plus.png",
+      "before_sha256": "7e8e5c5d00274b119c9fae14db2813cbb83b58c0774b2ad9c51f8a62389943ba",
+      "after_sha256": "975792654e29da5de21dd3e7c5fbf39c585de1e3f4e69c9ea63a3b7d047c9770",
+      "comparison": "changed_from_baseline"
+    },
+    {
+      "path": "docs/research/rule-documents-2026-10-16.json",
+      "before_sha256": "4d4727592c7c3aad43f33c8705442da7888c353f9f625b82e778723b3ee814ea",
+      "after_sha256": "7cd99217e9a091b7cd664cb7d1fc9de4d49bbec579b11cd74008a1a8f91d5d24",
+      "comparison": "changed_from_baseline"
+    },
+    {
+      "path": "scripts/evaluate-vibe-coder-real.mjs",
+      "before_sha256": "aa3c6564cb4561795a4816da2a1a55d29b6c608df58bf153a5675dbefff9012a",
+      "after_sha256": "2cee9485d215c511e109f9011440c4f904b46d6e005e607b0b0a0d63a97c7173",
+      "comparison": "changed_from_baseline"
+    },
+    {
+      "path": "scripts/lib/vibe-evidence.mjs",
+      "before_sha256": "0080d09ba1453dd73e993121b4f1805222e71c9086e5cfa8642c41d7a4027ffe",
+      "after_sha256": "d9675ce9bd0cddfdfd864e4fa1533e190499b5af7b8bb33a5fe69f78d7bdb10f",
+      "comparison": "changed_from_baseline"
+    },
+    {
+      "path": "scripts/probe-desktop-semantic.mjs",
+      "before_sha256": "7e77b85f42ebd023dfc362f55df766b2a652f43faf8eacf2ad120d7bb3590a1b",
+      "after_sha256": "607d52972aa113804c2bca8524e99b708e6ec07bce13adfa8e4004fad41b1c66",
+      "comparison": "changed_from_baseline"
+    },
+    {
+      "path": "scripts/tests/vibe-evidence.test.mjs",
+      "before_sha256": "4a8886a08731d38ed083b22766659a41ebb1416254c296a4310df37d79b1e2b5",
+      "after_sha256": "522bee16d142e6d7fc1dfda3a790448506a5a94256c85c18baf3e2c7d87f94d1",
+      "comparison": "changed_from_baseline"
+    },
+    {
+      "path": "src-tauri/src/intelligence/semantic.rs",
+      "before_sha256": "80f08d42ed5676072a11a30f3ea1afd4437ec5c470de28b5543a4f54ec04e9cc",
+      "after_sha256": "f42cc28ad9197b0617c88e1a53e24d81342025236a6804868a86d675b7afef9b",
+      "comparison": "changed_from_baseline"
+    },
+    {
+      "path": "src/CompilerRepairReview.tsx",
+      "before_sha256": "5ab55f14c73447605757d520bc51e517c4278acd43c6ed2e49788b27541b1de1",
+      "after_sha256": "71da51c544a037e966bc54e1d18675c30c1e1562be958a7e9d85464504a84577",
+      "comparison": "changed_from_baseline"
+    },
+    {
+      "path": "src/test/compilerRepairReview.test.tsx",
+      "before_sha256": "5d2e5f695343cbc01e11b22492ab26e308e0507a40eb08031845999101cc41d3",
+      "after_sha256": "153649ec49f61edac84638d2e30d77964f538e4e6c1040545b1e93abb6a376ad",
+      "comparison": "changed_from_baseline"
+    }
+  ]
+}

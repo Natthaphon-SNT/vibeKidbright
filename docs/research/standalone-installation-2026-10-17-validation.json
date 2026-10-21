@@ -1,0 +1,254 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-17",
+  "version": "3.7.2",
+  "target": "Windows x64",
+  "artifact": {
+    "path": "src-tauri/target/release/bundle/nsis/VibeKidbright IDE_3.7.2_x64-setup.exe",
+    "bytes": 316127316,
+    "sha256": "247f7e0eacff06d4355d9a3e35936eacb48f6c45cdd8dfcc84d4af73e7701c63"
+  },
+  "installer_build": {
+    "command": "npm run tauri -- build --bundles nsis -- --offline",
+    "exit_code": 0,
+    "bundles": [
+      "NSIS"
+    ],
+    "published": false,
+    "installed_over_existing_application": false
+  },
+  "package_contents": [
+    {
+      "resource": "knowledge_base",
+      "files": 41,
+      "all_hashes_match": true,
+      "nested_paths_preserved": true
+    },
+    {
+      "resource": "embedding",
+      "files": 8,
+      "all_hashes_match": true,
+      "nested_paths_preserved": true
+    },
+    {
+      "resource": "MSVC runtime",
+      "files": 10,
+      "all_hashes_match": true
+    },
+    {
+      "resource": "WebView2 offline installer",
+      "bytes": 214156024,
+      "sha256": "0625fb5c1e75be58a164e14f95aa58a3e5badb859b3d17c952385f3e4a9ff3e8"
+    }
+  ],
+  "extracted_binary_probe": {
+    "architecture": "x86_64",
+    "embedding_dimensions": 384,
+    "embedding_samples": 2,
+    "hardware_flashed": false,
+    "knowledge_files_copied": 41,
+    "local_vector_search": true,
+    "native_credential_roundtrip": true,
+    "platform": "windows",
+    "runtime_downloads_required": false,
+    "settings_write_and_read": true,
+    "toolchain_required_for_self_check": false,
+    "version": "3.7.2",
+    "probe_environment": {
+      "separate_install_directory": true,
+      "separate_working_directory": true,
+      "fresh_appdata": true,
+      "developer_paths_removed_from_environment": true,
+      "http_proxy_closed": true,
+      "os_firewall_isolation": false,
+      "fresh_virtual_machine": false
+    }
+  },
+  "production_browser": {
+    "strict_production_csp": true,
+    "native_backend_stubbed": true,
+    "external_requests_attempted": [],
+    "page_errors": [],
+    "editor_rendered": true,
+    "workers_created": 1,
+    "wiki_native_bridge": true,
+    "automatic_download": false
+  },
+  "tests": {
+    "frontend_files": 15,
+    "frontend_passed": 155,
+    "rust_lib_passed": 127,
+    "rust_example_passed": 9,
+    "rust_total_passed": 136
+  },
+  "portability_changes": [
+    "Bundled model/tokenizer with pinned hashes; fastembed hub feature removed",
+    "Native keyring backends enabled; no new plaintext fallback; legacy migration removes plaintext only after credential read-back succeeds",
+    "Serialized atomic settings updates and reported I/O errors",
+    "Native Wiki provider bridge; sanitized Wiki HTML; system font stacks",
+    "Monaco and web workers bundled locally",
+    "Offline WebView2 installer and app-local MSVC redistributables",
+    "Knowledge resources use directory mapping to preserve nested paths and avoid filename collisions",
+    "User starts toolchain download; opening the IDE does not start one",
+    "Runtime data belongs to the receiving user, not the development machine"
+  ],
+  "exceptions": {
+    "toolchain_download": "GitHub remains permitted for toolchain installation; not executed during smoke checks",
+    "ai_provider": "User-configured AI provider still needs its own key/network, or a local model prepared by that user"
+  },
+  "limits": {
+    "clean_virtual_machine_tested": false,
+    "gui_installer_install_uninstall_tested": false,
+    "macos_installer_built": false,
+    "hardware_flashed": false,
+    "all_boards_certified": false,
+    "other_audit_backlog_resolved": false
+  },
+  "sources": [
+    {
+      "path": "src-tauri/tauri.conf.json",
+      "bytes": 1783,
+      "sha256": "61bde010777e8f31d4b8c94d3868a3b581fe582e8dea191bfb88c34b02598c65"
+    },
+    {
+      "path": "src-tauri/tauri.windows.conf.json",
+      "bytes": 94,
+      "sha256": "b83b14703ae5a82e3e99e38ddee5ad255fe549e77bb748a6825c18f13ae9534e"
+    },
+    {
+      "path": "src-tauri/Cargo.toml",
+      "bytes": 2029,
+      "sha256": "0be86da5f30b0ad2d043f109d51faa4cbcd2a7cecc28f2a7d3259c8bff50bc25"
+    },
+    {
+      "path": "src-tauri/Cargo.lock",
+      "bytes": 189939,
+      "sha256": "c2d2eacbdcec859ea9a00832db0a6aeb137743a71895a2ae5781761b97fb48b2"
+    },
+    {
+      "path": "src-tauri/src/ai/config.rs",
+      "bytes": 10083,
+      "sha256": "609d77d69885bb18ba74a04c9ebaa7be9538b525f4834443b44e13f1f23542e5"
+    },
+    {
+      "path": "src-tauri/src/ai/wiki.rs",
+      "bytes": 4786,
+      "sha256": "c9c9770124af24c97c41a60db3d9bbb894af3c5b3419fbcd0a475f58f392253f"
+    },
+    {
+      "path": "src-tauri/src/kb_embed.rs",
+      "bytes": 6134,
+      "sha256": "be085e810caa915e60337ec08ef40b0908add370e35408e2da5cb9b710a116ef"
+    },
+    {
+      "path": "src-tauri/src/installation.rs",
+      "bytes": 3060,
+      "sha256": "9d4bb1195440755a46948ecfefe40f8b0ca4565cf6925f1a2e12477093ce9dae"
+    },
+    {
+      "path": "src-tauri/src/ai_chat.rs",
+      "bytes": 43066,
+      "sha256": "9196785d5b07936b8635837fd3d1de4bd7904c405ec3b6ea4e87e117ab95d62a"
+    },
+    {
+      "path": "src-tauri/src/ai/kb.rs",
+      "bytes": 21498,
+      "sha256": "1f934150c97bba141da5c4b9c860808cef77afcb89e54be031435308b4293385"
+    },
+    {
+      "path": "src-tauri/src/esp_idf.rs",
+      "bytes": 113023,
+      "sha256": "2190c3e53245f00221a1d9fc47b619751b1a49784ff3ce30f47ce0ed34752775"
+    },
+    {
+      "path": "src-tauri/src/main.rs",
+      "bytes": 1230,
+      "sha256": "cccbfc53a48eee9695ad2254b5e49f36d1c13a9b34cb52938a296a11f728791c"
+    },
+    {
+      "path": "src-tauri/src/lib.rs",
+      "bytes": 5448,
+      "sha256": "919b5f3ae7c3c39993ae80db2424f75405570880463771007ddb4a2a38b8a723"
+    },
+    {
+      "path": "src/main.tsx",
+      "bytes": 1287,
+      "sha256": "3eebbee8ab58cc8e596bd7b8278ce84a4337b912d59e5cca725f534d21f1e160"
+    },
+    {
+      "path": "src/WikiView.tsx",
+      "bytes": 46225,
+      "sha256": "53fe668c7fece3ffcf82b840079066559d1ecbda46b1d4945e60c3d2961a60d7"
+    },
+    {
+      "path": "src/ToolchainSetup.tsx",
+      "bytes": 31518,
+      "sha256": "ad242395c025276bbf9a3fc09d898b659cab8a8753489b2346e4db5539996449"
+    },
+    {
+      "path": "src/test/wikiView.test.tsx",
+      "bytes": 2170,
+      "sha256": "5808c94fd530485d7530cd173ba1c0adf6f1a7d25f83550dd308274dec092db1"
+    },
+    {
+      "path": "src/test/toolchainFirstLaunch.test.tsx",
+      "bytes": 1302,
+      "sha256": "354c509affb840c4fc59fa5b0feab9cee5c587075c61145dfca0e559c3ee822a"
+    },
+    {
+      "path": "scripts/check-standalone.mjs",
+      "bytes": 2241,
+      "sha256": "2c6777316efd0f92eb4da8a4a0be95e9f8e1e6332476f2a1102762fe34b51e89"
+    },
+    {
+      "path": "scripts/prepare-runtime.mjs",
+      "bytes": 3336,
+      "sha256": "a9768315a98ac4d57e60215a25a99694370346be5eaf05d2227c279fbc45bdea"
+    },
+    {
+      "path": "scripts/test-standalone-install.py",
+      "bytes": 2478,
+      "sha256": "7cfcca328f199dfc842129c3367c78cde3eee57597f9b0b02bf5425525d6fcd6"
+    },
+    {
+      "path": "resources/embedding/manifest.json",
+      "bytes": 1160,
+      "sha256": "6e2c396405d9b56abefe09dfe375bc8396b7df95ddb13df5faf726ed0dfbadc4"
+    },
+    {
+      "path": "resources/embedding/LICENSE.txt",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    {
+      "path": "resources/embedding/UPSTREAM.txt",
+      "bytes": 945,
+      "sha256": "2c47a70b94fe29e24841acf0e177949f1c9aa543e450d43af7e872ea81e43501"
+    },
+    {
+      "path": "package.json",
+      "bytes": 2408,
+      "sha256": "c1d1bf605303105dbe8a4ac5f7d816c5a4150d227700da2b6d91dfcb924e0fac"
+    },
+    {
+      "path": "package-lock.json",
+      "bytes": 145323,
+      "sha256": "fbaf3f5dd7d5e86909cc4cdbc0c85b983cce007e64e1727827e838982e97f0e3"
+    },
+    {
+      "path": ".github/workflows/build-windows.yml",
+      "bytes": 4970,
+      "sha256": "80ff29aefd2064886067c4b93bebcea418d7e7c12564dfdfdce9a6065afcb671"
+    },
+    {
+      "path": ".github/workflows/build-macos.yml",
+      "bytes": 6663,
+      "sha256": "28e0c0ba8cf6fd0233ae5cf2d991f0b46d4ba3ef58c1eaf7a1225c59a1b792fc"
+    },
+    {
+      "path": "docs/STANDALONE_INSTALLATION_2026-10-17.md",
+      "bytes": 8575,
+      "sha256": "f6b6dd53584da47f554049a5480bead7c810db18c9e60606df109c56d69b7c42"
+    }
+  ]
+}

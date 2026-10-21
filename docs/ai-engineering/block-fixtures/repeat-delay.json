@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "board_profile": "kidbright32_v13",
+  "blocks": [
+    {"type":"controls_repeat_ext", "values":{"TIMES":{"type":"math_number","fields":{"VALUE":2}}},
+     "statements":{"DO":[{"type":"basic_delay","fields":{"VALUE":0.02}},{"type":"basic_delay","fields":{"VALUE":0.05}}]}}
+  ]
+}

@@ -1,0 +1,265 @@
+{
+  "scope": "Actual debug native desktop WebView2 with production React/CSP, Tauri IPC, configured SDK, clangd and Monaco. No native/provider stubs or Vite/HMR. No paid credentials. Generated public fixtures only.",
+  "cases": [
+    {
+      "scenario": "configured_external_sdk_ready_in_actual_ui",
+      "status": "PASS",
+      "source": "configured-sdk",
+      "managed_marker_created": false
+    },
+    {
+      "operation": "Find definition",
+      "engine": "clangd semantic results",
+      "elapsed_ms": 1891,
+      "status": "PASS"
+    },
+    {
+      "scenario": "definition_result_to_monaco",
+      "status": "PASS",
+      "cursor": {
+        "position": {
+          "lineNumber": 11,
+          "column": 6
+        },
+        "line": "bool kb_delay_ms(double seconds, uint32_t *milliseconds);"
+      }
+    },
+    {
+      "operation": "Find definition",
+      "engine": "Tree-sitter syntax candidates",
+      "elapsed_ms": 229,
+      "status": "PASS"
+    },
+    {
+      "scenario": "header_navigation_and_exact_cdb_fallback",
+      "status": "PASS",
+      "semantic_header_inference": false
+    },
+    {
+      "operation": "Find references",
+      "engine": "Tree-sitter syntax candidates",
+      "elapsed_ms": 217,
+      "status": "PASS"
+    },
+    {
+      "scenario": "header_references_labelled_syntax_fallback",
+      "status": "PASS",
+      "semantic_header_inference": false
+    },
+    {
+      "operation": "Find references",
+      "engine": "clangd semantic results",
+      "elapsed_ms": 852,
+      "status": "PASS"
+    },
+    {
+      "scenario": "reference_result_to_monaco",
+      "status": "PASS",
+      "reference_scope": "opened main translation unit only"
+    },
+    {
+      "operation": "Find references",
+      "engine": "clangd semantic results",
+      "elapsed_ms": 874,
+      "status": "PASS"
+    },
+    {
+      "scenario": "cross_component_open_translation_unit_references",
+      "status": "PASS",
+      "tab_bootstrap": "synthetic existing native app event; no patch",
+      "source_scope": "main plus opened kb_reference implementation",
+      "references": 3
+    },
+    {
+      "operation": "Find definition",
+      "engine": "clangd semantic results",
+      "elapsed_ms": 847,
+      "status": "PASS"
+    },
+    {
+      "scenario": "cross_component_definition_to_monaco",
+      "status": "PASS"
+    },
+    {
+      "operation": "Find definition",
+      "engine": "clangd semantic results",
+      "elapsed_ms": 873,
+      "status": "PASS"
+    },
+    {
+      "scenario": "unsaved_buffer",
+      "status": "PASS",
+      "disk_unchanged": true
+    },
+    {
+      "operation": "Find definition",
+      "engine": "clangd semantic results",
+      "elapsed_ms": 895,
+      "status": "PASS"
+    },
+    {
+      "scenario": "thai_emoji_unsaved_definition_exact_monaco_column",
+      "status": "PASS",
+      "column": 24,
+      "source_written": false
+    },
+    {
+      "operation": "Find references",
+      "engine": "clangd semantic results",
+      "elapsed_ms": 845,
+      "status": "PASS"
+    },
+    {
+      "scenario": "thai_emoji_unsaved_references",
+      "status": "PASS",
+      "references": 2
+    },
+    {
+      "operation": "Find definition",
+      "engine": "Tree-sitter syntax candidates",
+      "elapsed_ms": 1863,
+      "status": "PASS"
+    },
+    {
+      "scenario": "invalid_lsp_eof_range_fallback",
+      "status": "PASS",
+      "protocol_fault_fixture": true,
+      "real_clangd": false
+    },
+    {
+      "operation": "Find definition",
+      "engine": "Tree-sitter syntax candidates",
+      "elapsed_ms": 857,
+      "status": "PASS"
+    },
+    {
+      "scenario": "invalid_lsp_surrogate_range_fallback",
+      "status": "PASS",
+      "protocol_fault_fixture": true,
+      "real_clangd": false
+    },
+    {
+      "operation": "Find definition",
+      "engine": "Tree-sitter syntax candidates",
+      "elapsed_ms": 846,
+      "status": "PASS"
+    },
+    {
+      "scenario": "invalid_lsp_reversed_range_fallback",
+      "status": "PASS",
+      "protocol_fault_fixture": true,
+      "real_clangd": false
+    },
+    {
+      "operation": "Find definition",
+      "engine": "Tree-sitter syntax candidates",
+      "elapsed_ms": 70,
+      "status": "PASS"
+    },
+    {
+      "scenario": "invalid_compilation_database_fallback",
+      "status": "PASS"
+    },
+    {
+      "operation": "Find definition",
+      "engine": "Tree-sitter syntax candidates",
+      "elapsed_ms": 30,
+      "status": "PASS"
+    },
+    {
+      "scenario": "clangd_unavailable_fallback",
+      "status": "PASS"
+    },
+    {
+      "scenario": "ui_cancellation",
+      "status": "PASS",
+      "child_terminated": true
+    },
+    {
+      "operation": "Find definition",
+      "engine": "Tree-sitter syntax candidates",
+      "elapsed_ms": 20819,
+      "status": "PASS"
+    },
+    {
+      "scenario": "native_20_second_timeout",
+      "status": "PASS",
+      "fault_fixture": true,
+      "child_terminated": true
+    },
+    {
+      "scenario": "project_switch_during_pending_request",
+      "status": "PASS",
+      "old_child_terminated": true,
+      "stale_results_discarded": true
+    },
+    {
+      "operation": "Find references",
+      "engine": "clangd semantic results",
+      "elapsed_ms": 838,
+      "status": "PASS"
+    },
+    {
+      "scenario": "project_switch",
+      "status": "PASS"
+    },
+    {
+      "scenario": "private_root_boundary",
+      "status": "PASS",
+      "path": "real IPC only"
+    },
+    {
+      "scenario": "invalid_line_and_split_surrogate_rejected",
+      "status": "PASS",
+      "path": "real IPC only",
+      "cases": 2
+    },
+    {
+      "scenario": "empty_source_and_final_line_eof",
+      "status": "PASS",
+      "path": "real IPC only",
+      "cases": 3
+    },
+    {
+      "scenario": "react_terminal_to_configured_idf_build",
+      "status": "PASS",
+      "command": "idf.py build",
+      "elapsed_ms": 16797,
+      "flashed": false
+    }
+  ],
+  "source_sha256": {
+    "src-tauri/src/lib.rs": "1b51d9a3b39e8e15119fffa436731f84e1d05127c4060d8de5f89e05ab412dc8",
+    "src-tauri/src/ai/config.rs": "ae0c19d990bcf82a5fea3a5673b320d9186478b254da2171cd85937ce35bf595",
+    "src-tauri/src/esp_idf.rs": "62728b30693db31b4e17da2ce159ff74bba8f812a58a9dd1fdced193e9573a5c",
+    "src-tauri/src/toolchain.rs": "a6e8b8935c774a2b9b274176a3398a807bb8c1be2ff8bc59257377b733325e80",
+    "src-tauri/src/intelligence/semantic.rs": "f42cc28ad9197b0617c88e1a53e24d81342025236a6804868a86d675b7afef9b",
+    "src-tauri/build.rs": "10653c53fdefb7e3dee3654ab791f5e2146e734955ed0671172cd8f506cfa69f",
+    "src-tauri/examples/desktop_evaluation.rs": "6780ef718fc211f43e4a7c68cdf7147caa2def6514998061290cd133e801e3b0",
+    "src-tauri/examples/desktop-evaluation.manifest": "708bff8872b2502137891dcbb140f403c3e98977661dd15f818c760b881723f2",
+    "src-tauri/examples/stalling_lsp_fixture.rs": "582f68d74eaa8d65ff2307c66eef777588319320c81ff01e762f0c34c9d3a64d",
+    "src-tauri/examples/range_lsp_fixture.rs": "c23dd4c58b473729ad993a50731f636f960a854b564c884ad5472e94d17faa04",
+    "src/CIntelligencePanel.tsx": "586e1830259c4a5eb617f60963cbdca80416fc75dbd6763c5775bdac003681cc",
+    "src/CodeEditor.tsx": "6bf768136cce69a18c6e1bd4afc071e79e645e117048f57eec5233494c133e9b",
+    "scripts/probe-desktop-semantic.mjs": "46d23e093046d3240f2f589768c6319af4c4a495076c8acf381f42ffe803fe72",
+    "scripts/evaluate-vibe-coder-real.mjs": "4d7343556c0c29ed99c4a415477f5a8e993b6901d469efb0ab5260b50b4943eb",
+    "scripts/lib/vibe-evidence.mjs": "ff023f4646c0d75a7a40d51733397dedcaeb4774d439a677d81854cb98a32b1b",
+    "scripts/lib/capability-matrix.mjs": "97de40378c3832226138c037875e18be66b5c5bf6c32a203b10c78da2a6a60be",
+    "docs/ai-engineering/real-vibe-coder-cases.json": "a5727b1b60878db7806f8e6e6a79afacace5e7252e5141121a6661f1a43b5c9d"
+  },
+  "executable_sha256": "e6df0efa76f5b90cb2c4551cff9b694be59bf9436b9867c902c594a642f11989",
+  "clangd_sha256": "dbd52c13d21ef9d284f4f0627efe76c81adf2fe0998f230127f554a54fc9dde7",
+  "production_index_sha256": "46926aabae0b49ce08254f4f3aa0f586111c5e1a8a0ac0627d31d6201d27ca9b",
+  "disk_sources_unchanged": true,
+  "disk_component_sources_unchanged": true,
+  "compilation_database_restored": true,
+  "page_errors": [],
+  "date": "2026-10-19",
+  "observations": 39,
+  "raw_report": "src-tauri/target/capability-desktop-20261019.json",
+  "raw_sha256": "3929c6fd1aa9594499a6df496dd4c6a8cafda6419ef8a37c86fbdfe7628bdc6a",
+  "native_stubbed": false,
+  "invalid_range_tests_use_labelled_protocol_fixture": true,
+  "actual_llm_inference": 0,
+  "installed_release_qualified": false
+}

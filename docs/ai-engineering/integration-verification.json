@@ -1,0 +1,211 @@
+{
+  "date": "2026-10-18",
+  "status": "PARTIAL",
+  "commands": [
+    {
+      "command": "npm test -- --reporter=dot",
+      "exit_code": 0,
+      "tests": 176,
+      "files": 18
+    },
+    {
+      "command": "cargo test --manifest-path src-tauri/Cargo.toml --offline --locked --all-targets --quiet",
+      "exit_code": 0,
+      "library_tests": 194,
+      "example_tests": 9,
+      "total_tests": 203
+    },
+    {
+      "command": "python -m unittest discover -s scripts/tests -v",
+      "exit_code": 0,
+      "tests": 14
+    },
+    {
+      "command": "npm run test:compat",
+      "exit_code": 0,
+      "core_assertions": 122,
+      "matrix_music_assertions": 368
+    },
+    {
+      "command": "cargo check --manifest-path src-tauri/Cargo.toml --offline --locked --release --bin vibe-kidbright --quiet",
+      "exit_code": 0,
+      "scope": "Release configuration compile check; not a new application/installer artifact"
+    },
+    {
+      "command": "npm run build:release",
+      "exit_code": 0,
+      "includes": [
+        "runtime",
+        "standalone",
+        "KB sync",
+        "boards",
+        "coverage",
+        "rules",
+        "public",
+        "bundle",
+        "TypeScript",
+        "Vite"
+      ]
+    },
+    {
+      "command": "cargo build --manifest-path src-tauri/Cargo.toml --offline --locked --example desktop_evaluation --quiet",
+      "exit_code": 0
+    },
+    {
+      "command": "cargo build --manifest-path src-tauri/Cargo.toml --offline --locked --example semantic_probe --example export_block_fixture --quiet",
+      "exit_code": 0
+    },
+    {
+      "command": "node scripts/probe-desktop-semantic.mjs",
+      "exit_code": 0,
+      "windows_user_session": true,
+      "native_stubbed": false,
+      "observations": 21,
+      "report": "desktop-semantic-integration.json"
+    },
+    {
+      "command": "node scripts/check-production-workflows.mjs --report docs/ai-engineering/production-integration-ui.json",
+      "exit_code": 0,
+      "native_stubbed": true,
+      "report": "production-integration-ui.json"
+    },
+    {
+      "command": "src-tauri/target/debug/examples/semantic_probe.exe src-tauri/target/block-c-evaluation-20261018 src-tauri/target/clangd-evaluation/clangd_23.1.0/bin/clangd.exe ${APPDATA}/th.nectec.vibekidbright/toolchain/tools docs/ai-engineering/semantic-integration-adapter.json",
+      "exit_code": 0,
+      "queries": 6
+    },
+    {
+      "command": "python scripts/summarize-query-expansion.py",
+      "exit_code": 0,
+      "report": "query-expansion-comparison.json"
+    },
+    {
+      "command": "node scripts/evaluate-vibe-coder-real.mjs --output docs/ai-engineering/real-vibe-coder-prepared.json",
+      "exit_code": 0,
+      "inference_requests": 0,
+      "scope": "Initial prepare run; subsequent output creation is exclusive"
+    },
+    {
+      "command": "node scripts/evaluate-vibe-coder-real.mjs --preflight --cdp http://127.0.0.1:19327 --output <run-directory>/real-vibe-preflight.json",
+      "exit_code": 0,
+      "inference_requests": 0,
+      "exact_output_path": "D:\\Internship-NECTEC\\vibeKidbright\\src-tauri\\target\\desktop-evaluation\\run-1792330905748\\real-vibe-preflight.json"
+    },
+    {
+      "command": "idf.py build",
+      "exit_code": null,
+      "path": "Actual React terminal -> Tauri SDK runner",
+      "completion_observed": true,
+      "note": "Completion stdout observed through UI; raw native process exit code was not separately tapped. Node probe exit code is recorded above. No Flash."
+    },
+    {
+      "command": "src-tauri/target/debug/examples/knowledge_eval.exe --dataset docs/ai-engineering/evaluation-expansion-dev-v1.json --output src-tauri/target/expansion-dev-v2-baseline.json --dense",
+      "exit_code": 0,
+      "queries": 18
+    },
+    {
+      "command": "src-tauri/target/debug/examples/knowledge_eval.exe --dataset docs/ai-engineering/evaluation-expansion-dev-v1.json --output src-tauri/target/expansion-dev-v2-expanded.json --dense --expand",
+      "exit_code": 0,
+      "queries": 18
+    },
+    {
+      "command": "src-tauri/target/debug/examples/knowledge_eval.exe --dataset docs/ai-engineering/evaluation-heldout-v1.json --output docs/ai-engineering/expansion-heldout-baseline.json --dense",
+      "exit_code": 0,
+      "queries": 69
+    },
+    {
+      "command": "src-tauri/target/debug/examples/knowledge_eval.exe --dataset docs/ai-engineering/evaluation-heldout-v1.json --output docs/ai-engineering/expansion-heldout-expanded.json --dense --expand",
+      "exit_code": 0,
+      "queries": 69
+    },
+    {
+      "command": "python scripts/build-kidbright-examples.py --idf-path ${APPDATA}/th.nectec.vibekidbright/toolchain/frameworks/esp-idf-v5.5.4 --tools-path ${APPDATA}/th.nectec.vibekidbright/toolchain/tools --python ${APPDATA}/th.nectec.vibekidbright/toolchain/tools/python_env/idf5.5_py3.11_env/Scripts/python.exe --examples-root src-tauri/target/block-c-evaluation-20261018 --examples repeat_delay forever_delay",
+      "exit_code": 0,
+      "fixtures": 2,
+      "flashed": false
+    },
+    {
+      "command": "python scripts/build-kidbright-examples.py --idf-path ${APPDATA}/th.nectec.vibekidbright/toolchain/frameworks/esp-idf-v5.5.4 --tools-path ${APPDATA}/th.nectec.vibekidbright/toolchain/tools --python ${APPDATA}/th.nectec.vibekidbright/toolchain/tools/python_env/idf5.5_py3.11_env/Scripts/python.exe --examples-root src-tauri/target/block-expansion-20261018 --examples arithmetic_if nested_conditions",
+      "exit_code": 0,
+      "fixtures": 2,
+      "flashed": false
+    },
+    {
+      "command": "npm run check:public",
+      "exit_code": 0,
+      "scope": "Final policy/diff checks after integration evidence updates"
+    },
+    {
+      "command": "npm run check:rules",
+      "exit_code": 0,
+      "scope": "Final policy/diff checks after integration evidence updates"
+    },
+    {
+      "command": "npm run check:standalone",
+      "exit_code": 0,
+      "scope": "Final policy/diff checks after integration evidence updates"
+    },
+    {
+      "command": "npm run check:coverage",
+      "exit_code": 0,
+      "scope": "Final policy/diff checks after integration evidence updates"
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "scope": "Final policy/diff checks after integration evidence updates"
+    }
+  ],
+  "environment": {
+    "os": "Windows-11-10.0.26300-SP0",
+    "python": "3.14.7",
+    "jsonschema": "4.26.0",
+    "clangd": "23.1.0",
+    "sdk_tested": "5.5.4"
+  },
+  "baseline": {
+    "recorded_hashes_matched_before_changes": 177,
+    "source_manifest_snapshot": "src-tauri/target/verification-integration-start.json",
+    "nsis_sha256": "d09d0f9418d94059e801fc43a38241314757c686e5060e26596a806ba56ae7c1"
+  },
+  "current_comparison": "query-expansion-comparison.json",
+  "real_model_status": "NOT_EXECUTED",
+  "requirements": {
+    "system_architecture": "PARTIAL",
+    "hybrid_rag": "PARTIAL",
+    "knowledge_base_data": "PARTIAL",
+    "code_aware_chunking": "PARTIAL",
+    "compiler_validation_auto_fix": "PARTIAL",
+    "technology_integration": "PARTIAL",
+    "development_phases": "PARTIAL",
+    "evaluation_quality": "PARTIAL"
+  },
+  "initial_corrected_failures": [
+    "GUI example before main: 0xc0000139, fixed Common Controls manifest",
+    "Non-interactive sandbox CDP unavailable; authorized Windows user-session probe succeeds",
+    "Header/open-TU fixture expectations corrected to actual supported scope",
+    "Vite/HMR interrupted a deadline test; replaced with fixed production asset server",
+    "One initial development API control duplicated a frozen query; replaced and development rerun; deviation retained",
+    "Real desktop found configured external SDK blocked by managed-marker-only readiness; resolver/Python fallback fixed and actual UI build completed",
+    "Final public policy caught host-specific home paths in the new command ledger; exact local commands moved to ignored target record with digest, public paths normalized to APPDATA"
+  ],
+  "warnings": [
+    "Weak multilingual relevance and English MRR regression",
+    "Uncontrolled timing, no new RAM sampling",
+    "Header inference, unopened/all-project and installed-release qualification missing",
+    "No authorized ready LLM, independent human annotation, clean VM or physical board validation",
+    "Existing Rust/Vite warnings and prior advisory classifications remain; no fresh full database audit"
+  ],
+  "not_executed": [
+    "Real LLM inference/generation/citation quality/repair/rollback evaluation",
+    "Independent human relevance review",
+    "Clean VM GUI install/upgrade/rollback/uninstall/user-data preservation tests",
+    "Other SDK versions, macOS/Unix execution and physical boards/Flash",
+    "New installer, version promotion, staging/commit/push/publish/deploy"
+  ],
+  "command_path_policy": {
+    "public_commands": "Development-host AppData prefix normalized to ${APPDATA}; no change to executable/arguments otherwise",
+    "local_exact_command_record": "src-tauri/target/integration-executed-commands.local.json",
+    "local_exact_command_record_sha256": "ada197f867d2db958e8e959699a120a5e90688af6673535fe36e8d80103587c0"
+  }
+}

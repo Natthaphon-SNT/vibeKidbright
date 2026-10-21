@@ -1,0 +1,163 @@
+{
+  "date": "2026-10-19",
+  "scope": "User-supplied iP matrix reference added as public KB data, preserved source and scoped report; no new preset or Block mapping.",
+  "baseline_verified_before_changes": true,
+  "baseline_files_matched": 299,
+  "baseline": {
+    "path": "src-tauri/target/ip-matrix-baseline-20261019.json",
+    "sha256": "238afb800d6b8ee3472bc67ab1087875257145698ccfe5df0a7d21d47e2f8b53",
+    "bytes": 67901
+  },
+  "user_report": {
+    "board": "KidBright32iP",
+    "pcb_revision": null,
+    "sdk_version": null,
+    "behavior": "A-Z scrolling from right to left",
+    "outcome": "USER_REPORTED_PASS",
+    "agent_executed": false,
+    "source": {
+      "path": "knowledge_base/sensor_examples/kidbright32ip_matrix_az_user_passed.c",
+      "sha256": "571963f3bf8b174a344de48d67fd613648790f659e3215b85c48d6a571fbf2b8",
+      "bytes": 4259
+    },
+    "bundled_source": {
+      "path": "resources/knowledge_base/sensor_examples/kidbright32ip_matrix_az_user_passed.c",
+      "sha256": "571963f3bf8b174a344de48d67fd613648790f659e3215b85c48d6a571fbf2b8",
+      "bytes": 4259
+    }
+  },
+  "commands": [
+    {
+      "command": "node scripts/sync-knowledge-base.mjs --write",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/ip-matrix-kb-sync-20261019.log",
+        "sha256": "a7f25000624bf972b6d714825555046556d7a98f5a273ef9bb664a226a61ef44",
+        "bytes": 96
+      }
+    },
+    {
+      "command": "node scripts/audit-kidbright-coverage.mjs",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/ip-matrix-coverage-inventory-20261019.log",
+        "sha256": "d069f5b66fd5038d69c42ce9dfe0478bf09e08b454ce9312a6002d45cf566652",
+        "bytes": 656
+      }
+    },
+    {
+      "command": "node scripts/audit-rule-documents.mjs",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/ip-matrix-rules-inventory-20261019.log",
+        "sha256": "ce7c683652ba03caa98fcd48816f530575d5f2999026277c08a78d5947d9fad5",
+        "bytes": 574
+      }
+    },
+    {
+      "command": "cargo test --manifest-path src-tauri/Cargo.toml --offline --locked --all-targets --quiet",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/ip-matrix-rust-20261019.log",
+        "sha256": "76b1302bba912135debedb8bb62fa7240f80d84f10c74ac61f376abcdd05929d",
+        "bytes": 12840
+      }
+    },
+    {
+      "command": "node scripts/check-kidbright-board-catalog.mjs",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/ip-matrix-catalog-20261019.log",
+        "sha256": "d80b7e01188b2530fcb4bdbd34e29b207d30399d627b24e783e22680caa03a4c",
+        "bytes": 196
+      }
+    },
+    {
+      "command": "npm run check:standalone",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/ip-matrix-standalone-20261019.log",
+        "sha256": "882c2e7160084ebbe400f85ba9a7ffab8782405d187430e2100945c8fca53fc8",
+        "bytes": 408
+      }
+    },
+    {
+      "command": "npm run check:public",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/ip-matrix-public-20261019.log",
+        "sha256": "5c9185ee1b065bbf79d1b497031b335b59759de6ed8916693edddc9a8d626e15",
+        "bytes": 290
+      }
+    },
+    {
+      "command": "npm run check:rules",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/ip-matrix-rules-check-20261019.log",
+        "sha256": "fd5a34f8c5f5e7ea8a0fb3de3432336771d6fdab58cebc87f25aac946d67d148",
+        "bytes": 752
+      }
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/ip-matrix-diff-20261019.log",
+        "sha256": "065d9f374f5d20550e2c5fb6b2fd6d5944c6416f6e9b30d985161a4955d4a952",
+        "bytes": 8724
+      }
+    },
+    {
+      "command": "npm run tauri -- build --no-bundle --config src-tauri/tauri.windows.conf.json -- --offline --locked",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/ip-matrix-desktop-build-20261019.log",
+        "sha256": "5199067fd09d48e2f445b845314694408df68fd24e2a5c18658b8cd873199d88",
+        "bytes": 31470
+      }
+    }
+  ],
+  "rust": {
+    "library": 199,
+    "example": 10,
+    "total": 209,
+    "failed": 0
+  },
+  "frontend_tests_rerun": false,
+  "firmware_compilation": "NOT_EXECUTED",
+  "agent_physical_execution": "NOT_EXECUTED",
+  "real_provider_replay": "NOT_EXECUTED",
+  "retrieval_measurements_rerun": false,
+  "local_application": {
+    "path": "src-tauri/target/release/vibe-kidbright.exe",
+    "sha256": "a7bba0caeefc613a392fb3e47aa6483fc46989864a61113dd556554e3e5da2e7",
+    "bytes": 47447040
+  },
+  "sidecar_reference_matches": true,
+  "historical_installer": {
+    "path": "src-tauri/target/release/bundle/nsis/VibeKidbright IDE_3.7.3_x64-setup.exe",
+    "sha256": "d09d0f9418d94059e801fc43a38241314757c686e5060e26596a806ba56ae7c1",
+    "bytes": 316758944
+  },
+  "installed_app_replaced": false,
+  "new_installer": false,
+  "production_ranker_model_frozen_dataset_changed": false,
+  "board_profiles": [
+    "kidbright32_v13",
+    "kidbright32_rev31"
+  ],
+  "block_schema_version": 1,
+  "verified_block_ids": 9,
+  "eight_original_requirement_statuses": {
+    "system_architecture": "PARTIAL",
+    "hybrid_rag": "PARTIAL",
+    "knowledge_base_data": "PARTIAL",
+    "code_aware_chunking": "PARTIAL",
+    "compiler_validation_auto_fix": "PARTIAL",
+    "technology_integration": "PARTIAL",
+    "development_phases": "PARTIAL",
+    "evaluation_quality": "PARTIAL"
+  },
+  "committed_pushed_published": false
+}

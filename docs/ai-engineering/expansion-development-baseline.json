@@ -1,0 +1,876 @@
+{
+  "config": {
+    "batch_size": 16,
+    "candidate_k": 40,
+    "chunk_chars": 1600,
+    "dense_enabled": true,
+    "dense_weight": 0.15,
+    "lexical_weight": 1.0,
+    "max_context_chars": 12000,
+    "query_routing": false,
+    "rrf_k": 60.0,
+    "technical_expansion": false,
+    "top_k": 5
+  },
+  "dataset": "evaluation-expansion-dev-v1.json",
+  "dataset_sha256": "97ac80f710385d0998e51ae27c886142db5e4802f8d18b809a42a16bbe336292",
+  "date": "2026-10-18",
+  "index": {
+    "cached_embeddings": 254,
+    "chunks": 2026,
+    "embedded_chunks": 1772,
+    "files_deleted": 0,
+    "files_seen": 37,
+    "files_unchanged": 0,
+    "files_updated": 37,
+    "warnings": []
+  },
+  "index_latency_ms": 160118.05570000003,
+  "legacy_like_macro_average": {
+    "mrr": 0.23148148148148145,
+    "ndcg_at_5": 0.2572738751984143,
+    "precision_at_5": 0.06666666666666667,
+    "recall_at_5": 0.3333333333333333
+  },
+  "limits": [
+    "Agent-authored non-exhaustive file labels; not a human independent benchmark or grounded-answer evaluation",
+    "No held-out tuning; fixed weights and routing recorded before evaluation",
+    "Relevance deduplicates only the top five chunks; does not refill document ranks",
+    "No LLM/provider, firmware build, flash or hardware test by this runner"
+  ],
+  "macro_average": {
+    "mrr": 0.07870370370370369,
+    "ndcg_at_5": 0.11453368398026947,
+    "precision_at_5": 0.044444444444444446,
+    "recall_at_5": 0.2222222222222222
+  },
+  "mode": "real-local-dense-plus-lexical",
+  "model": "Qdrant/all-MiniLM-L6-v2-onnx@d13954661f83248295ba75c1ed411eef3b7b936e:384:mean",
+  "model_artifact_bytes": 91115499,
+  "model_load_ms": 238.8361,
+  "queries": [
+    {
+      "id": "dev-th-1",
+      "language": "th",
+      "latency_ms": 133.5411,
+      "legacy_like_files": [
+        "formula_kid_controller.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "สาธิตให้พักการทำงานของทาสก์สั้น ๆ",
+      "query_plan": {
+        "concepts": [
+          "delay"
+        ],
+        "exact_api": false,
+        "language": "th",
+        "original": "สาธิตให้พักการทำงานของทาสก์สั้น ๆ",
+        "terms": [
+          "vTaskDelay",
+          "pdMS_TO_TICKS"
+        ]
+      },
+      "ranked_files": [
+        "kidbright_uai.md",
+        "kidbright32iA.md",
+        "all_models.md",
+        "skate_rev1.3.md",
+        "skate_rev1.3.md"
+      ],
+      "relevant_files": [
+        "compatibility/button_buzzer.c"
+      ]
+    },
+    {
+      "id": "dev-th-2",
+      "language": "th",
+      "latency_ms": 136.8835,
+      "legacy_like_files": [],
+      "legacy_like_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "ต้องการตรวจสถานะสวิตช์ระหว่างวนลูป",
+      "query_plan": {
+        "concepts": [
+          "button"
+        ],
+        "exact_api": false,
+        "language": "th",
+        "original": "ต้องการตรวจสถานะสวิตช์ระหว่างวนลูป",
+        "terms": [
+          "gpio_get_level",
+          "KB_SW1_GPIO"
+        ]
+      },
+      "ranked_files": [
+        "kidbright_uai.md",
+        "all_models.md",
+        "README.md",
+        "all_models.md",
+        "iKB-1.md"
+      ],
+      "relevant_files": [
+        "compatibility/button_buzzer.c"
+      ]
+    },
+    {
+      "id": "dev-th-3",
+      "language": "th",
+      "latency_ms": 130.8893,
+      "legacy_like_files": [],
+      "legacy_like_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "เพิ่มความถี่ของบัซเซอร์ระหว่างเล่นสเกล",
+      "query_plan": {
+        "concepts": [
+          "buzzer"
+        ],
+        "exact_api": false,
+        "language": "th",
+        "original": "เพิ่มความถี่ของบัซเซอร์ระหว่างเล่นสเกล",
+        "terms": [
+          "ledc_set_freq",
+          "ledc_set_duty"
+        ]
+      },
+      "ranked_files": [
+        "kidbright_uai.md",
+        "all_models.md",
+        "README.md",
+        "all_models.md",
+        "iKB-1.md"
+      ],
+      "relevant_files": [
+        "compatibility/music_scale.c"
+      ]
+    },
+    {
+      "id": "dev-th-4",
+      "language": "th",
+      "latency_ms": 143.4462,
+      "legacy_like_files": [],
+      "legacy_like_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "อ่านแสงภายนอกด้วยการแปลงอนาล็อก",
+      "query_plan": {
+        "concepts": [
+          "light"
+        ],
+        "exact_api": false,
+        "language": "th",
+        "original": "อ่านแสงภายนอกด้วยการแปลงอนาล็อก",
+        "terms": [
+          "adc_oneshot_read",
+          "LDR"
+        ]
+      },
+      "ranked_files": [
+        "kidbright_uai.md",
+        "all_models.md",
+        "README.md",
+        "all_models.md",
+        "iKB-1.md"
+      ],
+      "relevant_files": [
+        "sensor_examples/adc_ldr_external.c"
+      ]
+    },
+    {
+      "id": "dev-th-5",
+      "language": "th",
+      "latency_ms": 123.22070000000001,
+      "legacy_like_files": [],
+      "legacy_like_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "จัดไบต์สำหรับเมทริกซ์ก่อนส่งไปแสดงผล",
+      "query_plan": {
+        "concepts": [
+          "matrix"
+        ],
+        "exact_api": false,
+        "language": "th",
+        "original": "จัดไบต์สำหรับเมทริกซ์ก่อนส่งไปแสดงผล",
+        "terms": [
+          "HT16K33",
+          "kb_matrix_pack"
+        ]
+      },
+      "ranked_files": [
+        "kidbright_uai.md",
+        "all_models.md",
+        "README.md",
+        "all_models.md",
+        "iKB-1.md"
+      ],
+      "relevant_files": [
+        "compatibility/kb_basic.c"
+      ]
+    },
+    {
+      "id": "dev-en-1",
+      "language": "en",
+      "latency_ms": 156.7806,
+      "legacy_like_files": [
+        "led_16x8_matrix_mapping.md",
+        "compatibility/kb_core.h",
+        "sensor_examples/accel_mc3479.c",
+        "support_scope.md",
+        "compatibility/README.md"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "Read a thermometer register and convert the signed bytes",
+      "query_plan": {
+        "concepts": [
+          "temperature"
+        ],
+        "exact_api": false,
+        "language": "en",
+        "original": "Read a thermometer register and convert the signed bytes",
+        "terms": [
+          "LM73",
+          "i2c_master_transmit_receive"
+        ]
+      },
+      "ranked_files": [
+        "led_16x8_matrix_mapping.md",
+        "compatibility/README.md",
+        "support_scope.md",
+        "compatibility/README.md",
+        "support_scope.md"
+      ],
+      "relevant_files": [
+        "compatibility/temperature_serial.c"
+      ]
+    },
+    {
+      "id": "dev-en-2",
+      "language": "en",
+      "latency_ms": 151.80450000000002,
+      "legacy_like_files": [
+        "led_16x8_matrix_mapping.md",
+        "compatibility/README.md",
+        "compatibility/button_buzzer.c",
+        "compatibility/button_buzzer.c",
+        "compatibility/kb_basic.h"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 0.3333333333333333,
+        "ndcg_at_5": 0.5,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "Pause execution for a timed note in a loop",
+      "query_plan": {
+        "concepts": [
+          "delay"
+        ],
+        "exact_api": false,
+        "language": "en",
+        "original": "Pause execution for a timed note in a loop",
+        "terms": [
+          "vTaskDelay",
+          "pdMS_TO_TICKS"
+        ]
+      },
+      "ranked_files": [
+        "kidbright32iA.md",
+        "led_16x8_matrix_mapping.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "led_16x8_matrix_mapping.md"
+      ],
+      "relevant_files": [
+        "compatibility/button_buzzer.c"
+      ]
+    },
+    {
+      "id": "dev-en-3",
+      "language": "en",
+      "latency_ms": 140.1277,
+      "legacy_like_files": [
+        "compatibility/button_buzzer.c",
+        "compatibility/README.md",
+        "sensor_examples/kidbright_full_system_demo.c",
+        "compatibility/README.md",
+        "compatibility/music_scale.c"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "metrics": {
+        "mrr": 0.5,
+        "ndcg_at_5": 0.6309297535714575,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "query": "Wait for a button release before accepting another press",
+      "query_plan": {
+        "concepts": [
+          "button"
+        ],
+        "exact_api": false,
+        "language": "en",
+        "original": "Wait for a button release before accepting another press",
+        "terms": [
+          "gpio_get_level",
+          "KB_SW1_GPIO"
+        ]
+      },
+      "ranked_files": [
+        "compatibility/music_scale.c",
+        "compatibility/button_buzzer.c",
+        "sensor_examples/kidbright_full_system_demo.c",
+        "kidbright32iA.md",
+        "sensor_examples/kidbright_full_system_demo.c"
+      ],
+      "relevant_files": [
+        "compatibility/button_buzzer.c"
+      ]
+    },
+    {
+      "id": "dev-en-4",
+      "language": "en",
+      "latency_ms": 148.1706,
+      "legacy_like_files": [
+        "compatibility/README.md",
+        "compatibility/kb_basic.c",
+        "compatibility/kb_basic.h",
+        "compatibility/kb_display_idf.c",
+        "led_16x8_matrix_mapping.md"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 0.5,
+        "ndcg_at_5": 0.6309297535714575,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "Pack a dot matrix frame into controller RAM bytes",
+      "query_plan": {
+        "concepts": [
+          "matrix"
+        ],
+        "exact_api": false,
+        "language": "en",
+        "original": "Pack a dot matrix frame into controller RAM bytes",
+        "terms": [
+          "HT16K33",
+          "kb_matrix_pack"
+        ]
+      },
+      "ranked_files": [
+        "led_16x8_matrix_mapping.md",
+        "kidbright32iA.md",
+        "sensor_examples/all_sensors_demo.c",
+        "kidbright32iA.md",
+        "led_16x8_matrix_mapping.md"
+      ],
+      "relevant_files": [
+        "compatibility/kb_basic.c"
+      ]
+    },
+    {
+      "id": "dev-en-5",
+      "language": "en",
+      "latency_ms": 146.1427,
+      "legacy_like_files": [
+        "compatibility/README.md",
+        "compatibility/kb_basic.h",
+        "led_16x8_matrix_mapping.md",
+        "README.md",
+        "compatibility/README.md"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "Change the frequency of a piezo during a musical scale",
+      "query_plan": {
+        "concepts": [
+          "buzzer"
+        ],
+        "exact_api": false,
+        "language": "en",
+        "original": "Change the frequency of a piezo during a musical scale",
+        "terms": [
+          "ledc_set_freq",
+          "ledc_set_duty"
+        ]
+      },
+      "ranked_files": [
+        "led_16x8_matrix_mapping.md",
+        "support_scope.md",
+        "kidbright32iA.md",
+        "support_scope.md",
+        "compatibility/README.md"
+      ],
+      "relevant_files": [
+        "compatibility/music_scale.c"
+      ]
+    },
+    {
+      "id": "dev-mixed-1",
+      "language": "mixed",
+      "latency_ms": 165.8589,
+      "legacy_like_files": [],
+      "legacy_like_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "ขอโค้ด thermometer ที่อ่านข้อมูลสองไบต์",
+      "query_plan": {
+        "concepts": [
+          "temperature"
+        ],
+        "exact_api": false,
+        "language": "mixed",
+        "original": "ขอโค้ด thermometer ที่อ่านข้อมูลสองไบต์",
+        "terms": [
+          "LM73",
+          "i2c_master_transmit_receive"
+        ]
+      },
+      "ranked_files": [
+        "sensor_examples/kidbright_full_system_demo.c",
+        "README.md",
+        "all_models.md",
+        "kidbright32iA.md",
+        "kidbright_uai.md"
+      ],
+      "relevant_files": [
+        "compatibility/temperature_serial.c"
+      ]
+    },
+    {
+      "id": "dev-mixed-2",
+      "language": "mixed",
+      "latency_ms": 148.3809,
+      "legacy_like_files": [
+        "formula_kid_controller.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "อยาก pause execution ในงานเสียงสั้น ๆ",
+      "query_plan": {
+        "concepts": [
+          "delay",
+          "buzzer"
+        ],
+        "exact_api": false,
+        "language": "mixed",
+        "original": "อยาก pause execution ในงานเสียงสั้น ๆ",
+        "terms": [
+          "vTaskDelay",
+          "pdMS_TO_TICKS",
+          "ledc_set_freq",
+          "ledc_set_duty"
+        ]
+      },
+      "ranked_files": [
+        "led_16x8_matrix_mapping.md",
+        "skate_rev1.3.md",
+        "led_16x8_matrix_mapping.md",
+        "led_16x8_matrix_mapping.md",
+        "led_16x8_matrix_mapping.md"
+      ],
+      "relevant_files": [
+        "compatibility/button_buzzer.c"
+      ]
+    },
+    {
+      "id": "dev-mixed-3",
+      "language": "mixed",
+      "latency_ms": 160.077,
+      "legacy_like_files": [
+        "iKB-1.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "README.md",
+        "README.md"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "อ่าน switch input แล้วรอให้ปล่อย",
+      "query_plan": {
+        "concepts": [
+          "button"
+        ],
+        "exact_api": false,
+        "language": "mixed",
+        "original": "อ่าน switch input แล้วรอให้ปล่อย",
+        "terms": [
+          "gpio_get_level",
+          "KB_SW1_GPIO"
+        ]
+      },
+      "ranked_files": [
+        "README.md",
+        "minibike.md",
+        "sensor_examples/temp_lm73.c",
+        "kidbright32iA.md",
+        "kidbright32iA.md"
+      ],
+      "relevant_files": [
+        "compatibility/button_buzzer.c"
+      ]
+    },
+    {
+      "id": "dev-mixed-4",
+      "language": "mixed",
+      "latency_ms": 157.86430000000001,
+      "legacy_like_files": [
+        "all_models.md",
+        "all_models.md",
+        "compatibility/README.md",
+        "compatibility/kb_basic.c",
+        "compatibility/kb_basic.c"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 0.3333333333333333,
+        "ndcg_at_5": 0.5,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "metrics": {
+        "mrr": 0.3333333333333333,
+        "ndcg_at_5": 0.5,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "query": "เตรียม frame ของ dot matrix ก่อนส่งข้อมูล",
+      "query_plan": {
+        "concepts": [
+          "matrix"
+        ],
+        "exact_api": false,
+        "language": "mixed",
+        "original": "เตรียม frame ของ dot matrix ก่อนส่งข้อมูล",
+        "terms": [
+          "HT16K33",
+          "kb_matrix_pack"
+        ]
+      },
+      "ranked_files": [
+        "led_16x8_matrix_mapping.md",
+        "kidbright32iA.md",
+        "compatibility/kb_basic.c",
+        "compatibility/kb_basic.c",
+        "sensor_examples/all_sensors_demo.c"
+      ],
+      "relevant_files": [
+        "compatibility/kb_basic.c"
+      ]
+    },
+    {
+      "id": "dev-mixed-5",
+      "language": "mixed",
+      "latency_ms": 147.7189,
+      "legacy_like_files": [
+        "kidbright32iA.md",
+        "README.md",
+        "README.md",
+        "README.md",
+        "formula_kid_controller.md"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "วัด ambient light จากพอร์ตอนาล็อก",
+      "query_plan": {
+        "concepts": [
+          "light"
+        ],
+        "exact_api": false,
+        "language": "mixed",
+        "original": "วัด ambient light จากพอร์ตอนาล็อก",
+        "terms": [
+          "adc_oneshot_read",
+          "LDR"
+        ]
+      },
+      "ranked_files": [
+        "sensor_examples/kidbright_full_system_demo.c",
+        "kidbright32iA.md",
+        "led_16x8_matrix_mapping.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md"
+      ],
+      "relevant_files": [
+        "sensor_examples/adc_ldr_external.c"
+      ]
+    },
+    {
+      "id": "dev-api-1",
+      "language": "api",
+      "latency_ms": 124.30810000000001,
+      "legacy_like_files": [
+        "compatibility/button_buzzer.c",
+        "compatibility/music_scale.c",
+        "compatibility/music_scale.c",
+        "formula_kid_controller.md",
+        "formula_kid_controller.md"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "metrics": {
+        "mrr": 0.25,
+        "ndcg_at_5": 0.43067655807339306,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "query": "gpio_get_level",
+      "query_plan": {
+        "concepts": [],
+        "exact_api": true,
+        "language": "en",
+        "original": "gpio_get_level",
+        "terms": []
+      },
+      "ranked_files": [
+        "compatibility/music_scale.c",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "formula_kid_controller.md",
+        "compatibility/button_buzzer.c"
+      ],
+      "relevant_files": [
+        "compatibility/button_buzzer.c"
+      ]
+    },
+    {
+      "id": "dev-api-2",
+      "language": "api",
+      "latency_ms": 147.0779,
+      "legacy_like_files": [
+        "compatibility/kb_display_idf.c",
+        "compatibility/temperature_serial.c",
+        "sensor_examples/minibike_sender.c"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "metrics": {
+        "mrr": 0.3333333333333333,
+        "ndcg_at_5": 0.5,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0
+      },
+      "query": "i2c_master_bus_add_device",
+      "query_plan": {
+        "concepts": [],
+        "exact_api": true,
+        "language": "en",
+        "original": "i2c_master_bus_add_device",
+        "terms": []
+      },
+      "ranked_files": [
+        "compatibility/temperature_serial.c",
+        "sensor_examples/minibike_sender.c",
+        "compatibility/kb_display_idf.c",
+        "sensor_examples/calibrate_balancing_bike.c",
+        "sensor_examples/minibike_sender.c"
+      ],
+      "relevant_files": [
+        "compatibility/kb_display_idf.c"
+      ]
+    },
+    {
+      "id": "dev-api-3",
+      "language": "api",
+      "latency_ms": 134.6706,
+      "legacy_like_files": [
+        "README.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md"
+      ],
+      "legacy_like_metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "metrics": {
+        "mrr": 0.0,
+        "ndcg_at_5": -0.0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0
+      },
+      "query": "adc_oneshot_read",
+      "query_plan": {
+        "concepts": [],
+        "exact_api": true,
+        "language": "en",
+        "original": "adc_oneshot_read",
+        "terms": []
+      },
+      "ranked_files": [
+        "sensor_examples/kidbright_full_system_demo.c",
+        "sensor_examples/calibrate_balancing_joystick.c",
+        "kidbright32iA.md",
+        "kidbright32iA.md",
+        "kidbright32iA.md"
+      ],
+      "relevant_files": [
+        "sensor_examples/adc_ldr_external.c"
+      ]
+    }
+  ],
+  "query_count": 18,
+  "schema_version": 1,
+  "scope": {
+    "architecture": "x86_64",
+    "operating_system": "windows",
+    "private_tool_export": false,
+    "source_directory": "knowledge_base (temporary copy)"
+  },
+  "unchanged_index": {
+    "latency_ms": 61.5054,
+    "report": {
+      "cached_embeddings": 0,
+      "chunks": 2026,
+      "embedded_chunks": 0,
+      "files_deleted": 0,
+      "files_seen": 37,
+      "files_unchanged": 37,
+      "files_updated": 0,
+      "warnings": []
+    }
+  }
+}

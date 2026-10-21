@@ -1,0 +1,67 @@
+{
+  "date": "2026-10-19",
+  "user_direction": "User confirms no endpoint/model/credentials for this round; finish offline preparation, leave actual-model NOT_EXECUTED and do not ask API questions again this round.",
+  "user_reported_no_endpoint_model_credentials_for_this_run": true,
+  "endpoint_probes": 0,
+  "credential_accesses": 0,
+  "api_questions_this_increment": 0,
+  "retained_permission": {
+    "data": [
+      "public evaluation-fixture source",
+      "nonprivate KB"
+    ],
+    "http_requests_including_retries": 10,
+    "usd": 1,
+    "per_patch_user_approval_required": true,
+    "flash_commit_push_publish_deploy_allowed": false
+  },
+  "offline_preparation_deliverables": "PREPARED",
+  "actual_model_status": "NOT_EXECUTED",
+  "actual_http_requests": 0,
+  "pilot_api_cost_usd": 0,
+  "native_metering_cost_scope_full_request_capture_ready": false,
+  "run_mode_still_fail_closed": true,
+  "prepared_evaluation": {
+    "path": "src-tauri/target/offline-closeout-20261019/prepared.json",
+    "sha256": "676692739b73393e4c5511075bca12205a8ed9982ef063d27fd2202ca89b70c4",
+    "bytes": 22583
+  },
+  "capability_matrix": {
+    "path": "src-tauri/target/offline-closeout-20261019/matrix.json",
+    "sha256": "6805cff9e7fbad88aa535301d2f44f5a500deadb15930321a27483682d137495",
+    "bytes": 15061
+  },
+  "review_draft": {
+    "path": "src-tauri/target/offline-closeout-20261019/review-draft.json",
+    "sha256": "4a917dc0b6007dea94b228d2cc68cc4006cdf70471cde9f55cbe30e90cde0b11",
+    "bytes": 4113
+  },
+  "manual_stage_draft": {
+    "path": "src-tauri/target/offline-closeout-20261019/manual-stage-draft.json",
+    "sha256": "d50066733b0f2ec0744ba2055480f67813918b35e357d5d6d25f615e8b24dca0",
+    "bytes": 850
+  },
+  "review_judgments_null_rows": 22,
+  "manual_stage_null_rows": 4,
+  "blind_review_packet_reused": {
+    "path": "src-tauri/target/actual-model-blind-review-20261019/development-review.json",
+    "sha256": "7b149e399b143f2b7a552d4a09f46162478c820a4f05ae7879bb765ad1844a36",
+    "bytes": 44449
+  },
+  "blind_review_snapshot_files_reverified": 37,
+  "blind_development_queries": 20,
+  "independent_reviewers_or_judgments": 0,
+  "future_actual_commands_runnable_now": false,
+  "runbook": "30-offline-closeout-and-runbook.md",
+  "release": "NOT_READY",
+  "original_requirements": {
+    "system_architecture": "PARTIAL",
+    "hybrid_rag": "PARTIAL",
+    "knowledge_base_data": "PARTIAL",
+    "code_aware_chunking": "PARTIAL",
+    "compiler_validation_auto_fix": "PARTIAL",
+    "technology_integration": "PARTIAL",
+    "development_phases": "PARTIAL",
+    "evaluation_quality": "PARTIAL"
+  }
+}

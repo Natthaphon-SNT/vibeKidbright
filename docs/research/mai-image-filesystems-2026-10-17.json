@@ -1,0 +1,702 @@
+{
+  "schema_version": 1,
+  "audit_date": "2026-10-17",
+  "timezone": "Asia/Bangkok",
+  "scope": "Read-only selected filesystem contents in supplied RSP/NanoPi images. Static files are evidence of image contents only; no boot, service invocation or device test.",
+  "prior_archive_hash_evidence": "mai-supplied-files-2026-10-17.json",
+  "path_notation": "Image-local account paths normalized to /home/<user> in published excerpts; SHA256 covers original complete file bytes before normalization.",
+  "tools": {
+    "filesystem_parser": "dissect.extfs 3.15",
+    "deflate64_reader": "zipfile-deflate64 0.2.0",
+    "temporary_prefix_cache_limit_bytes": 34359738368,
+    "temporary_prefix_cache_removed_after_each_completed_probe": true,
+    "primary_documentation": [
+      "https://docs.dissect.tools/en/latest/projects/dissect.extfs/index.html",
+      "https://pypi.org/project/zipfile-deflate64/"
+    ],
+    "cache_limit_note": "Earlier service probe used 17 GiB, first data probe used 10 GiB; final NanoPi data probe used 32 GiB (more than the 31,914,983,424-byte image). Actual decompressed prefix remained smaller than the full image."
+  },
+  "images": [
+    {
+      "archive": "KidBrightAI_RSP_v1_0_1.zip",
+      "archive_bytes": 5134681418,
+      "archive_sha256": "35b08349fb27abc5b7b5c3f917ed774d058746eaba6df999cf7a103edae90751",
+      "compression_method": 8,
+      "image_bytes": 31914983424,
+      "partitions": [
+        {
+          "index": 1,
+          "type_hex": "0xc",
+          "offset": 4194304,
+          "bytes": 268435456
+        },
+        {
+          "index": 2,
+          "type_hex": "0x83",
+          "offset": 272629760,
+          "bytes": 15658909696
+        }
+      ],
+      "findings": [
+        {
+          "kind": "os-identity",
+          "path": "etc/os-release",
+          "bytes": 303,
+          "sha256": "fed130f61010b10f4a55648109d68fa7df617f2cd755a7166c8e2db9f4efa190",
+          "text": "PRETTY_NAME=\"Raspbian GNU/Linux 10 (buster)\"\nNAME=\"Raspbian GNU/Linux\"\nVERSION_ID=\"10\"\nVERSION=\"10 (buster)\"\nVERSION_CODENAME=buster\nID=raspbian\nID_LIKE=debian\nHOME_URL=\"http://www.raspbian.org/\"\nSUPPORT_URL=\"http://www.raspbian.org/RaspbianForums\"\nBUG_REPORT_URL=\"http://www.raspbian.org/RaspbianBugs\"\n"
+        },
+        {
+          "kind": "os-identity",
+          "path": "usr/lib/os-release",
+          "bytes": 303,
+          "sha256": "fed130f61010b10f4a55648109d68fa7df617f2cd755a7166c8e2db9f4efa190",
+          "text": "PRETTY_NAME=\"Raspbian GNU/Linux 10 (buster)\"\nNAME=\"Raspbian GNU/Linux\"\nVERSION_ID=\"10\"\nVERSION=\"10 (buster)\"\nVERSION_CODENAME=buster\nID=raspbian\nID_LIKE=debian\nHOME_URL=\"http://www.raspbian.org/\"\nSUPPORT_URL=\"http://www.raspbian.org/RaspbianForums\"\nBUG_REPORT_URL=\"http://www.raspbian.org/RaspbianBugs\"\n"
+        },
+        {
+          "kind": "os-identity",
+          "path": "etc/issue",
+          "bytes": 29,
+          "sha256": "a0a610d257050a697c518a33fe0686f17c070049c6644d3fe3eb735dc45054d1",
+          "text": "Raspbian GNU/Linux 10 \\n \\l\n\n"
+        },
+        {
+          "kind": "startup-script",
+          "path": "etc/rc.local",
+          "bytes": 447,
+          "sha256": "976e122609bf1aff772b894f60b6f8f60a0f2464ac2d713616ebd818150d29f2",
+          "text": "#!/bin/sh -e\n#\n# rc.local\n#\n# This script is executed at the end of each multiuser runlevel.\n# Make sure that the script will \"exit 0\" on success or any other\n# value on error.\n#\n# In order to enable or disable this script just change the execution\n# bits.\n#\n# By default this script does nothing.\n\n# Print the IP address\n_IP=$(hostname -I) || true\nif [ \"$_IP\" ]; then\n  printf \"My IP address is %s\\n\" \"$_IP\"\nfi\nsudo /home/<user>/wifibridge.sh\nexit 0\n"
+        },
+        {
+          "kind": "elf-architecture",
+          "path": "usr/bin/python3",
+          "class_bits": 32,
+          "machine": 40
+        },
+        {
+          "kind": "elf-architecture",
+          "path": "bin/bash",
+          "class_bits": 32,
+          "machine": 40
+        },
+        {
+          "kind": "elf-architecture",
+          "path": "bin/sh",
+          "class_bits": 32,
+          "machine": 40
+        },
+        {
+          "kind": "startup-source",
+          "path": "etc/systemd/system/pm2-pi.service",
+          "sha256": "db75a88b39ea30501df7b812344723c9979ed680656b93a4f745c57dee909dcc",
+          "matching_lines": [
+            "Description=PM2 process manager",
+            "Documentation=https://pm2.keymetrics.io/",
+            "Environment=PM2_HOME=/home/<user>/.pm2",
+            "PIDFile=/home/<user>/.pm2/pm2.pid",
+            "ExecStart=/home/<user>/.nvm/versions/node/v10.21.0/lib/node_modules/pm2/bin/pm2 resurrect",
+            "ExecReload=/home/<user>/.nvm/versions/node/v10.21.0/lib/node_modules/pm2/bin/pm2 reload all",
+            "ExecStop=/home/<user>/.nvm/versions/node/v10.21.0/lib/node_modules/pm2/bin/pm2 kill"
+          ]
+        },
+        {
+          "kind": "application-manifest",
+          "path": "home/<user>/kbclientNew/server/package.json",
+          "sha256": "3a5eb2d07cbbeed8f948a906b54184349be25c429cd5c8452b1dd9fef4f3548e",
+          "selected_fields": {
+            "name": "vuenodeproject",
+            "version": "1.0.0",
+            "scripts": {
+              "start": "node index.js"
+            },
+            "dependencies": {
+              "archiver": "^3.1.1",
+              "body-parser": "^1.19.0",
+              "cors": "^2.8.5",
+              "drivelist": "^9.0.2",
+              "du": "^1.0.0",
+              "express": "^4.17.1",
+              "fs-extra": "^8.1.0",
+              "ip": "^1.1.5",
+              "js-untar": "^2.0.0",
+              "keypress": "^0.2.1",
+              "lowdb": "^1.0.0",
+              "multer": "^1.4.2",
+              "node-blockly": "^1.2.2",
+              "node-wifi": "^2.0.14",
+              "node-zip": "^1.1.1",
+              "rimraf": "^3.0.2",
+              "rosnodejs": "^3.0.2",
+              "rpi-wifi-connection": "^1.0.17",
+              "stream-buffers": "^3.0.2",
+              "tar": "^6.0.1",
+              "usb-detection": "^4.9.0",
+              "xml-js": "^1.6.11",
+              "xml2js": "^0.4.22",
+              "xml2json": "^0.12.0"
+            }
+          }
+        },
+        {
+          "kind": "application-manifest",
+          "path": "home/<user>/.pm2/dump.pm2",
+          "sha256": "b6eed590ebf5519a0580ba929e37cd574b99e921e5f348db4bd19450e2e474b1",
+          "selected_fields": [
+            {
+              "name": "index",
+              "pm_exec_path": "/home/<user>/kbclientNew/server/index.js",
+              "exec_interpreter": "node",
+              "pm_cwd": "/home/<user>"
+            },
+            {
+              "name": "app3",
+              "pm_exec_path": "/home/<user>/kbclientNew/server/kb_2/app3.py",
+              "exec_interpreter": "python3",
+              "pm_cwd": "/home/<user>"
+            }
+          ]
+        },
+        {
+          "kind": "application-directory",
+          "path": "home/<user>/kbclientNew",
+          "entries": [
+            "aoba",
+            "hello",
+            "hifumi",
+            "inko",
+            "kidbright_api",
+            "nectec-client",
+            "server"
+          ]
+        },
+        {
+          "kind": "application-directory",
+          "path": "home/<user>/kbclientNew/server",
+          "entries": [
+            "Ex_Obj_Detection",
+            "Example_ObjectDetection",
+            "FMP",
+            "aoba",
+            "cake",
+            "dd.js",
+            "hello",
+            "hifumi",
+            "imclass.json",
+            "index.js",
+            "index.js.bak",
+            "inko",
+            "kb_2",
+            "node_modules",
+            "package-lock.json",
+            "package.json",
+            "python",
+            "ruri",
+            "tmp",
+            "totoro",
+            "yarn.lock",
+            "yun"
+          ]
+        },
+        {
+          "kind": "application-directory",
+          "path": "home/<user>/kbclientNew/server/kb_2",
+          "entries": [
+            "__pycache__",
+            "app.py",
+            "app2.py",
+            "app3.py",
+            "data",
+            "e.csv",
+            "e.py",
+            "feature_sets",
+            "globals.py",
+            "image_classifier_api.py",
+            "img_model_test.py",
+            "label_map.pkl",
+            "label_map_test.py",
+            "libs",
+            "media_converter",
+            "mfcc_test.py",
+            "model_param.sh",
+            "model_test.py",
+            "models",
+            "oh_test.py",
+            "pillow_test.py",
+            "requirements.txt",
+            "setup",
+            "subscriber_test.py",
+            "tensorflow-2.1.0-cp37-cp37m-linux_armv7l.whl",
+            "train.py",
+            "train_from_api.sh"
+          ]
+        },
+        {
+          "kind": "application-source-sample",
+          "path": "home/<user>/kbclientNew/server/index.js",
+          "bytes": 56798,
+          "sha256": "7fa67d38a09941fece8f3ff3948ad25c264a47201ec4e6e12e7e48a9cd4cf5c4",
+          "selected_lines": [
+            "var express = require(\"express\");",
+            "var cors = require(\"cors\");",
+            "var rimraf = require(\"rimraf\");",
+            "const { spawn, exec } = require(\"child_process\");",
+            "const fs = require(\"fs\");",
+            "var http = require(\"http\");",
+            "const path = require(\"path\");",
+            "var convert = require(\"xml-js\");",
+            "var archiver = require(\"archiver\");",
+            "var streamBuffers = require(\"stream-buffers\");",
+            "var tar = require(\"tar\");",
+            "var zlib = require(\"zlib\");",
+            "const multer = require(\"multer\");",
+            "var _ = require(\"lodash\");",
+            "var ip = require(\"ip\");",
+            "var usbDetect = require(\"usb-detection\");",
+            "var parser = require(\"xml2json\");",
+            "const du = require(\"du\");",
+            "var rimraf = require(\"rimraf\");",
+            "//var wifi = require('node-wifi')",
+            "var Wifi = require(\"rpi-wifi-connection\");",
+            "var request = require(\"request\");",
+            "const low = require(\"lowdb\");",
+            "const FileAsync = require(\"lowdb/adapters/FileAsync\");",
+            "const rosnodejs = require(\"rosnodejs\");",
+            "const std_msgs = rosnodejs.require(\"std_msgs\").msg;",
+            "var bodyParser = require(\"body-parser\");",
+            "const drivelist = require(\"drivelist\");",
+            "app.get(\"/getDirectories\", function (req, res) {",
+            "app.post(\"/loadFromUSB\", async function (req, res) {",
+            "app.post(\"/loadALLFromUSB\", async function (req, res) {",
+            "app.post(\"/saveToUSB\", function (req, res) {",
+            "app.post(\"/ejectUSB\", function (req, res) {",
+            "app.get(\"/getClassesLabel/:projectName\", function (req, res) {",
+            "app.post(\"/saveClassesLabel/:projectName\", function (req, res) {",
+            "app.get(\"/archiveForClassify/:projectName\", async function (req, res, next) {",
+            "var zip = new require(\"node-zip\")();",
+            "app.post(\"/downloadClassifier\", function (req, res) {",
+            "app.get(\"/img/:proj\", function (req, res, next) {",
+            "app.post(\"/img/:proj/model/download\", function (req, res, next) {",
+            "app.get(\"/img/:proj/class\", (req, res) => {",
+            "app.post(\"/img/:project/label\", (req, res) => {",
+            "app.post(\"/archiveFile\", function (req, res, next) {",
+            "app.post(\"/extractFile\", upload.any(), function (req, res) {",
+            "app.get(\"/getProjects/:type\", function (req, res, next) {",
+            "app.get(\"/getIP\", function (req, res, next) {",
+            "app.get(\"/getDrive\", function (req, res, next) {",
+            "app.post(\"/checkXmlFile\", function (req, res, next) {",
+            "const fs = require(\"fs\");",
+            "app.post(\"/writeXml\", function (req, res) {",
+            "var fs = require(\"fs\");",
+            "app.post(\"/runPython3\", function (req, res) {",
+            "var fs = require(\"fs\");",
+            "app.post(\"/createProject\", function (req, res) {",
+            "app.get(\"/getPython\", function (req, res) {",
+            "var fs = require(\"fs\");",
+            "app.post(\"/upload/image\", function (req, res, next) {",
+            "app.post(",
+            "app.post(\"/robot/record\", function (req, res, next) {",
+            "app.get(\"/wav/:project\", function (req, res, next) {",
+            "app.post(\"/wav/:project/client/upload\", function (req, res, next) {",
+            "app.post(\"/wav/:project/order/add\", function (req, res, next) {",
+            "app.post(\"/wav/:project/model/download\", function (req, res, next) {",
+            "app.get(\"/wav/:project/class\", (req, res) => {",
+            "app.post(\"/wav/:project/label\", (req, res) => {",
+            "app.post(\"/wav/:project/archive\", async function (req, res, next) {",
+            "var zip = new require(\"node-zip\")();",
+            "app.get(\"/getBlocksDefinition.js\", function (req, res, next) {",
+            "app.post(\"/run\", (req, res) => {",
+            "var fs = require(\"fs\");",
+            "app.post(\"/stop\", (req, res) => {",
+            "app.post(\"/retrainImg\", (req, response) => {",
+            "app.post(\"/imclassAnotaion\", (req, res) => {",
+            "app.post(\"/removeImclassAnotaion\", (req, res) => {",
+            "app.post(\"/getAnotaions\", (req, res) => {",
+            "app.post(\"/deleteImage\", (req, res) => {",
+            "app.post(\"/createImclassDataset\", (req, res) => {",
+            "app.post(\"/saveXML\", (req, res) => {",
+            "var fs = require(\"fs\");",
+            "app.post(\"/getXML\", (req, response) => {"
+          ]
+        },
+        {
+          "kind": "application-source-sample",
+          "path": "home/<user>/kbclientNew/server/kb_2/app3.py",
+          "bytes": 25066,
+          "sha256": "bf6d190b487319af259e5278ee599ef78a85040ee01197b01ba7354d6296483e",
+          "selected_lines": [
+            "import numpy as np",
+            "import pandas as pd",
+            "import threading",
+            "# import matplotlib.pyplot as plt",
+            "from scipy.io import wavfile",
+            "from flask import Flask, request, jsonify, send_file",
+            "from flask_cors import CORS",
+            "import os",
+            "import signal",
+            "import time",
+            "import json",
+            "# import tensorflow as tf",
+            "# from tensorflow.keras import Input",
+            "# from tensorflow.keras.models import Model, Sequential, load_model",
+            "# from tensorflow.keras.layers import Dense, Conv2D, MaxPooling2D, Flatten",
+            "# from tensorflow.keras.optimizers import Adam, SGD",
+            "import zipfile",
+            "import subprocess",
+            "import shlex",
+            "import select",
+            "from threading import Thread",
+            "from fcntl import fcntl, F_GETFL, F_SETFL",
+            "from os import O_NONBLOCK, read",
+            "import asyncio",
+            "import sys",
+            "from asyncio.subprocess import PIPE, STDOUT",
+            "import pickle",
+            "from tensorflow.keras import models",
+            "from datetime import datetime",
+            "import globals",
+            "# from libs.spectrogram_utils import *",
+            "from libs.data_utils import *",
+            "from libs.model_utils import *",
+            "from libs.train_utils import *",
+            "# import train",
+            "from datetime import datetime",
+            "from multiprocessing import Process, Queue",
+            "import rospy",
+            "import python_speech_features",
+            "from std_msgs.msg import String",
+            "from shutil import copyfile",
+            "import queue as Queue",
+            "@app.route(\"/upload\", methods=['POST'])",
+            "@app.route(\"/train/stop\")",
+            "@app.route(\"/train/log\")",
+            "@app.route(\"/train/is_running\")",
+            "@app.route(\"/download\")",
+            "@app.route(\"/inference_image\", methods=['POST'])",
+            "@app.route('/record', methods=['POST'])",
+            "@app.route(\"/upload_and_train\", methods=['POST'])",
+            "@app.route(\"/download_model\", methods=['POST'])",
+            "@app.route(\"/log_training\", methods=['GET','POST'])",
+            "@app.route(\"/is_training\", methods=['GET','POST'])",
+            "@app.route(\"/stop_training\", methods=['POST'])",
+            "@app.route(\"/stop_process\", methods=['POST'])",
+            "@app.route(\"/inference\", methods=['POST'])",
+            "@app.route(\"/stop_inference\", methods=['POST'])",
+            "@app.route(\"/image_test\", methods=['POST'])",
+            "@app.route(\"/run\", methods=['POST'])",
+            "@app.route(\"/stop\", methods=['POST'])",
+            "#if __name__ == \"__main__\":"
+          ]
+        },
+        {
+          "kind": "application-source-sample",
+          "path": "home/<user>/kbclientNew/server/kb_2/requirements.txt",
+          "bytes": 113,
+          "sha256": "74e20d43600b9024dd6600dca721872d584bc40e54baff43c8c614b508ed6f42",
+          "selected_lines": []
+        }
+      ],
+      "io": {
+        "prefix_cache_bytes": 11696472064,
+        "decompressed_bytes": 11696472064,
+        "stream_reads": 2794
+      },
+      "probe_seconds": 62.43,
+      "errors": [],
+      "fresh_archive_hash_verification": {
+        "algorithm": "SHA256",
+        "method": "Get-FileHash -LiteralPath; full ZIP bytes read again during this audit",
+        "observed_sha256": "35b08349fb27abc5b7b5c3f917ed774d058746eaba6df999cf7a103edae90751",
+        "matches_prior_full_input_audit": true
+      }
+    },
+    {
+      "archive": "KidBright_AI_IDE_NanoPi_v1_0_1.zip",
+      "archive_bytes": 11208696934,
+      "archive_sha256": "dae3d46f72d1d28635f3cd46f2a64779f41b7de57db2d136c3165fa22952665d",
+      "compression_method": 9,
+      "image_bytes": 31914983424,
+      "partitions": [
+        {
+          "index": 1,
+          "type_hex": "0x83",
+          "offset": 100663296,
+          "bytes": 6719275008
+        },
+        {
+          "index": 2,
+          "type_hex": "0x83",
+          "offset": 6819938304,
+          "bytes": 25095028224
+        }
+      ],
+      "inspected_partition_index": 1,
+      "findings": [
+        {
+          "kind": "os-identity",
+          "path": "etc/os-release",
+          "bytes": 386,
+          "sha256": "ed46d9be2771ad779b35b358d708140cc8942e36ed07806648123155b41fa665",
+          "text": "NAME=\"Ubuntu\"\nVERSION=\"18.04.2 LTS (Bionic Beaver)\"\nID=ubuntu\nID_LIKE=debian\nPRETTY_NAME=\"Ubuntu 18.04.2 LTS\"\nVERSION_ID=\"18.04\"\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nVERSION_CODENAME=bionic\nUBUNTU_CODENAME=bionic\n"
+        },
+        {
+          "kind": "os-identity",
+          "path": "usr/lib/os-release",
+          "bytes": 386,
+          "sha256": "ed46d9be2771ad779b35b358d708140cc8942e36ed07806648123155b41fa665",
+          "text": "NAME=\"Ubuntu\"\nVERSION=\"18.04.2 LTS (Bionic Beaver)\"\nID=ubuntu\nID_LIKE=debian\nPRETTY_NAME=\"Ubuntu 18.04.2 LTS\"\nVERSION_ID=\"18.04\"\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nVERSION_CODENAME=bionic\nUBUNTU_CODENAME=bionic\n"
+        },
+        {
+          "kind": "os-identity",
+          "path": "etc/issue",
+          "bytes": 26,
+          "sha256": "1094a1ff5d6d0d9137ad321396fe5c2a4653258b102f9ac04ec7acae00970598",
+          "text": "Ubuntu 18.04.2 LTS \\n \\l\n\n"
+        },
+        {
+          "kind": "startup-script",
+          "path": "etc/rc.local",
+          "bytes": 1266,
+          "sha256": "cbaae78bea138493df6e297ff5347a89a6743c5d9b0064fa9a418eecc35ac53b",
+          "text": "#!/bin/sh -e\n#\n# rc.local\n#\n# This script is executed at the end of each multiuser runlevel.\n# Make sure that the script will \"exit 0\" on success or any other\n# value on error.\n#\n# In order to enable or disable this script just change the execution\n# bits.\n#\n# By default this script does nothing.\n\n/usr/local/bin/gen-friendlyelec-release\n. /etc/friendlyelec-release\n\n# enable swap if needed\nif [ \"x${BOARD}\" = \"xNanoPi-NEO4\" ]; then\n    /usr/bin/enable-swap.sh\nfi\n\nif [ ! -f /etc/firstuse ]; then\n    /bin/echo ${BOARD} > /etc/hostname\n    /bin/sed -i \"s/\\(127.0.1.1\\s*\\).*/\\1${BOARD}/g\" /etc/hosts\n    /bin/hostname ${BOARD}\n    /bin/echo \"0\" > /etc/firstuse\nfi\n\nif [ -d /sys/module/bcmdhd ]; then\n    /bin/echo 1 > /sys/class/rfkill/rfkill0/state\n    /usr/bin/hciattach /dev/ttyS0 bcm43xx 115200\nfi\n\nif [ -f /usr/bin/python3.6 ]; then\n    setcap cap_sys_rawio+ep /usr/bin/python3.6\n    if [ -f /home/<user>/.virtualenvs/cv/bin/python3 ]; then\n        setcap cap_sys_rawio+ep home/<user>/.virtualenvs/cv/bin/python3\n    fi\nfi\n\necho \"performance\" > /sys/devices/platform/ff9a0000.gpu/devfreq/ff9a0000.gpu/governor\n/usr/bin/cpufreq-set -c 0-5 -g performance\n\n/usr/bin/lcd2usb_print \"CPU: {{CPU}}\" \"Mem: {{MEM}}\" \"IP: {{IP}}\" \"LoadAvg: {{LOADAVG}}\" 2>&1 > /dev/null&\n\nexit 0\n"
+        },
+        {
+          "kind": "elf-architecture",
+          "path": "usr/bin/python3",
+          "class_bits": 64,
+          "machine": 183
+        },
+        {
+          "kind": "elf-architecture",
+          "path": "bin/bash",
+          "class_bits": 64,
+          "machine": 183
+        },
+        {
+          "kind": "elf-architecture",
+          "path": "bin/sh",
+          "class_bits": 64,
+          "machine": 183
+        },
+        {
+          "kind": "directory",
+          "path": "opt",
+          "entries": [
+            "dual-camera",
+            "opencv-videoprocessor",
+            "qt5-qml-image-viewer",
+            "qt5-smarthome"
+          ]
+        }
+      ],
+      "io": {
+        "prefix_cache_bytes": 6819807232,
+        "decompressed_bytes": 6819807232,
+        "stream_reads": 1630
+      },
+      "probe_seconds": 240.66,
+      "errors": [],
+      "scope_limit": "Partition 1 only in this probe; no inference that it is the active boot root or the only location for IDE/data.",
+      "additional_partition_probes": [
+        {
+          "partition_index": 2,
+          "findings": [
+            {
+              "kind": "filesystem",
+              "partition_index": 2,
+              "block_size": 4096,
+              "root_entries": [
+                "lost+found",
+                "root",
+                "work"
+              ]
+            }
+          ],
+          "io": {
+            "prefix_cache_bytes": 6825836544,
+            "decompressed_bytes": 6825836544,
+            "stream_reads": 1630
+          },
+          "probe_seconds": 216.0,
+          "expected_missing_os_paths": [
+            "etc",
+            "home",
+            "opt"
+          ],
+          "scope_limit": "Data partition root directory confirmed; missing OS-style paths are not evidence of filesystem corruption."
+        },
+        {
+          "partition_index": 2,
+          "purpose": "Attempt bounded traversal of data partition root/work to locate IDE/application sources",
+          "prefix_cache_limit_bytes": 10737418240,
+          "findings": [
+            {
+              "kind": "filesystem",
+              "partition_index": 2,
+              "block_size": 4096,
+              "root_entries": [
+                "lost+found",
+                "root",
+                "work"
+              ]
+            }
+          ],
+          "io": {
+            "prefix_cache_bytes": 6825836544,
+            "decompressed_bytes": 6825836544,
+            "stream_reads": 1630
+          },
+          "probe_seconds": 214.7,
+          "errors": [
+            {
+              "path": "/work",
+              "error": "temporary prefix cache limit reached"
+            },
+            {
+              "path": "/root",
+              "error": "temporary prefix cache limit reached"
+            }
+          ],
+          "outcome": "Root directory readable. Access to root/work children requires an offset beyond the prefix budget; no child listing or IDE source read was completed. This is an inspection limit, not proof of missing files or filesystem corruption."
+        },
+        {
+          "partition_index": 2,
+          "purpose": "Follow-up with access covering the entire declared image; supersedes the earlier 10 GiB access limit",
+          "prefix_cache_limit_bytes": 34359738368,
+          "directory_walk_limit": 240,
+          "directory_walk_depth_limit": 4,
+          "directories_inspected": 240,
+          "findings": [
+            {
+              "kind": "platform-artifact-names",
+              "path": "root/home/<user>",
+              "entries": [
+                "kbclientNew",
+                "tensorflow-2.3.0-cp36-cp36m-linux_aarch64.whl"
+              ]
+            },
+            {
+              "kind": "data-directory",
+              "path": "root/etc/systemd/system",
+              "entries": [
+                "multi-user.target.wants",
+                "pm2-pi.service",
+                "usb-mount@.service"
+              ]
+            },
+            {
+              "kind": "application-source-sample",
+              "path": "root/home/<user>/.pm2/dump.pm2",
+              "bytes": 18837,
+              "sha256": "dd6d4da6012acd069a99bb8561ba29245f701da226d83769303a40e94312ed73",
+              "selected_lines": [
+                {
+                  "name": "index",
+                  "pm_exec_path": "/home/<user>/kbclientNew/server/index.js",
+                  "exec_interpreter": "node",
+                  "pm_cwd": "/home/<user>/kbclientNew/server"
+                },
+                {
+                  "name": "app3",
+                  "pm_exec_path": "/home/<user>/kbclientNew/server/kb_2/app3.py",
+                  "exec_interpreter": "python3",
+                  "pm_cwd": "/home/<user>/kbclientNew/server/kb_2"
+                }
+              ]
+            },
+            {
+              "kind": "data-directory",
+              "path": "root/home/<user>/kbclientNew",
+              "entries": [
+                "aoba",
+                "hello",
+                "hifumi",
+                "inko",
+                "kidbright_api",
+                "nectec-client",
+                "server"
+              ]
+            }
+          ],
+          "io": {
+            "prefix_cache_bytes": 23330422784,
+            "decompressed_bytes": 23330422784,
+            "stream_reads": 5575
+          },
+          "probe_seconds": 891.01,
+          "errors": [],
+          "outcome": "kbclientNew directory tree and PM2 process declarations confirmed in data partition. Source bodies/package manifest were not inspected in this bounded walk; live service success and identical RSP APIs are not established.",
+          "temporary_cache_removed": true
+        }
+      ],
+      "fresh_archive_hash_verification": {
+        "algorithm": "SHA256",
+        "method": "Get-FileHash -LiteralPath; full ZIP bytes read again during this audit",
+        "observed_sha256": "dae3d46f72d1d28635f3cd46f2a64779f41b7de57db2d136c3165fa22952665d",
+        "matches_prior_full_input_audit": true
+      }
+    }
+  ],
+  "limits": [
+    "Selected files and directories only; no complete filesystem integrity or full image CRC verification.",
+    "No archive program was executed, no filesystem mounted, no card written and no private board endpoint contacted.",
+    "Exact board revision, boot success, active service versions, complete request/response contracts, installed dependency consistency, model quality and source redistribution rights remain unverified.",
+    "ELF class/e_machine observations describe inspected userspace binaries, not a live CPU probe or proof of the running kernel architecture.",
+    "NanoPi data-partition package manifest and index.js/app3.py bodies were not inspected within the 240-directory/four-level walk. PM2 declarations identify intended processes, not proven live endpoints or source/API equivalence."
+  ],
+  "active_profiles_added": 0,
+  "validation": {
+    "evidence_json": "parsed; 2 image sizes, partition bounds and SHA256 field lengths checked; fresh full-input hashes match prior audit",
+    "document_checks": [
+      {
+        "command": "npm run check:kb",
+        "exit_code": 0
+      },
+      {
+        "command": "npm run check:coverage",
+        "exit_code": 0
+      },
+      {
+        "command": "npm run check:rules",
+        "exit_code": 0
+      },
+      {
+        "command": "npm run check:boards",
+        "exit_code": 0
+      },
+      {
+        "command": "npm run check:bundle",
+        "exit_code": 0
+      },
+      {
+        "command": "npm run check:public",
+        "exit_code": 0
+      },
+      {
+        "command": "git -c core.safecrlf=false diff --check",
+        "exit_code": 0
+      }
+    ],
+    "scope": "Documentation, knowledge synchronization, coverage/catalog consistency and public-file checks. No app/firmware build, image boot, service execution, training or physical board test was performed in this filesystem audit."
+  },
+  "repository_snapshot": [
+    {
+      "path": "docs/KIDBRIGHT_MAI_SUPPLIED_FILES_AUDIT_2026-10-17.md",
+      "sha256": "fbcd8753f17d35067a614f5d338508f4a7dd194ad5725dbb01d101468eea38f7"
+    },
+    {
+      "path": "docs/VIBEKIDBRIGHT_UNIFIED_BOARD_ARCHITECTURE_2026-10-17.md",
+      "sha256": "f6329b91125acffa99fb63624638365a4c4905d4d9eaea814119ca353c0304bd"
+    },
+    {
+      "path": "knowledge_base/kidbright_uai.md",
+      "sha256": "36a787e3f7f3869066306af61ca9ca92d2f8c3f4a60370b04c0af6afda7b7297"
+    },
+    {
+      "path": "resources/knowledge_base/kidbright_uai.md",
+      "sha256": "36a787e3f7f3869066306af61ca9ca92d2f8c3f4a60370b04c0af6afda7b7297"
+    },
+    {
+      "path": "src-tauri/src/ai/system_prompt.txt",
+      "sha256": "0556405942a4d3e22b2da7fe3e40da5ade221da985a2937f9a20a87c70206b29"
+    }
+  ]
+}

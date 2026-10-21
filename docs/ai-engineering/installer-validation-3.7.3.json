@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-18",
+  "version": "3.7.3",
+  "target": "Windows x64",
+  "artifact": {
+    "path": "src-tauri/target/release/bundle/nsis/VibeKidbright IDE_3.7.3_x64-setup.exe",
+    "bytes": 316758944,
+    "sha256": "d09d0f9418d94059e801fc43a38241314757c686e5060e26596a806ba56ae7c1"
+  },
+  "installer_build": {
+    "command": "npm run tauri -- build --bundles nsis -- --offline --locked",
+    "exit_code": 0,
+    "published": false,
+    "deployed": false,
+    "installed_over_existing_application": false
+  },
+  "package_contents": [
+    {
+      "resource": "knowledge_base",
+      "files": 41,
+      "all_hashes_match": true,
+      "nested_paths_preserved": true
+    },
+    {
+      "resource": "embedding",
+      "files": 8,
+      "all_hashes_match": true,
+      "nested_paths_preserved": true
+    },
+    {
+      "resource": "MSVC runtime",
+      "files": 10,
+      "all_hashes_match": true
+    }
+  ],
+  "all_66_extracted_files_accounted_for": true,
+  "webview2_offline_installer": {
+    "bytes": 214156024,
+    "sha256": "0625fb5c1e75be58a164e14f95aa58a3e5badb859b3d17c952385f3e4a9ff3e8"
+  },
+  "extracted_binary": {
+    "bytes": 46999552,
+    "sha256": "26e69a43a1da5779b260af50153cbd5a0cfc8acb3c8cbe751047bbb9f7f35103"
+  },
+  "release_binary_before_bundle_marker": {
+    "bytes": 46999552,
+    "sha256": "9bf5ac24973023b4ab9a2c75c1762ce7e1baeb2e4baeb82ab723d7a331349b35"
+  },
+  "extracted_binary_matches_release_after_exact_tauri_nsis_marker_patch": true,
+  "cargo_lock_sha256": "eb87460f9044180f98ac7f761a446bdef2579e1f2be8c6e16f9ba07d04f34a1b",
+  "probe_report": "installer-probe-3.7.3.json",
+  "extracted_binary_probe_passed": true,
+  "credential_probe_execution": "Sandbox lacked Windows logon session (ERROR_NO_SUCH_LOGON_SESSION); passed in authorized Windows user session using only its own temporary credential entry, then deleting it.",
+  "corrected_during_verification": "Initial self-check omitted creating its scratch index directory; see installer-probe-3.7.3-before-fix.json. Final installer rebuilt after correction.",
+  "excluded_development_assets": [
+    "candidate embedding models",
+    "clangd",
+    "private indices",
+    "user settings",
+    "review journals",
+    "SDK/toolchain"
+  ],
+  "limits": [
+    "same Windows development host",
+    "no clean VM",
+    "no GUI install/upgrade/uninstall",
+    "no physical USB board",
+    "HTTP proxy is not OS firewall isolation",
+    "no macOS execution"
+  ]
+}

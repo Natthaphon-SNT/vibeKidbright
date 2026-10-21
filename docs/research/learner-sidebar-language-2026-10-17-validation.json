@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "validation_date": "2026-10-17",
+  "scope": "Main-only learner sidebar, supporting-file read-only editor, and latest user-language payload evidence",
+  "software_checks": [
+    {
+      "command": "npm test",
+      "status": "passed",
+      "tests": 125,
+      "files": 10
+    },
+    {
+      "command": "cargo test --manifest-path src-tauri/Cargo.toml --lib --offline",
+      "status": "passed",
+      "tests": 101
+    },
+    {
+      "command": "npm run build:release",
+      "status": "passed"
+    }
+  ],
+  "sidebar_regressions": [
+    "Screenshot fixture shows main/main.c only; component, CMake, sdkconfig and reserved board header remain off the Project sidebar.",
+    "Custom source/header/assets inside main remain editable; missing main never falls back to supporting files.",
+    "New File targets main, and main itself cannot be renamed or deleted from its menu.",
+    "Supporting AI changes open read only; manual changes are ignored and Ctrl+S saves only dirty learner program files.",
+    "Monaco readOnly and save callbacks follow current props; AI diff Keep/Undo remain usable.",
+    "Windows case/separators, traversal, boundary checks, reserved names, and input tree immutability have policy tests.",
+    "New File uses atomic create_new and never falls back to an overwrite when a file exists.",
+    "Applying an AI proposal to an open supporting file updates both content and savedContent; it stays clean and does not block project Keep/Undo."
+  ],
+  "language_regressions": {
+    "offline_tests": 15,
+    "new_tests": 6,
+    "scope": "Source selection, escaped JSON data and both actual provider message builders; not model response fluency",
+    "cases": [
+      "Thai -> wrapped English try again/retry/continue -> tool outputs",
+      "English -> Thai",
+      "explicit response-language preference",
+      "reference/quote/code/log exclusion",
+      "code-only fallback",
+      "original history unmodified",
+      "text-part arrays and OpenAI images preserved",
+      "tool-response adjacency and Google thought signatures preserved"
+    ],
+    "implementation": "Sanitized selected prose is attached as JSON data to an existing user message in the temporary provider payload, never system instructions or saved history."
+  },
+  "source_hashes": [
+    {
+      "path": "src/projectFiles.ts",
+      "sha256": "de2e83d4d31ce2f5d0345d52c226066d20b8d6a7bb684d04474f42f7012ea6cd"
+    },
+    {
+      "path": "src/App.tsx",
+      "sha256": "541bdb8a49559357f68d58ea2fd8b9671c5b5662a672b9e4590210cbca897989"
+    },
+    {
+      "path": "src/CodeEditor.tsx",
+      "sha256": "09318b266af527b2d4a2e81cf8f0d20245c409dbfd5110bf22a60fae69185774"
+    },
+    {
+      "path": "src/test/projectFiles.test.ts",
+      "sha256": "f6bafad1f2be6deebc1993a675058f14d83cfa97ae10433801367e56d2e52dc9"
+    },
+    {
+      "path": "src/test/projectSidebar.test.tsx",
+      "sha256": "20750c659b27847faa3cdbca4d15746e0673f622b01c6dfa399563a910f5b9bb"
+    },
+    {
+      "path": "src/test/codeEditorDiff.test.tsx",
+      "sha256": "b1945ae75b7e83e0ceeddaed6aeb2d9a307790b96ad5bb7325fe049442b2ff2e"
+    },
+    {
+      "path": "src-tauri/src/ai/language.rs",
+      "sha256": "7e46a30237577f1b29314025c07d0a3f4898515d81019b734c8257b12f415fe8"
+    },
+    {
+      "path": "src-tauri/src/ai/providers.rs",
+      "sha256": "4d06b5f99815a5c4ac804c39f61598e787e4d4b2d5a75e375281a2ef72a8476e"
+    },
+    {
+      "path": "src-tauri/src/ai/system_prompt.txt",
+      "sha256": "14db1c356cca85678ab240ff53c7d619ae8688803c78a9fe5804d59b3b2e187c"
+    },
+    {
+      "path": "src-tauri/src/esp_idf.rs",
+      "sha256": "57a59c5ac2504b9d69a5936e56ca43aa2b512c064a209596a6dc73aee9b3e22a"
+    },
+    {
+      "path": "src-tauri/src/lib.rs",
+      "sha256": "7933375a70a616bb1cf2ea95f10ebe5b6f858e7f052d17b4d2718010b8e4a39f"
+    }
+  ],
+  "limitations": [
+    "Sidebar visibility and read-only editor are app behavior, not filesystem access permissions.",
+    "All supporting build files remain on disk; Save As, build and project-level Keep/Undo continue using all files.",
+    "No installed app or installer has been replaced by these checks.",
+    "Tauri UI behavior is covered through DOM tests with mocked desktop calls; no physical board or live AI provider request was made.",
+    "Google OpenAI-format image_url inputs remain unsupported; text parts now reach that provider rather than being dropped."
+  ],
+  "physical_board_tested": false,
+  "live_ai_provider_tested": false
+}

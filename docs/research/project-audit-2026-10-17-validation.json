@@ -1,0 +1,274 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-17",
+  "platform": "Windows",
+  "scope": "Whole-project automated checks and targeted source review of editing, workspace, AI tools, credentials, reviews, build, rules, packaging and CI; no claim of line-by-line formal verification.",
+  "checks": [
+    {
+      "command": "npm run test:coverage -- --reporter=dot --coverage.reportsDirectory=src-tauri/target/project-audit-coverage",
+      "exit_code": 0,
+      "files": 13,
+      "tests_passed": 152,
+      "coverage": {
+        "lines": {
+          "total": 2230,
+          "covered": 982,
+          "skipped": 0,
+          "pct": 44.03
+        },
+        "statements": {
+          "total": 2669,
+          "covered": 1173,
+          "skipped": 0,
+          "pct": 43.94
+        },
+        "functions": {
+          "total": 667,
+          "covered": 292,
+          "skipped": 0,
+          "pct": 43.77
+        },
+        "branches": {
+          "total": 2040,
+          "covered": 854,
+          "skipped": 0,
+          "pct": 41.86
+        },
+        "branchesTrue": {
+          "total": 0,
+          "covered": 0,
+          "skipped": 0,
+          "pct": "Unknown"
+        }
+      }
+    },
+    {
+      "command": "cargo test --offline --all-targets --quiet",
+      "exit_code": 0,
+      "lib_tests": 123,
+      "example_tests": 9,
+      "total_tests_passed": 132
+    },
+    {
+      "command": "npm run test:compat",
+      "exit_code": 0,
+      "portable_core_checks": 122,
+      "matrix_music_checks": 368,
+      "total_checks": 490
+    },
+    {
+      "command": "npm run build:release",
+      "exit_code": 0,
+      "build_type": "TypeScript/Vite production frontend with knowledge/board/coverage/rule/public/bundle checks; not a desktop installer"
+    },
+    {
+      "command": "cargo clippy --offline --lib --tests --message-format=short",
+      "exit_code": 0,
+      "lib_warnings": 13,
+      "additional_test_warnings": 1
+    },
+    {
+      "command": "cargo fmt --all -- --check",
+      "exit_code": 1,
+      "status": "formatting differences remain; no repository-wide formatting applied"
+    },
+    {
+      "command": "git -c core.safecrlf=false diff --check",
+      "exit_code": 0
+    },
+    {
+      "command": "Python yaml.safe_load for .github/workflows/*.yml",
+      "exit_code": 0,
+      "workflows_parsed": 3,
+      "actions_executed": false
+    }
+  ],
+  "npm_audit": {
+    "registry": "https://registry.npmjs.org",
+    "before": {
+      "critical": 2,
+      "high": 2,
+      "moderate": 2,
+      "low": 1,
+      "total": 7
+    },
+    "after": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    },
+    "force_used": false,
+    "install_scripts_executed": false,
+    "raw_result": {
+      "path": "src-tauri/target/project-audit-npm.json",
+      "bytes": 774,
+      "sha256": "c3b453706c80a7c88955194204c2a391d36a0896c3a8e82fcba3be5d74404909"
+    }
+  },
+  "browser_preview": {
+    "native_calls_stubbed": true,
+    "production_stubs_added": false,
+    "viewport_checks": [
+      {
+        "width": 1536,
+        "documentOverflow": false,
+        "workspaceOverflow": false
+      },
+      {
+        "width": 1280,
+        "documentOverflow": false,
+        "workspaceOverflow": false
+      },
+      {
+        "width": 1024,
+        "documentOverflow": false,
+        "workspaceOverflow": false
+      },
+      {
+        "width": 800,
+        "documentOverflow": false,
+        "workspaceOverflow": false
+      }
+    ],
+    "page_errors": [],
+    "checks": [
+      "local file preview",
+      "class reassignment",
+      "training remains unavailable"
+    ],
+    "board_build_or_file_write_commands_observed": []
+  },
+  "open_findings": [
+    {
+      "id": "A01",
+      "priority": "P1",
+      "status": "open",
+      "finding": "API keys retained in plaintext config fallback",
+      "source": "src-tauri/src/ai/config.rs"
+    },
+    {
+      "id": "A02",
+      "priority": "P1",
+      "status": "open",
+      "finding": "Per-message Undo drops backup before restore, ignores I/O errors and lacks conflict checks",
+      "source": "src-tauri/src/ai_chat.rs"
+    },
+    {
+      "id": "A03",
+      "priority": "P1",
+      "status": "open",
+      "finding": "Review, diff and draft recovery do not survive process restart",
+      "source": "src-tauri/src/ai/project_review.rs"
+    },
+    {
+      "id": "A04",
+      "priority": "P1",
+      "status": "open",
+      "finding": "AI command tool retains general shell execution and does not guarantee descendant termination",
+      "source": "src-tauri/src/ai/tools.rs"
+    },
+    {
+      "id": "A05",
+      "priority": "P2",
+      "status": "open",
+      "finding": "Frontend coverage 44.03%; several major modules have no coverage in this suite"
+    },
+    {
+      "id": "A06",
+      "priority": "P2",
+      "status": "open",
+      "finding": "Settings writes ignore persistence errors and share one temporary path",
+      "source": "src-tauri/src/ai/config.rs"
+    },
+    {
+      "id": "A07",
+      "priority": "P2",
+      "status": "known_deferred",
+      "finding": "All-board equivalence, full UI localization and native muAI/Plus workflows remain incomplete"
+    },
+    {
+      "id": "A08",
+      "priority": "P3",
+      "status": "open",
+      "finding": "Rustfmt, Clippy warnings and large editor bundle remain"
+    }
+  ],
+  "limits": {
+    "rustsec_dependency_audit": "not run: cargo-audit not installed",
+    "physical_hardware_tested": false,
+    "live_ai_providers_tested": false,
+    "macos_build_tested": false,
+    "desktop_installer_built_or_installed": false,
+    "public_release_created": false
+  },
+  "sources": [
+    {
+      "path": "src/App.tsx",
+      "bytes": 107940,
+      "sha256": "ac93f3abd79dafa7074769c93ecacfff1d3fd0000558cebdf67edfaf70a32c39"
+    },
+    {
+      "path": "src/DiffReview.tsx",
+      "bytes": 8255,
+      "sha256": "5163a2dd6d1ade07326b2ed3c6f426d3528e010110f67720322cda00751ec779"
+    },
+    {
+      "path": "src-tauri/src/ai/tools.rs",
+      "bytes": 43338,
+      "sha256": "d8e243e8cfb6adb7e9b03a54b069153eb4fb9c8346667724991a14dad3fc77a9"
+    },
+    {
+      "path": "src-tauri/src/kb_store.rs",
+      "bytes": 19631,
+      "sha256": "29cffdaa4f9b5fa83772b95e9fff2b6f44305bc61af80286e76dd0b00422e503"
+    },
+    {
+      "path": "src/test/projectSidebar.test.tsx",
+      "bytes": 18425,
+      "sha256": "45d759eafc22c47655cddf00e5de1ed1921ec9847fef46943b44625abd642e8a"
+    },
+    {
+      "path": "src/test/diffReview.test.ts",
+      "bytes": 1143,
+      "sha256": "bb76fe83fdf7bd598a2e2892b8852a9a3f97f32cd7a4ab81eff2031a11364574"
+    },
+    {
+      "path": "package.json",
+      "bytes": 2138,
+      "sha256": "5365abecb5c1cbc424d4a4ee870881c7f6c42e2c970c0895aade53b83dbdce57"
+    },
+    {
+      "path": "package-lock.json",
+      "bytes": 145290,
+      "sha256": "602faa940423547d11205f9bab2a14d8246bd2efa6de022a5f7ba42230c0454f"
+    },
+    {
+      "path": "src-tauri/Cargo.toml",
+      "bytes": 2046,
+      "sha256": "bb9be4d22dda047e8a00609223be3cd282b702599ed3ce27994b10853cacf45c"
+    },
+    {
+      "path": "src-tauri/Cargo.lock",
+      "bytes": 190942,
+      "sha256": "b2b4e231ca8d0920bc117daeaca96a8e09007b1909b37939fe25c0ccd761bb11"
+    },
+    {
+      "path": ".github/workflows/build-windows.yml",
+      "bytes": 4825,
+      "sha256": "40343eba105da3ec464058400013252791c5303c41f0e221860b451046405c0b"
+    },
+    {
+      "path": ".github/workflows/build-macos.yml",
+      "bytes": 6530,
+      "sha256": "11ad364b61e2d6e8d8002eb04ff22b461086cb3a253c03969260dc5b8eecef0d"
+    },
+    {
+      "path": "docs/PROJECT_AUDIT_2026-10-17.md",
+      "bytes": 15372,
+      "sha256": "96abb668dcbd90c5d86c2aaa8efde5a6c88c04507f42cca4b34bb0ffb9383843"
+    }
+  ]
+}

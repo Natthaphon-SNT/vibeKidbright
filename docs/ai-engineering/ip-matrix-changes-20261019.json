@@ -1,0 +1,108 @@
+{
+  "date": "2026-10-19",
+  "baseline": {
+    "path": "src-tauri/target/ip-matrix-baseline-20261019.json",
+    "sha256": "238afb800d6b8ee3472bc67ab1087875257145698ccfe5df0a7d21d47e2f8b53",
+    "bytes": 67901
+  },
+  "baseline_verified_before_changes": true,
+  "scope": "Prior recorded manifest and newly recorded current paths, not the entire pre-existing Git diff. Newly recorded does not mean newly created. Excludes self and verification.json hashes.",
+  "files": [
+    {
+      "path": "docs/KIDBRIGHT_BLOCK_COVERAGE_2026-10-16.md",
+      "before_sha256": "eb2224b69aaad9af14c4f65d56acdce84cd17017b275904ce5c800e7fc7aa1c2",
+      "after_sha256": "4e66d5f4ec59f729d29e4d8ddce0c57cb60eafdf9926272ee77d603b3ae63063",
+      "comparison": "changed_from_verified_baseline"
+    },
+    {
+      "path": "docs/ai-engineering/27-ip-matrix-user-evidence.md",
+      "before_sha256": null,
+      "after_sha256": "9fd66066a22009a4292a953ec6b79dbd573b478fbfc9275a766635bdbd8d7534",
+      "comparison": "newly_recorded"
+    },
+    {
+      "path": "docs/ai-engineering/bundled-source-hashes.json",
+      "before_sha256": "f5e42af699ee6483426b0640726a370d1476879e0b6d1c12933ef7c65e5bf7c1",
+      "after_sha256": "07f6752bc4184e8f1d8948b072396b482992b03b1f8e07c55c1c48a8bcb1781f",
+      "comparison": "changed_from_verified_baseline"
+    },
+    {
+      "path": "docs/ai-engineering/ip-matrix-verification-20261019.json",
+      "before_sha256": null,
+      "after_sha256": "b4ac84a85439118afee2af0c92bfc8f584140941e13640708eb59598f1ff6875",
+      "comparison": "newly_recorded"
+    },
+    {
+      "path": "docs/research/kidbright-coverage-2026-10-16.json",
+      "before_sha256": "0e4f513d5edda295470b79b5f4c308b46f3caaa36473c598a1688354d4d3204b",
+      "after_sha256": "b0f3ae0a2c62c464e86b9ede42d6fba77a1d3ec243fed4f4dc4ec853f918c954",
+      "comparison": "changed_from_verified_baseline"
+    },
+    {
+      "path": "docs/research/rule-documents-2026-10-16.json",
+      "before_sha256": "e657c8de7b192f0fdcfacdf87c177a70855aba298e3392eb1209d964d2fba2ef",
+      "after_sha256": "b7353c7d8941a1cb3ade871cf616d0226c15a37508de0695ee276d73be123a14",
+      "comparison": "changed_from_verified_baseline"
+    },
+    {
+      "path": "knowledge_base/all_models.md",
+      "before_sha256": null,
+      "after_sha256": "c408745c35c3455added1766e54b53d99ed1a072f20bd0c6afcba027d4aacc25",
+      "comparison": "newly_recorded"
+    },
+    {
+      "path": "knowledge_base/compatibility/board_catalog.json",
+      "before_sha256": null,
+      "after_sha256": "ff4a2bc5268d27b2f57be45b3e606743b389ccd176d646ca43c23e522081042e",
+      "comparison": "newly_recorded"
+    },
+    {
+      "path": "knowledge_base/inex_ia_ip.md",
+      "before_sha256": "04d3d98f7a8453cfc36a454f22b714e979979ccfd3f4bf6ce54f5df82d299187",
+      "after_sha256": "f6836b75e4f4a04ad764b6c3098838afe7cfa7dd782306d8e2693779f598ed00",
+      "comparison": "changed_from_verified_baseline"
+    },
+    {
+      "path": "knowledge_base/sensor_examples/kidbright32ip_matrix_az_user_passed.c",
+      "before_sha256": null,
+      "after_sha256": "571963f3bf8b174a344de48d67fd613648790f659e3215b85c48d6a571fbf2b8",
+      "comparison": "newly_recorded"
+    },
+    {
+      "path": "knowledge_base/support_scope.md",
+      "before_sha256": "f15f22d407f0292ae462a1b166f86d8f142c76bfa16ae72e5ba37c83d4bc9849",
+      "after_sha256": "2303a4b4b3604d9a2c60cc3492c670c2214b09cc30953b3574a361266bd317b1",
+      "comparison": "changed_from_verified_baseline"
+    },
+    {
+      "path": "resources/knowledge_base/all_models.md",
+      "before_sha256": null,
+      "after_sha256": "c408745c35c3455added1766e54b53d99ed1a072f20bd0c6afcba027d4aacc25",
+      "comparison": "newly_recorded"
+    },
+    {
+      "path": "resources/knowledge_base/inex_ia_ip.md",
+      "before_sha256": "04d3d98f7a8453cfc36a454f22b714e979979ccfd3f4bf6ce54f5df82d299187",
+      "after_sha256": "f6836b75e4f4a04ad764b6c3098838afe7cfa7dd782306d8e2693779f598ed00",
+      "comparison": "changed_from_verified_baseline"
+    },
+    {
+      "path": "resources/knowledge_base/sensor_examples/kidbright32ip_matrix_az_user_passed.c",
+      "before_sha256": null,
+      "after_sha256": "571963f3bf8b174a344de48d67fd613648790f659e3215b85c48d6a571fbf2b8",
+      "comparison": "newly_recorded"
+    },
+    {
+      "path": "resources/knowledge_base/support_scope.md",
+      "before_sha256": "f15f22d407f0292ae462a1b166f86d8f142c76bfa16ae72e5ba37c83d4bc9849",
+      "after_sha256": "2303a4b4b3604d9a2c60cc3492c670c2214b09cc30953b3574a361266bd317b1",
+      "comparison": "changed_from_verified_baseline"
+    },
+    {
+      "path": "src-tauri/src/ai/system_prompt.txt",
+      "before_sha256": "d2a7155a223778596514987a16cef8e578e852e1bd13879b078ab51dd95d1c79",
+      "after_sha256": "f70ea53f0e6cc7709d5ec2491bfb806340662e2910bbd3b300b8bdf8b8f7977c",
+      "comparison": "changed_from_verified_baseline"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "board_profile": "kidbright32_rev31",
+  "blocks": [{"type": "basic_forever", "statements": {"HANDLER": [{
+    "type": "controls_if",
+    "values": {"IF0": {"type": "logic_negate", "values": {"BOOL": {"type": "logic_boolean", "fields": {"BOOL": "FALSE"}}}}},
+    "statements": {
+      "DO0": [{"type": "basic_delay", "fields": {"VALUE": 0.02}}],
+      "ELSE": [{"type": "basic_delay", "fields": {"VALUE": 0.04}}]
+    }
+  }]}}]
+}

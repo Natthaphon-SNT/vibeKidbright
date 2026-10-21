@@ -1,0 +1,607 @@
+{
+  "date": "2026-10-19",
+  "timezone": "Asia/Bangkok",
+  "status": "PARTIAL",
+  "report": "24-capability-validation-report.md",
+  "change_manifest": "capability-changes-20261019.json",
+  "baseline": {
+    "path": "src-tauri/target/verification-capability-start-20261019.json",
+    "sha256": "d14683ba9ffe5eb8cfbf52c212591c33b39992e57503993d9130dd1676c1bb09",
+    "bytes": 58837
+  },
+  "baseline_sources_matched": 253,
+  "commands": [
+    {
+      "name": "frontend",
+      "command": "npm test -- --reporter=dot",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/capability-frontend-20261019.log",
+        "sha256": "fe151f3bb6986da0c5ba7327f5494448f9d0482cda32c43084ccfb304d498efb",
+        "bytes": 2034
+      },
+      "passed": 178,
+      "files": 18
+    },
+    {
+      "name": "rust",
+      "command": "cargo test --manifest-path src-tauri/Cargo.toml --offline --locked --all-targets --quiet",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/capability-rust-20261019.log",
+        "sha256": "0d311b81ee1402598fb9f048feb850d55a79b17a7f4f92b8998a5cf15cdadf04",
+        "bytes": 12814
+      },
+      "library_passed": 196,
+      "example_passed": 10,
+      "passed": 206
+    },
+    {
+      "name": "python",
+      "command": "python -m unittest discover -s scripts/tests -v",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/capability-python-20261019.log",
+        "sha256": "b3f8300a74cb142c5207e6fce9b856838ef5e756079997ec3aaf0663b2a7686f",
+        "bytes": 8178
+      },
+      "passed": 22
+    },
+    {
+      "name": "node_initial",
+      "command": "node --test scripts/tests/vibe-evidence.test.mjs scripts/tests/capability-matrix.test.mjs",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/capability-node-20261019.log",
+        "sha256": "b6f422124477b084c5aca1011ecfe10a988c3ca81ae5a6385e48d6184a341a9d",
+        "bytes": 2590
+      },
+      "passed": 12
+    },
+    {
+      "name": "node_resource_bounds",
+      "command": "node --test scripts/tests/vibe-evidence.test.mjs scripts/tests/capability-matrix.test.mjs",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/capability-node-checked-20261019.log",
+        "sha256": "ce7ee915212eec62b0db5edeeb6641dc4f74fc31d3be07af563eb2d8d2c91072",
+        "bytes": 2590
+      },
+      "passed": 12
+    },
+    {
+      "name": "node_final",
+      "command": "node --test scripts/tests/vibe-evidence.test.mjs scripts/tests/capability-matrix.test.mjs",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/capability-node-final-cli-20261019.log",
+        "sha256": "81611c011d1df5cd66e6f2a739ef4b4c3b4e7efaf2a0a597972fdd9a3c1b45d9",
+        "bytes": 2590
+      },
+      "passed": 12
+    },
+    {
+      "name": "host_c",
+      "command": "npm run test:compat",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/capability-host-c-20261019.log",
+        "sha256": "23675fdfb3bacdad7e82546db841e8085cc573e65fd5f4f301c1f85c7b0b5eff",
+        "bytes": 560
+      },
+      "assertions": 490
+    },
+    {
+      "name": "examples_current",
+      "command": "cargo build --manifest-path src-tauri/Cargo.toml --offline --locked --example range_lsp_fixture --example desktop_evaluation --example semantic_probe --example stalling_lsp_fixture --quiet",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/capability-examples-current-20261019.log",
+        "sha256": "a0ae5095462c8f6e4bce0f4ade8deea137cb6ee197290fc4a4e70e0011e20289",
+        "bytes": 9348
+      }
+    },
+    {
+      "name": "rust_release",
+      "command": "cargo check --manifest-path src-tauri/Cargo.toml --offline --locked --release --bin vibe-kidbright --quiet",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/capability-release-rust-20261019.log",
+        "sha256": "e4f76bfe7a16e272ec593bbe17a183da215d8573d05b1a13f6bbd765ee128e2d",
+        "bytes": 9348
+      }
+    },
+    {
+      "name": "frontend_release",
+      "command": "npm run build:release",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/capability-release-frontend-20261019.log",
+        "sha256": "03c5e33c08dfb0016b1a65b5bee6b08619931a96051b8b18f5c40c4f1ae6eeff",
+        "bytes": 21626
+      },
+      "installer_built": false
+    },
+    {
+      "name": "actual_desktop",
+      "command": "node scripts/probe-desktop-semantic.mjs --output src-tauri/target/capability-desktop-20261019.json",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/capability-desktop-20261019.log",
+        "sha256": "c019742458a7a215ab9f0d8be798b36ac77eca97930ac20b25f189c4df7ea08b",
+        "bytes": 46702
+      },
+      "observations": 39,
+      "invalid_range_protocol_faults": 3,
+      "native_stubbed": false
+    },
+    {
+      "name": "adapter",
+      "command": "src-tauri/target/debug/examples/semantic_probe.exe src-tauri/target/block-c-evaluation-20261018 src-tauri/target/clangd-evaluation/clangd_23.1.0/bin/clangd.exe \"${APPDATA}/th.nectec.vibekidbright/toolchain/tools\" src-tauri/target/capability-semantic-adapter-20261019.json",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/capability-semantic-adapter-20261019.log",
+        "sha256": "d58e19aa66e4353cf1fc708cdfeadf4d518e082986c421320fe71a15b6c21d3f",
+        "bytes": 180
+      },
+      "queries": 6
+    },
+    {
+      "name": "production_browser",
+      "command": "node scripts/check-production-workflows.mjs --report docs/ai-engineering/capability-production-ui-20261019.json",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/capability-production-ui-20261019.log",
+        "sha256": "06b136854895db605bbcce75784c9f761399b091090c7c30eeda0e9e2bfed399",
+        "bytes": 2718
+      },
+      "native_provider_fixture": true
+    },
+    {
+      "name": "prepare",
+      "command": "node scripts/evaluate-vibe-coder-real.mjs --output docs/ai-engineering/capability-prepared-20261019.json",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/capability-prepare-20261019.log",
+        "sha256": "c71a60744419a7a5c1a759af236e03d8bb54d2d79834f82c078cf6742a22dabe",
+        "bytes": 316
+      },
+      "llm_requests": 0
+    },
+    {
+      "name": "review_template",
+      "command": "node scripts/evaluate-capabilities.mjs --evidence docs/ai-engineering/capability-prepared-20261019.json --template review --output docs/ai-engineering/capability-review-draft-20261019.json",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/capability-review-template-20261019.log",
+        "sha256": "26b37d2a1a3e52b62839a06042117a554817495d0a498b036abf670039b0ae33",
+        "bytes": 250
+      },
+      "actual_judgments": 0
+    },
+    {
+      "name": "matrix_partial",
+      "command": "node scripts/evaluate-capabilities.mjs --evidence docs/ai-engineering/capability-prepared-20261019.json --mechanical docs/ai-engineering/capability-mechanical-20261019.json --output docs/ai-engineering/capability-matrix-current-20261019.json",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/capability-matrix-export-20261019.log",
+        "sha256": "6657e8bfdc282882a88ba0a3e1cb83f865ac108926bba06a929dce46a90ebc81",
+        "bytes": 400
+      }
+    },
+    {
+      "name": "matrix_complete",
+      "command": "node scripts/evaluate-capabilities.mjs --evidence docs/ai-engineering/capability-prepared-20261019.json --mechanical docs/ai-engineering/capability-mechanical-complete-20261019.json --output docs/ai-engineering/capability-matrix-20261019.json",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/capability-matrix-complete-20261019.log",
+        "sha256": "dc123e7bcc570bf63c546df5f1a0b48b7fa6d7bb937de2f8635881cda163c201",
+        "bytes": 384
+      },
+      "ai_quality_passes": 0,
+      "mechanical_observations": 10
+    },
+    {
+      "name": "osv",
+      "command": "python scripts/audit-rust-dependencies.py --date 2026-10-19 --output src-tauri/target/capability-rust-advisories-20261019.json",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/capability-rust-advisories-20261019.log",
+        "sha256": "06b9484eef16c3a30f19703b08f5ddcab2065ed91cae173b51e1ca3157f4fa9f",
+        "bytes": 1490
+      }
+    },
+    {
+      "name": "npm_audit",
+      "command": "npm audit --json --registry=https://registry.npmjs.org",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/capability-npm-audit-20261019.json",
+        "sha256": "c3b453706c80a7c88955194204c2a391d36a0896c3a8e82fcba3be5d74404909",
+        "bytes": 774
+      }
+    },
+    {
+      "name": "rule_refresh",
+      "command": "node scripts/audit-rule-documents.mjs",
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/capability-rules-final-20261019.log",
+        "sha256": "7dd97058f2eb4e41129c308ebf3ef4d97cb04806a8f3e4520d4d51782d92e285",
+        "bytes": 574
+      }
+    },
+    {
+      "name": "draft_review_negative",
+      "command": [
+        "python",
+        "scripts/review-retrieval.py",
+        "validate-development",
+        "docs/ai-engineering/retrieval-development-review-20261019.json",
+        "--output",
+        "src-tauri/target/capability-reviewed-dev-should-not-exist.json"
+      ],
+      "exit_code": 1,
+      "expected_nonzero": true,
+      "log": {
+        "path": "src-tauri/target/capability-development-gate-20261019.log",
+        "sha256": "e72cf1dd3e4762bbde3322a62895d36ba6febac020b4f0c639db028a3e1d2a00",
+        "bytes": 778
+      },
+      "dataset_exported": false
+    },
+    {
+      "name": "firmware_repeat_delay",
+      "command": [
+        "${APPDATA}\\th.nectec.vibekidbright\\toolchain\\tools\\python_env\\idf5.5_py3.11_env\\Scripts\\python.exe",
+        "${APPDATA}\\th.nectec.vibekidbright\\toolchain\\frameworks\\esp-idf-v5.5.4\\tools\\idf.py",
+        "-C",
+        "D:\\Internship-NECTEC\\vibeKidbright\\src-tauri\\target\\block-c-evaluation-20261018\\repeat_delay",
+        "-DCCACHE_ENABLE=0",
+        "build"
+      ],
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/capability-firmware-base-20261019/repeat_delay-build.log",
+        "sha256": "f535465acbd23d4f7b86cc698dbcef0b874945f644619f8c9d26e086ba9bd5e6",
+        "bytes": 3125
+      },
+      "source_unchanged": true,
+      "main_recompiled": true,
+      "elf_relinked": true,
+      "flashed": false
+    },
+    {
+      "name": "firmware_forever_delay",
+      "command": [
+        "${APPDATA}\\th.nectec.vibekidbright\\toolchain\\tools\\python_env\\idf5.5_py3.11_env\\Scripts\\python.exe",
+        "${APPDATA}\\th.nectec.vibekidbright\\toolchain\\frameworks\\esp-idf-v5.5.4\\tools\\idf.py",
+        "-C",
+        "D:\\Internship-NECTEC\\vibeKidbright\\src-tauri\\target\\block-c-evaluation-20261018\\forever_delay",
+        "-DCCACHE_ENABLE=0",
+        "build"
+      ],
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/capability-firmware-base-20261019/forever_delay-build.log",
+        "sha256": "d4f4b6322a97f3556b5a6ef2e8b62a2925f71e23134e902e354a4bb7da53c3c1",
+        "bytes": 3136
+      },
+      "source_unchanged": true,
+      "main_recompiled": true,
+      "elf_relinked": true,
+      "flashed": false
+    },
+    {
+      "name": "firmware_arithmetic_if",
+      "command": [
+        "${APPDATA}\\th.nectec.vibekidbright\\toolchain\\tools\\python_env\\idf5.5_py3.11_env\\Scripts\\python.exe",
+        "${APPDATA}\\th.nectec.vibekidbright\\toolchain\\frameworks\\esp-idf-v5.5.4\\tools\\idf.py",
+        "-C",
+        "D:\\Internship-NECTEC\\vibeKidbright\\src-tauri\\target\\block-expansion-20261018\\arithmetic_if",
+        "-DCCACHE_ENABLE=0",
+        "build"
+      ],
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/capability-firmware-nested-20261019/arithmetic_if-build.log",
+        "sha256": "0c814b4bd71fbdcd2ddb8c0d774709ce1925a283506c4ffb4c578af8d0c7ed02",
+        "bytes": 3103
+      },
+      "source_unchanged": true,
+      "main_recompiled": true,
+      "elf_relinked": true,
+      "flashed": false
+    },
+    {
+      "name": "firmware_nested_conditions",
+      "command": [
+        "${APPDATA}\\th.nectec.vibekidbright\\toolchain\\tools\\python_env\\idf5.5_py3.11_env\\Scripts\\python.exe",
+        "${APPDATA}\\th.nectec.vibekidbright\\toolchain\\frameworks\\esp-idf-v5.5.4\\tools\\idf.py",
+        "-C",
+        "D:\\Internship-NECTEC\\vibeKidbright\\src-tauri\\target\\block-expansion-20261018\\nested_conditions",
+        "-DCCACHE_ENABLE=0",
+        "build"
+      ],
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/capability-firmware-nested-20261019/nested_conditions-build.log",
+        "sha256": "7a48127b841915a337c13bbeef4f360105f9285a52e738d8826ae43b25b6ba84",
+        "bytes": 3147
+      },
+      "source_unchanged": true,
+      "main_recompiled": true,
+      "elf_relinked": true,
+      "flashed": false
+    },
+    {
+      "name": "final_rules",
+      "command": [
+        "node",
+        "scripts/audit-rule-documents.mjs",
+        "--check"
+      ],
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/capability-final-policy-rules-20261019.log",
+        "sha256": "bfffd6d85ecf570e0c15d3853bfc449b8c2da8869a0523c7f546de3de06b3877",
+        "bytes": 285
+      }
+    },
+    {
+      "name": "final_public",
+      "command": [
+        "node",
+        "scripts/check-public.mjs"
+      ],
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/capability-final-policy-public-20261019.log",
+        "sha256": "0caa86f8240167862b463d193ef1ce09fa1a8c67cd9fed470f7d29880503682a",
+        "bytes": 69
+      }
+    },
+    {
+      "name": "final_bundle",
+      "command": [
+        "node",
+        "scripts/check-public.mjs",
+        "--bundle"
+      ],
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/capability-final-policy-bundle-20261019.log",
+        "sha256": "6acb55ad3aebd01116311772a55a5088db2b8df52f7efb1a0a1ba527bb2ad509",
+        "bytes": 66
+      }
+    },
+    {
+      "name": "final_standalone",
+      "command": [
+        "node",
+        "scripts/check-standalone.mjs"
+      ],
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/capability-final-policy-standalone-20261019.log",
+        "sha256": "addf38704d6b3d8842ecd95a5f00a86bdd742498e21c3bec91e5f44376c5012e",
+        "bytes": 120
+      }
+    },
+    {
+      "name": "final_knowledge",
+      "command": [
+        "node",
+        "scripts/sync-knowledge-base.mjs"
+      ],
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/capability-final-policy-knowledge-20261019.log",
+        "sha256": "ebb53a3570c8f0cb3e1999b5c37fa7651595652658b405ac67859f8054230ff8",
+        "bytes": 42
+      }
+    },
+    {
+      "name": "final_boards",
+      "command": [
+        "node",
+        "scripts/check-kidbright-board-catalog.mjs"
+      ],
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/capability-final-policy-boards-20261019.log",
+        "sha256": "c56b6125a10242e1018782d8d1c6eaaee916a0ed1115c23d14f60eff44fc8071",
+        "bytes": 96
+      }
+    },
+    {
+      "name": "final_blocks",
+      "command": [
+        "node",
+        "scripts/audit-kidbright-coverage.mjs",
+        "--check"
+      ],
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/capability-final-policy-blocks-20261019.log",
+        "sha256": "40f617700396a0cca0f0142a205e0a269f902ba95128b2b5af967242366f5a1e",
+        "bytes": 114
+      }
+    },
+    {
+      "name": "final_git_diff",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/capability-final-policy-git_diff-20261019.log",
+        "sha256": "a271c5be9f4fd9052ad9973c58c83b1adc3db64437ccf2b52104f520e0db092b",
+        "bytes": 3826
+      }
+    }
+  ],
+  "command_scope": "Executed underlying commands; shell redirections are represented by hashed logs. APPDATA normalized publicly; raw firmware commands remain in hashed target build-results.json.",
+  "reports": [
+    {
+      "path": "docs/ai-engineering/capability-assets-20261019.json",
+      "sha256": "99ea922f6acc168694b108451c2a430aea54e8e18b9249cb32e85da50e956ff3",
+      "bytes": 3436
+    },
+    {
+      "path": "docs/ai-engineering/capability-desktop-20261019.json",
+      "sha256": "e975704c14b7f43bd5698c34b2e1a95d2ca0ce5dc7144d460db8520fce527a87",
+      "bytes": 8777
+    },
+    {
+      "path": "docs/ai-engineering/capability-firmware-20261019.json",
+      "sha256": "7b047f7087324e6c39fd66f3f6f0a728d3d25f103b64af1f18c578092b8d1c2a",
+      "bytes": 5858
+    },
+    {
+      "path": "docs/ai-engineering/capability-matrix-20261019.json",
+      "sha256": "b13c4a82e6e8b04d61eff03a60e311524d96bfa7c179c226f6e32d67438436bb",
+      "bytes": 18312
+    },
+    {
+      "path": "docs/ai-engineering/capability-matrix-current-20261019.json",
+      "sha256": "11f1741229a734cfd9009aa8a5360288d364f2c94a39551d4a9063af94ac221c",
+      "bytes": 17791
+    },
+    {
+      "path": "docs/ai-engineering/capability-mechanical-20261019.json",
+      "sha256": "49116011007a8395cb6eb22e0948e3da1b0bba42acaa2756cbffc0e52ae8db78",
+      "bytes": 3920
+    },
+    {
+      "path": "docs/ai-engineering/capability-mechanical-complete-20261019.json",
+      "sha256": "e102072ae637fd5edb172647a38dde4eb36683dab70bb54cc044de76d8db53a5",
+      "bytes": 4563
+    },
+    {
+      "path": "docs/ai-engineering/capability-prepared-20261019.json",
+      "sha256": "2abe0c3313ff4e63dbfcfcfb477ba388898626e24e39a0739ccd4adc9b6ea709",
+      "bytes": 22555
+    },
+    {
+      "path": "docs/ai-engineering/capability-production-ui-20261019.json",
+      "sha256": "53ae86338c8d22eba72265d031c376f9965c8b4bfdcaccb9302c45a2efb015de",
+      "bytes": 1537
+    },
+    {
+      "path": "docs/ai-engineering/capability-release-readiness-20261019.json",
+      "sha256": "3a45384c2642cb87e33077cb621957263fc211a01802fdab7fb4d39ea9e73ec5",
+      "bytes": 1553
+    },
+    {
+      "path": "docs/ai-engineering/capability-retrieval-readiness-20261019.json",
+      "sha256": "fcd096c8492726e16808f5f2671770fe06486b3a0c9fec7af78b5d283348ccb8",
+      "bytes": 1526
+    },
+    {
+      "path": "docs/ai-engineering/capability-review-draft-20261019.json",
+      "sha256": "392a1973c862edbd35b935ddf66ceb297170486a5cb4bcf58c5c235cb8f5753a",
+      "bytes": 4063
+    },
+    {
+      "path": "docs/ai-engineering/capability-security-20261019.json",
+      "sha256": "a4a7d8519a230d4f5e5f906cea214ed93fa4ab0b8b92f2af3b2aa4a0b73378b0",
+      "bytes": 32389
+    },
+    {
+      "path": "docs/ai-engineering/23-capability-validation-protocol.md",
+      "sha256": "48914aa2dc03f7a76e5c4103568842bdbace09eebac156d13b62a37dfe3a3f1c",
+      "bytes": 5975
+    },
+    {
+      "path": "docs/ai-engineering/24-capability-validation-report.md",
+      "sha256": "f5679119a9da2af7f98d73ea1bd4e203a2a8633ea58084b7944f51ef5354b6e0",
+      "bytes": 9452
+    }
+  ],
+  "matrix": "capability-matrix-20261019.json",
+  "real_llm": {
+    "status": "NOT_EXECUTED",
+    "requests": 0,
+    "paid_credential_access": false,
+    "authorized_endpoints_supplied": [],
+    "endpoints_probed": [],
+    "quality_metrics": null
+  },
+  "capability_levels": {
+    "knowledge": "NOT_EXECUTED",
+    "project": "NOT_EXECUTED",
+    "build": "NOT_EXECUTED"
+  },
+  "mechanical_pass_observations": 10,
+  "reviewed_judgments": 0,
+  "retrieval": {
+    "readiness": "capability-retrieval-readiness-20261019.json",
+    "performance_evaluation_executed": false,
+    "prior_metrics": {
+      "path": "docs/ai-engineering/retrieval-fixed-measurement-20261019.json",
+      "sha256": "f88a7da5bb63feb4d62c50939afe72b8ec1ee4e26422015e9afea783b12beda8",
+      "bytes": 23241
+    },
+    "ranking_or_model_changed": false,
+    "frozen_dataset_sha256": "c75de0d838a5f0e6670c48776c67d3b5c0a98ca755f02ba09c2d548c28b55c43",
+    "independent_relevance_reviewed": false
+  },
+  "desktop": {
+    "report": "capability-desktop-20261019.json",
+    "observations": 39,
+    "adapter_queries": 6,
+    "protocol_fault_cases_not_real_clangd": 3,
+    "ipc_only_eof_checks": true,
+    "production_browser_native_provider_fixture": true
+  },
+  "firmware": {
+    "report": "capability-firmware-20261019.json",
+    "passed": 4,
+    "schema_version": 1,
+    "ids": 9,
+    "physical_tests": 0
+  },
+  "repair_safety": {
+    "frontend_consent_tests": "capability-frontend-20261019.log",
+    "native_guards_rollback_and_reopened_store_tests": "capability-rust-20261019.log",
+    "actual_model_workflow_executed": false,
+    "real_os_reboot_or_power_loss_tested": false
+  },
+  "security": "capability-security-20261019.json",
+  "release": "capability-release-readiness-20261019.json",
+  "requirements": {
+    "system_architecture": "PARTIAL",
+    "hybrid_rag": "PARTIAL",
+    "knowledge_base_data": "PARTIAL",
+    "code_aware_chunking": "PARTIAL",
+    "compiler_validation_auto_fix": "PARTIAL",
+    "technology_integration": "PARTIAL",
+    "development_phases": "PARTIAL",
+    "evaluation_quality": "PARTIAL"
+  },
+  "not_executed": [
+    "Real LLM inference/generation/citation quality/repair/rollback evaluation",
+    "Independent human relevance review",
+    "Clean VM GUI install/upgrade/rollback/uninstall/user-data preservation tests",
+    "Other SDK versions, macOS/Unix execution and physical boards/Flash",
+    "New installer, version promotion, staging/commit/push/publish/deploy"
+  ],
+  "remaining_blockers": [
+    "No explicitly authorized ready model",
+    "No independent retrieval/citation/API/version/hardware review",
+    "No connected approved model compile/repair/rollback workflow",
+    "No clean-VM lifecycle/user-data preservation",
+    "No physical/cross-platform qualification",
+    "Remaining other-platform/maintenance advisories"
+  ],
+  "new_installer_or_rc": false,
+  "commit_push_publish_deploy_promote": false,
+  "expected_failure": "Draft retrieval review rejection; no test suite failures this increment",
+  "limitations": [
+    "Hash binding cannot authenticate actual execution or independent human identity.",
+    "CAPTURED and deterministic/source/compiler evidence do not automatically qualify AI quality."
+  ]
+}

@@ -34,6 +34,7 @@ pub struct KbStore {
 }
 
 impl KbStore {
+    pub(crate) fn connection(&self) -> &Connection { &self.conn }
     /// Open (or create) the SQLite database in `kb_dir`.
     pub fn open(kb_dir: &Path) -> Result<Self, String> {
         let db_path = kb_dir.join(DB_FILENAME);
@@ -97,11 +98,12 @@ impl KbStore {
         chunks: &[(String, Vec<f32>)],
         mtime: u64,
     ) -> Result<(), String> {
-        // Remove old chunks for this file
-        self.delete_file(file_name)?;
+        // Replace atomically: an insertion error must preserve the previous index.
+        let transaction = self.conn.unchecked_transaction().map_err(|e| e.to_string())?;
+        transaction.execute("DELETE FROM kb_chunks WHERE file_name = ?1", params![file_name])
+            .map_err(|e| e.to_string())?;
 
-        let mut stmt = self
-            .conn
+        let mut stmt = transaction
             .prepare(
                 "INSERT INTO kb_chunks (file_name, content, embedding, indexed_at)
                  VALUES (?1, ?2, ?3, ?4)",
@@ -113,6 +115,8 @@ impl KbStore {
             stmt.execute(params![file_name, content, emb_blob, mtime as f64])
                 .map_err(|e| format!("insert error: {e}"))?;
         }
+        drop(stmt);
+        transaction.commit().map_err(|e| e.to_string())?;
         Ok(())
     }
 
@@ -264,7 +268,7 @@ impl KbStore {
     /// Delete all chunks belonging to files no longer present on disk.
     pub fn prune_deleted_files(&self, active_files: &[&str]) -> Result<usize, String> {
         if active_files.is_empty() {
-            return Ok(0);
+            return self.conn.execute("DELETE FROM kb_chunks", []).map_err(|e| e.to_string());
         }
         let placeholders: String = active_files
             .iter()
@@ -403,13 +407,6 @@ pub fn migrate_from_json(kb_dir: &Path, store: &KbStore) -> Result<usize, String
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::path::PathBuf;
-
-    fn temp_store() -> (KbStore, tempfile::TempDir) {
-        let dir = tempfile::tempdir().expect("create temp dir");
-        let store = KbStore::open(dir.path()).expect("open store");
-        (store, dir)
-    }
 
     #[test]
     fn test_cosine_similarity_identical() {

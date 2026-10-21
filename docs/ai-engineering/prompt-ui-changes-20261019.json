@@ -1,0 +1,150 @@
+{
+  "date": "2026-10-19",
+  "scope": "Previous reported manifest plus newly recorded paths; not the entire Git diff. Newly recorded is not proof of new creation. Excludes this manifest and verification.json to avoid self-hashes.",
+  "reported_baseline": {
+    "path": "src-tauri/target/prompt-ui-reported-baseline-20261019.json",
+    "sha256": "9a81878b1d61ed04d73f9d9085ac149ccd1e68fde189ffbd09e5731298ac2e95",
+    "bytes": 62697
+  },
+  "baseline_verified_before_changes": false,
+  "files": [
+    {
+      "path": ".github/workflows/winget-release.yml",
+      "before_sha256": null,
+      "after_sha256": "59638a5311230a945081c02359307c9ca4e0e0ddf16e3517df1fd9afcbf45dfe",
+      "comparison": "newly_recorded"
+    },
+    {
+      "path": "docs/WINGET_RELEASE_SETUP.md",
+      "before_sha256": null,
+      "after_sha256": "4635fa1819252b8e9d4c6a2f853ab503e90b65eaf5c0420da7a309b859fdfe01",
+      "comparison": "newly_recorded"
+    },
+    {
+      "path": "docs/ai-engineering/25-prompt-examples-and-winget.md",
+      "before_sha256": null,
+      "after_sha256": "92f8ab3dff4b4a86d8ddfb75d2bf62c8dd5d7b0a9fea211b523c5f2b0102b24b",
+      "comparison": "newly_recorded"
+    },
+    {
+      "path": "docs/ai-engineering/prompt-ui-production-20261019.json",
+      "before_sha256": null,
+      "after_sha256": "52a89990d539e4721182ca43a4e5fa556410d5826a1226b5c605a6d18a961fee",
+      "comparison": "newly_recorded"
+    },
+    {
+      "path": "docs/ai-engineering/prompt-ui-verification-20261019.json",
+      "before_sha256": null,
+      "after_sha256": "6ed84e84e2a2557be20413a8f6e7765ec0dad24f5d7954388d0c064f3a7c1a4a",
+      "comparison": "newly_recorded"
+    },
+    {
+      "path": "docs/previews/board-guide-compact-dark.png",
+      "before_sha256": "16e86e6b2cb9786eb40ef94cd5ebd563c27fe213e32c485d0b6a0b1cfbc4bfde",
+      "after_sha256": "186ee3061f3275158825d035a94dc856ac67f8dd9e05def77698abd300851c8a",
+      "comparison": "changed_from_reported_baseline"
+    },
+    {
+      "path": "docs/previews/board-guide-en-mai.png",
+      "before_sha256": "345112fc2f24720ab2d7b303aeafa0ec818b904164c97ae1e804ee84dcdbbc4e",
+      "after_sha256": "e4e7772552bfbbd5e1cd00849718e9cbbb0aad702c478f6ef6fd86a2c46c669f",
+      "comparison": "changed_from_reported_baseline"
+    },
+    {
+      "path": "docs/previews/board-guide-th-plus.png",
+      "before_sha256": "5530f25fb93ba2d598b046ffb33d3c1a7e13d7423c3d81827fe49665a274476a",
+      "after_sha256": "a9ccdc03144891a028f3ef3edd982a9b1974628ba88374d52a1154b5f000d9b8",
+      "comparison": "changed_from_reported_baseline"
+    },
+    {
+      "path": "docs/previews/prompt-examples-en-dark.png",
+      "before_sha256": null,
+      "after_sha256": "9309d617a5d4575e347bc604774ffbedfe89cc196821b0b8aafc0b54a29b1285",
+      "comparison": "newly_recorded"
+    },
+    {
+      "path": "docs/previews/prompt-examples-th.png",
+      "before_sha256": null,
+      "after_sha256": "83ad5f558902d59b8123dee58ff3fc9073b4016ed16b09ad464df5bc65502a31",
+      "comparison": "newly_recorded"
+    },
+    {
+      "path": "docs/research/rule-documents-2026-10-16.json",
+      "before_sha256": "dffa9d48ff270d81bfbf7437ab9aeb065bd1b86911bda03f50dcf5f63522c55d",
+      "after_sha256": "be5040fb7aae96dbc222d09be14572295ec6ab01a75f7f8abd191e7e1da03ae3",
+      "comparison": "changed_from_reported_baseline"
+    },
+    {
+      "path": "scripts/check-production-workflows.mjs",
+      "before_sha256": "d6513de77a964dced698a354c7fb0e9ccf8b9c5681114ddc863f3ff33a25c47a",
+      "after_sha256": "f95ab4f5ff2b8c7b1c37b6c2573342b9ddd3952ef1fdbf9b5e90e7a8d0c82279",
+      "comparison": "changed_from_reported_baseline"
+    },
+    {
+      "path": "scripts/check-winget-token.ps1",
+      "before_sha256": null,
+      "after_sha256": "d5d6a475999a39734150cf9f23945ac9c44ab581389947c34fb3e53631c078d4",
+      "comparison": "newly_recorded"
+    },
+    {
+      "path": "scripts/probe-prompt-examples.mjs",
+      "before_sha256": null,
+      "after_sha256": "33b29926d8a786105916ab4d597916e6a9da07a9b9c7adafa8c61409c7602c9c",
+      "comparison": "newly_recorded"
+    },
+    {
+      "path": "scripts/tests/winget-token.tests.ps1",
+      "before_sha256": null,
+      "after_sha256": "362eb3ee0467990abeed2fbfd56e69ee6b81d7e503ce6df7d48efb277cc86d9b",
+      "comparison": "newly_recorded"
+    },
+    {
+      "path": "src-tauri/target/check-prompt-winget-workflow.py",
+      "before_sha256": null,
+      "after_sha256": "bf18049a6179f6bc6c55ecfa46753bfc997e83194406e9dcf76ad0bf9f2f6338",
+      "comparison": "newly_recorded"
+    },
+    {
+      "path": "src/AiChat.tsx",
+      "before_sha256": "db04651e0bf57fb3b16afe1a75498e58c66b539bc1b29339731948638550701e",
+      "after_sha256": "94f36cb2434ffeda032663906f02a5ca419d75006e24f635364332cd566b4673",
+      "comparison": "changed_from_reported_baseline"
+    },
+    {
+      "path": "src/App.tsx",
+      "before_sha256": "e4bc2048507581a0d64fba16adc68fa782afee77d098d4b366df0211e8536f12",
+      "after_sha256": "499a0c188a107a99852e909b6b9d68573b04e842ce006ad7612e5962e3928fbf",
+      "comparison": "changed_from_reported_baseline"
+    },
+    {
+      "path": "src/CodeEditor.tsx",
+      "before_sha256": "6bf768136cce69a18c6e1bd4afc071e79e645e117048f57eec5233494c133e9b",
+      "after_sha256": "817284148169f3f013b3376edba4c42a92b7953026890d33923f4c6c8e4a3e50",
+      "comparison": "changed_from_reported_baseline"
+    },
+    {
+      "path": "src/LearningWorkspace.css",
+      "before_sha256": "e780603831b63edf098b415042eaa76465fc168c21f67ddd67af9b3089307021",
+      "after_sha256": "a6455eee8576973c988bb4c6c90025725a2d8998d0ba67e6b6e2031a3640b9ad",
+      "comparison": "changed_from_reported_baseline"
+    },
+    {
+      "path": "src/LearningWorkspace.tsx",
+      "before_sha256": "fbeec1607ec38c5d4e3fef89c2a4fba54a59c17674037138733dac5e1ca54ba6",
+      "after_sha256": "38c3b9e8847c07744a12c4441886a6d1fd5715174e47710d62c51b1ed345460e",
+      "comparison": "changed_from_reported_baseline"
+    },
+    {
+      "path": "src/test/aiPromptDraft.test.tsx",
+      "before_sha256": null,
+      "after_sha256": "7f4bfcdbf1d6557b32e4a1c1572c4606e5f0dca479b1f47cba307598ca9f0f99",
+      "comparison": "newly_recorded"
+    },
+    {
+      "path": "src/test/learningWorkspace.test.tsx",
+      "before_sha256": "650671aede5627310b02092ab55a10ad8b8b80d3920585ba076313e7593c2d10",
+      "after_sha256": "97ceafae25f5b6f1eca57df1efbe9f60124bfda9a1c3a07544696e5aa8af666b",
+      "comparison": "changed_from_reported_baseline"
+    }
+  ]
+}

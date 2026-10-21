@@ -2,7 +2,7 @@ export type BuildResult = "idle" | "building" | "success" | "failed";
 export type BoardType = "kidbright32" | "miuaiplus";
 
 export const MIUAI_DEPLOYMENT_UNAVAILABLE =
-  "MiuAiPlus deployment is not yet supported — coming soon";
+  "μAI and μAI Plus deployment will be added after KidBright support is complete.";
 
 export function isBuildFlashSupported(board: BoardType): boolean {
   return board === "kidbright32";

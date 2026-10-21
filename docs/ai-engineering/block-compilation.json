@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-18",
+  "method": "Two typed normalized Block fixtures exported through the Rust converter, using the existing reference core; real installed configured ESP-IDF build, no install/download/flash",
+  "sdk_version_source": "tools/cmake/version.cmake",
+  "results": [
+    {
+      "example": "repeat_delay",
+      "board_profile": "kidbright32_v13",
+      "exit_code": 0,
+      "log": "src-tauri/target/block-c-evaluation-20261018/repeat_delay-build.log",
+      "flashed": false,
+      "sdk_version": "5.5.4",
+      "target": "esp32",
+      "generated_main_sha256": "ace975b65bbe205264e118b80d1c0da08a56088e9bf661a68a7c10eb9e4f961e",
+      "firmware": {
+        "bytes": 161904,
+        "sha256": "dd006555fb2f9fd08e87f247cacae65eb973f52bad1e6f1dfdf65b9d17ed7edd"
+      },
+      "compile_database_sha256": "2dcf65e17e5595a509fef4e1d27f89a87477c0d59962279a4f91afe65cd3d5c7",
+      "physical_behavior": "unverified"
+    },
+    {
+      "example": "forever_delay",
+      "board_profile": "kidbright32_rev31",
+      "exit_code": 0,
+      "log": "src-tauri/target/block-c-evaluation-20261018/forever_delay-build.log",
+      "flashed": false,
+      "sdk_version": "5.5.4",
+      "target": "esp32",
+      "generated_main_sha256": "513c690c3b412a1a24918256f7f423cf5f9e2ed4b7493969792b33678010a435",
+      "firmware": {
+        "bytes": 161840,
+        "sha256": "b9cb407f0bc71f89eb242e279d50617158bfd5194e7b17849ddec5025c77d46a"
+      },
+      "compile_database_sha256": "5965109f84635465829d5da6c6743ca94608cac3f0618ee36ff8b27561c22eb9",
+      "physical_behavior": "unverified"
+    }
+  ],
+  "passed": 2,
+  "total": 2,
+  "llm_generated": false,
+  "physically_verified": false
+}

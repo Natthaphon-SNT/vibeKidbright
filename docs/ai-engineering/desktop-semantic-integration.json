@@ -1,0 +1,252 @@
+{
+  "scope": "Actual debug native desktop WebView2 with production React/CSP, Tauri IPC, configured SDK, clangd and Monaco. No native/provider stubs or Vite/HMR. No paid credentials. Generated public fixtures only.",
+  "production_index_sha256": "a4ff51a573def4a1196df2cac2f68fe9eab91f342acf0ae6e75633f2fbd43f00",
+  "run_directory": "D:\\Internship-NECTEC\\vibeKidbright\\src-tauri\\target\\desktop-evaluation\\run-1792330905748",
+  "status": "PARTIAL",
+  "cases": [
+    {
+      "scenario": "configured_external_sdk_ready_in_actual_ui",
+      "status": "PASS",
+      "source": "configured-sdk",
+      "managed_marker_created": false
+    },
+    {
+      "operation": "Find definition",
+      "engine": "clangd semantic results",
+      "elapsed_ms": 864,
+      "status": "PASS"
+    },
+    {
+      "scenario": "definition_result_to_monaco",
+      "status": "PASS",
+      "cursor": {
+        "position": {
+          "lineNumber": 11,
+          "column": 6
+        },
+        "line": "bool kb_delay_ms(double seconds, uint32_t *milliseconds);"
+      }
+    },
+    {
+      "operation": "Find definition",
+      "engine": "Tree-sitter syntax candidates",
+      "elapsed_ms": 216,
+      "status": "PASS"
+    },
+    {
+      "scenario": "header_navigation_and_exact_cdb_fallback",
+      "status": "PASS",
+      "semantic_header_inference": false
+    },
+    {
+      "operation": "Find references",
+      "engine": "clangd semantic results",
+      "elapsed_ms": 859,
+      "status": "PASS"
+    },
+    {
+      "scenario": "reference_result_to_monaco",
+      "status": "PASS",
+      "reference_scope": "opened main translation unit only"
+    },
+    {
+      "operation": "Find definition",
+      "engine": "clangd semantic results",
+      "elapsed_ms": 852,
+      "status": "PASS"
+    },
+    {
+      "scenario": "unsaved_buffer",
+      "status": "PASS",
+      "disk_unchanged": true
+    },
+    {
+      "operation": "Find definition",
+      "engine": "Tree-sitter syntax candidates",
+      "elapsed_ms": 52,
+      "status": "PASS"
+    },
+    {
+      "scenario": "invalid_compilation_database_fallback",
+      "status": "PASS"
+    },
+    {
+      "operation": "Find definition",
+      "engine": "Tree-sitter syntax candidates",
+      "elapsed_ms": 51,
+      "status": "PASS"
+    },
+    {
+      "scenario": "clangd_unavailable_fallback",
+      "status": "PASS"
+    },
+    {
+      "scenario": "ui_cancellation",
+      "status": "PASS",
+      "child_terminated": true
+    },
+    {
+      "operation": "Find definition",
+      "engine": "Tree-sitter syntax candidates",
+      "elapsed_ms": 20714,
+      "status": "PASS"
+    },
+    {
+      "scenario": "native_20_second_timeout",
+      "status": "PASS",
+      "fault_fixture": true,
+      "child_terminated": true
+    },
+    {
+      "scenario": "project_switch_during_pending_request",
+      "status": "PASS",
+      "old_child_terminated": true,
+      "stale_results_discarded": true
+    },
+    {
+      "operation": "Find references",
+      "engine": "clangd semantic results",
+      "elapsed_ms": 854,
+      "status": "PASS"
+    },
+    {
+      "scenario": "project_switch",
+      "status": "PASS"
+    },
+    {
+      "scenario": "private_root_boundary",
+      "status": "PASS",
+      "path": "real IPC only"
+    },
+    {
+      "scenario": "react_terminal_to_configured_idf_build",
+      "status": "PASS",
+      "command": "idf.py build",
+      "elapsed_ms": 13183,
+      "flashed": false
+    }
+  ],
+  "installed_app_modified": false,
+  "installer_built": false,
+  "desktop_firmware_sha256": "b9cb407f0bc71f89eb242e279d50617158bfd5194e7b17849ddec5025c77d46a",
+  "page_errors": [],
+  "disk_sources_unchanged": true,
+  "compilation_database_restored": true,
+  "executable_sha256": "da26bd506708af8b12b3961333d16b35055b43ad78047b8a2b61aa1171b6acf1",
+  "clangd_sha256": "dbd52c13d21ef9d284f4f0627efe76c81adf2fe0998f230127f554a54fc9dde7",
+  "startup_credentials": "Debug-only evaluation guard returns empty credentials before any keyring or legacy-config access",
+  "real_vibe_harness_preflight": {
+    "status": "NOT_EXECUTED",
+    "inference_requests": 0,
+    "paid_credential_access": false,
+    "patches_approved_by_harness": 0,
+    "cases": [
+      {
+        "id": "grounding-th",
+        "prompt": "อธิบาย kb_delay_ms จากเอกสารใน knowledge_search พร้อมอ้างอิงชื่อไฟล์และเลขบรรทัด ไม่แก้ไฟล์",
+        "kind": "read_only",
+        "expected_evidence": [
+          "compatibility/kb_core.c",
+          "kb_delay_ms"
+        ],
+        "human_quality_grade": null
+      },
+      {
+        "id": "grounding-en",
+        "prompt": "Explain button release handling in the bundled button_buzzer example. Use knowledge_search and cite exact file and line ranges. Do not modify files.",
+        "kind": "read_only",
+        "expected_evidence": [
+          "compatibility/button_buzzer.c",
+          "gpio_get_level"
+        ],
+        "human_quality_grade": null
+      },
+      {
+        "id": "generation",
+        "prompt": "Propose a change to main/main.c that uses kb_delay_ms for a 0.1 second delay. Use the existing project and preserve its board profile. Wait for my review before applying any change.",
+        "kind": "review_required",
+        "expected_evidence": [
+          "pending revision",
+          "source unchanged before Keep",
+          "explicit user approval"
+        ],
+        "human_quality_grade": null
+      },
+      {
+        "id": "compile",
+        "kind": "manual_after_approval",
+        "expected_evidence": [
+          "exact configured idf.py command",
+          "SDK version",
+          "exit code",
+          "source and firmware hashes"
+        ],
+        "compiler_valid": null
+      },
+      {
+        "id": "diagnostics",
+        "kind": "manual_public_fault_fixture",
+        "expected_evidence": [
+          "actual compiler diagnostic",
+          "path line column severity",
+          "same source revision"
+        ],
+        "diagnostic_correct": null
+      },
+      {
+        "id": "bounded-repair",
+        "kind": "review_required",
+        "expected_evidence": [
+          "maximum configured attempts <= 3",
+          "separate approval per patch",
+          "repeated failed patch rejected",
+          "actual rebuild result"
+        ],
+        "repair_correct": null
+      },
+      {
+        "id": "rollback",
+        "kind": "manual_after_approval",
+        "expected_evidence": [
+          "review revision",
+          "user Undo",
+          "exact original source hash restored",
+          "conflict preserved if later edited"
+        ],
+        "rollback_correct": null
+      }
+    ],
+    "grading": {
+      "retrieval_relevance": null,
+      "citation_existence": null,
+      "citation_support": null,
+      "model_output_quality": null,
+      "compiler_validity": null,
+      "review_safety": null,
+      "note": "These are separate judgments. Rendering a citation or compiling C does not prove model correctness."
+    },
+    "isolated_desktop_identifier": "th.nectec.vibekidbright.desktop-evaluation",
+    "reason": "Real desktop IPC preflight passed; no model discovery or inference and no patch approval."
+  },
+  "header_status": "tested navigation and labelled syntax fallback; no inferred header compile command",
+  "native_provider_stubbed": false,
+  "source_sha256": {
+    "src-tauri/src/lib.rs": "1b51d9a3b39e8e15119fffa436731f84e1d05127c4060d8de5f89e05ab412dc8",
+    "src-tauri/src/ai/config.rs": "ae0c19d990bcf82a5fea3a5673b320d9186478b254da2171cd85937ce35bf595",
+    "src-tauri/src/esp_idf.rs": "62728b30693db31b4e17da2ce159ff74bba8f812a58a9dd1fdced193e9573a5c",
+    "src-tauri/src/toolchain.rs": "a6e8b8935c774a2b9b274176a3398a807bb8c1be2ff8bc59257377b733325e80",
+    "src-tauri/src/intelligence/semantic.rs": "80f08d42ed5676072a11a30f3ea1afd4437ec5c470de28b5543a4f54ec04e9cc",
+    "src-tauri/build.rs": "10653c53fdefb7e3dee3654ab791f5e2146e734955ed0671172cd8f506cfa69f",
+    "src-tauri/examples/desktop_evaluation.rs": "6780ef718fc211f43e4a7c68cdf7147caa2def6514998061290cd133e801e3b0",
+    "src-tauri/examples/desktop-evaluation.manifest": "708bff8872b2502137891dcbb140f403c3e98977661dd15f818c760b881723f2",
+    "src-tauri/examples/stalling_lsp_fixture.rs": "582f68d74eaa8d65ff2307c66eef777588319320c81ff01e762f0c34c9d3a64d",
+    "src/CIntelligencePanel.tsx": "586e1830259c4a5eb617f60963cbdca80416fc75dbd6763c5775bdac003681cc",
+    "src/CodeEditor.tsx": "6bf768136cce69a18c6e1bd4afc071e79e645e117048f57eec5233494c133e9b",
+    "scripts/probe-desktop-semantic.mjs": "fef3eb81c956efbadf0561d55e2606ff831f5da6149e84d2baa001392c90f8aa",
+    "scripts/evaluate-vibe-coder-real.mjs": "7ecd727a02239746846c4b329713d5147380a88374f929307532dc6e31b7a14d"
+  },
+  "screenshot": {
+    "path": "docs/previews/desktop-semantic-integration.png",
+    "sha256": "dacb47588f482f1e1581e6222b4cbb97a6d4b7c49940e1ae0910223b754663d4"
+  }
+}

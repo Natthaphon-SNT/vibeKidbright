@@ -1,0 +1,37 @@
+{
+  "version": "3.7.3",
+  "artifact": {
+    "path": "src-tauri/target/release/bundle/nsis/VibeKidbright IDE_3.7.3_x64-setup.exe",
+    "bytes": 316758944,
+    "sha256": "d09d0f9418d94059e801fc43a38241314757c686e5060e26596a806ba56ae7c1"
+  },
+  "artifact_unchanged": true,
+  "new_installer_built": false,
+  "working_tree_changes_in_this_installer": false,
+  "resource_hashes_match": true,
+  "resource_counts": {
+    "knowledge_base": 41,
+    "embedding": 8
+  },
+  "extracted_binary_hash_matches": true,
+  "generated_nsis_script_sha256": "78416625a6b91dd0c4b12eb07db13e7c2b5c5e6210291bdb8e895df327ae0af6",
+  "static_uninstall_review": {
+    "appdata_removal_requires_explicit_checkbox": true,
+    "appdata_removal_disabled_in_update_mode": true,
+    "install_directory_removal_is_not_recursive": true,
+    "native_credentials_deleted_by_script": false,
+    "limitation": "Static source inspection, not a GUI lifecycle test. Checking Delete app data explicitly removes settings/recovery data. Keep it unchecked."
+  },
+  "vm_available_for_execution": false,
+  "lifecycle_execution": {
+    "install": "NOT_EXECUTED",
+    "upgrade": "NOT_EXECUTED",
+    "rollback": "NOT_EXECUTED",
+    "uninstall": "NOT_EXECUTED"
+  },
+  "limits": [
+    "No clean VM supplied/discovered through available host tooling",
+    "No existing application installation, settings, projects or credentials changed",
+    "Static NSIS checks do not certify registry, driver, shortcut, schema downgrade or GUI behavior"
+  ]
+}

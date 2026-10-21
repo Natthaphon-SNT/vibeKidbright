@@ -1,0 +1,279 @@
+{
+  "schema_version": 1,
+  "source_archive_sha256": "8a3f7c8e9b8ba08375853213faac1b42bfac3e767a56fa81edfe9a124125495b",
+  "checked_date": "2026-10-18",
+  "verified_against_actual_archive": true,
+  "ids": [
+    "basic_delay",
+    "basic_forever",
+    "controls_repeat_ext",
+    "math_number",
+    "math_arithmetic",
+    "logic_boolean",
+    "logic_compare",
+    "logic_negate",
+    "controls_if"
+  ],
+  "records": [
+    {
+      "scope": "archive",
+      "kind": "block",
+      "type": "controls_repeat_ext",
+      "path": "kbide/app/public/blockly/blocks_compressed.js",
+      "line": 61,
+      "declaration": "json-array",
+      "mutator_only": false
+    },
+    {
+      "scope": "archive",
+      "kind": "generator",
+      "type": "controls_repeat_ext",
+      "path": "kbide/app/public/blockly/javascript_compressed.js",
+      "line": 46,
+      "declaration": "function",
+      "helper_only": false
+    },
+    {
+      "scope": "archive",
+      "kind": "block",
+      "type": "basic_delay",
+      "path": "kbide/app/public/blockly/kidbright/blocks.js",
+      "line": 138,
+      "declaration": "assignment",
+      "mutator_only": false
+    },
+    {
+      "scope": "archive",
+      "kind": "block",
+      "type": "basic_forever",
+      "path": "kbide/app/public/blockly/kidbright/blocks.js",
+      "line": 152,
+      "declaration": "assignment",
+      "mutator_only": false
+    },
+    {
+      "scope": "archive",
+      "kind": "block",
+      "type": "math_number",
+      "path": "kbide/app/public/blockly/kidbright/blocks.js",
+      "line": 185,
+      "declaration": "assignment",
+      "mutator_only": false
+    },
+    {
+      "scope": "archive",
+      "kind": "generator",
+      "type": "basic_delay",
+      "path": "kbide/app/public/blockly/kidbright/generators.js",
+      "line": 57,
+      "declaration": "function",
+      "helper_only": false
+    },
+    {
+      "scope": "archive",
+      "kind": "generator",
+      "type": "basic_forever",
+      "path": "kbide/app/public/blockly/kidbright/generators.js",
+      "line": 61,
+      "declaration": "function",
+      "helper_only": false
+    },
+    {
+      "scope": "archive",
+      "kind": "generator",
+      "type": "math_number",
+      "path": "kbide/app/public/blockly/kidbright/generators.js",
+      "line": 75,
+      "declaration": "function",
+      "helper_only": false
+    },
+    {
+      "scope": "archive",
+      "kind": "block",
+      "type": "controls_if",
+      "path": "kbide/app/public/blockly/blocks_compressed.js",
+      "line": 42,
+      "declaration": "json-array",
+      "mutator_only": false
+    },
+    {
+      "scope": "archive",
+      "kind": "generator",
+      "type": "controls_if",
+      "path": "kbide/app/public/blockly/javascript_compressed.js",
+      "line": 41,
+      "declaration": "function",
+      "helper_only": false
+    },
+    {
+      "scope": "archive",
+      "kind": "generator",
+      "type": "controls_if",
+      "path": "kbide/app/public/blockly/kidbright/generators.js",
+      "line": 134,
+      "declaration": "function",
+      "helper_only": false
+    },
+    {
+      "scope": "archive",
+      "kind": "block",
+      "type": "logic_boolean",
+      "path": "kbide/app/public/blockly/blocks_compressed.js",
+      "line": 42,
+      "declaration": "json-array",
+      "mutator_only": false
+    },
+    {
+      "scope": "archive",
+      "kind": "generator",
+      "type": "logic_boolean",
+      "path": "kbide/app/public/blockly/javascript_compressed.js",
+      "line": 44,
+      "declaration": "function",
+      "helper_only": false
+    },
+    {
+      "scope": "archive",
+      "kind": "generator",
+      "type": "logic_boolean",
+      "path": "kbide/app/public/blockly/kidbright/generators.js",
+      "line": 222,
+      "declaration": "function",
+      "helper_only": false
+    },
+    {
+      "scope": "archive",
+      "kind": "block",
+      "type": "logic_compare",
+      "path": "kbide/app/public/blockly/blocks_compressed.js",
+      "line": 44,
+      "declaration": "json-array",
+      "mutator_only": false
+    },
+    {
+      "scope": "archive",
+      "kind": "generator",
+      "type": "logic_compare",
+      "path": "kbide/app/public/blockly/javascript_compressed.js",
+      "line": 42,
+      "declaration": "function",
+      "helper_only": false
+    },
+    {
+      "scope": "archive",
+      "kind": "generator",
+      "type": "logic_compare",
+      "path": "kbide/app/public/blockly/kidbright/generators.js",
+      "line": 154,
+      "declaration": "function",
+      "helper_only": false
+    },
+    {
+      "scope": "archive",
+      "kind": "block",
+      "type": "logic_negate",
+      "path": "kbide/app/public/blockly/blocks_compressed.js",
+      "line": 45,
+      "declaration": "json-array",
+      "mutator_only": false
+    },
+    {
+      "scope": "archive",
+      "kind": "generator",
+      "type": "logic_negate",
+      "path": "kbide/app/public/blockly/javascript_compressed.js",
+      "line": 44,
+      "declaration": "function",
+      "helper_only": false
+    },
+    {
+      "scope": "archive",
+      "kind": "generator",
+      "type": "logic_negate",
+      "path": "kbide/app/public/blockly/kidbright/generators.js",
+      "line": 213,
+      "declaration": "function",
+      "helper_only": false
+    },
+    {
+      "scope": "archive",
+      "kind": "block",
+      "type": "math_arithmetic",
+      "path": "kbide/app/public/blockly/blocks_compressed.js",
+      "line": 72,
+      "declaration": "json-array",
+      "mutator_only": false
+    },
+    {
+      "scope": "archive",
+      "kind": "block",
+      "type": "math_arithmetic",
+      "path": "kbide/app/public/blockly/kidbright/blocks.js",
+      "line": 198,
+      "declaration": "assignment",
+      "mutator_only": false
+    },
+    {
+      "scope": "archive",
+      "kind": "generator",
+      "type": "math_arithmetic",
+      "path": "kbide/app/public/blockly/javascript_compressed.js",
+      "line": 54,
+      "declaration": "function",
+      "helper_only": false
+    },
+    {
+      "scope": "archive",
+      "kind": "generator",
+      "type": "math_arithmetic",
+      "path": "kbide/app/public/blockly/kidbright/generators.js",
+      "line": 83,
+      "declaration": "function",
+      "helper_only": false
+    }
+  ],
+  "sources": [
+    {
+      "scope": "archive",
+      "path": "kbide/app/public/blockly/blocks_compressed.js",
+      "sha256": "840d2b995de74579f90c900f3f14da6a52b0fc1c8b539cf6f6ccae6f934fbc56",
+      "bytes": 71184
+    },
+    {
+      "scope": "archive",
+      "path": "kbide/app/public/blockly/javascript_compressed.js",
+      "sha256": "5ce35eb8b4c8a2a8a8652fb9352ef3b4e8ab4fb316573bd9ccfef8438aae1af8",
+      "bytes": 47087
+    },
+    {
+      "scope": "archive",
+      "path": "kbide/app/public/blockly/kidbright/blocks.js",
+      "sha256": "12b2250f705f54e798cb1bf0f70e5d7ab0b92726ea80c52a33b319c60d884dc9",
+      "bytes": 57733
+    },
+    {
+      "scope": "archive",
+      "path": "kbide/app/public/blockly/kidbright/generators.js",
+      "sha256": "64103bf8ea389e16aff57ca74ea3a82aa9084fb70667cf81403b9f890350d7e9",
+      "bytes": 17211
+    }
+  ],
+  "normalized_ir": true,
+  "xml_import": false,
+  "physical_behavior": "unverified",
+  "limitations": [
+    "Only constant integer repeat counts 0..10000",
+    "Delays 0.02..86400 seconds; modern pdMS_TO_TICKS with configured 1000Hz",
+    "Forever requires an unconditional blocking delay",
+    "No macro evaluation, arbitrary C expression or plugin code",
+    "Board profiles limited to existing confirmed classic ESP32 pilot"
+  ],
+  "continuation_verified_against_actual_archive": true,
+  "limits_of_expansion": [
+    "Numeric-only comparisons; no strings",
+    "IF0/DO0/optional ELSE only; no elseif mutator",
+    "Arithmetic uses Desktop ADD/MINUS/MULTIPLY/DIVIDE/MODULO; POWER excluded",
+    "Constant expressions checked for non-finite/range/zero divisors; MODULO restricted to bounded integers",
+    "Repeat counts remain literals, no variables/hardware expressions"
+  ]
+}

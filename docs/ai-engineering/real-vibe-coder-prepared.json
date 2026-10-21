@@ -1,0 +1,92 @@
+{
+  "status": "NOT_EXECUTED",
+  "inference_requests": 0,
+  "paid_credential_access": false,
+  "patches_approved_by_harness": 0,
+  "cases": [
+    {
+      "id": "grounding-th",
+      "prompt": "อธิบาย kb_delay_ms จากเอกสารใน knowledge_search พร้อมอ้างอิงชื่อไฟล์และเลขบรรทัด ไม่แก้ไฟล์",
+      "kind": "read_only",
+      "expected_evidence": [
+        "compatibility/kb_core.c",
+        "kb_delay_ms"
+      ],
+      "human_quality_grade": null
+    },
+    {
+      "id": "grounding-en",
+      "prompt": "Explain button release handling in the bundled button_buzzer example. Use knowledge_search and cite exact file and line ranges. Do not modify files.",
+      "kind": "read_only",
+      "expected_evidence": [
+        "compatibility/button_buzzer.c",
+        "gpio_get_level"
+      ],
+      "human_quality_grade": null
+    },
+    {
+      "id": "generation",
+      "prompt": "Propose a change to main/main.c that uses kb_delay_ms for a 0.1 second delay. Use the existing project and preserve its board profile. Wait for my review before applying any change.",
+      "kind": "review_required",
+      "expected_evidence": [
+        "pending revision",
+        "source unchanged before Keep",
+        "explicit user approval"
+      ],
+      "human_quality_grade": null
+    },
+    {
+      "id": "compile",
+      "kind": "manual_after_approval",
+      "expected_evidence": [
+        "exact configured idf.py command",
+        "SDK version",
+        "exit code",
+        "source and firmware hashes"
+      ],
+      "compiler_valid": null
+    },
+    {
+      "id": "diagnostics",
+      "kind": "manual_public_fault_fixture",
+      "expected_evidence": [
+        "actual compiler diagnostic",
+        "path line column severity",
+        "same source revision"
+      ],
+      "diagnostic_correct": null
+    },
+    {
+      "id": "bounded-repair",
+      "kind": "review_required",
+      "expected_evidence": [
+        "maximum configured attempts <= 3",
+        "separate approval per patch",
+        "repeated failed patch rejected",
+        "actual rebuild result"
+      ],
+      "repair_correct": null
+    },
+    {
+      "id": "rollback",
+      "kind": "manual_after_approval",
+      "expected_evidence": [
+        "review revision",
+        "user Undo",
+        "exact original source hash restored",
+        "conflict preserved if later edited"
+      ],
+      "rollback_correct": null
+    }
+  ],
+  "grading": {
+    "retrieval_relevance": null,
+    "citation_existence": null,
+    "citation_support": null,
+    "model_output_quality": null,
+    "compiler_validity": null,
+    "review_safety": null,
+    "note": "These are separate judgments. Rendering a citation or compiling C does not prove model correctness."
+  },
+  "reason": "Prepared only. No model inference. Run requires explicit --authorize-local-inference, a loopback endpoint, discovered model and isolated desktop CDP."
+}

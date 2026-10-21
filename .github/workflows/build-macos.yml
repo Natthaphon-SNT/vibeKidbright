@@ -20,19 +20,6 @@ jobs:
         with:
           path: main_repo
 
-      - name: Checkout external knowledge_base repo
-        uses: actions/checkout@v4
-        with:
-          repository: Natthaphon-SNT/Knowledge
-          path: external_repo
-
-      - name: Extract external knowledge_base.zip
-        run: |
-          ZIP="external_repo/knowledge_base.zip"
-          if [ ! -f "$ZIP" ]; then echo "ไม่พบไฟล์ $ZIP"; exit 1; fi
-          mkdir -p external_repo/extracted
-          unzip -o "$ZIP" -d external_repo/extracted
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -58,30 +45,13 @@ jobs:
         working-directory: main_repo
         run: npm run check:public
 
-      - name: Merge knowledge_base from both repos
-        run: |
-          DST="main_repo/resources/knowledge_base"
-          mkdir -p "$DST"
+      - name: Prepare bundled offline model
+        working-directory: main_repo
+        run: npm run prepare:runtime -- --download
 
-          sync_kb() {
-            SRC="$1"
-            if [ ! -d "$SRC" ]; then echo "Skipping $SRC (not found)"; return; fi
-            # Keep this allowlist in sync with bundleExtensions in scripts/check-public.mjs.
-            find "$SRC" -type f | while IFS= read -r FILE; do
-              case "${FILE##*.}" in
-                c|h|jpeg|jpg|md|pdf|png|txt|webp) ;;
-                *) continue ;;
-              esac
-              REL="${FILE#$SRC/}"
-              DST_FILE="$DST/$REL"
-              mkdir -p "$(dirname "$DST_FILE")"
-              cp "$FILE" "$DST_FILE"
-            done
-          }
-
-          sync_kb "external_repo/extracted/knowledge_base"
-          sync_kb "main_repo/knowledge_base"
-          echo "Merge complete -> $DST"
+      - name: Synchronize audited repository knowledge base
+        working-directory: main_repo
+        run: npm run sync:kb
 
       - name: Verify clean installer resources
         working-directory: main_repo
@@ -173,9 +143,11 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.get_version.outputs.TAG }}
+          target_commitish: ${{ github.sha }}
           name: 'vibeKidbright ${{ steps.get_version.outputs.TAG }} (macOS)'
           body: 'ดาวน์โหลดไฟล์ .dmg ด้านล่างเพื่อติดตั้งบน macOS (รองรับทั้ง Apple Silicon และ Intel)'
           draft: true
           prerelease: false
+          fail_on_unmatched_files: true
           files: |
             main_repo/src-tauri/target/universal-apple-darwin/release/bundle/dmg/*.dmg

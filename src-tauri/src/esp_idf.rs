@@ -1,5 +1,5 @@
 use std::ffi::OsString;
-use std::io::{BufRead, BufReader, Read};
+use std::io::{BufRead, BufReader, Read, Write};
 #[cfg(target_os = "windows")]
 use std::os::windows::process::CommandExt;
 use std::path::{Path, PathBuf};
@@ -18,7 +18,6 @@ fn apply_no_window(cmd: &mut Command) {
     cmd.creation_flags(CREATE_NO_WINDOW);
 }
 
-static CACHED_ESP_IDF_CONFIG: OnceLock<Mutex<Option<serde_json::Value>>> = OnceLock::new();
 
 #[derive(Clone, serde::Serialize, Debug, PartialEq, Eq)]
 pub struct CommandOutcome {
@@ -26,6 +25,7 @@ pub struct CommandOutcome {
     pub code: Option<i32>,
 }
 
+#[cfg(test)]
 fn wait_for_child(mut child: std::process::Child) -> Result<CommandOutcome, String> {
     let status = child
         .wait()
@@ -46,50 +46,44 @@ fn wait_for_child(mut child: std::process::Child) -> Result<CommandOutcome, Stri
     }
 }
 
+struct StreamedCommandOutput {
+    outcome: CommandOutcome,
+    stdout: String,
+}
+
+type ProcessLineEmitter = Arc<dyn Fn(String, bool) + Send + Sync>;
+
+fn captured_outcome(output:crate::sdk_process::Captured)->Result<StreamedCommandOutput,String> {
+    if !output.success {
+        return Err(format!("Command failed with exit code {}\n{}{}",output.code.map(|v|v.to_string()).unwrap_or_else(||"unknown".into()),output.stdout,output.stderr));
+    }
+    Ok(StreamedCommandOutput{outcome:CommandOutcome{success:output.success,code:output.code},stdout:format!("{}{}",output.stdout,output.stderr)})
+}
+#[cfg(test)]
+fn execute_streamed_command(command:Command,emit:ProcessLineEmitter)->Result<StreamedCommandOutput,String> {
+    captured_outcome(crate::sdk_process::execute(command,emit,Arc::new(AtomicBool::new(false)),Duration::from_secs(30))?)
+}
+async fn stream_command_with_lease(command:Command,app_handle:AppHandle,lease:Arc<crate::sdk_process::WorkspaceLease>)->Result<StreamedCommandOutput,String> {
+    let timeout=Duration::from_secs(crate::sdk_process::get_sdk_execution_config()?.timeout_seconds);
+    let cancel=lease.cancel.clone();
+    let _cancel_on_drop=crate::sdk_process::CancelOnDrop(cancel.clone());
+    let emit:ProcessLineEmitter=Arc::new(move|line,is_error|{
+        let line=if is_error{format!("\x1b[31m{}\x1b[0m",line)}else{line};
+        let _=app_handle.emit("terminal-output",line);
+    });
+    tauri::async_runtime::spawn_blocking(move||{
+        let _lease=lease;
+        captured_outcome(crate::sdk_process::execute(command,emit,cancel,timeout)?)
+    }).await.map_err(|error|format!("Command worker failed: {error}"))?
+}
+
 const DEFAULT_ESP_IDF_VERSION: &str = "v5.5.1";
 const ESP_IDF_REPO_URL: &str = "https://github.com/espressif/esp-idf.git";
 
 // ── Persistent Config for custom paths ───────────────────────────────
 // Stored in: %APPDATA%/vibeKidbright/config.json
 
-fn esp_idf_config_path() -> std::path::PathBuf {
-    let home = std::env::var("APPDATA")
-        .or_else(|_| std::env::var("HOME"))
-        .unwrap_or_else(|_| ".".to_string());
-    std::path::PathBuf::from(home)
-        .join(".vibekidbright")
-        .join("config.json")
-}
-
-fn read_esp_idf_config() -> serde_json::Value {
-    let mut guard = get_cached_config().lock().unwrap();
-    if let Some(config) = &*guard {
-        return config.clone();
-    }
-
-    let path = esp_idf_config_path();
-    let config = if path.exists() {
-        let data = std::fs::read_to_string(&path).unwrap_or_default();
-        serde_json::from_str(&data).unwrap_or(serde_json::json!({}))
-    } else {
-        serde_json::json!({})
-    };
-
-    *guard = Some(config.clone());
-    config
-}
-
-fn write_esp_idf_config(config: &serde_json::Value) {
-    let path = esp_idf_config_path();
-    if let Some(parent) = path.parent() {
-        let _ = std::fs::create_dir_all(parent);
-    }
-    let _ = std::fs::write(
-        &path,
-        serde_json::to_string_pretty(config).unwrap_or_default(),
-    );
-    *get_cached_config().lock().unwrap() = None;
-}
+fn read_esp_idf_config() -> serde_json::Value { crate::ai::config::read_config() }
 
 /// Check if the user has manually configured custom ESP-IDF paths in config
 fn resolve_custom_config_paths() -> Option<(PathBuf, PathBuf)> {
@@ -115,7 +109,10 @@ fn resolve_custom_config_paths() -> Option<(PathBuf, PathBuf)> {
             map.remove("custom_idf_path");
             map.remove("custom_tools_path");
         }
-        write_esp_idf_config(&stale);
+        let _ = crate::ai::config::update_config(|config| {
+            config.as_object_mut().unwrap().remove("custom_idf_path");
+            config.as_object_mut().unwrap().remove("custom_tools_path");
+        });
         return None;
     }
 
@@ -233,7 +230,7 @@ fn detect_host_python() -> Result<String, String> {
 
 /// Resolve the ESP-IDF and tools paths (runtime, bundled, or dev fallback).
 /// Priority: env override > user config > Happy Meal toolchain > runtime > bundled.
-fn resolve_idf_paths(app_handle: &AppHandle) -> Result<(PathBuf, PathBuf), String> {
+pub(crate) fn resolve_idf_paths(app_handle: &AppHandle) -> Result<(PathBuf, PathBuf), String> {
     // 1. Environment variable override
     if let Some((idf_path, tools_path)) = resolve_env_override() {
         if let Ok(paths) = canonical_idf_pair(&idf_path, &tools_path) {
@@ -356,6 +353,15 @@ fn read_idf_version(idf_path: &Path) -> String {
         .unwrap_or_default()
         .trim()
         .to_string()
+}
+
+/// Read-only readiness for a configured/external SDK. A managed-install marker
+/// is not required when the same resolver used by build found an existing SDK.
+pub(crate) fn installed_sdk_status(idf: &Path, tools: &Path) -> Result<serde_json::Value,String> {
+    let (idf,tools)=canonical_idf_pair(idf,tools)?;
+    find_idf_python(&tools)?;
+    let version=read_idf_version(&idf);
+    Ok(serde_json::json!({"status":"ready","version":if version.is_empty(){None}else{Some(version.trim_start_matches('v').to_owned())},"path":idf,"tools_path":tools,"source":"configured-sdk"}))
 }
 
 /// Scan an ESP-IDF tools directory and add all executable directories to `paths`.
@@ -562,15 +568,10 @@ pub async fn set_idf_custom_paths(idf_path: String, tools_path: String) -> Resul
         return Err(format!("Tools path does not exist: '{}'", tools_path));
     }
 
-    let mut config = read_esp_idf_config();
-    if let serde_json::Value::Object(ref mut map) = config {
-        map.insert("custom_idf_path".to_string(), serde_json::json!(idf_path));
-        map.insert(
-            "custom_tools_path".to_string(),
-            serde_json::json!(tools_path),
-        );
-    }
-    write_esp_idf_config(&config);
+    crate::ai::config::update_config(|config| {
+        config["custom_idf_path"] = serde_json::json!(idf_path);
+        config["custom_tools_path"] = serde_json::json!(tools_path);
+    })?;
     Ok(format!(
         "ESP-IDF paths saved: {} | {}",
         idf_path, tools_path
@@ -579,13 +580,10 @@ pub async fn set_idf_custom_paths(idf_path: String, tools_path: String) -> Resul
 
 #[tauri::command]
 pub async fn clear_idf_custom_paths() -> Result<(), String> {
-    let mut config = read_esp_idf_config();
-    if let serde_json::Value::Object(ref mut map) = config {
-        map.remove("custom_idf_path");
-        map.remove("custom_tools_path");
-    }
-    write_esp_idf_config(&config);
-    Ok(())
+    crate::ai::config::update_config(|config| {
+        config.as_object_mut().unwrap().remove("custom_idf_path");
+        config.as_object_mut().unwrap().remove("custom_tools_path");
+    })
 }
 
 #[tauri::command]
@@ -725,21 +723,56 @@ pub async fn setup_esp_idf(
     ))
 }
 
+/// Resolve every explicit IDF project directory against the process working
+/// directory, so a -C argument cannot bypass a pending creation review.
+fn idf_project_directories(args: &[String], working_dir: &Path) -> Vec<PathBuf> {
+    let mut directories = vec![working_dir.to_path_buf()];
+    let mut remaining = args.iter();
+    while let Some(argument) = remaining.next() {
+        if argument == "--" { break; }
+        let value = if argument == "-C" || argument == "--project-dir" {
+            remaining.next().map(String::as_str)
+        } else {
+            argument.strip_prefix("--project-dir=")
+                .or_else(|| argument.strip_prefix("-C").filter(|value| !value.is_empty()))
+        };
+        if let Some(value) = value {
+            let path = PathBuf::from(crate::ai_chat::normalize_project_dir(value));
+            directories.push(if path.is_absolute() { path } else { working_dir.join(path) });
+        }
+    }
+    directories
+}
+
 #[tauri::command]
 pub async fn run_idf_command(
     app_handle: AppHandle,
     command: String,
     args: Vec<String>,
+    project_dir: Option<String>,
 ) -> Result<String, String> {
+    let working_dir = match project_dir.as_deref().filter(|path| !path.trim().is_empty()) {
+        Some(path) => PathBuf::from(crate::ai_chat::normalize_project_dir(path)),
+        None => std::env::current_dir().map_err(|error| error.to_string())?,
+    };
+    let idf_args: Vec<_> = std::iter::once(command.clone()).chain(args.iter().cloned()).collect();
+    let lease=Arc::new(crate::sdk_process::lease(&working_dir,true)?);
+    let _cancel=crate::sdk_process::CancelOnDrop(lease.cancel.clone());
+    for project in idf_project_directories(&idf_args, &working_dir) {
+        ensure_project_reviewed(&project)?;
+    }
     let (actual_idf_path, actual_tools_path) = resolve_idf_paths(&app_handle)?;
     let (python_bin, python_env_path) = find_idf_python(&actual_tools_path)?;
     let path_env = build_idf_path(&actual_tools_path);
     let idf_version = read_idf_version(&actual_idf_path);
 
+    prepare_idf_build(&idf_args, &working_dir, &actual_idf_path, &actual_tools_path, &app_handle,lease.clone()).await?;
+
     let mut cmd = Command::new(&python_bin);
     cmd.arg(actual_idf_path.join("tools/idf.py"))
         .arg(&command)
         .args(&args)
+        .current_dir(&working_dir)
         .env("IDF_PATH", &actual_idf_path)
         .env("IDF_TOOLS_PATH", &actual_tools_path)
         .env("IDF_PYTHON_ENV_PATH", &python_env_path)
@@ -755,15 +788,7 @@ pub async fn run_idf_command(
     if let Some(rom_elf_dir) = find_esp_rom_elf_dir(&actual_tools_path) {
         cmd.env("ESP_ROM_ELF_DIR", rom_elf_dir);
     }
-    let output = cmd
-        .output()
-        .map_err(|e| format!("Failed to execute idf.py: {}", e))?;
-
-    if output.status.success() {
-        Ok(String::from_utf8_lossy(&output.stdout).to_string())
-    } else {
-        Err(String::from_utf8_lossy(&output.stderr).to_string())
-    }
+    Ok(stream_command_with_lease(cmd, app_handle,lease).await?.stdout)
 }
 
 #[tauri::command]
@@ -801,8 +826,12 @@ project({})
     })?;
 
     // 2. main/CMakeLists.txt
-    let main_cmake = r#"idf_component_register(SRCS "main.c"
-                       INCLUDE_DIRS ".")
+    let main_cmake = r#"idf_component_register(
+    SRCS
+    # VIBEKIDBRIGHT_MANAGED_SOURCES_BEGIN
+    "main.c"
+    # VIBEKIDBRIGHT_MANAGED_SOURCES_END
+    INCLUDE_DIRS ".")
 "#;
     std::fs::write(project_path.join("main/CMakeLists.txt"), main_cmake).map_err(|e| {
         let err = format!("Failed to write main/CMakeLists.txt: {}", e);
@@ -868,17 +897,25 @@ pub async fn list_project_files(path: String) -> Result<Vec<FileEntry>, String> 
                     .unwrap_or_default()
                     .to_string_lossy()
                     .to_string();
+                let is_dir = path.is_dir();
+                // Older AI-generated projects placed IDE metadata beside source
+                // files. Hide those reserved root files while retaining genuine
+                // project documents/configuration and identically named user files
+                // inside subdirectories. New metadata lives in a hidden directory.
+                let is_legacy_project_metadata = depth == 0 && !is_dir
+                    && (name.eq_ignore_ascii_case("kidbright-project.json")
+                        || name.eq_ignore_ascii_case("KIDBRIGHT_COMPATIBILITY.md"));
 
                 // Skip hidden files and build artifacts
                 if name.starts_with('.')
                     || name == "build"
                     || name == "target"
                     || name == "node_modules"
+                    || is_legacy_project_metadata
                 {
                     continue;
                 }
 
-                let is_dir = path.is_dir();
                 let children = if is_dir {
                     Some(read_dir_recursive(&path, depth + 1)?)
                 } else {
@@ -916,11 +953,416 @@ pub async fn read_project_file(path: String) -> Result<String, String> {
 
 #[tauri::command]
 pub async fn write_project_file(path: String, content: String) -> Result<(), String> {
+    let parent=Path::new(&path).parent().ok_or("File parent unavailable.")?;
+    let _lease=crate::sdk_process::lease(parent,false)?;
     std::fs::write(path, content).map_err(|e| format!("Failed to write file: {}", e))
 }
 
 #[tauri::command]
+pub async fn create_project_file(path: String) -> Result<(), String> {
+    // A learner's New File action must never truncate an existing program.
+    std::fs::OpenOptions::new().write(true).create_new(true).open(path)
+        .map(drop)
+        .map_err(|error| format!("Could not create file (existing files are kept): {}", error))
+}
+
+const SOURCES_BEGIN: &str = "# VIBEKIDBRIGHT_MANAGED_SOURCES_BEGIN";
+const SOURCES_END: &str = "# VIBEKIDBRIGHT_MANAGED_SOURCES_END";
+
+fn is_program_source(path: &Path) -> bool {
+    matches!(path.extension().and_then(|value| value.to_str()), Some("c" | "cpp" | "cc" | "cxx" | "S"))
+}
+
+fn same_source_path(left: &str, right: &str) -> bool {
+    if cfg!(windows) { left.eq_ignore_ascii_case(right) } else { left == right }
+}
+
+fn source_is_within(source: &str, item: &str) -> bool {
+    same_source_path(source, item)
+        || (source.as_bytes().get(item.len()) == Some(&b'/')
+            && source.get(..item.len()).is_some_and(|prefix| same_source_path(prefix, item)))
+}
+
+fn safe_relative_program_path(path: &Path) -> Result<String, String> {
+    use std::path::Component;
+    let mut components = path.components();
+    if !components.next().is_some_and(|component| matches!(component, Component::Normal(name)
+        if name.to_str().is_some_and(|name| same_source_path(name, "main")))) {
+        return Err("Program files must be inside the project's main directory.".into());
+    }
+    let mut names = Vec::new();
+    for component in components {
+        let Component::Normal(name) = component else {
+            return Err("Program paths cannot contain traversal or absolute components.".into());
+        };
+        let name = name.to_str().ok_or("Program paths must be valid Unicode.")?;
+        if name.is_empty() || name.starts_with('.') || name.ends_with(['.', ' '])
+            || matches!(name, "build" | "target" | "node_modules")
+            || name.chars().any(|character| character.is_control() || ";$\"\\#()[]:<>|?*".contains(character)) {
+            return Err("This path cannot be safely registered as a program file.".into());
+        }
+        names.push(name);
+    }
+    if names.is_empty() { return Err("Choose an item below main, not main itself.".into()); }
+    Ok(names.join("/"))
+}
+
+#[derive(Debug)]
+struct CmakeToken { start: usize, end: usize, text: String, quoted: bool }
+
+// Deliberately accept a single static component registration only. Arbitrary
+// CMake programs need an explicit human/AI edit instead of an unsafe rewrite.
+fn cmake_tokens(text: &str) -> Result<Vec<CmakeToken>, String> {
+    let bytes = text.as_bytes();
+    let mut index = 0;
+    let mut tokens = Vec::new();
+    while index < bytes.len() {
+        if bytes[index].is_ascii_whitespace() { index += 1; continue; }
+        if bytes[index] == b'#' {
+            if bytes.get(index + 1) == Some(&b'[') { return Err("Bracket comments require an explicit CMake edit.".into()); }
+            while index < bytes.len() && bytes[index] != b'\n' { index += 1; }
+            continue;
+        }
+        let start = index;
+        let quoted = bytes[index] == b'"';
+        if quoted {
+            index += 1;
+            let value_start = index;
+            while index < bytes.len() && bytes[index] != b'"' {
+                if bytes[index] == b'\\' { return Err("Escaped CMake arguments require an explicit CMake edit.".into()); }
+                index += 1;
+            }
+            if index == bytes.len() { return Err("Unterminated CMake argument.".into()); }
+            let value = text[value_start..index].to_string();
+            index += 1;
+            tokens.push(CmakeToken { start, end: index, text: value, quoted });
+        } else {
+            if matches!(bytes[index], b'(' | b')') { index += 1; }
+            else {
+                while index < bytes.len() && !bytes[index].is_ascii_whitespace()
+                    && !matches!(bytes[index], b'(' | b')' | b'#' | b'"') { index += 1; }
+            }
+            tokens.push(CmakeToken { start, end: index, text: text[start..index].into(), quoted });
+        }
+    }
+    Ok(tokens)
+}
+
+fn source_keyword(token: &CmakeToken) -> bool {
+    !token.quoted && matches!(token.text.as_str(), "INCLUDE_DIRS" | "PRIV_INCLUDE_DIRS" | "REQUIRES"
+        | "PRIV_REQUIRES" | "LDFRAGMENTS" | "EMBED_FILES" | "EMBED_TXTFILES" | "KCONFIG"
+        | "KCONFIG_PROJBUILD" | "WHOLE_ARCHIVE" | "REQUIRED_IDF_TARGETS" | ")")
+}
+
+fn planned_cmake_sources(cmake: &str, added: &[String], removed: &[String]) -> Result<String, String> {
+    let tokens = cmake_tokens(cmake)?;
+    if tokens.len() < 4 || tokens[0].quoted || tokens[0].text != "idf_component_register"
+        || tokens[1].quoted || tokens[1].text != "("
+        || tokens.last().is_none_or(|token| token.quoted || token.text != ")")
+        || tokens[2..tokens.len()-1].iter().any(|token| !token.quoted && matches!(token.text.as_str(), "(" | ")" | "SRC_DIRS" | "EXCLUDE_SRCS")) {
+        return Err("Custom/dynamic main/CMakeLists.txt was kept. Register sources explicitly before retrying.".into());
+    }
+    let positions: Vec<_> = tokens.iter().enumerate().filter(|(_, token)| !token.quoted && token.text == "SRCS").map(|(index, _)| index).collect();
+    if positions.len() != 1 { return Err("main/CMakeLists.txt needs one explicit static SRCS list.".into()); }
+    let source_index = positions[0];
+    let boundary = (source_index+1..tokens.len()).find(|&index| source_keyword(&tokens[index]))
+        .ok_or("Could not locate the end of the CMake source list.")?;
+    let mut sources = Vec::new();
+    for token in &tokens[source_index+1..boundary] {
+        let relative = safe_relative_program_path(&Path::new("main").join(&token.text))?;
+        if !is_program_source(Path::new(&relative)) { return Err("The SRCS list contains a dynamic or unsupported source; CMake was kept.".into()); }
+        if !removed.iter().any(|removed| source_is_within(&relative, removed)) {
+            sources.push(relative);
+        }
+    }
+    for source in added {
+        if !sources.iter().any(|existing| same_source_path(existing, source)) { sources.push(source.clone()); }
+    }
+    sources.sort();
+    sources.dedup();
+    let start = tokens[source_index].end;
+    let end = tokens[boundary].start;
+    let old_source_area = &cmake[start..end];
+    let begin_count = cmake.matches(SOURCES_BEGIN).count();
+    let end_count = cmake.matches(SOURCES_END).count();
+    if begin_count != end_count || begin_count > 1
+        || (begin_count == 1 && (!old_source_area.contains(SOURCES_BEGIN) || !old_source_area.contains(SOURCES_END)
+            || old_source_area.find(SOURCES_BEGIN) >= old_source_area.find(SOURCES_END))) {
+        return Err("Managed CMake source markers are malformed; the file was kept.".into());
+    }
+    // Do not discard user comments when adopting an older, unmarked source list.
+    if begin_count == 0 && old_source_area.contains('#') {
+        return Err("Source-list comments require an explicit CMake edit; the file was kept.".into());
+    }
+    let newline = if cmake.contains("\r\n") { "\r\n" } else { "\n" };
+    let mut area = format!("{newline}    {SOURCES_BEGIN}{newline}");
+    for source in sources { area.push_str(&format!("    \"{source}\"{newline}")); }
+    area.push_str(&format!("    {SOURCES_END}{newline}    "));
+    Ok(format!("{}{}{}", &cmake[..start], area, &cmake[end..]))
+}
+
+/// Non-mutating companion for reviewed AI writes. Paths are project-relative;
+/// removed directories also remove registered descendants. Other CMake arguments
+/// and all content outside the static SRCS area are retained byte-for-byte.
+pub(crate) fn source_list_plan(
+    project_root: &Path,
+    added: &[PathBuf],
+    removed: &[PathBuf],
+) -> Result<Option<(PathBuf, String)>, String> {
+    source_list_plan_with_content(project_root, added, removed, None)
+}
+
+pub(crate) fn source_list_plan_with_content(
+    project_root: &Path,
+    added: &[PathBuf],
+    removed: &[PathBuf],
+    original_override: Option<&str>,
+) -> Result<Option<(PathBuf, String)>, String> {
+    let added: Vec<_> = added.iter().filter(|path| is_program_source(path))
+        .map(|path| safe_relative_program_path(path)).collect::<Result<_, _>>()?;
+    let removed: Vec<_> = removed.iter().map(|path| safe_relative_program_path(path)).collect::<Result<_, _>>()?;
+    if added.is_empty() && removed.is_empty() { return Ok(None); }
+    let root = checked_program_root(project_root)?;
+    let cmake_path = root.join("main/CMakeLists.txt");
+    reject_link(&cmake_path)?;
+    let original = match original_override {
+        Some(content) => content.to_string(),
+        None => std::fs::read_to_string(&cmake_path).map_err(|error| format!("Could not read main/CMakeLists.txt: {}", error))?,
+    };
+    let next = planned_cmake_sources(&original, &added, &removed)?;
+    Ok((next != original).then_some((cmake_path, next)))
+}
+
+fn reject_link(path: &Path) -> Result<(), String> {
+    let metadata = std::fs::symlink_metadata(path).map_err(|error| format!("Could not inspect {}: {}", path.display(), error))?;
+    let mut linked = metadata.file_type().is_symlink();
+    #[cfg(windows)] {
+        use std::os::windows::fs::MetadataExt;
+        linked |= metadata.file_attributes() & 0x400 != 0;
+    }
+    if linked { Err("Program operations cannot follow symbolic links or junctions.".into()) } else { Ok(()) }
+}
+
+fn checked_program_root(project_root: &Path) -> Result<PathBuf, String> {
+    let root = dunce::canonicalize(project_root).map_err(|error| format!("Invalid project directory: {}", error))?;
+    if !root.join("CMakeLists.txt").is_file() || !root.join("main").is_dir() {
+        return Err("Choose an ESP-IDF project containing CMakeLists.txt and main.".into());
+    }
+    reject_link(&root.join("main"))?;
+    Ok(root)
+}
+
+fn has_project_pending_diff(root: &Path, paths: impl IntoIterator<Item = PathBuf>) -> bool {
+    let project = root.to_string_lossy().replace('\\', "/");
+    paths.into_iter().any(|path| {
+        let path = dunce::canonicalize(&path).unwrap_or(path);
+        source_is_within(&path.to_string_lossy().replace('\\', "/"), project.trim_end_matches('/'))
+    })
+}
+
+fn checked_program_operation_root(project_dir: &str) -> Result<PathBuf, String> {
+    let root = checked_program_root(Path::new(&crate::ai_chat::normalize_project_dir(project_dir)))?;
+    ensure_project_reviewed(&root)?;
+    Ok(root)
+}
+
+pub(crate) fn ensure_project_reviewed(project: &Path) -> Result<(), String> {
+    crate::ai::project_review::ensure_project_kept(project)?;
+    let root = dunce::canonicalize(project).map_err(|error| format!("Could not resolve project directory: {}", error))?;
+    let pending = crate::ai::change_journal::with(|journal|Ok(journal.pending_map()))?;
+    if has_project_pending_diff(&root, pending.keys().cloned()) {
+        return Err("Review and Keep or Undo pending AI file changes before building or changing program items.".into());
+    }
+    Ok(())
+}
+
+fn checked_program_item(root: &Path, supplied: &Path, must_exist: bool) -> Result<(PathBuf, PathBuf), String> {
+    use std::path::Component;
+    if supplied.components().any(|part| matches!(part, Component::ParentDir | Component::CurDir)) {
+        return Err("Program paths cannot contain traversal.".into());
+    }
+    let raw = if supplied.is_absolute() { supplied.to_path_buf() } else { root.join(supplied) };
+    let parent = raw.parent().ok_or("Missing program parent directory.")?;
+    let parent = dunce::canonicalize(parent).map_err(|error| format!("Program parent directory does not exist: {}", error))?;
+    let path = parent.join(raw.file_name().ok_or("Missing program filename.")?);
+    let relative = path.strip_prefix(root).map_err(|_| "Program path is outside the project.")?.to_path_buf();
+    let source = safe_relative_program_path(&relative)?;
+    if source.eq_ignore_ascii_case("CMakeLists.txt") || source.eq_ignore_ascii_case("kb_board.h") {
+        return Err("This file is managed by the IDE. Choose a program file.".into());
+    }
+    let mut original_chain = root.to_path_buf();
+    // Inspect the original path as well as the resolved parent so links cannot
+    // make a source operation escape or alias another part of the project.
+    let mut raw_components = raw.components();
+    for root_component in root.components() {
+        let raw_component = raw_components.next().ok_or("Program path is outside the project.")?;
+        if !same_source_path(&raw_component.as_os_str().to_string_lossy(), &root_component.as_os_str().to_string_lossy()) {
+            return Err("Program path is outside the project.".into());
+        }
+    }
+    let raw_relative = raw_components.as_path();
+    for component in raw_relative.components() {
+        original_chain.push(component);
+        if original_chain.exists() { reject_link(&original_chain)?; }
+    }
+    if must_exist && !path.exists() { return Err("The selected program item no longer exists.".into()); }
+    Ok((path, relative))
+}
+
+fn write_cmake_atomically(path: &Path, content: &str) -> Result<(), String> {
+    static NEXT_TEMP: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+    let temp = path.with_file_name(format!(".vibekidbright-cmake-{}-{}", std::process::id(), NEXT_TEMP.fetch_add(1, Ordering::Relaxed)));
+    let result = (|| {
+        let mut file = std::fs::OpenOptions::new().write(true).create_new(true).open(&temp).map_err(|error| error.to_string())?;
+        file.write_all(content.as_bytes()).and_then(|_| file.sync_all()).map_err(|error| error.to_string())?;
+        std::fs::set_permissions(&temp, std::fs::metadata(path).map_err(|error| error.to_string())?.permissions()).map_err(|error| error.to_string())?;
+        drop(file);
+        std::fs::rename(&temp, path).map_err(|error| error.to_string())
+    })();
+    if result.is_err() {
+        #[cfg(windows)]
+        if let Ok(metadata) = std::fs::metadata(&temp) {
+            let mut permissions = metadata.permissions();
+            permissions.set_readonly(false);
+            let _ = std::fs::set_permissions(&temp, permissions);
+        }
+        let _ = std::fs::remove_file(&temp);
+    }
+    result.map_err(|error| format!("Could not update CMake; program operation was not completed: {}", error))
+}
+
+fn apply_program_operation(
+    plan: Option<(PathBuf, String)>,
+    operation: impl FnOnce() -> std::io::Result<()>,
+) -> Result<(), String> {
+    let original = if let Some((path, content)) = &plan {
+        let original = std::fs::read_to_string(path).map_err(|error| error.to_string())?;
+        write_cmake_atomically(path, content)?;
+        Some(original)
+    } else { None };
+    if let Err(error) = operation() {
+        if let (Some((path, _)), Some(original)) = (&plan, original) {
+            write_cmake_atomically(path, &original).map_err(|restore| format!("Program operation failed: {}. CMake recovery also failed: {}. Inspect main/CMakeLists.txt before building.", error, restore))?;
+        }
+        return Err(format!("Program operation failed: {}", error));
+    }
+    Ok(())
+}
+
+fn create_program_file_inner(project_root: &Path, supplied: &Path) -> Result<(), String> {
+    let root = checked_program_root(project_root)?;
+    let (path, relative) = checked_program_item(&root, supplied, false)?;
+    if path.exists() { return Err("A file or folder with this name already exists; it was kept.".into()); }
+    let plan = source_list_plan(&root, &[relative], &[])?;
+    apply_program_operation(plan, || std::fs::OpenOptions::new().write(true).create_new(true).open(path).map(drop))
+}
+
+fn collect_program_sources(path: &Path, root: &Path, output: &mut Vec<PathBuf>) -> Result<(), String> {
+    reject_link(path)?;
+    if path.is_dir() {
+        for entry in std::fs::read_dir(path).map_err(|error| error.to_string())? {
+            collect_program_sources(&entry.map_err(|error| error.to_string())?.path(), root, output)?;
+        }
+    } else if is_program_source(path) {
+        let relative = path.strip_prefix(root).map_err(|_| "Program source escaped the project.")?.to_path_buf();
+        safe_relative_program_path(&relative)?;
+        output.push(relative);
+    }
+    Ok(())
+}
+
+fn registered_sources_for_rename(root: &Path) -> Result<Vec<PathBuf>, String> {
+    let cmake_path = root.join("main/CMakeLists.txt");
+    reject_link(&cmake_path)?;
+    let cmake = std::fs::read_to_string(cmake_path).map_err(|error| error.to_string())?;
+    // Validate the static format before using its tokens. Existing unregistered
+    // source files must remain unregistered during a folder rename.
+    planned_cmake_sources(&cmake, &[], &[])?;
+    let tokens = cmake_tokens(&cmake)?;
+    let start = tokens.iter().position(|token| !token.quoted && token.text == "SRCS").unwrap() + 1;
+    let end = (start..tokens.len()).find(|&index| source_keyword(&tokens[index])).unwrap();
+    Ok(tokens[start..end].iter().map(|token| Path::new("main").join(&token.text)).collect())
+}
+
+fn rename_program_item_inner(project_root: &Path, old_path: &Path, new_path: &Path) -> Result<(), String> {
+    let root = checked_program_root(project_root)?;
+    let (old, old_relative) = checked_program_item(&root, old_path, true)?;
+    let (new, new_relative) = checked_program_item(&root, new_path, false)?;
+    if new.exists() { return Err("The destination already exists; both items were kept.".into()); }
+    let mut sources = Vec::new();
+    collect_program_sources(&old, &root, &mut sources)?;
+    let plan = if old.is_file() && !is_program_source(&old) && is_program_source(&new) {
+        source_list_plan(&root, &[new_relative], &[])?
+    } else if !sources.is_empty() {
+        let registered = registered_sources_for_rename(&root)?;
+        let added: Vec<_> = sources.iter().filter(|source| registered.iter().any(|registered| same_source_path(
+                &source.to_string_lossy().replace('\\', "/"), &registered.to_string_lossy().replace('\\', "/"))))
+            .map(|source| new_relative.join(source.strip_prefix(&old_relative).unwrap())).collect();
+        source_list_plan(&root, &added, &[old_relative])?
+    } else { None };
+    apply_program_operation(plan, || std::fs::rename(old, new))
+}
+
+fn delete_program_item_inner(project_root: &Path, supplied: &Path) -> Result<(), String> {
+    let root = checked_program_root(project_root)?;
+    let (path, relative) = checked_program_item(&root, supplied, true)?;
+    let mut sources = Vec::new();
+    collect_program_sources(&path, &root, &mut sources)?;
+    let plan = if !sources.is_empty() { source_list_plan(&root, &[], &[relative])? } else { None };
+    // The resolved target was verified below canonical root/main above. Rejecting
+    // links throughout the tree also protects recursive directory deletion.
+    apply_program_operation(plan, || {
+        let result = if path.is_dir() { std::fs::remove_dir_all(path) } else { std::fs::remove_file(path) };
+        result.map_err(|error| std::io::Error::new(error.kind(), format!("Removal may be incomplete; inspect the selected item before retrying: {}", error)))
+    })
+}
+
+#[tauri::command]
+pub async fn create_program_file(app_handle: AppHandle, project_dir: String, path: String) -> Result<(), String> {
+    let _guard = crate::ai_chat::acquire_ai_generation_guard(&app_handle)?;
+    let root = checked_program_operation_root(&project_dir)?;
+    let _lease=crate::sdk_process::lease(&root,false)?;
+    create_program_file_inner(&root, Path::new(&path))?;
+    emit_managed_cmake_changed(&app_handle, &root);
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn create_program_directory(app_handle: AppHandle, project_dir: String, path: String) -> Result<(), String> {
+    let _guard = crate::ai_chat::acquire_ai_generation_guard(&app_handle)?;
+    let root = checked_program_operation_root(&project_dir)?;
+    let _lease=crate::sdk_process::lease(&root,false)?;
+    let (path, _) = checked_program_item(&root, Path::new(&path), false)?;
+    std::fs::create_dir(path).map_err(|error| format!("Could not create program directory (existing items are kept): {}", error))
+}
+
+#[tauri::command]
+pub async fn rename_program_item(app_handle: AppHandle, project_dir: String, old_path: String, new_path: String) -> Result<(), String> {
+    let _guard = crate::ai_chat::acquire_ai_generation_guard(&app_handle)?;
+    let root = checked_program_operation_root(&project_dir)?;
+    let _lease=crate::sdk_process::lease(&root,false)?;
+    rename_program_item_inner(&root, Path::new(&old_path), Path::new(&new_path))?;
+    emit_managed_cmake_changed(&app_handle, &root);
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn delete_program_item(app_handle: AppHandle, project_dir: String, path: String) -> Result<(), String> {
+    let _guard = crate::ai_chat::acquire_ai_generation_guard(&app_handle)?;
+    let root = checked_program_operation_root(&project_dir)?;
+    let _lease=crate::sdk_process::lease(&root,false)?;
+    delete_program_item_inner(&root, Path::new(&path))?;
+    emit_managed_cmake_changed(&app_handle, &root);
+    Ok(())
+}
+
+fn emit_managed_cmake_changed(app: &AppHandle, root: &Path) {
+    let _ = app.emit("file-modified", serde_json::json!({ "path": root.join("main/CMakeLists.txt").to_string_lossy() }).to_string());
+}
+
+#[tauri::command]
 pub async fn safe_write_project_file(path: String, content: String) -> Result<(), String> {
+    let _lease=crate::sdk_process::lease(Path::new(&path).parent().ok_or("Missing file parent.")?,false)?;
     let path_buf = PathBuf::from(&path);
     if !path_buf.exists() {
         return Err(format!("File does not exist: {}", path));
@@ -1040,6 +1482,68 @@ pub(crate) fn is_build_dir_stale(
     false
 }
 
+fn prepare_idf_build_directory(
+    args: &[String],
+    working_dir: &Path,
+    idf_path: &Path,
+    tools_path: &Path,
+) -> Result<Option<PathBuf>, String> {
+    let options: Vec<_> = args.iter().take_while(|argument| argument.as_str() != "--").collect();
+    if !options.iter().any(|argument| matches!(argument.as_str(), "build" | "flash" | "reconfigure")) {
+        return Ok(None);
+    }
+    // Custom build locations may be outside this project and are never removed
+    // automatically. In that case the default build directory is unused too.
+    if options.iter().any(|argument| argument.as_str() == "--build-dir"
+        || argument.starts_with("--build-dir=") || argument.starts_with("-B")) {
+        return Ok(None);
+    }
+    let projects = idf_project_directories(args, working_dir);
+    let project = projects.last().ok_or("Missing IDF project directory.")?;
+    let project = dunce::canonicalize(project).map_err(|error| format!("Could not resolve IDF project directory: {}", error))?;
+    if !project.join("CMakeLists.txt").is_file() {
+        return Ok(None);
+    }
+    let build = project.join("build");
+    match std::fs::symlink_metadata(&build) {
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => return Ok(None),
+        Err(error) => return Err(format!("Could not inspect build directory: {}", error)),
+        Ok(metadata) if !metadata.is_dir() => return Err("The project's build path is not a regular directory; it was kept.".into()),
+        Ok(_) => (),
+    }
+    reject_link(&build)?;
+    let resolved = dunce::canonicalize(&build).map_err(|error| format!("Could not resolve build directory: {}", error))?;
+    if resolved.parent() != Some(project.as_path())
+        || !resolved.file_name().is_some_and(|name| same_source_path(&name.to_string_lossy(), "build")) {
+        return Err("Build cleanup target escaped the selected project; it was kept.".into());
+    }
+    if !is_build_dir_stale(&resolved, idf_path, tools_path) { return Ok(None); }
+    // Preserve the verified build tree. A cancelled reconfigure must not leave
+    // partially deleted build output or silently discard files users added there.
+    let recovery=tempfile::Builder::new().prefix(".vibekidbright-stale-build-").tempdir_in(&project).map_err(|e|e.to_string())?.keep();
+    std::fs::rename(&resolved,recovery.join("build")).map_err(|error|format!("Could not preserve stale project build directory: {error}"))?;
+    Ok(Some(resolved))
+}
+
+async fn prepare_idf_build(
+    args: &[String], working_dir: &Path, idf_path: &Path, tools_path: &Path, app: &AppHandle,
+    lease:Arc<crate::sdk_process::WorkspaceLease>,
+) -> Result<(), String> {
+    let projects = idf_project_directories(args, working_dir);
+    crate::ai::compatibility::validate_build_profile(projects.last().ok_or("Missing IDF project directory.")?)?;
+    let (args, working_dir, idf_path, tools_path) = (args.to_vec(), working_dir.to_path_buf(), idf_path.to_path_buf(), tools_path.to_path_buf());
+    let cleaned = tauri::async_runtime::spawn_blocking(move || {
+        if lease.cancel.load(Ordering::SeqCst){return Err("SDK preparation cancelled.".into());}
+        let result=prepare_idf_build_directory(&args, &working_dir, &idf_path, &tools_path);
+        drop(lease);result
+    })
+        .await.map_err(|error| format!("Build preparation task failed: {}", error))??;
+    if let Some(build) = cleaned {
+        let _ = app.emit("terminal-output", format!("Preserved stale build directory {} in a .vibekidbright-stale-build recovery folder. CMake will reconfigure.", build.display()));
+    }
+    Ok(())
+}
+
 #[tauri::command]
 pub async fn run_shell_command(
     app_handle: AppHandle,
@@ -1047,44 +1551,25 @@ pub async fn run_shell_command(
     args: Vec<String>,
     cwd: Option<String>,
 ) -> Result<CommandOutcome, String> {
+    let working_dir = match cwd.as_deref().filter(|path| !path.trim().is_empty()) {
+        Some(path) => PathBuf::from(crate::ai_chat::normalize_project_dir(path)),
+        None => std::env::current_dir().map_err(|error| error.to_string())?,
+    };
+    crate::ai::project_review::ensure_project_kept(&working_dir)?;
+    let lease=Arc::new(crate::sdk_process::lease(&working_dir,true)?);
+    let _cancel=crate::sdk_process::CancelOnDrop(lease.cancel.clone());
+    if cmd == "idf.py" {
+        for project in idf_project_directories(&args, &working_dir) {
+            ensure_project_reviewed(&project)?;
+        }
+    }
     let (actual_idf_path, actual_tools_path) = resolve_idf_paths(&app_handle)?;
     let (python_bin, python_env_path) = find_idf_python(&actual_tools_path)?;
     let path_env = build_idf_path(&actual_tools_path);
     let idf_version = read_idf_version(&actual_idf_path);
 
-    // ── Auto-clean stale build directory ────────────────────────────────
-    // When a project is opened on a different machine or after a partial build,
-    // the build/ directory may contain a CMakeCache.txt with paths that don't
-    // exist on this machine, or managed_components_list.temp.cmake may be missing.
-    // This causes cryptic CMake errors. We detect and auto-clean this situation.
-    if cmd == "idf.py"
-        && args
-            .iter()
-            .any(|a| a == "build" || a == "flash" || a == "reconfigure")
-    {
-        if let Some(ref c_dir) = cwd {
-            if !c_dir.is_empty() && c_dir != "." {
-                let build_dir = Path::new(c_dir).join("build");
-                if build_dir.exists() {
-                    let needs_clean =
-                        is_build_dir_stale(&build_dir, &actual_idf_path, &actual_tools_path);
-                    if needs_clean {
-                        let _ = app_handle.emit("terminal-output",
-                            "⚠️ Detected stale build directory (paths from another machine or incomplete build). Auto-cleaning...".to_string());
-                        match std::fs::remove_dir_all(&build_dir) {
-                            Ok(_) => {
-                                let _ = app_handle.emit("terminal-output",
-                                    "✅ Build directory cleaned. CMake will reconfigure from scratch.".to_string());
-                            }
-                            Err(e) => {
-                                let _ = app_handle.emit("terminal-output",
-                                    format!("⚠️ Failed to clean build directory: {}. Build may fail — try deleting the 'build' folder manually.", e));
-                            }
-                        }
-                    }
-                }
-            }
-        }
+    if cmd == "idf.py" {
+        prepare_idf_build(&args, &working_dir, &actual_idf_path, &actual_tools_path, &app_handle,lease.clone()).await?;
     }
 
     let mut command = if cmd == "idf.py" {
@@ -1124,32 +1609,7 @@ pub async fn run_shell_command(
         command.env("ESP_ROM_ELF_DIR", rom_elf_dir);
     }
 
-    command.stdout(Stdio::piped()).stderr(Stdio::piped());
-
-    apply_no_window(&mut command);
-    let mut child = command.spawn().map_err(|e| e.to_string())?;
-    let stdout = child.stdout.take().ok_or("Failed to open stdout")?;
-    let stderr = child.stderr.take().ok_or("Failed to open stderr")?;
-
-    let app_handle_clone = app_handle.clone();
-    std::thread::spawn(move || {
-        let reader = BufReader::new(stdout);
-        for l in reader.lines().map_while(Result::ok) {
-            let _ = app_handle_clone.emit("terminal-output", l);
-        }
-    });
-
-    let app_handle_clone_err = app_handle;
-    std::thread::spawn(move || {
-        let reader = BufReader::new(stderr);
-        for l in reader.lines().map_while(Result::ok) {
-            let _ = app_handle_clone_err.emit("terminal-output", format!("\x1b[31m{}\x1b[0m", l));
-        }
-    });
-
-    tauri::async_runtime::spawn_blocking(move || wait_for_child(child))
-        .await
-        .map_err(|e| format!("Command wait task failed: {}", e))?
+    Ok(stream_command_with_lease(command, app_handle,lease).await?.outcome)
 }
 
 #[tauri::command]
@@ -1250,6 +1710,8 @@ pub async fn save_project_as(source_dir: String) -> Result<String, String> {
         .await
         .map_err(|e| format!("Copy task panicked: {}", e))??;
 
+    crate::ai::compatibility::hide_internal_metadata(&dest)
+        .map_err(|error| format!("Project files were copied, but private metadata could not be hidden: {}", error))?;
     Ok(format!("{}|{}", dest.to_string_lossy(), file_count))
 }
 
@@ -1258,9 +1720,7 @@ struct SerialMonitorState {
     tx: Sender<String>,
 }
 
-fn get_cached_config() -> &'static Mutex<Option<serde_json::Value>> {
-    CACHED_ESP_IDF_CONFIG.get_or_init(|| Mutex::new(None))
-}
+
 
 fn serial_monitor_store() -> &'static Mutex<Option<SerialMonitorState>> {
     static SERIAL_MONITOR: OnceLock<Mutex<Option<SerialMonitorState>>> = OnceLock::new();
@@ -1705,9 +2165,408 @@ pub async fn stop_adb_monitor() -> Result<String, String> {
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn configured_sdk_readiness_requires_sdk_and_python_without_install_marker() {
+        let scratch=tempfile::tempdir().unwrap();let idf=scratch.path().join("idf");let tools=scratch.path().join("tools");
+        assert!(super::installed_sdk_status(&idf,&tools).is_err());
+        std::fs::create_dir_all(idf.join("tools")).unwrap();std::fs::write(idf.join("tools/idf.py"),"# fixture").unwrap();std::fs::write(idf.join("version.txt"),"v5.5.4\n").unwrap();
+        let venv=tools.join("python_env/idf5.5_py3.11_env");let python=super::venv_python_candidates(&venv)[0].clone();
+        std::fs::create_dir_all(python.parent().unwrap()).unwrap();std::fs::write(&python,"fixture, never executed").unwrap();
+        let status=super::installed_sdk_status(&idf,&tools).unwrap();assert_eq!(status["status"],"ready");assert_eq!(status["version"],"5.5.4");assert_eq!(status["source"],"configured-sdk");
+        assert!(!scratch.path().join(".toolchain_ready").exists());
+        std::fs::remove_file(python).unwrap();assert!(super::installed_sdk_status(&idf,&tools).is_err());
+    }
     use super::*;
     use std::fs;
     use std::process::Command;
+
+    fn managed_test_project(cmake: &str) -> tempfile::TempDir {
+        let directory = tempfile::tempdir().unwrap();
+        fs::create_dir(directory.path().join("main")).unwrap();
+        fs::write(directory.path().join("CMakeLists.txt"), "project(test)").unwrap();
+        fs::write(directory.path().join("main/CMakeLists.txt"), cmake).unwrap();
+        fs::write(directory.path().join("main/main.c"), "void app_main(void) {}\n").unwrap();
+        directory
+    }
+
+    #[test]
+    fn managed_new_source_preserves_dependencies_and_never_overwrites() {
+        let original = "# lesson configuration\nidf_component_register(SRCS \"main.c\" INCLUDE_DIRS \".\" \"include\" PRIV_REQUIRES driver esp_driver_i2c kb_reference)\n";
+        let project = managed_test_project(original);
+        create_program_file_inner(project.path(), Path::new("main/helper.cpp")).unwrap();
+        let cmake = fs::read_to_string(project.path().join("main/CMakeLists.txt")).unwrap();
+        assert!(cmake.starts_with("# lesson configuration\nidf_component_register(SRCS"));
+        assert!(cmake.ends_with("INCLUDE_DIRS \".\" \"include\" PRIV_REQUIRES driver esp_driver_i2c kb_reference)\n"));
+        assert!(cmake.contains("\"helper.cpp\""));
+        assert!(cmake.contains(SOURCES_BEGIN));
+        fs::write(project.path().join("main/helper.cpp"), "learner work").unwrap();
+        assert!(create_program_file_inner(project.path(), Path::new("main/helper.cpp")).is_err());
+        assert_eq!(fs::read_to_string(project.path().join("main/helper.cpp")).unwrap(), "learner work");
+        assert_eq!(fs::read_to_string(project.path().join("main/CMakeLists.txt")).unwrap(), cmake);
+    }
+
+    #[test]
+    fn source_plan_is_non_mutating_and_handles_each_compiler_source_extension() {
+        let original = "idf_component_register(SRCS \"main.c\" INCLUDE_DIRS \".\" PRIV_REQUIRES driver)\r\n";
+        let project = managed_test_project(original);
+        fs::create_dir(project.path().join("main/tasks")).unwrap();
+        let additions: Vec<_> = ["main/tasks/a.c", "main/tasks/b.cpp", "main/tasks/c.cc", "main/tasks/d.cxx", "main/tasks/e.S", "main/tasks/api.h"]
+            .iter().map(PathBuf::from).collect();
+        let (path, next) = source_list_plan(project.path(), &additions, &[]).unwrap().unwrap();
+        assert_eq!(path, dunce::canonicalize(project.path()).unwrap().join("main/CMakeLists.txt"));
+        for name in ["a.c", "b.cpp", "c.cc", "d.cxx", "e.S"] { assert!(next.contains(&format!("\"tasks/{}\"", name))); }
+        assert!(!next.contains("api.h"));
+        assert!(next.contains("\r\n"));
+        assert_eq!(fs::read_to_string(path).unwrap(), original);
+        assert_eq!(planned_cmake_sources(&next, &[], &[]).unwrap(), next);
+    }
+
+    #[test]
+    fn source_plan_preserves_pending_dependency_edits_without_touching_disk() {
+        let original = "idf_component_register(SRCS main.c INCLUDE_DIRS . PRIV_REQUIRES driver)\n";
+        let pending = "idf_component_register(SRCS main.c INCLUDE_DIRS . include PRIV_REQUIRES driver esp_wifi nvs_flash)\n";
+        let project = managed_test_project(original);
+        let (path, next) = source_list_plan_with_content(project.path(), &[PathBuf::from("main/helper.c")], &[], Some(pending)).unwrap().unwrap();
+        assert!(next.contains("\"helper.c\""));
+        assert!(next.contains("INCLUDE_DIRS . include PRIV_REQUIRES driver esp_wifi nvs_flash)"));
+        assert_eq!(fs::read_to_string(path).unwrap(), original);
+    }
+
+    #[test]
+    fn managed_rename_and_delete_sync_nested_sources_without_adding_unregistered_files() {
+        let project = managed_test_project("idf_component_register(SRCS \"main.c\" \"tasks/a.c\" INCLUDE_DIRS \".\" PRIV_REQUIRES driver)\n");
+        fs::create_dir(project.path().join("main/tasks")).unwrap();
+        fs::write(project.path().join("main/tasks/a.c"), "registered").unwrap();
+        fs::write(project.path().join("main/tasks/draft.c"), "unregistered").unwrap();
+        fs::write(project.path().join("main/tasks/helper.h"), "header").unwrap();
+        rename_program_item_inner(project.path(), Path::new("main/tasks"), Path::new("main/lessons")).unwrap();
+        let cmake = fs::read_to_string(project.path().join("main/CMakeLists.txt")).unwrap();
+        assert!(cmake.contains("\"lessons/a.c\""));
+        assert!(!cmake.contains("\"tasks/a.c\""));
+        assert!(!cmake.contains("draft.c"));
+        assert!(project.path().join("main/lessons/draft.c").is_file());
+        rename_program_item_inner(project.path(), Path::new("main/lessons/a.c"), Path::new("main/lessons/a.cc")).unwrap();
+        assert!(fs::read_to_string(project.path().join("main/CMakeLists.txt")).unwrap().contains("\"lessons/a.cc\""));
+        delete_program_item_inner(project.path(), Path::new("main/lessons")).unwrap();
+        assert!(!project.path().join("main/lessons").exists());
+        let cmake = fs::read_to_string(project.path().join("main/CMakeLists.txt")).unwrap();
+        assert!(!cmake.contains("lessons/"));
+        assert!(cmake.contains("\"main.c\""));
+        assert!(cmake.contains("PRIV_REQUIRES driver"));
+    }
+
+    #[test]
+    fn custom_cmake_is_retained_and_no_program_mutation_is_reported_as_success() {
+        for custom in [
+            "file(GLOB sources *.c)\nidf_component_register(SRCS ${sources} INCLUDE_DIRS .)\n",
+            "idf_component_register(SRC_DIRS . INCLUDE_DIRS .)\n",
+            "idf_component_register(SRCS main.c INCLUDE_DIRS .)\nset_property(TARGET x PROPERTY C_STANDARD 17)\n",
+            "idf_component_register(SRCS ${sources} INCLUDE_DIRS .)\n",
+        ] {
+            let project = managed_test_project(custom);
+            assert!(create_program_file_inner(project.path(), Path::new("main/helper.c")).is_err());
+            assert!(!project.path().join("main/helper.c").exists());
+            assert!(rename_program_item_inner(project.path(), Path::new("main/main.c"), Path::new("main/lesson.c")).is_err());
+            assert!(delete_program_item_inner(project.path(), Path::new("main/main.c")).is_err());
+            assert!(project.path().join("main/main.c").is_file());
+            assert_eq!(fs::read_to_string(project.path().join("main/CMakeLists.txt")).unwrap(), custom);
+            // Headers have no source-list effect and need no CMake rewrite.
+            create_program_file_inner(project.path(), Path::new("main/lesson.h")).unwrap();
+        }
+    }
+
+    #[test]
+    fn managed_operations_reject_outside_reserved_traversal_and_existing_destinations() {
+        let project = managed_test_project("idf_component_register(SRCS main.c INCLUDE_DIRS .)\n");
+        for path in ["outside.c", "main/../outside.c", "main/CMakeLists.txt", "main/kb_board.h", "main/kb_board.h.", "main/kb_board.h ", "main/subdir./helper.c", "main", "main/name.c:stream", "main/missing/helper.c"] {
+            assert!(create_program_file_inner(project.path(), Path::new(path)).is_err(), "accepted {}", path);
+        }
+        fs::write(project.path().join("main/keep.c"), "kept").unwrap();
+        assert!(rename_program_item_inner(project.path(), Path::new("main/main.c"), Path::new("main/keep.c")).is_err());
+        assert_eq!(fs::read_to_string(project.path().join("main/keep.c")).unwrap(), "kept");
+        assert!(delete_program_item_inner(project.path(), Path::new("main")).is_err());
+    }
+
+    #[cfg(windows)]
+    #[test]
+    fn windows_protected_aliases_are_rejected_and_project_case_variants_work() {
+        let project = managed_test_project("idf_component_register(SRCS main.c INCLUDE_DIRS .)\n");
+        let header = project.path().join("main/kb_board.h");
+        fs::write(&header, "protected board pin definitions").unwrap();
+        for alias in ["main/kb_board.h.", "main/kb_board.h "] {
+            assert!(delete_program_item_inner(project.path(), Path::new(alias)).is_err());
+            assert!(rename_program_item_inner(project.path(), Path::new(alias), Path::new("main/renamed.h")).is_err());
+            assert_eq!(fs::read_to_string(&header).unwrap(), "protected board pin definitions");
+        }
+        let root = dunce::canonicalize(project.path()).unwrap();
+        let differently_cased = PathBuf::from(root.to_string_lossy().to_ascii_uppercase()).join("main/helper.c");
+        create_program_file_inner(project.path(), &differently_cased).unwrap();
+        assert!(root.join("main/helper.c").is_file());
+        fs::rename(root.join("main"), root.join("Main")).unwrap();
+        create_program_file_inner(project.path(), &root.join("Main/lesson.c")).unwrap();
+        assert!(root.join("Main/lesson.c").is_file());
+    }
+
+    #[test]
+    fn pending_diff_guard_matches_only_the_selected_project_and_windows_path_case() {
+        let project = managed_test_project("idf_component_register(SRCS main.c INCLUDE_DIRS .)\n");
+        let root = dunce::canonicalize(project.path()).unwrap();
+        assert!(has_project_pending_diff(&root, [root.join("main/CMakeLists.txt")]));
+        assert!(!has_project_pending_diff(&root, [root.with_file_name(format!("{}-other", root.file_name().unwrap().to_string_lossy())).join("main/main.c")]));
+        #[cfg(windows)]
+        assert!(has_project_pending_diff(&root, [PathBuf::from(root.join("main/new.c").to_string_lossy().to_ascii_uppercase())]));
+    }
+
+    #[test]
+    fn pending_source_registration_must_be_reviewed_before_building_or_mutating() {
+        let project = managed_test_project("idf_component_register(SRCS main.c INCLUDE_DIRS .)\n");
+        let root = dunce::canonicalize(project.path()).unwrap();
+        let cmake = root.join("main/CMakeLists.txt");
+        let proposed=crate::ai::change_journal::with(|journal|journal.propose(&root,&cmake,"source-registration-test","pending SRCS/dependency proposal")).unwrap();
+        let build_error = ensure_project_reviewed(&root).unwrap_err();
+        let mutation_error = checked_program_operation_root(root.to_str().unwrap()).unwrap_err();
+        crate::ai::change_journal::with(|journal|journal.reject(&cmake,&proposed.revision)).unwrap();
+        assert!(build_error.contains("Keep or Undo"));
+        assert!(mutation_error.contains("Keep or Undo"));
+        assert_eq!(proposed.proposed, "pending SRCS/dependency proposal");
+        ensure_project_reviewed(&root).unwrap();
+    }
+
+    #[test]
+    fn failed_filesystem_operation_restores_original_cmake() {
+        let original = "idf_component_register(SRCS main.c INCLUDE_DIRS . PRIV_REQUIRES driver)\n";
+        let project = managed_test_project(original);
+        let plan = source_list_plan(project.path(), &[PathBuf::from("main/helper.c")], &[]).unwrap();
+        let error = apply_program_operation(plan, || Err(std::io::Error::new(std::io::ErrorKind::PermissionDenied, "simulated operation failure"))).unwrap_err();
+        assert!(error.contains("simulated operation failure"));
+        assert_eq!(fs::read_to_string(project.path().join("main/CMakeLists.txt")).unwrap(), original);
+    }
+
+    #[cfg(windows)]
+    #[test]
+    fn failed_cmake_replace_does_not_create_a_source_or_truncate_configuration() {
+        let original = "idf_component_register(SRCS main.c INCLUDE_DIRS . PRIV_REQUIRES driver)\n";
+        let project = managed_test_project(original);
+        let cmake = project.path().join("main/CMakeLists.txt");
+        let mut permissions = fs::metadata(&cmake).unwrap().permissions();
+        permissions.set_readonly(true);
+        fs::set_permissions(&cmake, permissions).unwrap();
+        assert!(create_program_file_inner(project.path(), Path::new("main/helper.c")).is_err());
+        assert!(!project.path().join("main/helper.c").exists());
+        assert_eq!(fs::read_to_string(&cmake).unwrap(), original);
+        assert!(!fs::read_dir(project.path().join("main")).unwrap().any(|entry|
+            entry.unwrap().file_name().to_string_lossy().starts_with(".vibekidbright-cmake-")));
+        let mut permissions = fs::metadata(&cmake).unwrap().permissions();
+        permissions.set_readonly(false);
+        fs::set_permissions(cmake, permissions).unwrap();
+    }
+
+    #[test]
+    fn renaming_header_to_source_adds_it_and_source_to_header_removes_it() {
+        let project = managed_test_project("idf_component_register(SRCS main.c INCLUDE_DIRS .)\n");
+        fs::write(project.path().join("main/helper.h"), "learner work").unwrap();
+        rename_program_item_inner(project.path(), Path::new("main/helper.h"), Path::new("main/helper.c")).unwrap();
+        assert!(fs::read_to_string(project.path().join("main/CMakeLists.txt")).unwrap().contains("\"helper.c\""));
+        rename_program_item_inner(project.path(), Path::new("main/helper.c"), Path::new("main/helper.h")).unwrap();
+        assert!(!fs::read_to_string(project.path().join("main/CMakeLists.txt")).unwrap().contains("helper.c"));
+        assert_eq!(fs::read_to_string(project.path().join("main/helper.h")).unwrap(), "learner work");
+    }
+
+    fn diagnostic_command(code: i32) -> Command {
+        let mut command = if cfg!(windows) { Command::new("cmd") } else { Command::new("sh") };
+        if cfg!(windows) {
+            command.args(["/C", &format!("echo compiler-out& echo compiler-error 1>&2& exit {}", code)]);
+        } else {
+            command.args(["-c", &format!("printf 'compiler-out\\n'; printf 'compiler-error\\n' >&2; exit {}", code)]);
+        }
+        command
+    }
+
+    #[test]
+    fn streamed_process_joins_both_readers_before_success_and_reports_stdout_on_failure() {
+        let lines = Arc::new(Mutex::new(Vec::new()));
+        let captured = lines.clone();
+        let emit: ProcessLineEmitter = Arc::new(move |line, error| captured.lock().unwrap().push((line, error)));
+        let output = execute_streamed_command(diagnostic_command(0), emit.clone()).unwrap();
+        assert_eq!(output.outcome.code, Some(0));
+        assert!(output.stdout.contains("compiler-out"));
+        let lines = lines.lock().unwrap().clone();
+        assert!(lines.iter().any(|(line, error)| line.contains("compiler-out") && !error));
+        assert!(lines.iter().any(|(line, error)| line.contains("compiler-error") && *error));
+        let error = execute_streamed_command(diagnostic_command(2), emit).err().unwrap();
+        assert!(error.contains("exit code 2"));
+        assert!(error.contains("compiler-out"));
+        assert!(error.contains("compiler-error"));
+    }
+
+    #[tokio::test]
+    async fn new_project_file_does_not_overwrite_an_existing_program() {
+        let directory = tempfile::tempdir().unwrap();
+        let existing = directory.path().join("main.c");
+        fs::write(&existing, "original learner program").unwrap();
+        assert!(create_project_file(existing.to_string_lossy().into_owned()).await.is_err());
+        assert_eq!(fs::read_to_string(&existing).unwrap(), "original learner program");
+        let new = directory.path().join("lesson.c");
+        create_project_file(new.to_string_lossy().into_owned()).await.unwrap();
+        assert_eq!(fs::read(&new).unwrap(), Vec::<u8>::new());
+    }
+
+    fn project_tree_relative_paths(entries: &[FileEntry], root: &Path) -> Vec<String> {
+        let mut paths = Vec::new();
+        for entry in entries {
+            paths.push(Path::new(&entry.path).strip_prefix(root).unwrap()
+                .to_string_lossy().replace('\\', "/"));
+            if let Some(children) = &entry.children {
+                paths.extend(project_tree_relative_paths(children, root));
+            }
+        }
+        paths
+    }
+
+    #[tokio::test]
+    async fn project_tree_hides_only_reserved_root_metadata_and_retains_user_documents() {
+        let root = tempfile::tempdir().unwrap();
+        fs::create_dir(root.path().join("main")).unwrap();
+        fs::create_dir(root.path().join("docs")).unwrap();
+        for relative in [
+            "CMakeLists.txt", "sdkconfig", "sdkconfig.defaults", "main/main.c",
+            "main/CMakeLists.txt", "main/idf_component.yml", "config.json",
+            "README.md", "assets.yml", "docs/kidbright-project.json",
+            "docs/KIDBRIGHT_COMPATIBILITY.md", "docs/lesson.md",
+            "kidbright-project.json", "KIDBRIGHT_COMPATIBILITY.md",
+        ] {
+            fs::write(root.path().join(relative), "project content").unwrap();
+        }
+        let entries = list_project_files(root.path().to_string_lossy().into_owned()).await.unwrap();
+        let paths = project_tree_relative_paths(&entries, root.path());
+        for relative in [
+            "CMakeLists.txt", "sdkconfig", "sdkconfig.defaults", "main/main.c",
+            "main/CMakeLists.txt", "main/idf_component.yml", "config.json",
+            "README.md", "assets.yml", "docs/kidbright-project.json",
+            "docs/KIDBRIGHT_COMPATIBILITY.md", "docs/lesson.md",
+        ] {
+            assert!(paths.iter().any(|path| path == relative), "missing user file: {}", relative);
+        }
+        assert!(!paths.iter().any(|path| path == "kidbright-project.json"));
+        assert!(!paths.iter().any(|path| path == "KIDBRIGHT_COMPATIBILITY.md"));
+    }
+
+    #[tokio::test]
+    async fn project_tree_excludes_hidden_internal_state_and_build_outputs() {
+        let root = tempfile::tempdir().unwrap();
+        for relative in [
+            ".vibekidbright", ".git", "build", "target", "node_modules",
+            "main/.cache", "main/build", "components/driver/include",
+            "KIDBRIGHT_COMPATIBILITY.md",
+        ] {
+            fs::create_dir_all(root.path().join(relative)).unwrap();
+        }
+        for relative in [
+            ".vibekidbright/project.json", ".git/config", "build/project.bin",
+            "target/output.bin", "node_modules/package.json", "main/.cache/state.json",
+            "main/build/ninja.log", ".env", "components/driver/include/driver.h",
+            "components/driver/driver.c", "components/driver/CMakeLists.txt",
+            "KIDBRIGHT_COMPATIBILITY.md/lesson.c",
+        ] {
+            fs::write(root.path().join(relative), "project content").unwrap();
+        }
+        let entries = list_project_files(root.path().to_string_lossy().into_owned()).await.unwrap();
+        let paths = project_tree_relative_paths(&entries, root.path());
+        assert_eq!(paths.len(), 9, "unexpected visible tree: {:?}", paths);
+        for relative in [
+            "components", "components/driver", "components/driver/include",
+            "components/driver/include/driver.h", "components/driver/driver.c",
+            "components/driver/CMakeLists.txt", "main",
+            "KIDBRIGHT_COMPATIBILITY.md", "KIDBRIGHT_COMPATIBILITY.md/lesson.c",
+        ] {
+            assert!(paths.iter().any(|path| path == relative), "missing user path: {}", relative);
+        }
+    }
+
+    #[test]
+    fn idf_project_flags_resolve_the_actual_target_before_process_launch() {
+        let base = tempfile::tempdir().unwrap();
+        let absolute = base.path().join("absolute project");
+        let args = vec![
+            "-C".into(), "relative project".into(),
+            format!("--project-dir={}", absolute.display()),
+            "-Cjoined".into(), "--project-dir".into(), "separate".into(),
+        ];
+        assert_eq!(idf_project_directories(&args, base.path()), vec![
+            base.path().to_path_buf(), base.path().join("relative project"),
+            absolute, base.path().join("joined"), base.path().join("separate"),
+        ]);
+    }
+
+    #[test]
+    fn idf_project_flags_stop_after_the_option_terminator() {
+        let base = tempfile::tempdir().unwrap();
+        let args = vec!["build".into(), "--".into(), "-C".into(), "not-an-option".into()];
+        assert_eq!(idf_project_directories(&args, base.path()), vec![base.path().to_path_buf()]);
+    }
+
+    fn cached_test_build(project: &Path, cached_idf: &Path) -> PathBuf {
+        let build = project.join("build");
+        fs::create_dir(&build).unwrap();
+        fs::write(build.join("CMakeCache.txt"), format!("IDF_PATH:PATH={}\n", cached_idf.display())).unwrap();
+        fs::write(build.join("build.ninja"), "test build output").unwrap();
+        build
+    }
+
+    #[test]
+    fn idf_build_preparation_repairs_stale_cache_and_preserves_matching_cache() {
+        let project = managed_test_project("idf_component_register(SRCS main.c INCLUDE_DIRS .)\n");
+        let idf = project.path().join("installed-sdk");
+        fs::create_dir(&idf).unwrap();
+        let build = cached_test_build(project.path(), &project.path().join("old-sdk"));
+        let args = vec!["-p".into(), "COM999".into(), "build".into(), "flash".into()];
+        assert_eq!(prepare_idf_build_directory(&args, project.path(), &idf, project.path()).unwrap(), Some(dunce::canonicalize(project.path()).unwrap().join("build")));
+        assert!(!build.exists());
+        assert!(project.path().join("main/main.c").is_file());
+        let build = cached_test_build(project.path(), &dunce::canonicalize(&idf).unwrap());
+        assert!(prepare_idf_build_directory(&args, project.path(), &idf, project.path()).unwrap().is_none());
+        assert!(build.join("build.ninja").is_file());
+        assert!(project.path().join("main/main.c").is_file());
+    }
+
+    #[test]
+    fn idf_build_preparation_uses_selected_project_and_keeps_other_directories() {
+        let working = managed_test_project("idf_component_register(SRCS main.c INCLUDE_DIRS .)\n");
+        let selected = managed_test_project("idf_component_register(SRCS main.c INCLUDE_DIRS .)\n");
+        let unrelated = managed_test_project("idf_component_register(SRCS main.c INCLUDE_DIRS .)\n");
+        let idf = working.path().join("installed-sdk");
+        fs::create_dir(&idf).unwrap();
+        let working_build = cached_test_build(working.path(), &working.path().join("old-sdk"));
+        let selected_build = cached_test_build(selected.path(), &selected.path().join("old-sdk"));
+        let unrelated_build = cached_test_build(unrelated.path(), &unrelated.path().join("old-sdk"));
+        let args = vec!["-p".into(), "COM999".into(), "--project-dir".into(), selected.path().to_string_lossy().into_owned(), "build".into(), "flash".into()];
+        assert!(prepare_idf_build_directory(&args, working.path(), &idf, working.path()).unwrap().is_some());
+        assert!(!selected_build.exists());
+        assert!(working_build.join("build.ninja").is_file());
+        assert!(unrelated_build.join("build.ninja").is_file());
+        assert!(selected.path().join("main/main.c").is_file());
+        let args = vec!["build".into(), "-B".into(), unrelated_build.to_string_lossy().into_owned()];
+        assert!(prepare_idf_build_directory(&args, working.path(), &idf, working.path()).unwrap().is_none());
+        assert!(working_build.join("build.ninja").is_file());
+        assert!(unrelated_build.join("build.ninja").is_file());
+        let args = vec!["monitor".into(), "--".into(), "build".into()];
+        assert!(prepare_idf_build_directory(&args, working.path(), &idf, working.path()).unwrap().is_none());
+        assert!(working_build.join("build.ninja").is_file());
+    }
+
+    #[test]
+    fn idf_build_preparation_repairs_incomplete_build_but_keeps_non_directory_target() {
+        let project = managed_test_project("idf_component_register(SRCS main.c INCLUDE_DIRS .)\n");
+        let build = project.path().join("build");
+        fs::create_dir(&build).unwrap();
+        fs::write(build.join("build.ninja"), "interrupted configuration").unwrap();
+        let args = vec!["reconfigure".into()];
+        assert!(prepare_idf_build_directory(&args, project.path(), project.path(), project.path()).unwrap().is_some());
+        assert!(!build.exists());
+        fs::write(&build, "user file").unwrap();
+        assert!(prepare_idf_build_directory(&args, project.path(), project.path(), project.path()).is_err());
+        assert_eq!(fs::read_to_string(build).unwrap(), "user file");
+    }
 
     fn shell_exit(code: i32) -> Command {
         if cfg!(windows) {

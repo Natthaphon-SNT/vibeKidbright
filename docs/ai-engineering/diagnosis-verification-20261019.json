@@ -1,0 +1,688 @@
+{
+  "date": "2026-10-19",
+  "timezone": "Asia/Bangkok",
+  "status": "PARTIAL",
+  "report": "20-diagnosis-and-hardening-report.md",
+  "change_manifest": "diagnosis-changes-20261019.json",
+  "baseline": {
+    "path": "src-tauri/target/verification-diagnosis-start-20261019.json",
+    "sha256": "cb9d00cbd05d190202bfb2e49aef3a14e5529d540666e556019ef01719b3d175",
+    "bytes": 50177
+  },
+  "baseline_manifest_files_matched_before_implementation": 216,
+  "execution_command_scope": "Underlying executed commands; shell stdout/stderr redirections are represented by their hashed logs. APPDATA is normalized in public firmware/adapter commands; raw native firmware commands remain in hashed ignored target results.",
+  "commands": [
+    {
+      "name": "frontend",
+      "command": "npm test -- --reporter=dot",
+      "exit_code": 0,
+      "logs": [
+        {
+          "path": "src-tauri/target/frontend-diagnosis-20261019.stdout.log",
+          "sha256": "527245a20fbbdbec04b7ea6b7e0922be458d0ec050723536ed5a2b49309093ea",
+          "bytes": 970
+        },
+        {
+          "path": "src-tauri/target/frontend-diagnosis-20261019.stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      ],
+      "passed": 176,
+      "files": 18
+    },
+    {
+      "name": "rust_all_targets_confirmation",
+      "command": "cargo test --manifest-path src-tauri/Cargo.toml --offline --locked --all-targets --quiet",
+      "exit_code": 0,
+      "logs": [
+        {
+          "path": "src-tauri/target/rust-diagnosis-confirmed-20261019.log",
+          "sha256": "854f64c0401797123b9627c38420959e09c987d32b2d07762c347167b297f90b",
+          "bytes": 12576
+        }
+      ],
+      "passed": 205,
+      "library_passed": 195,
+      "example_passed": 10
+    },
+    {
+      "name": "python_final",
+      "command": "python -m unittest discover -s scripts/tests -v",
+      "exit_code": 0,
+      "logs": [
+        {
+          "path": "src-tauri/target/python-diagnosis-final-20261019.log",
+          "sha256": "fe1413a3bfc93d9a21f42cfc02e6cede4a45d48e77f904b93eace7b211462585",
+          "bytes": 8178
+        }
+      ],
+      "passed": 22
+    },
+    {
+      "name": "host_c",
+      "command": "npm run test:compat",
+      "exit_code": 0,
+      "logs": [
+        {
+          "path": "src-tauri/target/host-c-diagnosis-20261019.stdout.log",
+          "sha256": "23675fdfb3bacdad7e82546db841e8085cc573e65fd5f4f301c1f85c7b0b5eff",
+          "bytes": 560
+        },
+        {
+          "path": "src-tauri/target/host-c-diagnosis-20261019.stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      ],
+      "assertions": 490
+    },
+    {
+      "name": "node_source_evidence_final",
+      "command": "node --test scripts/tests/vibe-evidence.test.mjs",
+      "exit_code": 0,
+      "logs": [
+        {
+          "path": "src-tauri/target/source-evidence-diagnosis-final-20261019.log",
+          "sha256": "017dff91b396b306827cda9917976da9fcee68224585ddf16ccefb54cb79261c",
+          "bytes": 1126
+        }
+      ],
+      "passed": 5,
+      "synthetic": true
+    },
+    {
+      "name": "native_examples",
+      "command": "cargo build --manifest-path src-tauri/Cargo.toml --offline --locked --example knowledge_eval --example desktop_evaluation --example export_block_fixture --example semantic_probe --quiet",
+      "exit_code": 0,
+      "logs": [
+        {
+          "path": "src-tauri/target/examples-diagnosis-build-20261019.log",
+          "sha256": "a0ae5095462c8f6e4bce0f4ade8deea137cb6ee197290fc4a4e70e0011e20289",
+          "bytes": 9348
+        }
+      ]
+    },
+    {
+      "name": "rust_release_check",
+      "command": "cargo check --manifest-path src-tauri/Cargo.toml --offline --locked --release --bin vibe-kidbright --quiet",
+      "exit_code": 0,
+      "logs": [
+        {
+          "path": "src-tauri/target/rust-diagnosis-release-20261019.log",
+          "sha256": "e4f76bfe7a16e272ec593bbe17a183da215d8573d05b1a13f6bbd765ee128e2d",
+          "bytes": 9348
+        }
+      ]
+    },
+    {
+      "name": "frontend_release_confirmation",
+      "command": "npm run build:release",
+      "exit_code": 0,
+      "logs": [
+        {
+          "path": "src-tauri/target/release-diagnosis-confirmed-20261019.log",
+          "sha256": "c0e4b69fef977b766c6a2f4089a540ecc341870a609de6130e1c2b18bd80ee94",
+          "bytes": 21624
+        }
+      ],
+      "installer_built": false
+    },
+    {
+      "name": "retrieval_fixed_policy",
+      "command": "python scripts/evaluate-retrieval.py --output-directory src-tauri/target/retrieval-fixed-diagnosis-20261019 --modes lexical bundled bundled-expanded multilingual-e5-small multilingual-minilm --date 2026-10-19",
+      "exit_code": 0,
+      "logs": [
+        {
+          "path": "src-tauri/target/retrieval-fixed-diagnosis-20261019.stdout.log",
+          "sha256": "134cee3107c9703154dcedafce8b97400b2090cf0d300da7e8a2e0348add30be",
+          "bytes": 4970
+        },
+        {
+          "path": "src-tauri/target/retrieval-fixed-diagnosis-20261019.stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      ],
+      "runs": 5,
+      "ranking_changed": false
+    },
+    {
+      "name": "desktop_current_native",
+      "command": "node scripts/probe-desktop-semantic.mjs --output src-tauri/target/semantic-hardening-current-native-20261019.json",
+      "exit_code": 0,
+      "logs": [
+        {
+          "path": "src-tauri/target/semantic-hardening-current-native-20261019.stdout.log",
+          "sha256": "c5c8f924bd7e22fbf12fe9e2a4553e91311240d96cdafe137035c5f75fc86b0b",
+          "bytes": 21044
+        },
+        {
+          "path": "src-tauri/target/semantic-hardening-current-native-20261019.stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      ],
+      "observations": 27,
+      "native_stubbed": false,
+      "synthetic_read_only_tab_bootstrap": true
+    },
+    {
+      "name": "desktop_corrected_locator",
+      "command": "node scripts/probe-desktop-semantic.mjs --output src-tauri/target/semantic-hardening-tabs-20261019.json",
+      "exit_code": 0,
+      "logs": [
+        {
+          "path": "src-tauri/target/semantic-hardening-tabs-20261019.stdout.log",
+          "sha256": "d90da6f4c69d48c535a1492fef1657b0dc1c93e208b5e4dc1ce72df41a20d333",
+          "bytes": 21044
+        },
+        {
+          "path": "src-tauri/target/semantic-hardening-tabs-20261019.stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      ],
+      "observations": 27
+    },
+    {
+      "name": "semantic_adapter",
+      "command": "src-tauri/target/debug/examples/semantic_probe.exe src-tauri/target/block-c-evaluation-20261018 src-tauri/target/clangd-evaluation/clangd_23.1.0/bin/clangd.exe \"${APPDATA}/th.nectec.vibekidbright/toolchain/tools\" src-tauri/target/semantic-adapter-diagnosis-20261019.json",
+      "exit_code": 0,
+      "logs": [
+        {
+          "path": "src-tauri/target/semantic-adapter-diagnosis-20261019.log",
+          "sha256": "d58e19aa66e4353cf1fc708cdfeadf4d518e082986c421320fe71a15b6c21d3f",
+          "bytes": 180
+        }
+      ],
+      "executed_queries": 6,
+      "projects": 2
+    },
+    {
+      "name": "production_browser",
+      "command": "node scripts/check-production-workflows.mjs --report docs/ai-engineering/production-diagnosis-ui-20261019.json",
+      "exit_code": 0,
+      "logs": [
+        {
+          "path": "src-tauri/target/production-diagnosis-ui-20261019.log",
+          "sha256": "e59049482bf804bb003db3d40ea37869aacd7ff0b1bfff9a09081201e1a42350",
+          "bytes": 2718
+        }
+      ],
+      "native_stubbed": true,
+      "provider_stubbed": true,
+      "live_llm": false
+    },
+    {
+      "name": "rust_osv_permitted_retry",
+      "command": "python scripts/audit-rust-dependencies.py --date 2026-10-19 --output src-tauri/target/rust-advisory-network-20261019.json",
+      "exit_code": 0,
+      "logs": [
+        {
+          "path": "src-tauri/target/rust-security-network-20261019.stdout.log",
+          "sha256": "06b9484eef16c3a30f19703b08f5ddcab2065ed91cae173b51e1ca3157f4fa9f",
+          "bytes": 1490
+        },
+        {
+          "path": "src-tauri/target/rust-security-network-20261019.stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      ]
+    },
+    {
+      "name": "npm_audit_permitted_retry",
+      "command": "npm audit --json --registry=https://registry.npmjs.org",
+      "exit_code": 0,
+      "logs": [
+        {
+          "path": "src-tauri/target/npm-audit-network-20261019.json",
+          "sha256": "c3b453706c80a7c88955194204c2a391d36a0896c3a8e82fcba3be5d74404909",
+          "bytes": 774
+        },
+        {
+          "path": "src-tauri/target/npm-audit-network-20261019.stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      ]
+    },
+    {
+      "name": "rule_inventory_refresh",
+      "command": "node scripts/audit-rule-documents.mjs",
+      "exit_code": 0,
+      "logs": [
+        {
+          "path": "src-tauri/target/rules-diagnosis-final-20261019.log",
+          "sha256": "4a892d9cc8f551fb71e944ad823a84fd660f70d7ecebf531ce449380fb84c795",
+          "bytes": 572
+        }
+      ]
+    },
+    {
+      "name": "firmware_repeat_delay",
+      "command": [
+        "${APPDATA}\\th.nectec.vibekidbright\\toolchain\\tools\\python_env\\idf5.5_py3.11_env\\Scripts\\python.exe",
+        "${APPDATA}\\th.nectec.vibekidbright\\toolchain\\frameworks\\esp-idf-v5.5.4\\tools\\idf.py",
+        "-C",
+        "D:\\Internship-NECTEC\\vibeKidbright\\src-tauri\\target\\block-c-evaluation-20261018\\repeat_delay",
+        "-DCCACHE_ENABLE=0",
+        "build"
+      ],
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/firmware-base-diagnosis-20261019/repeat_delay-build.log",
+        "sha256": "f343c5e3fd81916126673212342e21a9a55774663f82e40d85731c4603f9f250",
+        "bytes": 3125
+      },
+      "main_recompiled": true,
+      "elf_relinked": true,
+      "physical_test": false
+    },
+    {
+      "name": "firmware_forever_delay",
+      "command": [
+        "${APPDATA}\\th.nectec.vibekidbright\\toolchain\\tools\\python_env\\idf5.5_py3.11_env\\Scripts\\python.exe",
+        "${APPDATA}\\th.nectec.vibekidbright\\toolchain\\frameworks\\esp-idf-v5.5.4\\tools\\idf.py",
+        "-C",
+        "D:\\Internship-NECTEC\\vibeKidbright\\src-tauri\\target\\block-c-evaluation-20261018\\forever_delay",
+        "-DCCACHE_ENABLE=0",
+        "build"
+      ],
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/firmware-base-diagnosis-20261019/forever_delay-build.log",
+        "sha256": "d4f4b6322a97f3556b5a6ef2e8b62a2925f71e23134e902e354a4bb7da53c3c1",
+        "bytes": 3136
+      },
+      "main_recompiled": true,
+      "elf_relinked": true,
+      "physical_test": false
+    },
+    {
+      "name": "firmware_arithmetic_if",
+      "command": [
+        "${APPDATA}\\th.nectec.vibekidbright\\toolchain\\tools\\python_env\\idf5.5_py3.11_env\\Scripts\\python.exe",
+        "${APPDATA}\\th.nectec.vibekidbright\\toolchain\\frameworks\\esp-idf-v5.5.4\\tools\\idf.py",
+        "-C",
+        "D:\\Internship-NECTEC\\vibeKidbright\\src-tauri\\target\\block-expansion-20261018\\arithmetic_if",
+        "-DCCACHE_ENABLE=0",
+        "build"
+      ],
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/firmware-nested-diagnosis-20261019/arithmetic_if-build.log",
+        "sha256": "952474f4f28edf1d974bf343f3ef8e85f6bd37154942550e77478c897048fd31",
+        "bytes": 3103
+      },
+      "main_recompiled": true,
+      "elf_relinked": true,
+      "physical_test": false
+    },
+    {
+      "name": "firmware_nested_conditions",
+      "command": [
+        "${APPDATA}\\th.nectec.vibekidbright\\toolchain\\tools\\python_env\\idf5.5_py3.11_env\\Scripts\\python.exe",
+        "${APPDATA}\\th.nectec.vibekidbright\\toolchain\\frameworks\\esp-idf-v5.5.4\\tools\\idf.py",
+        "-C",
+        "D:\\Internship-NECTEC\\vibeKidbright\\src-tauri\\target\\block-expansion-20261018\\nested_conditions",
+        "-DCCACHE_ENABLE=0",
+        "build"
+      ],
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/firmware-nested-diagnosis-20261019/nested_conditions-build.log",
+        "sha256": "7a48127b841915a337c13bbeef4f360105f9285a52e738d8826ae43b25b6ba84",
+        "bytes": 3147
+      },
+      "main_recompiled": true,
+      "elf_relinked": true,
+      "physical_test": false
+    },
+    {
+      "name": "final_rules",
+      "command": [
+        "node",
+        "scripts/audit-rule-documents.mjs",
+        "--check"
+      ],
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/policy-diagnosis-final-rules-20261019.log",
+        "sha256": "87fd4e5317fd6e7cf7a8d37bc822d651cd705ea9ef22bda5c0eea8c760a6cc57",
+        "bytes": 284
+      }
+    },
+    {
+      "name": "final_standalone",
+      "command": [
+        "node",
+        "scripts/check-standalone.mjs"
+      ],
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/policy-diagnosis-final-standalone-20261019.log",
+        "sha256": "addf38704d6b3d8842ecd95a5f00a86bdd742498e21c3bec91e5f44376c5012e",
+        "bytes": 120
+      }
+    },
+    {
+      "name": "final_knowledge_sync",
+      "command": [
+        "node",
+        "scripts/sync-knowledge-base.mjs"
+      ],
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/policy-diagnosis-final-knowledge_sync-20261019.log",
+        "sha256": "ebb53a3570c8f0cb3e1999b5c37fa7651595652658b405ac67859f8054230ff8",
+        "bytes": 42
+      }
+    },
+    {
+      "name": "final_boards",
+      "command": [
+        "node",
+        "scripts/check-kidbright-board-catalog.mjs"
+      ],
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/policy-diagnosis-final-boards-20261019.log",
+        "sha256": "c56b6125a10242e1018782d8d1c6eaaee916a0ed1115c23d14f60eff44fc8071",
+        "bytes": 96
+      }
+    },
+    {
+      "name": "final_block_inventory",
+      "command": [
+        "node",
+        "scripts/audit-kidbright-coverage.mjs",
+        "--check"
+      ],
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/policy-diagnosis-final-block_inventory-20261019.log",
+        "sha256": "40f617700396a0cca0f0142a205e0a269f902ba95128b2b5af967242366f5a1e",
+        "bytes": 114
+      }
+    },
+    {
+      "name": "final_public",
+      "command": [
+        "node",
+        "scripts/check-public.mjs"
+      ],
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/policy-diagnosis-final-public-20261019.log",
+        "sha256": "1a2c1e84f1590a9d1011bbad3cf85a8a56f29f0b58f840b74cd931cf1593cb0d",
+        "bytes": 69
+      }
+    },
+    {
+      "name": "final_bundle",
+      "command": [
+        "node",
+        "scripts/check-public.mjs",
+        "--bundle"
+      ],
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/policy-diagnosis-final-bundle-20261019.log",
+        "sha256": "6acb55ad3aebd01116311772a55a5088db2b8df52f7efb1a0a1ba527bb2ad509",
+        "bytes": 66
+      }
+    },
+    {
+      "name": "final_git_diff_check",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/policy-diagnosis-final-git_diff_check-20261019.log",
+        "sha256": "a271c5be9f4fd9052ad9973c58c83b1adc3db64437ccf2b52104f520e0db092b",
+        "bytes": 3826
+      }
+    }
+  ],
+  "evidence": [
+    {
+      "path": "docs/ai-engineering/19-diagnosis-plan.md",
+      "sha256": "e1d4daff7e30e72b3dc4065cb73ea9559bffd45cc9750a2ad35251e966550da4",
+      "bytes": 4914
+    },
+    {
+      "path": "docs/ai-engineering/20-diagnosis-and-hardening-report.md",
+      "sha256": "f9f8a60f66333d7cec53b58c68d3369a4c7f75fa69a2a58d190a5e4bad3380de",
+      "bytes": 12317
+    },
+    {
+      "path": "docs/ai-engineering/dependency-security-diagnosis-20261019.json",
+      "sha256": "44f036cd5d952af4baed668fddc3fae9510cfc25c29b0c7ad3f158ec9bbe3373",
+      "bytes": 32827
+    },
+    {
+      "path": "docs/ai-engineering/development-review-gate-20261019.json",
+      "sha256": "295580bf183eae014ea7118a4370b81d6cf301f8f944f85853665f29787f0204",
+      "bytes": 335
+    },
+    {
+      "path": "docs/ai-engineering/firmware-diagnosis-20261019.json",
+      "sha256": "c10ebc23975ba19da93a9798ba42b5a4f474f5d2dceb8a4d56c4c585fec4b22a",
+      "bytes": 5894
+    },
+    {
+      "path": "docs/ai-engineering/model-availability-diagnosis-20261019.json",
+      "sha256": "38bbc66706ec65cbdec53404815ec46839e8129c09174e9f0ea8122ba286f5a3",
+      "bytes": 701
+    },
+    {
+      "path": "docs/ai-engineering/production-diagnosis-ui-20261019.json",
+      "sha256": "3df663993b368d10ed25de1dd2c2afbb575ab88ce28437baecf0a082fd2de9be",
+      "bytes": 1537
+    },
+    {
+      "path": "docs/ai-engineering/release-preservation-diagnosis-20261019.json",
+      "sha256": "aca24bdcc65c8740d7d5f59a0fcd5574494e177e981de4dc4d47cb9af58c332a",
+      "bytes": 1739
+    },
+    {
+      "path": "docs/ai-engineering/retrieval-development-review-20261019.json",
+      "sha256": "7b149e399b143f2b7a552d4a09f46162478c820a4f05ae7879bb765ad1844a36",
+      "bytes": 44449
+    },
+    {
+      "path": "docs/ai-engineering/retrieval-diagnosis-20261019.json",
+      "sha256": "05f8897613ff6ae43356f40522b618a7a4bdbf7af4fb7201d400f690aca4f865",
+      "bytes": 127008
+    },
+    {
+      "path": "docs/ai-engineering/retrieval-fixed-measurement-20261019.json",
+      "sha256": "f88a7da5bb63feb4d62c50939afe72b8ec1ee4e26422015e9afea783b12beda8",
+      "bytes": 23241
+    },
+    {
+      "path": "docs/ai-engineering/retrieval-output-safety-20261019.json",
+      "sha256": "f9bfc7e6ed7f7a0ac7a61f235a46e72aeabd74753ec49c6abc0751b3c0b3bf52",
+      "bytes": 357
+    },
+    {
+      "path": "docs/ai-engineering/semantic-hardening-20261019.json",
+      "sha256": "50d41e014e434df2acbe9225a82cdc074c2c2a80dac4d18f186a552a9570a9fb",
+      "bytes": 7030
+    }
+  ],
+  "negative_or_incomplete_observations": [
+    {
+      "scenario": "draft_review_rejected",
+      "expected_exit": 1,
+      "report": "development-review-gate-20261019.json",
+      "dataset_exported": false
+    },
+    {
+      "scenario": "existing_output_rejected_before_model_load",
+      "expected_exit": 1,
+      "report": "retrieval-output-safety-20261019.json",
+      "old_bytes_preserved": true
+    },
+    {
+      "scenario": "first_desktop_attempt",
+      "status": "FAILED",
+      "reason": "Probe locator expected a button for a div tab; app opened the read-only component correctly",
+      "report": {
+        "path": "src-tauri/target/semantic-hardening-20261019.json",
+        "sha256": "d92d534707fb9a244a8da09ec3804be8e74552d16caeae30c840f0bc281fcb72",
+        "bytes": 12246
+      }
+    },
+    {
+      "scenario": "first_rust_python_shell_invocations",
+      "shell_exit": 1,
+      "tests_failed": 0,
+      "reason": "PowerShell native stderr redirection behavior; explicit-exit confirmation runs passed",
+      "logs": [
+        {
+          "path": "src-tauri/target/rust-diagnosis-20261019.stdout.log",
+          "sha256": "ceecc62c644670d260da091ffdde6df0a39dd2317b316eb2ede1f3a607220fe8",
+          "bytes": 2344
+        },
+        {
+          "path": "src-tauri/target/rust-diagnosis-20261019.stderr.log",
+          "sha256": "d41323bcc8dc87679f1d78758d69593e5bf0d7f1033b3d4a99ca11e91522e8d9",
+          "bytes": 10234
+        },
+        {
+          "path": "src-tauri/target/python-diagnosis-20261019.stdout.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        {
+          "path": "src-tauri/target/python-diagnosis-20261019.stderr.log",
+          "sha256": "6b5a265bb84330d02fdff6527cfc054272c7f52790b48184b8a73af6be832dd1",
+          "bytes": 8178
+        }
+      ]
+    },
+    {
+      "scenario": "initial_security_network_denials",
+      "status": "FAILED_SANDBOX_NETWORK",
+      "permitted_retries": "PASS",
+      "logs": [
+        {
+          "path": "src-tauri/target/rust-security-diagnosis-20261019.stderr.log",
+          "sha256": "e797e7b4bb58242285fdb0026a7295af8b436198f99f61df5302cb1600d8349f",
+          "bytes": 8700
+        },
+        {
+          "path": "src-tauri/target/npm-security-diagnosis-20261019.stderr.log",
+          "sha256": "c2663b3fd3739c0c2f5316161ade86297118ff7e8a1aa14bd326359b93d57543",
+          "bytes": 1424
+        }
+      ]
+    },
+    {
+      "scenario": "first_release_build",
+      "log_has_successful_vite_completion": true,
+      "tool_session_exit_code": null,
+      "confirmation_exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/release-diagnosis-20261019.log",
+        "sha256": "cf318d704ce538fb9a683ab5e12560637cef1f5b7f95408f107d0636b393d3e9",
+        "bytes": 21624
+      }
+    },
+    {
+      "scenario": "prior_learning_view_transition",
+      "reproduced_in_two_expanded_passes": false,
+      "cause_established": false,
+      "declared_fixed": false
+    }
+  ],
+  "retrieval": {
+    "report": "retrieval-fixed-measurement-20261019.json",
+    "ranker_model_corpus_unchanged": true,
+    "query_count": 69,
+    "frozen_sha256": "c75de0d838a5f0e6670c48776c67d3b5c0a98ca755f02ba09c2d548c28b55c43",
+    "tuning_on_frozen_labels": false,
+    "reviewed_development_cases": 0,
+    "user_requested_keep_ranking": true,
+    "production_ranking_drift_ids": [],
+    "new_model_selected": false
+  },
+  "desktop": {
+    "report": "semantic-hardening-20261019.json",
+    "native_observations_passed": 27,
+    "adapter_queries": 6,
+    "production_browser_native_provider_stubbed": true,
+    "synthetic_read_only_component_tab_bootstrap": true,
+    "f12_added": false,
+    "installed_release_qualified": false
+  },
+  "block_to_c": {
+    "ids": 9,
+    "schema_version": 1,
+    "mapping_runtime_changed": false,
+    "firmware_builds": 4,
+    "sdk": "5.5.4",
+    "target": "esp32",
+    "hardware_tests": 0
+  },
+  "real_llm": {
+    "status": "NOT_EXECUTED",
+    "inference_requests": 0,
+    "paid_credential_reads": 0,
+    "model_patches_applied": 0,
+    "quality_metrics": null,
+    "availability_report": "model-availability-diagnosis-20261019.json"
+  },
+  "capability_levels": {
+    "knowledge_aware": "NOT_EVALUATED",
+    "project_aware": "NOT_EVALUATED",
+    "build_aware": "NOT_EVALUATED"
+  },
+  "requirements": {
+    "system_architecture": "PARTIAL",
+    "hybrid_rag": "PARTIAL",
+    "knowledge_base_data": "PARTIAL",
+    "code_aware_chunking": "PARTIAL",
+    "compiler_validation_auto_fix": "PARTIAL",
+    "technology_integration": "PARTIAL",
+    "development_phases": "PARTIAL",
+    "evaluation_quality": "PARTIAL"
+  },
+  "installer": {
+    "bytes": 316758944,
+    "sha256": "d09d0f9418d94059e801fc43a38241314757c686e5060e26596a806ba56ae7c1",
+    "rebuilt": false
+  },
+  "security": {
+    "report": "dependency-security-diagnosis-20261019.json",
+    "npm_advisories": 0,
+    "rust_whole_lock_packages": 8,
+    "rust_whole_lock_records": 10,
+    "selected_windows_maintenance_findings": 2,
+    "selected_windows_nonmaintenance_matches": 0,
+    "actual_llm_prompt_injection_resistance_measured": false
+  },
+  "not_executed": [
+    "Real LLM inference/generation/citation quality/repair/rollback evaluation",
+    "Independent human relevance review",
+    "Clean VM GUI install/upgrade/rollback/uninstall/user-data preservation tests",
+    "Other SDK versions, macOS/Unix execution and physical boards/Flash",
+    "New installer, version promotion, staging/commit/push/publish/deploy"
+  ],
+  "remaining_blockers": [
+    "Independent reviewer unavailable; user explicitly keeps current ranking",
+    "No explicitly authorized ready LLM",
+    "Thai grounding remains weak and labels non-exhaustive",
+    "No physical board or clean-VM lifecycle qualification",
+    "Header inference/unopened project completeness and F12 remain unqualified",
+    "Other-platform Rust advisories and maintenance migrations remain"
+  ],
+  "new_installer_or_rc": false,
+  "commit_push_publish_deploy_promote": false
+}

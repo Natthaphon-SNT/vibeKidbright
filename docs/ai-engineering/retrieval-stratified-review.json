@@ -1,0 +1,380 @@
+{
+  "dataset_sha256": "c75de0d838a5f0e6670c48776c67d3b5c0a98ca755f02ba09c2d548c28b55c43",
+  "measurement": "Post-processing of existing measured runs; no model rerun, qrel edit or tuning",
+  "annotation_status": "assistant-authored, not independent human review",
+  "groups_overlap": true,
+  "hardware_topics_declared": [
+    "balance",
+    "external-adc",
+    "formula",
+    "iaip",
+    "kxtj3",
+    "mai",
+    "mc3479",
+    "minibike",
+    "oled",
+    "pins",
+    "schematic"
+  ],
+  "runs": [
+    {
+      "mode": "lexical",
+      "strata": {
+        "th": {
+          "queries": 20,
+          "metrics": {
+            "mrr": 0.0,
+            "ndcg_at_5": 0.0,
+            "precision_at_5": 0.0,
+            "recall_at_5": 0.0
+          },
+          "latency_median_ms": 0.8344,
+          "latency_p95_ms": 1.1395000000000002
+        },
+        "en": {
+          "queries": 20,
+          "metrics": {
+            "mrr": 0.2375,
+            "ndcg_at_5": 0.19087646826539673,
+            "precision_at_5": 0.07,
+            "recall_at_5": 0.225
+          },
+          "latency_median_ms": 4.415150000000001,
+          "latency_p95_ms": 5.5883
+        },
+        "mixed": {
+          "queries": 20,
+          "metrics": {
+            "mrr": 0.5666666666666667,
+            "ndcg_at_5": 0.4923793323602941,
+            "precision_at_5": 0.14,
+            "recall_at_5": 0.525
+          },
+          "latency_median_ms": 8.552800000000001,
+          "latency_p95_ms": 10.6189
+        },
+        "exact_api": {
+          "queries": 9,
+          "metrics": {
+            "mrr": 0.6851851851851852,
+            "ndcg_at_5": 0.8023958498624948,
+            "precision_at_5": 0.4,
+            "recall_at_5": 1.0
+          },
+          "latency_median_ms": 0.7904,
+          "latency_p95_ms": 1.013
+        },
+        "hardware": {
+          "queries": 33,
+          "metrics": {
+            "mrr": 0.21464646464646464,
+            "ndcg_at_5": 0.2291395852013591,
+            "precision_at_5": 0.05454545454545455,
+            "recall_at_5": 0.2727272727272727
+          },
+          "latency_median_ms": 4.5116000000000005,
+          "latency_p95_ms": 9.6
+        }
+      },
+      "cold_index_ms": 1073.198,
+      "process_resources": {
+        "peak_working_set_bytes": 19394560,
+        "peak_sampled_private_bytes": 7946240,
+        "wall_seconds": 2.1169045999995433,
+        "sampling_interval_ms": 100,
+        "method": "Windows GetProcessMemoryInfo, one process per ranker; single run"
+      },
+      "model_bytes": 0
+    },
+    {
+      "mode": "bundled",
+      "strata": {
+        "th": {
+          "queries": 20,
+          "metrics": {
+            "mrr": 0.05,
+            "ndcg_at_5": 0.05,
+            "precision_at_5": 0.01,
+            "recall_at_5": 0.05
+          },
+          "latency_median_ms": 147.41989999999998,
+          "latency_p95_ms": 168.8231
+        },
+        "en": {
+          "queries": 20,
+          "metrics": {
+            "mrr": 0.24166666666666667,
+            "ndcg_at_5": 0.2100785736263389,
+            "precision_at_5": 0.08,
+            "recall_at_5": 0.25
+          },
+          "latency_median_ms": 174.9644,
+          "latency_p95_ms": 185.959
+        },
+        "mixed": {
+          "queries": 20,
+          "metrics": {
+            "mrr": 0.625,
+            "ndcg_at_5": 0.5226294385530916,
+            "precision_at_5": 0.13,
+            "recall_at_5": 0.5
+          },
+          "latency_median_ms": 181.99829999999997,
+          "latency_p95_ms": 202.8151
+        },
+        "exact_api": {
+          "queries": 9,
+          "metrics": {
+            "mrr": 0.9444444444444444,
+            "ndcg_at_5": 0.9344536996946328,
+            "precision_at_5": 0.4,
+            "recall_at_5": 1.0
+          },
+          "latency_median_ms": 169.41410000000002,
+          "latency_p95_ms": 176.653
+        },
+        "hardware": {
+          "queries": 33,
+          "metrics": {
+            "mrr": 0.2878787878787879,
+            "ndcg_at_5": 0.29184635616883203,
+            "precision_at_5": 0.06060606060606061,
+            "recall_at_5": 0.30303030303030304
+          },
+          "latency_median_ms": 180.875,
+          "latency_p95_ms": 197.482
+        }
+      },
+      "cold_index_ms": 122319.4186,
+      "process_resources": {
+        "peak_working_set_bytes": 388841472,
+        "peak_sampled_private_bytes": 648929280,
+        "wall_seconds": 135.99046289999387,
+        "sampling_interval_ms": 100,
+        "method": "Windows GetProcessMemoryInfo, one process per ranker; single run"
+      },
+      "model_bytes": 91115499
+    },
+    {
+      "mode": "bundled-routed",
+      "strata": {
+        "th": {
+          "queries": 20,
+          "metrics": {
+            "mrr": 0.05,
+            "ndcg_at_5": 0.05,
+            "precision_at_5": 0.01,
+            "recall_at_5": 0.05
+          },
+          "latency_median_ms": 169.00085,
+          "latency_p95_ms": 204.9002
+        },
+        "en": {
+          "queries": 20,
+          "metrics": {
+            "mrr": 0.24166666666666667,
+            "ndcg_at_5": 0.2100785736263389,
+            "precision_at_5": 0.08,
+            "recall_at_5": 0.25
+          },
+          "latency_median_ms": 203.43125,
+          "latency_p95_ms": 246.6258
+        },
+        "mixed": {
+          "queries": 20,
+          "metrics": {
+            "mrr": 0.625,
+            "ndcg_at_5": 0.5226294385530916,
+            "precision_at_5": 0.13,
+            "recall_at_5": 0.5
+          },
+          "latency_median_ms": 209.35475,
+          "latency_p95_ms": 246.9069
+        },
+        "exact_api": {
+          "queries": 9,
+          "metrics": {
+            "mrr": 0.6851851851851852,
+            "ndcg_at_5": 0.8023958498624948,
+            "precision_at_5": 0.4,
+            "recall_at_5": 1.0
+          },
+          "latency_median_ms": 1.7214,
+          "latency_p95_ms": 2.1684
+        },
+        "hardware": {
+          "queries": 33,
+          "metrics": {
+            "mrr": 0.2878787878787879,
+            "ndcg_at_5": 0.29184635616883203,
+            "precision_at_5": 0.06060606060606061,
+            "recall_at_5": 0.30303030303030304
+          },
+          "latency_median_ms": 205.3499,
+          "latency_p95_ms": 246.9069
+        }
+      },
+      "cold_index_ms": 129332.8378,
+      "process_resources": {
+        "peak_working_set_bytes": 389017600,
+        "peak_sampled_private_bytes": 649338880,
+        "wall_seconds": 143.40987019999739,
+        "sampling_interval_ms": 100,
+        "method": "Windows GetProcessMemoryInfo, one process per ranker; single run"
+      },
+      "model_bytes": 91115499
+    },
+    {
+      "mode": "multilingual-e5-small",
+      "strata": {
+        "th": {
+          "queries": 20,
+          "metrics": {
+            "mrr": 0.09166666666666666,
+            "ndcg_at_5": 0.11963946303571862,
+            "precision_at_5": 0.04,
+            "recall_at_5": 0.2
+          },
+          "latency_median_ms": 185.01415000000003,
+          "latency_p95_ms": 421.586
+        },
+        "en": {
+          "queries": 20,
+          "metrics": {
+            "mrr": 0.2791666666666667,
+            "ndcg_at_5": 0.23775163576310607,
+            "precision_at_5": 0.09000000000000001,
+            "recall_at_5": 0.3
+          },
+          "latency_median_ms": 191.46535,
+          "latency_p95_ms": 453.1291
+        },
+        "mixed": {
+          "queries": 20,
+          "metrics": {
+            "mrr": 0.5916666666666667,
+            "ndcg_at_5": 0.51916064437242,
+            "precision_at_5": 0.14,
+            "recall_at_5": 0.525
+          },
+          "latency_median_ms": 198.81324999999998,
+          "latency_p95_ms": 454.0774
+        },
+        "exact_api": {
+          "queries": 9,
+          "metrics": {
+            "mrr": 0.8333333333333334,
+            "ndcg_at_5": 0.8663262338318041,
+            "precision_at_5": 0.4,
+            "recall_at_5": 1.0
+          },
+          "latency_median_ms": 300.64390000000003,
+          "latency_p95_ms": 336.20070000000004
+        },
+        "hardware": {
+          "queries": 33,
+          "metrics": {
+            "mrr": 0.31313131313131315,
+            "ndcg_at_5": 0.3340520913419949,
+            "precision_at_5": 0.0787878787878788,
+            "recall_at_5": 0.3939393939393939
+          },
+          "latency_median_ms": 307.9337,
+          "latency_p95_ms": 480.79179999999997
+        }
+      },
+      "cold_index_ms": 257450.533,
+      "process_resources": {
+        "peak_working_set_bytes": 1418936320,
+        "peak_sampled_private_bytes": 1535107072,
+        "wall_seconds": 282.6568352999966,
+        "sampling_interval_ms": 100,
+        "method": "Windows GetProcessMemoryInfo, one process per ranker; single run"
+      },
+      "model_bytes": 135394008
+    },
+    {
+      "mode": "multilingual-minilm",
+      "strata": {
+        "th": {
+          "queries": 20,
+          "metrics": {
+            "mrr": 0.1125,
+            "ndcg_at_5": 0.08284854718021549,
+            "precision_at_5": 0.030000000000000002,
+            "recall_at_5": 0.1
+          },
+          "latency_median_ms": 152.03455000000002,
+          "latency_p95_ms": 171.7708
+        },
+        "en": {
+          "queries": 20,
+          "metrics": {
+            "mrr": 0.18333333333333332,
+            "ndcg_at_5": 0.17372501544561222,
+            "precision_at_5": 0.07,
+            "recall_at_5": 0.25
+          },
+          "latency_median_ms": 158.76855,
+          "latency_p95_ms": 186.6196
+        },
+        "mixed": {
+          "queries": 20,
+          "metrics": {
+            "mrr": 0.5583333333333333,
+            "ndcg_at_5": 0.49769535240452734,
+            "precision_at_5": 0.14,
+            "recall_at_5": 0.55
+          },
+          "latency_median_ms": 159.40845000000002,
+          "latency_p95_ms": 182.9094
+        },
+        "exact_api": {
+          "queries": 9,
+          "metrics": {
+            "mrr": 0.8888888888888888,
+            "ndcg_at_5": 0.8867472240230017,
+            "precision_at_5": 0.4,
+            "recall_at_5": 1.0
+          },
+          "latency_median_ms": 132.89329999999998,
+          "latency_p95_ms": 142.15449999999998
+        },
+        "hardware": {
+          "queries": 33,
+          "metrics": {
+            "mrr": 0.23737373737373738,
+            "ndcg_at_5": 0.2533743368529329,
+            "precision_at_5": 0.06060606060606061,
+            "recall_at_5": 0.30303030303030304
+          },
+          "latency_median_ms": 160.666,
+          "latency_p95_ms": 186.6196
+        }
+      },
+      "cold_index_ms": 309207.5693,
+      "process_resources": {
+        "peak_working_set_bytes": 1422368768,
+        "peak_sampled_private_bytes": 1540988928,
+        "wall_seconds": 332.9129858000015,
+        "sampling_interval_ms": 100,
+        "method": "Windows GetProcessMemoryInfo, one process per ranker; single run"
+      },
+      "model_bytes": 135394365
+    }
+  ],
+  "uncertainties": [
+    "Labels are representative file targets, not exhaustive graded judgments",
+    "Translated topic triplets share intent; queries are not statistically independent",
+    "Chunk top-five can repeat a file; file ranks are deduplicated without refill",
+    "Version/board metadata is often unknown; retrieval relevance is not hardware compatibility",
+    "Exact-API cases are nine probes; hardware category is a declared subset, not all physical functions"
+  ],
+  "preserved_installer": {
+    "path": "src-tauri/target/release/bundle/nsis/VibeKidbright IDE_3.7.3_x64-setup.exe",
+    "bytes": 316758944,
+    "sha256": "d09d0f9418d94059e801fc43a38241314757c686e5060e26596a806ba56ae7c1",
+    "candidate_installers_built": false,
+    "note": "Actual NSIS bytes only; model assets are not compressed installer-size measurements"
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "date": "2026-10-19",
+  "baseline": {
+    "path": "src-tauri/target/actual-model-baseline-20261019.json",
+    "sha256": "f9a58d992e9ca28ef78f95438d8503ca42d556e229df216473f408df54ede3ea",
+    "bytes": 69424
+  },
+  "baseline_verified_before_changes": true,
+  "scope": "Only the previous 307-file recorded baseline plus new evidence files. Existing dirty/untracked work is not attributed wholesale. Newly recorded does not mean newly created. Excludes self/verification.json to avoid recursive hashes.",
+  "files": [
+    {
+      "path": "docs/ai-engineering/28-actual-model-readiness-and-evidence.md",
+      "before_sha256": null,
+      "after_sha256": "f27c06cf03374697faea66d897ba76b257d139a384424e81a024205388b1d2c3",
+      "comparison": "newly_recorded"
+    },
+    {
+      "path": "docs/ai-engineering/actual-model-pilot-source-readiness-20261019.json",
+      "before_sha256": null,
+      "after_sha256": "982d8f0f8aa67fa5e65807a75ea02a176699935179094b8f68a968c1344a3e17",
+      "comparison": "newly_recorded"
+    },
+    {
+      "path": "docs/ai-engineering/actual-model-retrieval-readiness-20261019.json",
+      "before_sha256": null,
+      "after_sha256": "54f48dd743b9fc6d3f79389fddb79950d06359d60ff6e8d2709d611d88cbcd2e",
+      "comparison": "newly_recorded"
+    },
+    {
+      "path": "docs/ai-engineering/actual-model-verification-20261019.json",
+      "before_sha256": null,
+      "after_sha256": "4e15f4ce113924f59b1cd8d4adfa8bee33444838a42bc0f900db4de3166f2772",
+      "comparison": "newly_recorded"
+    },
+    {
+      "path": "docs/research/rule-documents-2026-10-16.json",
+      "before_sha256": "b7353c7d8941a1cb3ade871cf616d0226c15a37508de0695ee276d73be123a14",
+      "after_sha256": "4503fc84f02ea84df62892b564243ce8a1c618ccfade1f8bdd0ff7d3a856f020",
+      "comparison": "changed_from_verified_baseline"
+    },
+    {
+      "path": "scripts/evaluate-vibe-coder-real.mjs",
+      "before_sha256": "4d7343556c0c29ed99c4a415477f5a8e993b6901d469efb0ab5260b50b4943eb",
+      "after_sha256": "7cd53bb6ea8cffb3f1def2fa5961fb11fb05f6ebd6805b146b5938399994ee16",
+      "comparison": "changed_from_verified_baseline"
+    },
+    {
+      "path": "scripts/tests/test_real_vibe_harness.py",
+      "before_sha256": "8e17d6e8da3a73979d3873f28daf44eeb0bb34e4d276748a9e5e68e3e014bb8f",
+      "after_sha256": "3a19dad0eb19e0a64b24361fb8036ccea4433c4ee4252afcd7543af9770dbd71",
+      "comparison": "changed_from_verified_baseline"
+    },
+    {
+      "path": "src-tauri/target/actual-model-blind-review-20261019/manifest.json",
+      "before_sha256": null,
+      "after_sha256": "54f48dd743b9fc6d3f79389fddb79950d06359d60ff6e8d2709d611d88cbcd2e",
+      "comparison": "newly_recorded"
+    },
+    {
+      "path": "src-tauri/target/actual-model-matrix-20261019.json",
+      "before_sha256": null,
+      "after_sha256": "d9563a1bc16264cddd54474c189bd8bb5f386416a9236c562b8312aa0c926890",
+      "comparison": "newly_recorded"
+    },
+    {
+      "path": "src-tauri/target/actual-model-prepared-20261019.json",
+      "before_sha256": null,
+      "after_sha256": "676692739b73393e4c5511075bca12205a8ed9982ef063d27fd2202ca89b70c4",
+      "comparison": "newly_recorded"
+    },
+    {
+      "path": "src-tauri/target/actual-model-review-draft-20261019.json",
+      "before_sha256": null,
+      "after_sha256": "7d126ad158bd08d5fe0475bd3fce6d2e9be8679924ce5c746c2fc622a3ee33a1",
+      "comparison": "newly_recorded"
+    },
+    {
+      "path": "src-tauri/target/actual-model-scoped-source-20261019.patch",
+      "before_sha256": null,
+      "after_sha256": "54b008516073d0748144becc6116a3cff54f102f055d531647dd1a61c9e27c63",
+      "comparison": "newly_recorded"
+    },
+    {
+      "path": "src-tauri/target/prepare-actual-model-offline-evidence.py",
+      "before_sha256": null,
+      "after_sha256": "6cfe8cdb1f0e2350a7b5602b7ae5c3288e8b953295c30c4b384345fbd0ebb1a2",
+      "comparison": "newly_recorded"
+    }
+  ]
+}

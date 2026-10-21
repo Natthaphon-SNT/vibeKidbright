@@ -1,0 +1,380 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vibekidbright.local/schemas/block-mapping-v1",
+  "title": "Normalized verified Desktop Block subset, not a generic Blockly file",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "board_profile",
+    "blocks"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "board_profile": {
+      "enum": [
+        "kidbright32_v13",
+        "kidbright32_rev31"
+      ]
+    },
+    "blocks": {
+      "type": "array",
+      "maxItems": 1000,
+      "items": {
+        "$ref": "#/$defs/block"
+      }
+    }
+  },
+  "$defs": {
+    "number": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/literal_number"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "fields",
+            "values"
+          ],
+          "properties": {
+            "type": {
+              "const": "math_arithmetic"
+            },
+            "fields": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "OP"
+              ],
+              "properties": {
+                "OP": {
+                  "enum": [
+                    "ADD",
+                    "MINUS",
+                    "MULTIPLY",
+                    "DIVIDE",
+                    "MODULO"
+                  ]
+                }
+              }
+            },
+            "values": {
+              "$ref": "#/$defs/numeric_pair"
+            }
+          }
+        }
+      ]
+    },
+    "sequence": {
+      "type": "array",
+      "maxItems": 1000,
+      "items": {
+        "$ref": "#/$defs/block"
+      }
+    },
+    "block": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "fields"
+          ],
+          "properties": {
+            "type": {
+              "const": "basic_delay"
+            },
+            "fields": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "VALUE"
+              ],
+              "properties": {
+                "VALUE": {
+                  "type": "number",
+                  "minimum": 0.02,
+                  "maximum": 86400
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "values",
+            "statements"
+          ],
+          "properties": {
+            "type": {
+              "const": "controls_repeat_ext"
+            },
+            "values": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "TIMES"
+              ],
+              "properties": {
+                "TIMES": {
+                  "$ref": "#/$defs/repeat_number"
+                }
+              }
+            },
+            "statements": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "DO"
+              ],
+              "properties": {
+                "DO": {
+                  "$ref": "#/$defs/sequence"
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "statements"
+          ],
+          "properties": {
+            "type": {
+              "const": "basic_forever"
+            },
+            "statements": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "HANDLER"
+              ],
+              "properties": {
+                "HANDLER": {
+                  "$ref": "#/$defs/sequence"
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "values",
+            "statements"
+          ],
+          "properties": {
+            "type": {
+              "const": "controls_if"
+            },
+            "values": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "IF0"
+              ],
+              "properties": {
+                "IF0": {
+                  "$ref": "#/$defs/condition"
+                }
+              }
+            },
+            "statements": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "DO0"
+              ],
+              "properties": {
+                "DO0": {
+                  "$ref": "#/$defs/sequence"
+                },
+                "ELSE": {
+                  "$ref": "#/$defs/sequence"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "repeat_number": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "fields"
+      ],
+      "properties": {
+        "type": {
+          "const": "math_number"
+        },
+        "fields": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "VALUE"
+          ],
+          "properties": {
+            "VALUE": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10000
+            }
+          }
+        }
+      }
+    },
+    "literal_number": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "fields"
+      ],
+      "properties": {
+        "type": {
+          "const": "math_number"
+        },
+        "fields": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "VALUE"
+          ],
+          "properties": {
+            "VALUE": {
+              "type": "number",
+              "minimum": -1000000000.0,
+              "maximum": 1000000000.0
+            }
+          }
+        }
+      }
+    },
+    "numeric_pair": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "A",
+        "B"
+      ],
+      "properties": {
+        "A": {
+          "$ref": "#/$defs/number"
+        },
+        "B": {
+          "$ref": "#/$defs/number"
+        }
+      }
+    },
+    "condition": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "fields"
+          ],
+          "properties": {
+            "type": {
+              "const": "logic_boolean"
+            },
+            "fields": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "BOOL"
+              ],
+              "properties": {
+                "BOOL": {
+                  "enum": [
+                    "TRUE",
+                    "FALSE"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "fields",
+            "values"
+          ],
+          "properties": {
+            "type": {
+              "const": "logic_compare"
+            },
+            "fields": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "OP"
+              ],
+              "properties": {
+                "OP": {
+                  "enum": [
+                    "EQ",
+                    "NEQ",
+                    "LT",
+                    "LTE",
+                    "GT",
+                    "GTE"
+                  ]
+                }
+              }
+            },
+            "values": {
+              "$ref": "#/$defs/numeric_pair"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "values"
+          ],
+          "properties": {
+            "type": {
+              "const": "logic_negate"
+            },
+            "values": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "BOOL"
+              ],
+              "properties": {
+                "BOOL": {
+                  "$ref": "#/$defs/condition"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "$comment": "Runtime enforces at most 1000 emitted statements and a shared counter for new conditional/expression nodes, depth 16, finite computed results, nonzero divisors, integer MODULO and unconditional waits in both branches of forever. Repeat counts remain bounded literal fields."
+}

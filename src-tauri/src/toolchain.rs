@@ -11,7 +11,7 @@
 //   3. get_toolchain_dir()  → คืนค่า path ของ toolchain ให้ build_firmware() ใช้
 // ─────────────────────────────────────────────────────────────────────────────
 
-use std::io::{BufReader, BufWriter, Read, Write};
+use std::io::{BufWriter, Read, Write};
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, OnceLock};
@@ -172,6 +172,11 @@ pub async fn check_toolchain(app_handle: AppHandle) -> Result<serde_json::Value,
             "path": dir.to_string_lossy()
         }))
     } else {
+        // An existing user-configured/runtime SDK is usable without downloading
+        // the managed bundle or manufacturing its installation sentinel.
+        if let Ok((idf,tools))=crate::esp_idf::resolve_idf_paths(&app_handle) {
+            if let Ok(status)=crate::esp_idf::installed_sdk_status(&idf,&tools) {return Ok(status);}
+        }
         Ok(serde_json::json!({
             "status": "not_installed",
             "version": null,
@@ -667,65 +672,10 @@ fn extract_zip_ranged(
     base_percent: u8,
     range: u8,
 ) -> Result<(), String> {
-    let file = std::fs::File::open(zip_path).map_err(|e| format!("Cannot open ZIP file: {}", e))?;
-
-    let mut archive = zip::ZipArchive::new(file).map_err(|e| format!("Invalid ZIP file: {}", e))?;
-
-    let total = archive.len();
-
-    for i in 0..total {
-        if cancel.load(Ordering::SeqCst) {
-            return Err("Cancelled during extraction.".to_string());
-        }
-
-        let mut zip_file = archive
-            .by_index(i)
-            .map_err(|e| format!("ZIP read error at index {}: {}", i, e))?;
-
-        let out_path = match zip_file.enclosed_name() {
-            Some(p) => dest_dir.join(p),
-            None => continue,
-        };
-
-        let percent = base_percent + ((i as f64 / total as f64) * range as f64) as u8;
-
-        if i % 500 == 0 || i == total - 1 {
-            emit_progress(
-                app,
-                "extracting",
-                percent,
-                &format!("Extracting... ({}/{}) {}", i + 1, total, zip_file.name()),
-            );
-        }
-
-        if zip_file.is_dir() {
-            std::fs::create_dir_all(&out_path)
-                .map_err(|e| format!("Cannot create dir {}: {}", out_path.display(), e))?;
-        } else {
-            if let Some(parent) = out_path.parent() {
-                std::fs::create_dir_all(parent)
-                    .map_err(|e| format!("Cannot create parent dir: {}", e))?;
-            }
-
-            let raw_out = std::fs::File::create(&out_path)
-                .map_err(|e| format!("Cannot create file {}: {}", out_path.display(), e))?;
-            let mut out_file = BufWriter::with_capacity(512 * 1024, raw_out); // 512 KB write buffer
-
-            std::io::copy(&mut zip_file, &mut out_file)
-                .map_err(|e| format!("Cannot extract {}: {}", zip_file.name(), e))?;
-
-            #[cfg(unix)]
-            {
-                use std::os::unix::fs::PermissionsExt;
-                if let Some(mode) = zip_file.unix_mode() {
-                    let _ =
-                        std::fs::set_permissions(&out_path, std::fs::Permissions::from_mode(mode));
-                }
-            }
-        }
-    }
-
-    Ok(())
+    crate::archive::extract_zip(zip_path,dest_dir,cancel,|i,total,name| {
+        let percent=base_percent+((i as f64/total.max(1) as f64)*range as f64) as u8;
+        emit_progress(app,"extracting",percent,&format!("Extracting... ({}/{}) {}",i+1,total,name));
+    })
 }
 
 // ── Build Firmware using bundled toolchain ────────────────────────────────────
@@ -734,181 +684,14 @@ fn extract_zip_ranged(
 /// ไม่ต้องพึ่ง Python หรือ Git ของระบบ Windows เลย!
 #[tauri::command]
 pub async fn build_firmware_with_toolchain(
-    app_handle: AppHandle,
-    project_dir: String,
-    extra_args: Option<Vec<String>>,
+    app_handle: AppHandle, project_dir: String, extra_args: Option<Vec<String>>,
 ) -> Result<(), String> {
-    let toolchain_dir = get_toolchain_dir(&app_handle)?;
-
-    if !is_toolchain_ready(&toolchain_dir) {
-        return Err(
-            "Toolchain is not installed yet. Please run download_toolchain() first.".to_string(),
-        );
-    }
-
-    let project_path = std::path::PathBuf::from(&project_dir);
-    if !project_path.exists() {
-        return Err(format!("Project directory not found: {}", project_dir));
-    }
-
-    let idf_path = toolchain_dir.join("esp-idf");
-    let tools_path = toolchain_dir.join(".espressif");
-
-    if !idf_path.join("tools/idf.py").exists() {
-        return Err(format!(
-            "ESP-IDF not found in toolchain at {}",
-            idf_path.display()
-        ));
-    }
-
-    // หา Python จาก toolchain โดยตรง (ไม่พึ่ง venv launcher stub ที่มี hardcoded path)
-    // Priority: 1) idf-python bundled  2) venv python (ถ้า pyvenv.cfg ถูก patch แล้ว)
-    let (python_bin, python_venv) = find_toolchain_python(&tools_path).ok_or_else(|| {
-        format!(
-            "Cannot find Python in toolchain at {}. \
-                Try clicking 'Repair Python Paths' or reinstall the toolchain.",
-            tools_path.display()
-        )
-    })?;
-
-    // สร้าง PATH ที่ชี้ไปยัง toolchain ของเรา
-    let custom_path = build_toolchain_path(&tools_path);
-
-    let mut args = vec!["build".to_string()];
-    if let Some(extra) = extra_args {
-        args.extend(extra);
-    }
-
-    // ── Auto-clean stale build directory ────────────────────────────────
-    // Reuse the same detection logic from esp_idf.rs
-    {
-        let build_dir = project_path.join("build");
-        if build_dir.exists() {
-            let needs_clean =
-                crate::esp_idf::is_build_dir_stale(&build_dir, &idf_path, &tools_path);
-            if needs_clean {
-                let _ = app_handle.emit(
-                    "terminal-output",
-                    "⚠️ Detected stale build directory. Auto-cleaning...".to_string(),
-                );
-                match std::fs::remove_dir_all(&build_dir) {
-                    Ok(_) => {
-                        let _ = app_handle.emit(
-                            "terminal-output",
-                            "✅ Build directory cleaned. CMake will reconfigure from scratch."
-                                .to_string(),
-                        );
-                    }
-                    Err(e) => {
-                        let _ = app_handle.emit("terminal-output",
-                            format!("⚠️ Failed to clean build dir: {}. Try manually deleting the 'build' folder.", e));
-                    }
-                }
-            }
-        }
-    }
-
-    emit_progress(&app_handle, "building", 0, "Starting build...");
-
-    let app_clone = app_handle.clone();
-    let python_bin_clone = python_bin.clone();
-    let idf_py = idf_path.join("tools/idf.py");
-    let idf_path_clone = idf_path.clone();
-    let tools_path_clone = tools_path.clone();
-    let python_venv_clone = python_venv.clone();
-    let custom_path_clone = custom_path.clone();
-
-    tokio::task::spawn_blocking(move || {
-        use std::io::BufRead;
-        use std::process::{Command, Stdio};
-
-        let mut cmd = Command::new(&python_bin_clone);
-        cmd.arg(&idf_py)
-            .args(&args)
-            .current_dir(&project_path)
-            .env("IDF_PATH", &idf_path_clone)
-            .env("IDF_TOOLS_PATH", &tools_path_clone)
-            .env("IDF_PYTHON_ENV_PATH", &python_venv_clone)
-            .env("PATH", &custom_path_clone)
-            // Always set IDF_TARGET so cmake never has to guess from sdkconfig
-            .env("IDF_TARGET", "esp32")
-            // Enable ccache — dramatically speeds up rebuild times by caching
-            // compiled objects across projects. Silently ignored if ccache is not installed.
-            .env("IDF_CCACHE_ENABLE", "1")
-            // Use all available CPU cores for parallel compilation
-            .env(
-                "NINJA_NUM_THREADS",
-                std::thread::available_parallelism()
-                    .map(|n| n.get())
-                    .unwrap_or(4)
-                    .to_string(),
-            )
-            // Force Python to use UTF-8 regardless of Windows system locale (cp874, cp932, etc.)
-            // This fixes kconfgen UnicodeDecodeError on non-English Windows machines.
-            .env("PYTHONUTF8", "1")
-            .env("PYTHONIOENCODING", "utf-8")
-            .env("PYTHONLEGACYWINDOWSSTDIO", "0");
-        if let Some(rom_elf_dir) = crate::esp_idf::find_esp_rom_elf_dir(&tools_path_clone) {
-            cmd.env("ESP_ROM_ELF_DIR", rom_elf_dir);
-        }
-        // Inject ccache into PATH if available. Searches common install locations
-        // without hardcoding any version-specific path — works on any machine.
-        if let Some(ccache_dir) = find_ccache_dir() {
-            let current_path = cmd
-                .get_envs()
-                .find(|(k, _)| *k == "PATH")
-                .and_then(|(_, v)| v)
-                .map(|v| v.to_os_string())
-                .unwrap_or_else(|| std::env::var_os("PATH").unwrap_or_default());
-            let mut new_path = ccache_dir.into_os_string();
-            new_path.push(";");
-            new_path.push(current_path);
-            cmd.env("PATH", new_path);
-        }
-        let mut child = cmd
-            .stdin(Stdio::null())
-            .stdout(Stdio::piped())
-            .stderr(Stdio::piped())
-            .spawn()
-            .map_err(|e| format!("Failed to start build: {}", e))?;
-
-        let stdout = child.stdout.take().ok_or("Failed to capture stdout")?;
-        let stderr = child.stderr.take().ok_or("Failed to capture stderr")?;
-
-        let app_out = app_clone.clone();
-        std::thread::spawn(move || {
-            for line in BufReader::new(stdout).lines().map_while(Result::ok) {
-                let _ = app_out.emit("terminal-output", &line);
-            }
-        });
-
-        let app_err = app_clone.clone();
-        std::thread::spawn(move || {
-            for line in BufReader::new(stderr).lines().map_while(Result::ok) {
-                let _ = app_err.emit("terminal-output", format!("\x1b[31m{}\x1b[0m", line));
-            }
-        });
-
-        let status = child
-            .wait()
-            .map_err(|e| format!("Build process error: {}", e))?;
-
-        if status.success() {
-            let _ = app_clone.emit(
-                "toolchain-progress",
-                ToolchainProgress {
-                    stage: "done".to_string(),
-                    percent: 100,
-                    message: "Build complete! Firmware is ready.".to_string(),
-                },
-            );
-            Ok(())
-        } else {
-            Err("Build failed. Check terminal output for details.".to_string())
-        }
-    })
-    .await
-    .map_err(|e| format!("Task panicked: {}", e))?
+    // Use the same configured SDK, profile/review checks, bounded process tree,
+    // cancellation and diagnostics as the main Build button.
+    emit_progress(&app_handle,"building",0,"Starting configured SDK build...");
+    crate::esp_idf::run_idf_command(app_handle.clone(),"build".into(),extra_args.unwrap_or_default(),Some(project_dir)).await?;
+    emit_progress(&app_handle,"done",100,"Build complete; physical behavior not verified.");
+    Ok(())
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
