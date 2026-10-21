@@ -841,8 +841,9 @@ mod tests {
     fn fallback_uses_unsaved_buffers_and_rejects_other_workspaces() {
         let a = tempfile::tempdir().unwrap();
         let b = tempfile::tempdir().unwrap();
-        std::fs::create_dir(a.path().join("main")).unwrap();
-        let file = a.path().join("main/main.c");
+        let root = dunce::canonicalize(a.path()).unwrap();
+        std::fs::create_dir(root.join("main")).unwrap();
+        let file = root.join("main/main.c");
         std::fs::write(&file, "void old(void) {}\n").unwrap();
         let mut q = Query {
             file_path: file.to_string_lossy().into(),
@@ -855,12 +856,12 @@ mod tests {
             operation: Operation::Definition,
             clangd_path: String::new(),
         };
-        let answer = query(a.path(), a.path(), &q, &AtomicBool::new(false)).unwrap();
+        let answer = query(&root, &root, &q, &AtomicBool::new(false)).unwrap();
         assert_eq!(answer.engine, "tree_sitter_syntax");
         assert!(!answer.locations.is_empty());
         assert!(std::fs::read_to_string(&file).unwrap().contains("old"));
         q.buffers[0].path = b.path().join("secret.c").to_string_lossy().into();
-        assert!(query(a.path(), a.path(), &q, &AtomicBool::new(false)).is_err());
+        assert!(query(&root, &root, &q, &AtomicBool::new(false)).is_err());
     }
     #[test]
     fn compiler_command_requires_exact_configured_driver() {

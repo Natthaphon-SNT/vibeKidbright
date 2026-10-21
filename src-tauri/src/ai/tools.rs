@@ -741,7 +741,7 @@ mod workspace_tests {
             assert!(workspace_file_path(root.path(), relative).is_err());
         }
         assert!(workspace_file_path(root.path(), &root.path().join("absolute.c").to_string_lossy()).is_err());
-        assert_eq!(workspace_file_path(root.path(), "main/tasks/new.c").unwrap(), root.path().join("main/tasks/new.c"));
+        assert_eq!(workspace_file_path(root.path(), "main/tasks/new.c").unwrap(), dunce::canonicalize(root.path()).unwrap().join("main/tasks/new.c"));
         assert!(!root.path().join("main").exists());
         assert!(workspace_file_path(root.path(), ".").is_ok());
     }

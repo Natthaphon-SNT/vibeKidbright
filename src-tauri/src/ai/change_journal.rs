@@ -548,6 +548,7 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         let root = dir.path().join("workspace");
         std::fs::create_dir(&root).unwrap();
+        let root = dunce::canonicalize(root).unwrap();
         let file = root.join("main.c");
         std::fs::write(&file, "original").unwrap();
         let journal = Journal::open(dir.path().join("journal.json")).unwrap();
