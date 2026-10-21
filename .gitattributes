@@ -1,2 +1,12 @@
 # These upstream files are verified byte-for-byte against pinned SHA-256 hashes.
 resources/embedding/** -text
+
+# Research manifests record raw document/source bytes, including line endings.
+# Preserve those bytes on every platform instead of rewriting the evidence hashes.
+*.md -text
+docs/** -text
+knowledge_base/** -text
+resources/knowledge_base/** -text
+src-tauri/src/ai/compatibility.rs -text
+src-tauri/src/ai/system_prompt.txt -text
+src-tauri/tests/*.c -text
