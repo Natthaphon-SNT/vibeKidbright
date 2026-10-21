@@ -105,23 +105,41 @@ jobs:
         working-directory: main_repo/src-tauri
         run: cargo test --lib -- --nocapture
 
+      - name: Configure available Apple signing credentials
+        env:
+          SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          NOTARY_APPLE_ID: ${{ secrets.APPLE_ID }}
+          NOTARY_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+          NOTARY_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          if [ "$HAS_APPLE_CERT" = "true" ]; then
+            if [ -z "$SIGNING_IDENTITY" ]; then
+              echo "An imported Apple certificate requires APPLE_SIGNING_IDENTITY" >&2
+              exit 1
+            fi
+            printf 'APPLE_SIGNING_IDENTITY=%s\n' "$SIGNING_IDENTITY" >> "$GITHUB_ENV"
+          else
+            # Tauri supports ad-hoc signing when no Apple certificate is configured.
+            printf 'APPLE_SIGNING_IDENTITY=-\n' >> "$GITHUB_ENV"
+          fi
+          if [ "$HAS_APPLE_CERT" = "true" ] && [ "$HAS_APPLE_NOTARY_CREDENTIALS" = "true" ]; then
+            printf 'APPLE_ID=%s\n' "$NOTARY_APPLE_ID" >> "$GITHUB_ENV"
+            printf 'APPLE_PASSWORD=%s\n' "$NOTARY_PASSWORD" >> "$GITHUB_ENV"
+            printf 'APPLE_TEAM_ID=%s\n' "$NOTARY_TEAM_ID" >> "$GITHUB_ENV"
+          fi
+
       # ─── Build Tauri App ──────────────────────────────────────────────────────
       - name: Build Tauri App (Universal Binary — Apple Silicon + Intel)
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # ตัวแปรสำหรับ Apple signing (ถ้าตั้งค่าไว้)
-          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         with:
           projectPath: main_repo
           args: --target universal-apple-darwin
 
       # ─── Notarize ไฟล์ DMG (ต้องการ Apple ID secrets) ───────────────────────
       - name: Notarize DMG with Apple Notary Service
-        if: ${{ env.HAS_APPLE_NOTARY_CREDENTIALS == 'true' }}
+        if: ${{ env.HAS_APPLE_CERT == 'true' && env.HAS_APPLE_NOTARY_CREDENTIALS == 'true' }}
         run: |
           DMG=$(find main_repo/src-tauri/target/universal-apple-darwin/release/bundle/dmg -name "*.dmg" | head -1)
           if [ -z "$DMG" ]; then

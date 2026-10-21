@@ -1,0 +1,2 @@
+# These upstream files are verified byte-for-byte against pinned SHA-256 hashes.
+resources/embedding/** -text
