@@ -12,7 +12,13 @@ mod ai;         // Modular AI subsystem structure (refactoring roadmap)
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    run_context(tauri::generate_context!());
+    run_context(app_context());
+}
+
+// Generate the embedded macOS Info.plist once per crate, including debug builds
+// that also expose the isolated desktop evaluation entry point.
+fn app_context() -> tauri::Context<tauri::Wry> {
+    tauri::generate_context!()
 }
 
 fn run_context(context: tauri::Context<tauri::Wry>) {
@@ -160,7 +166,7 @@ pub fn run_isolated_desktop_evaluation(root: &std::path::Path, idf: &std::path::
     std::fs::create_dir(&data).map_err(|e|format!("Evaluation AppData must be new: {e}"))?;
     std::fs::write(data.join("config.json"),serde_json::to_vec(&serde_json::json!({"custom_idf_path":idf,"custom_tools_path":tools,"provider":"local","base_url":"http://localhost:1234/v1","private_context_consent":false})).unwrap()).map_err(|e|e.to_string())?;
     ai::config::isolate_evaluation_credentials();
-    let mut context=tauri::generate_context!();
+    let mut context=app_context();
     context.config_mut().identifier="th.nectec.vibekidbright.desktop-evaluation".into();
     // Use the harness's immutable production frontend rather than the user's
     // Vite/HMR server, which can reload mid-cancellation when audits write public assets.
