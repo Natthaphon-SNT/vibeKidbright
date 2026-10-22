@@ -26,7 +26,7 @@ pub(crate) async fn execute_tool(
     message_id: &str,
     no_workspace: &mut bool,
 ) -> Value {
-    if *no_workspace && matches!(name, "write_file" | "run_command" | "read_file" | "list_files" | "get_file_tree" | "search_in_files" | "diff_file") {
+    if super::workflow::workspace_tool_blocked(name, *no_workspace) {
         return json!({
             "error": "BLOCKED: No project workspace is open. You MUST call 'create_project_workspace' FIRST."
         });
@@ -36,7 +36,7 @@ pub(crate) async fn execute_tool(
     // is already open. This stops disruptive folder-picker dialogs from appearing mid-task.
     if name == "create_project_workspace" && !*no_workspace {
         return json!({
-            "error": "BLOCKED: A workspace is already open. Do NOT call create_project_workspace again. Use write_file to create or modify files in the current workspace instead."
+            "error": "No new-project request was detected for this turn. Edit the current workspace; ask the user to explicitly request a new project if needed."
         });
     }
 
@@ -212,30 +212,12 @@ pub(crate) async fn execute_tool(
                 .set_title("Select a Base Directory for Your New Project")
                 .pick_folder()
             {
-                let new_proj_path = picked_dir.join(project_name);
-                if let Err(e) = std::fs::create_dir_all(&new_proj_path) {
-                    return json!({ "error": format!("Failed to create directory: {}", e) });
-                }
+                let new_proj_path = match super::workflow::initialize_project(&picked_dir, project_name) {
+                    Ok(path) => path,
+                    Err(error) => return json!({"error":error}),
+                };
                 *project_path = new_proj_path.clone();
                 *no_workspace = false;
-                let root_cmake = format!(
-                    "cmake_minimum_required(VERSION 3.16)\ninclude($ENV{{IDF_PATH}}/tools/cmake/project.cmake)\nproject({})\n",
-                    project_name
-                );
-                let _ = std::fs::write(new_proj_path.join("CMakeLists.txt"), root_cmake);
-                let _ = std::fs::create_dir_all(new_proj_path.join("main"));
-                let _ = std::fs::write(
-                    new_proj_path.join("main/CMakeLists.txt"),
-                    "idf_component_register(SRCS \"main.c\"\n                    INCLUDE_DIRS \".\")\n",
-                );
-                let _ = std::fs::write(
-                    new_proj_path.join("main/main.c"),
-                    "#include <stdio.h>\nvoid app_main(void) {\n    printf(\"Hello\\n\");\n}\n",
-                );
-                let _ = std::fs::write(
-                    new_proj_path.join("sdkconfig"),
-                    "CONFIG_IDF_TARGET=\"esp32\"\nCONFIG_FREERTOS_HZ=1000\n",
-                );
                 let _ = app_handle.emit("force-project-dir", new_proj_path.to_string_lossy().to_string());
                 json!({
                     "result": format!(
@@ -245,7 +227,7 @@ pub(crate) async fn execute_tool(
                     "workspace_path": new_proj_path.to_string_lossy().to_string()
                 })
             } else {
-                json!({ "error": "User cancelled the folder selection dialog." })
+                json!({ "error": "User cancelled new-project creation. Stop; do not write into the previous workspace." })
             }
         }
 

@@ -45,3 +45,5 @@ pub mod config;
 pub mod kb;
 pub mod providers;
 pub mod tools;
+
+pub mod workflow;

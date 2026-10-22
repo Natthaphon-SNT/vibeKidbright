@@ -1,6 +1,7 @@
 # KidBright32 — ESP-IDF Developer Reference
 > ESP32-WROOM-32 · NECTEC / Gravitech · **ESP-IDF v5.x Framework** · 3.3 V logic
-> Covers: **V1.5 Rev 3.1** (NECTEC Standard) · **V1.5 Rev 3.1G** (Gravitech OEM) · **V1.5 iA** (INEX) · **V1.6** (Gravitech)
+> Updated V1.3/V1.5 hardware: [comparison](kidbright32_versions.md), [V1.3](kidbright32_v13.md), [V1.5](kidbright32_v15.md). This mixed historical developer reference is not a universal board pin map.
+> Historical coverage labels: **V1.5 Rev 3.1** (NECTEC Standard) · **V1.5 Rev 3.1G** (Gravitech OEM) · **V1.5 iA** (INEX) · **V1.6** (Gravitech)
 > ⚠️ **CRITICAL RULE FOR AI:** DO NOT use Arduino Framework (`<Wire.h>`, `digitalWrite`, `setup()`, `loop()`). All code must be strictly C/C++ using official ESP-IDF components.
 
 ---
@@ -24,85 +25,15 @@
 
 ---
 
-## คุณสมบัติทางเทคนิคของบอร์ด KidBright32 V1.5 Rev 3.1 (NECTEC Standard)
-> **บอร์ดมาตรฐาน สวทช.** — เป็น baseline ที่ iA และ iP ต่อยอดมา
+## KidBright32 V1.3 / V1.5 — ปรับข้อมูล 22 ตุลาคม 2026
 
-- ใช้ไมโครคอนโทรลเลอร์ ESP32 (ESP32-WROOM-32) ที่มีวงจร WiFi และบลูทูธในตัว
-- มีส่วนแสดงผล LED ดอตเมตริกซ์ขนาด 16×8 จุด แบบสีแดง (ไดรเวอร์ HT16K33 @ I2C 0x70)
-- มีเซ็นเซอร์แสง LDR (GPIO36 / ADC1_CH0)
-- มีเซ็นเซอร์อุณหภูมิ LM73 (I2C_NUM_1, SDA=GPIO4, SCL=GPIO5, Address 0x4D)
-- มีลำโพงเปียโซขับเสียง (Passive Buzzer, GPIO13, ต้องใช้ PWM/LEDC)
-- มีวงจรสวิตช์กดติดปล่อยดับขนาดใหญ่ 2 ตัว (SW1=GPIO16, **SW2=GPIO14**)
-- มีวงจรฐานเวลานาฬิกาจริง (RTC) พร้อมแบตเตอรี่ CR1220 สำรอง
-- มีสวิตช์ RESET การทำงาน
-- เชื่อมต่อกับคอมพิวเตอร์ผ่านพอร์ต **Micro-USB** (ต่างจาก iA/iP ที่ใช้ USB-C)
-- มีช่อง **USB Type-A** (Host) สำหรับต่ออุปกรณ์ภายนอก (Active LOW ผ่าน IO25)
-- มีพอร์ต JST 3 ขา สำหรับ IN1–IN4 (GPIO32–35) และ OUT1–OUT2 (GPIO26–27)
-- มีพอร์ต KB Chain (I2C_NUM_0) สำหรับต่ออุปกรณ์เสริม
-- **ไม่มี** Accelerometer / Gyroscope / Magnetometer (เพิ่มเฉพาะใน iA และ V1.6)
-- **ไม่รองรับ ADC บนพอร์ต IN1–IN4** (ต่างจาก iA และ V1.6 ที่รองรับ)
+ใช้ [เอกสาร V1.3](kidbright32_v13.md), [เอกสาร V1.5](kidbright32_v15.md) และ [ตารางเปรียบเทียบ](kidbright32_versions.md) แทนตาราง Rev3.1/3.1G ที่เดิมรวมรุ่นโดยไม่มีหลักฐาน
 
-### Sensor Map — V1.5 Rev 3.1 (NECTEC Standard)
-> ⚠️ **SW2 = GPIO14** — เหมือนกันกับ Rev 3.1G และ iA (ทุกรุ่นใช้ GPIO14 ยกเว้น V1.6)
+V1.3 IN1–IN4 เป็น digital buffer ไม่รองรับ analog; V1.5 ภาพ S1 ระบุ U7/U8=N/A และ bypass 0Ω จึงมี analog path เมื่อประกอบตรงกัน PDF Rev.3 ยังไม่ยืนยันการประกอบ ไม่สรุปว่าทุก Rev3.1/3.1G มีหรือไม่มี ADC เหมือนกัน
 
-| Sensor | Protocol | Bus/Pin | Address/Channel |
-|--------|----------|---------|-----------------|
-| LDR (Light) | ADC | GPIO36 / ADC1_CH0 | — |
-| LM73 (Temp) | I2C | I2C_NUM_1, SDA=GPIO4, SCL=GPIO5 | 0x4D |
-| RTC MCP794xx | I2C | I2C_NUM_1, SDA=GPIO4, SCL=GPIO5 | 0x6F |
-| HT16K33 (Matrix) | I2C | I2C_NUM_0, SDA=GPIO21, SCL=GPIO22 | 0x70 |
-| Passive Buzzer | GPIO/PWM | GPIO13 (LEDC) | — |
-| SW1 Button | GPIO | GPIO16 | — |
-| **SW2 Button** | GPIO | **GPIO14** | — |
-| USB Host Control | GPIO | GPIO25 (Active LOW) | — |
+ทั้งสอง design ใช้ matrix GPIO21/22 และ LM73/RTC/Chain GPIO4/5, FT231XQ, SW1=16, SW2=14 V1.3 GPIO15 เป็น NTP LED; V1.5 Servo1=15, Servo2=17 ไม่ใช่ Servo1=16 ส่วน INEX iA/iP ใช้ [เอกสารแยกรุ่น](inex_ia_ip.md)
 
-> ⚠️ **V1.5 Rev 3.1 ไม่มี KXTJ3 Accelerometer** — I2C_NUM_0 จึงมีเฉพาะ HT16K33 (0x70) เท่านั้น
-
----
-
-### Sensor Map — V1.5 Rev 3.1G (Gravitech OEM)
-> ⚠️ **SW2 = GPIO14** — เหมือนกันกับ Rev 3.1 และ iA (corrected)
-> ฮาร์ดแวร์อื่นทุกอย่างเหมือน Rev 3.1 (ไม่มี KXTJ3, ไม่รองรับ ADC บน IN1–IN4)
-
-| Sensor | Protocol | Bus/Pin | Address/Channel |
-|--------|----------|---------|-----------------|
-| LDR (Light) | ADC | GPIO36 / ADC1_CH0 | — |
-| LM73 (Temp) | I2C | I2C_NUM_1, SDA=GPIO4, SCL=GPIO5 | 0x4D |
-| RTC MCP794xx | I2C | I2C_NUM_1, SDA=GPIO4, SCL=GPIO5 | 0x6F |
-| HT16K33 (Matrix) | I2C | I2C_NUM_0, SDA=GPIO21, SCL=GPIO22 | 0x70 |
-| Passive Buzzer | GPIO/PWM | GPIO13 (LEDC) | — |
-| SW1 Button | GPIO | GPIO16 | — |
-| **SW2 Button** | GPIO | **GPIO14** | — |
-| USB Host Control | GPIO | GPIO25 (Active LOW) | — |
-
-> 📋 **I2C Scan Result (V1.5 Rev 3.1G — confirmed Apr 17 2026)**
-> - I2C_NUM_0 (SDA=GPIO21, SCL=GPIO22): พบ `0x70` (HT16K33)
-> - I2C_NUM_1 (SDA=GPIO4, SCL=GPIO5): พบ `0x4D` (LM73) และ `0x6F` (RTC MCP794xx)
-> - Address `0x6F` คือ RTC chip ในตระกูล MCP7940N/MCP7941X (Microchip) ซึ่งเป็น RTC ที่มาพร้อมกับ SRAM และ alarm ในตัว ใช้ร่วมกับแบตเตอรี่ CR1220 บนบอร์ด
-
-### GPIO Conflict Table — V1.5 Rev 3.1 (NECTEC Standard)
-
-| GPIO | ใช้ได้เป็น... |
-|------|--------------|
-| GPIO4 | **BT LED** หรือ **LM73 SDA** — เลือกได้แค่อย่างเดียว |
-| GPIO13 | **Passive Buzzer** — ต้องใช้ LEDC/PWM เสมอ |
-| GPIO14 | **SW2 Button** — ห้ามใช้งานอื่น บน V1.5 Rev 3.1 |
-| GPIO16 | **SW1 Button** — ห้ามใช้งานอื่น บน V1.5 Rev 3.1 |
-| GPIO25 | **USB Host (Active LOW)** — อย่าใช้งานอื่น |
-| GPIO36 | **LDR ADC** — Input-only, ไม่มี pull resistor |
-| GPIO2 | **Wi-Fi LED** — อย่าใช้งานอื่น |
-
-### GPIO Conflict Table — V1.5 Rev 3.1G (Gravitech OEM)
-
-| GPIO | ใช้ได้เป็น... |
-|------|--------------|
-| GPIO4 | **BT LED** หรือ **LM73 SDA** — เลือกได้แค่อย่างเดียว |
-| GPIO13 | **Passive Buzzer** — ต้องใช้ LEDC/PWM เสมอ |
-| GPIO16 | **SW1 Button** — ห้ามใช้งานอื่น บน V1.5 Rev 3.1G |
-| GPIO14 | **SW2 Button** — ห้ามใช้งานอื่น บน V1.5 Rev 3.1G |
-| GPIO25 | **USB Host (Active LOW)** — อย่าใช้งานอื่น |
-| GPIO36 | **LDR ADC** — Input-only, ไม่มี pull resistor |
-| GPIO2 | **Wi-Fi LED** — อย่าใช้งานอื่น |
+ค่าจาก recipe/software, รายงาน scan เดิม, และตัวอย่าง code ในส่วนถัดไปไม่ใช่ผลทดสอบใหม่จากไฟล์ที่ส่ง ต้องตรวจ scope ของ source ก่อนใช้
 
 ---
 
@@ -304,14 +235,14 @@ const uint16_t* get_digit_pattern(int digit) {
 }
 ```
 
-### Built-in Indicator LEDs
-| LED | GPIO | Behavior | Notes |
-|---|---|---|---|
-| Wi-Fi LED | GPIO2 | Active HIGH | Use `gpio_set_level(GPIO_NUM_2, 1)` |
-| Bluetooth LED | GPIO4 | Active HIGH | Use `gpio_set_level(GPIO_NUM_4, 1)` |
-| Power LED | — | Always ON | Hardware controlled |
+### Built-in Indicator LEDs — versioned
 
-> ⚠️ GPIO2 and GPIO4 are shared with the Wi-Fi/BT indicator LEDs. Writing to them will light the LEDs; avoid using them for other purposes.
+| Design | LED | GPIO | Evidence |
+|---|---|---|---|
+| V1.3 | Wi-Fi / IoT / NTP | 2 / 12 / 15 | Supplied V1.3 report |
+| V1.5 S1 | Wi-Fi / IoT | 2 / 12 | Active-low according to schematic transcription |
+
+V1.5 GPIO15 is Servo1. GPIO4 is sensor/RTC/Chain SDA, not a documented BT LED for these designs. Other boards use their own reference.
 
 ### Sensors
 
@@ -323,7 +254,7 @@ const uint16_t* get_digit_pattern(int digit) {
 
 > ⚠️ **GPIO36** เป็น input-only สำหรับอ่านค่าแสง LDR (ADC1_CH0) โดยเฉพาะ
 
-> ⚠️ **GPIO4 CONFLICT WARNING:** GPIO4 ถูกใช้ร่วมกันระหว่าง **BT LED** (output) และ **SDA ของ LM73** (I2C_NUM_1) หากใช้ทั้งสองในโปรเจคเดียวกัน การควบคุม BT LED ด้วย `gpio_set_level` จะรบกวนการสื่อสาร I2C ให้เลือกใช้อย่างใดอย่างหนึ่งเท่านั้น
+> GPIO4 is LM73/RTC/Chain SDA in the supplied V1.3/V1.5 designs. Do not drive it as a generic LED; no BT LED sharing is established by these reports.
 
 #### ADC Usage — CRITICAL ESP-IDF v5.x API (MANDATORY READING FOR AI)
 > ⚠️ **CRITICAL AI INSTRUCTION:** The legacy ADC API (`adc1_config_width`, `adc1_config_channel_atten`, `adc1_get_raw`) was **REMOVED** in ESP-IDF v5.x. You MUST **NEVER** use those functions. They will cause compilation failure. You MUST use the `esp_adc/adc_oneshot.h` API shown below. There are no exceptions.
@@ -334,7 +265,7 @@ const uint16_t* get_digit_pattern(int digit) {
 #include "esp_adc/adc_oneshot.h"
 // ⚠️ Do NOT include adc_cali.h or adc_cali_scheme.h when only reading LDR raw values
 
-// --- Hardware-calibrated LDR bounds (KidBright32 iA on-board LDR) ---
+// --- Historical example bounds; measure the selected board before using percentages ---
 // The voltage-divider limits the range — it does NOT reach 0 or 4095!
 #define LDR_ADC_MIN_VAL  100   // Brightest (most light)
 #define LDR_ADC_MAX_VAL  900   // Darkest  (covered)
@@ -357,8 +288,8 @@ esp_err_t adc_init(void) {
 }
 
 // --- Read LDR and return light percentage (0=dark, 99=bright) ---
-// ⚠️ HARDWARE NOTE: On KidBright32 iA the voltage-divider limits range to ~100–900.
-// NEVER use 0 or 4095 as bounds. ALWAYS use LDR_ADC_MIN_VAL/LDR_ADC_MAX_VAL.
+// These 100..900 endpoints are example parameters, not calibration evidence for V1.3/V1.5 or every iA.
+// Substitute measured endpoints and verified polarity before using this percentage helper.
 int adc_read_ldr_percent(void) {
     int raw = 0;
     adc_oneshot_read(adc1_handle, ADC_CHANNEL_0, &raw);
@@ -376,7 +307,7 @@ void adc_deinit(void) {
 }
 ```
 
-> **Hardware Calibration Note:** The on-board LDR uses an INVERTED voltage-divider — MORE light = LOWER raw ADC value. The circuit physically limits the range to ~100 (bright) to ~900 (dark). The formula `(MAX - raw) / (MAX - MIN)` corrects for both inversion and clamped range.
+> **Calibration scope:** The supplied V1.5 circuit suggests more light gives lower ADC, but neither supplied report measures endpoints. Values 100/900 above are historical example parameters, not universal calibration or lux. Use measured bounds and matching polarity; otherwise report raw ADC.
 
 > **Note for AI:** `ADC_ATTEN_DB_12` (formerly `ADC_ATTEN_DB_11`) is the correct constant for full 3.3 V range in ESP-IDF v5.x. Never use `ADC_ATTEN_DB_11` — it is deprecated and may be removed.
 
@@ -407,52 +338,34 @@ void adc_deinit(void) {
 
 ## 3. GPIO & Connectors
 
-### JST Connectors (Digital I/O)
-บอร์ด KidBright32iA ใช้คอนเน็กเตอร์แบบ JST 2 มม. 3 ขา (JST : Japan Standard Terminal) จำนวน 6 พอร์ต แทนที่รูเสียบขนาดใหญ่ในรุ่นก่อนหน้า
+### Connector endpoints — supplied V1.3/V1.5
 
-| Label | GPIO | Direction | Capabilities | Notes |
-|---|---|---|---|---|
-| IN1 | GPIO32 | Input / Output | Digital I/O · ADC1_CH4 · touch9 | |
-| IN2 | GPIO33 | Input / Output | Digital I/O · ADC1_CH5 · touch8 | |
-| IN3 | GPIO34 | **Input only** | ADC1_CH6 | No internal pull-up/down |
-| IN4 | GPIO35 | **Input only** | ADC1_CH7 | No internal pull-up/down |
-| OUT1| GPIO26 | Input / Output | Digital I/O · DAC2 · ADC2_CH9 | |
-| OUT2| GPIO27 | Input / Output | Digital I/O · ADC2_CH7 · touch7 | |
+V1.3 IN32–35 are buffered digital inputs; V1.5 S1 has analog paths only with matching U7/U8=N/A and 0Ω bypass assembly. GPIO34/35 have no internal pulls or output capability. The chip capabilities of GPIO32/33 do not establish bidirectional connector support.
 
-> ⚠️ **GPIO34** และ **GPIO35** เป็นขาแบบ Input-only (ไม่มี internal pull-up/down)
+V1.5 JST OUT1/OUT2 are gate/GPIO signals (26/27); banana OUTPUT1/OUTPUT2 are MOSFET load drains. Do not transfer DAC/ADC/push-pull capability between those endpoints. See [connector pin tables](kidbright32_v15.md) and use [INEX references](inex_ia_ip.md) for iA/iP.
 
 ### Power & Ground Headers
-| Label | Capabilities |
-|---|---|
-| 5V | 5 V from USB — ~500 mA shared |
-| 3.3V | 3.3 V regulated — ~300 mA max |
-| GND | Ground |
 
-### Servo Connectors
-| Connector | GPIO | Notes |
+V1.3 banana supply is shown as 5V; supplied V1.5 J5 uses 3V3/GND. Do not swap the layouts. V1.5 F1 is labelled 500mA but this does not certify current available at every connector or the 3V3 regulator. Check PCB, load and component ratings. Servo +5VExt is separate from USB +5V.
+
+### Servo Connectors — supplied V1.5 design only
+
+| Connector | GPIO | Schematic pin |
 |---|---|---|
-| SERVO1 | GPIO16 | 50 Hz PWM, 1–2 ms pulse = 0–180° |
-| SERVO2 | GPIO17 | Same spec as SERVO1 |
+| SERVO1 | GPIO15 | J8 pin 2 |
+| SERVO2 | GPIO17 | J8 pin 1 |
 
-> Servo power comes from the dedicated **servo power terminal** (screw terminal), not the 3.3 V rail.
+SW1 remains GPIO16. V1.3 GPIO15 is NTP LED and has no documented dedicated Servo connector. V1.5 J8 pins 3/4 are +5VExt, 5/6 GND; J12 supplies external Servo power. JST Servo presence differs by revision. Match pulse limits to the actual Servo; the schematic does not certify timing or angle.
 
-### I²C Header
-| Pin | GPIO | Notes |
+### I²C Header and Communication Buses
+
+| Net group | GPIO | Supplied V1.3/V1.5 devices |
 |---|---|---|
-| SDA | GPIO21 | 4.7 kΩ pull-up on board |
-| SCL | GPIO22 | 4.7 kΩ pull-up on board |
-| 3.3V | Power | For external I2C devices |
-| GND | Power | Ground |
+| SDA0/SCL0 | 21/22 | HT16K33 matrix; expansion as documented |
+| SDA1/SCL1 | 4/5 | LM73, MCP79411 RTC and KB Chain |
+| UART0 TX/RX | 1/3 | FT231XQ USB-UART |
 
----
-
-## 4. Communication Buses
-
-| Bus | Pins | Notes |
-|---|---|---|
-| I2C (`I2C_NUM_0`) | SDA=GPIO21 · SCL=GPIO22 | On-board: LED matrix (HT16K33 @ 0x70), Accelerometer (KXTJ3 @ 0x0E), RTC + I2C header |
-| I2C (`I2C_NUM_1`) | SDA=GPIO4 · SCL=GPIO5 | On-board: Temperature sensor (LM73 @ 0x4D) — **shared with BT LED GPIO4** |
-| UART0 | TX=GPIO1 · RX=GPIO3 | USB bridge / Serial monitor |
+V1.5 S1 reports 10kΩ pull-ups on both I2C net groups. Net names do not dictate firmware controller IDs. Existing recipe addresses 0x70/0x4D/0x6F are separate software evidence, not measurements from the new report. KXTJ3 is not established by these V1.3/V1.5 reports; INEX variants use their own device evidence.
 
 ---
 
@@ -882,21 +795,19 @@ int32_t nvs_read_int(const char *key, int32_t default_val) {
 
 ## 10. Hardware Conflicts & Servo PWM
 
-### ⚠️ CRITICAL GPIO Conflict Table — AI MUST CHECK BEFORE ASSIGNING PINS
+### GPIO resources — supplied V1.3 / V1.5 designs
 
-| GPIO | Peripheral A | Peripheral B | Conflict? |
-|------|-------------|-------------|-----------|
-| GPIO16 | SW1 (Button) | SERVO1 Connector | **YES — mutually exclusive** |
-| GPIO17 | (free) | SERVO2 Connector | No conflict |
-| GPIO36 | LDR (ADC) | IO36 Pad (ADC input) | **YES — shared analog input** |
-| GPIO2  | Wi-Fi LED | General GPIO | Avoid for user logic |
-| GPIO4  | BT LED | LM73 SDA (I2C_NUM_1) | **YES — mutually exclusive** |
+| GPIO | V1.3 | V1.5 S1 |
+|---|---|---|
+| 15 | NTP LED | Servo1 (boot strapping also applies) |
+| 17 | No dedicated Servo connector established | Servo2 |
+| 16 / 14 | SW1 / SW2 | SW1 / SW2 |
+| 4 / 5 | LM73/RTC/Chain SDA/SCL | LM73/RTC/Chain SDA/SCL |
+| 36 | Onboard LDR; input-only, no internal pulls | Same allocation |
 
-> ⚠️ **AI INSTRUCTION:** GPIO16 is used by BOTH SW1 (button) and the SERVO1 connector. You MUST NEVER configure GPIO16 for servo output if buttons are also required in the same project. Use SERVO2 (GPIO17) as the default servo output in any project that also uses buttons.
+Do not assign Servo1 to GPIO16 or a BT LED to GPIO4 for these designs. INEX and other boards require their own references. The following PWM snippet illustrates GPIO17 for a matching V1.5 Servo2 setup; its frequency/pulse range is an example, not a schematic-certified Servo specification.
 
-> ⚠️ **AI INSTRUCTION:** GPIO4 is used by BOTH the BT LED indicator and the SDA line of the LM73 temperature sensor (I2C_NUM_1). In any project that reads the temperature sensor, do NOT use `gpio_set_level(GPIO_NUM_4, ...)` to control the BT LED — doing so will corrupt the I2C bus.
-
-### Servo PWM Template (use GPIO17 / SERVO2 to avoid conflict)
+### Servo PWM Template (matching V1.5 Servo2 only)
 
 ```c
 #include "driver/ledc.h"
@@ -948,7 +859,7 @@ void servo_set_angle(int angle) {
 ## 11. LM73 Temperature Sensor (I2C_NUM_1, Address 0x4D)
 > **AI INSTRUCTION:** The LM73 temperature sensor is on a separate I2C bus (`I2C_NUM_1`) using SDA=GPIO4, SCL=GPIO5. You must initialize this bus separately from the main `I2C_NUM_0` bus. Do NOT use external libraries. Read directly via standard ESP-IDF I2C functions.
 >
-> ⚠️ **GPIO4 CONFLICT:** GPIO4 (SDA of I2C_NUM_1) is also connected to the BT LED indicator. Do NOT call `gpio_set_level(GPIO_NUM_4, ...)` anywhere in a project that uses `temp_sensor_init()`.
+> GPIO4 is LM73/RTC/Chain SDA in the supplied V1.3/V1.5 designs. Do not drive it as a generic LED; no BT LED sharing is established by these reports.
 
 ```c
 #define I2C_TEMP_NUM    I2C_NUM_1
@@ -1177,7 +1088,7 @@ project(KidBright_Project)
 - Bus: `I2C_NUM_1` — SDA=GPIO4, SCL=GPIO5.
 - Initialize `I2C_NUM_1` SEPARATELY from `I2C_NUM_0`. Do NOT mix them up.
 - Read via `i2c_master_write_read_device()`. Raw value / 128.0 = degrees Celsius.
-- ⚠️ **GPIO4 CONFLICT**: GPIO4 is shared between the BT LED indicator and LM73 SDA. In ANY project that calls `temp_sensor_init()`, you MUST NEVER call `gpio_set_level(GPIO_NUM_4, ...)`. Doing so will corrupt the I2C bus. Choose one or the other — they cannot be used together.
+> GPIO4 is LM73/RTC/Chain SDA in the supplied V1.3/V1.5 designs. Do not drive it as a generic LED; no BT LED sharing is established by these reports.
 
 ### ═══ ACCELEROMETER ═══
 - IC: KXTJ3-1057 (Rohm/Kionix), I2C address `0x0E`.
@@ -1288,27 +1199,19 @@ void read_adc_task(void *pvParameters) {
 
 ### ═══ INDICATOR LEDs ═══
 - **Wi-Fi LED**: GPIO2 (Active HIGH)
-- **BT LED**: GPIO4 (Active HIGH) ⚠️ Conflicts with LM73 SDA — see TEMPERATURE SENSOR above.
+- **IoT LED (V1.5 S1)**: GPIO12 active-low. GPIO4 is LM73/RTC/Chain SDA.
 - **Power LED**: Always ON, hardware controlled.
 - AVOID using GPIO2 and GPIO4 for any other purpose.
 
-### ═══ JST CONNECTOR PINS ═══
-- **IN1**=GPIO32, **IN2**=GPIO33 — Digital I/O, ADC1, touch capable.
-- **IN3**=GPIO34, **IN4**=GPIO35 — Input-only. NO internal pull-up/pull-down.
-- **OUT1**=GPIO26 (DAC2), **OUT2**=GPIO27 — Digital I/O.
+### ═══ CONNECTOR ENDPOINTS ═══
+- IN1–IN4 use GPIO32–35; connector analog support follows fitted input path. V1.3 is digital-buffer-only; V1.5 S1 is N/A + 0Ω bypass. GPIO34/35 have no output or internal pulls.
+- OUT1/OUT2 GPIO26/27 gate control, V1.5 JST gate and banana drain are distinct endpoints. No DAC or push-pull claim applies to banana OUT.
 
-### ═══ CRITICAL GPIO CONFLICT TABLE ═══
-- **GPIO4** → BT LED output AND LM73 SDA (`I2C_NUM_1`) — MUTUALLY EXCLUSIVE
-- **GPIO16** → SW1 Button AND SERVO1 connector — MUTUALLY EXCLUSIVE
-- **GPIO36** → LDR ADC input only — no output, no pull resistors
-- **GPIO2** → Wi-Fi LED — avoid for user logic
-
-⚠️ **SERVO RULE:** If the project uses buttons (SW1), NEVER assign servo to GPIO16 (SERVO1). Use SERVO2 (GPIO17) as the default servo output in all projects that also use buttons.
-
-### ═══ I2C BUS SUMMARY ═══
-- **I2C_NUM_0** (SDA=GPIO21, SCL=GPIO22): LED Matrix (`0x70`), Accelerometer (`0x0E`), RTC, I2C header.
-- **I2C_NUM_1** (SDA=GPIO4,  SCL=GPIO5): Temperature Sensor LM73 (`0x4D`) only.
-- Initialize each bus only ONCE. Never call `i2c_driver_install()` twice on the same bus number.
+### ═══ VERSIONED HARDWARE RESOURCES ═══
+- V1.3 GPIO15=NTP LED; supplied V1.5 Servo1=GPIO15, Servo2=GPIO17, SW1=GPIO16, SW2=GPIO14. Do not invent SW1/Servo1 sharing for this V1.5 design.
+- GPIO36 is LDR input-only without internal pulls; GPIO2/12 are Wi-Fi/IoT LEDs.
+- Matrix SDA21/SCL22; LM73/RTC/Chain SDA4/SCL5. Controller IDs are firmware choices, separate from net names. Share initialization on each actual bus.
+- Read `kidbright32_versions.md` and the exact board reference before using IN/OUT, Servo or sensor snippets from this mixed historical file.
 
 ### ═══ RANDOM NUMBERS ═══
 - NEVER use `random()` or `srandom()` — compilation error in ESP-IDF v5.x.
@@ -1330,7 +1233,7 @@ void read_adc_task(void *pvParameters) {
 ### 15.1 On-Board Sensor Summary Table
 | Sensor | IC | Interface | Bus | Address/Pin | GPIO | หมายเหตุ |
 |---|---|---|---|---|---|---|
-| Temperature | LM73 | I2C | I2C_NUM_1 | 0x4D | SDA=GPIO4, SCL=GPIO5 | ⚠️ GPIO4 conflict กับ BT LED |
+| Temperature | LM73 | I2C | I2C_NUM_1 | 0x4D | SDA=GPIO4, SCL=GPIO5 | LM73/RTC/Chain shared bus |
 | Light (LDR) | Photoresistor | ADC | ADC1 | ADC_CHANNEL_0 | GPIO36 | Input-only, ไม่มี pull-up |
 | Accelerometer | KXTJ3-1057 | I2C | I2C_NUM_0 | 0x0E | SDA=GPIO21, SCL=GPIO22 | ร่วมกับ LED Matrix |
 
@@ -1681,20 +1584,9 @@ float hcsr04_measure_cm(void) {
 | ADC2 channel ขณะ WiFi เปิด | ใช้เฉพาะ ADC1 (GPIO32–39) |
 | อ่าน analog จาก OUT1/OUT2 (GPIO26/27) ขณะ WiFi | ย้ายมาใช้ IN1/IN2 แทน |
 
-### 15.7 Sensor GPIO Conflict Matrix — FINAL CHECK
+### 15.7 Sensor GPIO resources
 
-| GPIO | On-Board Sensor | JST Port | ความขัดแย้ง |
-|---|---|---|---|
-| GPIO36 | LDR (ADC1_CH0) | — | Input-only, ห้าม output |
-| GPIO4 | LM73 SDA (I2C_NUM_1) | — | ⚠️ ขัดกับ BT LED |
-| GPIO21 | KXTJ3 SDA + LED Matrix SDA | I2C Header SDA | ใช้ร่วมได้บน I2C_NUM_0 |
-| GPIO22 | KXTJ3 SCL + LED Matrix SCL | I2C Header SCL | ใช้ร่วมได้บน I2C_NUM_0 |
-| GPIO32 | — | IN1 (Analog/Digital) | ADC1_CH4, touch9 — WiFi-safe |
-| GPIO33 | — | IN2 (Analog/Digital) | ADC1_CH5, touch8 — WiFi-safe |
-| GPIO34 | — | IN3 (Input-only) | ไม่มี pull-up/down internal |
-| GPIO35 | — | IN4 (Input-only) | ไม่มี pull-up/down internal |
-| GPIO26 | — | OUT1 | DAC2, ADC2_CH9 — ห้ามใช้ ADC ขณะ WiFi |
-| GPIO27 | — | OUT2 | ADC2_CH7 — ห้ามใช้ ADC ขณะ WiFi |
+For V1.3/V1.5 use [the versioned hardware table](kidbright32_versions.md). LDR=36; LM73/RTC/Chain SDA4/SCL5; matrix SDA21/SCL22. GPIO34/35 have no output/internal pulls. IN analog availability follows fitted circuitry; OUT gate versus load endpoints must be distinguished. No accelerometer is established by the two supplied reports. Other boards use their own source.
 
 ## 16. OUTPUT RULES — Compatible Displays & Actuators
 > **AI INSTRUCTION:** ส่วนนี้รวบรวมกฎการเชื่อมต่ออุปกรณ์แสดงผลและกลไกควบคุม (Output) ทั้งบนบอร์ดและภายนอก ตรวจสอบข้อจำกัดของพินก่อนสั่งงานเสมอ
@@ -1704,54 +1596,21 @@ float hcsr04_measure_cm(void) {
 |---|---|---|---|
 | **LED Matrix (16x8)** | SDA=21, SCL=22 | `I2C_NUM_0` (HT16K33) | ⚠️ บังคับใช้ `rows_to_columns_16x8()` เสมอ |
 | **Buzzer (Piezo)** | GPIO13 | `driver/ledc.h` (PWM) | ห้ามใช้คำสั่ง `tone()` ของ Arduino |
-| **Wi-Fi LED** | GPIO2 | `driver/gpio.h` (Active HIGH) | เลี่ยงการใช้เป็น Output อย่างอื่น |
-| **BT LED** | GPIO4 | `driver/gpio.h` (Active HIGH) | ⚠️ **CONFLICT:** ห้ามใช้ถ้าเปิด I2C LM73 |
+| **Wi-Fi LED (V1.5 S1)** | GPIO2 | Active-low per supplied schematic transcription | Keep GPIO allocation reserved |
+| **IoT LED (V1.5 S1)** | GPIO12 | Active-low per supplied schematic transcription | Not GPIO4; GPIO4 is sensor SDA |
 
 > ⚠️ **LED MATRIX DIGIT ALIGNMENT RULES (FONT 4x7):**
 > หน้าจอ 16x8 ของ KidBright ประกอบด้วยจอ 8x8 สองจอต่อกัน (ซ้าย: col 0-7, ขวา: col 8-15) เพื่อความสวยงาม โปรดใช้ `col_offset` ดังนี้:
 > - **กรณีแสดงเลข 1 ตัว (ให้อยู่ตรงกลางระหว่าง 2 จอ):** ใช้ `col_offset = 6` (ครอบคลุม col 6,7,8,9)
 > - **กรณีแสดงเลข 2 ตัว (ให้แต่ละตัวอยู่ตรงกลางของแต่ละจอ):** ตัวหน้าใช้ `col_offset = 2` (ซ้าย), ตัวหลังใช้ `col_offset = 10` (ขวา)
 
-### 16.2 External Outputs via JST Connectors
-การเชื่อมต่ออุปกรณ์ Output ภายนอกผ่านพอร์ต JST ให้ใช้ขา **OUT1** และ **OUT2** เป็นหลัก
+### 16.2 External Outputs via JST and banana
 
-| พอร์ต JST | GPIO | การใช้งานที่แนะนำ | ความสามารถพิเศษ |
-|---|---|---|---|
-| **OUT1** | GPIO26 | โมดูลรีเลย์, สัญญาณควบคุมมอเตอร์ (EN), เสียง | รองรับ **DAC_CHANNEL_2** (สร้างสัญญาณแอนะล็อกแท้ 0-3.3V) |
-| **OUT2** | GPIO27 | โมดูลรีเลย์, ไฟ LED ภายนอก, สัญญาณควบคุมมอเตอร์ | Digital I/O, PWM (`ledc`) |
+Supplied V1.5 JST OUT1/OUT2 signals connect to OUT1/OUT2 gate nets on GPIO26/27. Banana OUTPUT1/OUTPUT2 connect to MOSFET drains. A chip DAC capability does not certify analog output at either assembled connector; do not use a load drain as a logic GPIO. Choose the external module's input level, loading, common ground and supply from its actual circuit. V1.3 connector layouts must not be copied from V1.5.
 
-> ⚠️ **คำเตือนวงจรขับมอเตอร์ (Motor Driver):** โมดูลอย่าง L298N หรือ TB6612FNG ต้องการไฟเลี้ยงมอเตอร์แยกต่างหาก **ห้ามดึงไฟ 5V/3.3V จากบอร์ด KidBright ไปขับมอเตอร์โดยตรง** ให้ใช้ขา OUT1/OUT2 ส่งเฉพาะสัญญาณ Logic/PWM ไปควบคุมเท่านั้น
+### 16.3 Servo Motor Rules — V1.5 design
 
-**ตัวอย่าง: การควบคุมโมดูลรีเลย์บน OUT1 (GPIO26)**
-```c
-#include "driver/gpio.h"
-
-#define RELAY_PIN GPIO_NUM_26
-
-void relay_init(void) {
-    gpio_config_t io_conf = {
-        .pin_bit_mask = (1ULL << RELAY_PIN),
-        .mode         = GPIO_MODE_OUTPUT,
-        .pull_up_en   = GPIO_PULLUP_DISABLE,
-        .pull_down_en = GPIO_PULLDOWN_DISABLE,
-        .intr_type    = GPIO_INTR_DISABLE
-    };
-    gpio_config(&io_conf);
-    gpio_set_level(RELAY_PIN, 0); // ปิดรีเลย์เป็นค่าเริ่มต้น
-}
-```
-
-### 16.3 Servo Motor Rules (CRITICAL CONFLICT)
-บอร์ดมีช่องเสียบ Servo สีเหลือง/แดง/ดำ (Terminal) แยกให้โดยเฉพาะ ซึ่งดึงไฟเลี้ยงจากจุดต่อ Servo Power แยกต่างหาก
-
-| ช่องเชื่อมต่อ | GPIO | สัญญาณ | กฎความปลอดภัย (Conflict Rule) |
-|---|---|---|---|
-| **SERVO1** | GPIO16 | PWM 50Hz | ⚠️ **MUTUALLY EXCLUSIVE กับปุ่ม SW1** ห้ามใช้ถ้าโปรเจกต์มีปุ่มกด |
-| **SERVO2** | GPIO17 | PWM 50Hz | ✅ **แนะนำให้ใช้เป็นค่าเริ่มต้น** ปลอดภัยจากการชนกันของฮาร์ดแวร์ |
-
-**กฎการขับเซอร์โว:**
-- ต้องใช้ `driver/ledc.h` สร้าง PWM ความถี่ 50Hz (Period = 20ms)
-- ความกว้างพัลส์ (Pulse Width) ทั่วไปคือ 500µs (0 องศา) ถึง 2500µs (180 องศา)
+Servo1=GPIO15, Servo2=GPIO17; SW1=GPIO16, SW2=GPIO14. J8 pin 1 is Servo2, pin 2 Servo1. External +5VExt is separate from USB +5V; share GND with signal. See [V1.5 connectors and revisions](kidbright32_v15.md). Do not apply these dedicated connectors to V1.3 or undocumented variants. PWM timing, pulse endpoints and angles depend on the selected Servo.
 
 ### 16.4 I2C External Displays (OLED / LCD)
 สามารถนำจอ I2C ภายนอกมาเสียบที่พิน I2C Header ของบอร์ดได้ (SDA, SCL, 3.3V, GND)
@@ -1774,14 +1633,14 @@ void relay_init(void) {
 
 | Sensor | Interface | Pins | Measure | Unit | Notes |
 |---|---|---|---|---|---|
-| **HC-SR04** (Ultrasonic) | Digital (2-pin) | TRIG=OUT1/18/19/23, ECHO=IN1/IN2/IN3/IN4 | Distance | cm | ใช้ `esp_timer_get_time()` วัด pulse width เท่านั้น |
+| **HC-SR04** (Ultrasonic) | Digital (2-pin) | TRIG=expansion GPIO18/19/23 ที่เหมาะสม; ECHO=IN ที่ตรวจระดับแรงดันแล้ว; ห้ามใช้ IN เป็น TRIG | Distance | cm | ใช้ `esp_timer_get_time()` วัด pulse width เท่านั้น |
 | **HC-SR501** (PIR) | Digital (1-pin) | IN1 / IN2 / IN3 / IN4 | Motion (heat change) | — | Output เป็น HIGH เมื่อตรวจพบการเคลื่อนไหว |
-| **DHT11** | Digital (1-pin) | IN1 / IN2 / IN3 / IN4 | Temp + Humidity | °C / %RH | ต้องการ timing-critical bit-bang protocol |
-| **DS18B20** (Waterproof) | 1-Wire (1-pin) | IN1 / IN2 / IN3 / IN4 | Temperature | °C | **บังคับ** ต่อ pull-up resistor 4.7 kΩ ระหว่าง DATA และ VCC |
-| **DS18B20** (Air) | 1-Wire (1-pin) | IN1 / IN2 / IN3 / IN4 | Temperature | °C | ไม่ต้องการ external pull-up ถ้าใช้ parasitic power |
+| **DHT11** | Bidirectional data | Suitable expansion GPIO18/19/23; not V1.3 buffered IN | Temp + Humidity | °C / %RH | ต้องการ timing-critical bit-bang protocol |
+| **DS18B20** (Waterproof) | Bidirectional 1-Wire | Suitable expansion GPIO; not V1.3 buffered IN | Temperature | °C | **บังคับ** ต่อ pull-up resistor 4.7 kΩ ระหว่าง DATA และ VCC |
+| **DS18B20** (Air) | Bidirectional 1-Wire | Suitable expansion GPIO; not V1.3 buffered IN | Temperature | °C | ตรวจ pull-up และโหมดจ่ายไฟตามโมดูล; ไม่อนุมานว่า parasitic power ตัดความต้องการ pull-up |
 | **HW-511** (Line Tracking) | Digital (1-pin) | IN1 / IN2 / IN3 / IN4 | Line detection | — | Output เป็น HIGH/LOW ตามสีพื้นผิว |
 | **BME280** | I2C | SDA0 / SCL0 (`I2C_NUM_0`) | Temp / Pressure / Altitude / Humidity | °C / hPa / m / % | ⚠️ **ใช้บัสเดียวกับ LED Matrix** อย่า re-install I2C driver |
-| **Light Sensor Module** | Analog (1-pin) | IN1 / IN2 / IN3 / IN4 (ADC) | Light intensity | — | **V1.6 เท่านั้น** — ต้องอ่านด้วย ADC oneshot API |
+| **Light Sensor Module** | Analog (1-pin) | IN ตาม input path ของรุ่น | Light intensity | — | V1.3 buffered IN ไม่รองรับ; V1.5 S1 ต้องยืนยัน bypass; เลือก ADC API ตาม SDK |
 
 ---
 
@@ -1823,8 +1682,8 @@ int pir_read(void) {
 - ตรวจสอบ checksum ก่อนใช้ข้อมูลเสมอ
 
 ```c
-// DHT11 บน IN2 (GPIO33)
-#define DHT11_GPIO GPIO_NUM_33
+// DHT11 example on a suitable bidirectional expansion GPIO; not V1.3 buffered IN.
+#define DHT11_GPIO GPIO_NUM_18
 // ⚠️ ต้องสลับ mode ระหว่าง OUTPUT (start signal) และ INPUT (reading)
 // ใช้ gpio_set_direction() เพื่อเปลี่ยน direction แบบ dynamic
 ```
@@ -1840,7 +1699,7 @@ int pir_read(void) {
 | DS18B20 Air (module) | ไม่จำเป็น | มี resistor built-in บนโมดูลแล้ว |
 
 ```c
-// DS18B20 ใช้ 1-Wire protocol บน IN1 (GPIO32)
+// DS18B20 requires a suitable bidirectional expansion GPIO, not V1.3 buffered IN.
 // ⚠️ ห้ามใช้ I2C หรือ SPI API — DS18B20 ใช้ OneWire protocol เท่านั้น
 // ต้องส่ง Reset Pulse → Presence Pulse → ROM Command → Function Command → Read Scratchpad
 ```
@@ -1872,16 +1731,17 @@ i2c_master_write_read_device(I2C_MASTER_NUM, BME280_ADDR,
 
 ---
 
-### 17.6 Light Sensor Module Rules (V1.6 Only — Analog)
-> ⚠️ **AI INSTRUCTION:** Light Sensor Module แบบ Analog (ไม่ใช่ LDR บนบอร์ด) ใช้ได้เฉพาะ **KidBright V1.6** เท่านั้น เพราะ V1.6 รองรับ Analog Input บนพอร์ต IN1–IN4 ส่วน V1.3 IN1–IN4 **ไม่รองรับ Analog Input**
+### 17.6 Light Sensor Module Rules (version-specific analog path)
+> External analog IN: V1.3 ไม่รองรับผ่าน digital buffer; V1.5 ภาพ S1 รองรับเมื่อประกอบ bypass 0Ω/U7/U8=N/A ตรงแหล่งอ้างอิง ไม่จำกัดว่า V1.6 เท่านั้น ดู `kidbright32_v15.md`; รุ่นอื่นใช้หลักฐานของตนเอง
 
 | Board | IN1–IN4 Analog Input |
 |---|---|
 | **V1.3** | ❌ ไม่รองรับ |
+| **V1.5 S1** | ADC1_CH4–CH7 เมื่อประกอบ U7/U8=N/A และ bypass 0Ω ตรง design |
 | **V1.6** | ✅ รองรับ (ใช้ ADC1 Channel 4–7) |
 
 ```c
-// Light Sensor Module (Analog) บน IN1 (GPIO32 / ADC1_CH4) — V1.6 เท่านั้น
+// External analog example: IN1 GPIO32/ADC1_CH4 requires a verified analog connector path (e.g. matching V1.5 S1 assembly).
 // ใช้ adc_oneshot API เหมือนกับ LDR บนบอร์ด แต่เปลี่ยน channel เป็น ADC_CHANNEL_4
 adc_oneshot_chan_cfg_t chan_cfg = {
     .atten    = ADC_ATTEN_DB_12,
@@ -1891,7 +1751,7 @@ adc_oneshot_config_channel(adc1_handle, ADC_CHANNEL_4, &chan_cfg); // IN1
 
 int raw = 0;
 adc_oneshot_read(adc1_handle, ADC_CHANNEL_4, &raw);
-// raw: 0 (มืด) → 4095 (สว่าง)
+// Raw ADC only; light polarity/endpoints require the actual sensor circuit and calibration.
 ```
 
 ---
@@ -1911,7 +1771,7 @@ adc_oneshot_read(adc1_handle, ADC_CHANNEL_4, &raw);
 | **Fan Motor DC 5V** | OUT1 / OUT2 / 18 / 19 / 23 | Digital | ⚠️ ห้ามขับมอเตอร์โดยตรงจากพิน — ต้องใช้ transistor หรือ driver module |
 | **Vibration Motor DC** | OUT1 / OUT2 / 18 / 19 / 23 | Digital | ⚠️ ต้องใช้ transistor ขับกระแสเช่นเดียวกับ Fan Motor |
 | **LCD 1602 (I2C)** | SDA0 / SCL0 (`I2C_NUM_0`) | I2C | ดูกฎใน Section 16.4 |
-| **Servo Motor 180°** | SERVO1 / SERVO2 | PWM 50Hz | **V1.6 เท่านั้น** — ดูกฎใน Section 16.3 |
+| **Servo Motor** | Matching dedicated connector | PWM ตามรุ่น Servo | V1.5 design มี Servo15/17; V1.3 ไม่ยืนยันช่องเฉพาะ; ดู Section 16.3 |
 
 ---
 
@@ -1952,16 +1812,9 @@ void active_buzzer_off(void) { gpio_set_level(ACTIVE_BUZZER_PIN, 0); }
 
 ---
 
-### 18.4 Relay 5V Rules — CRITICAL Logic Level Warning
-> ⚠️ **AI INSTRUCTION:** ทิศทาง logic (Active HIGH / Active LOW) ของรีเลย์ **ขึ้นกับช่องที่เชื่อมต่อ** ไม่ใช่ตัวรีเลย์เอง
+### 18.4 Relay / output polarity
 
-| ช่องเชื่อมต่อ | เปิดรีเลย์ | ปิดรีเลย์ | หมายเหตุ |
-|---|---|---|---|
-| ขา **18 / 19 / 23** | `gpio_set_level(..., 1)` HIGH | `gpio_set_level(..., 0)` LOW | Active HIGH |
-| ช่อง **Out1 / Out2** | `gpio_set_level(..., 0)` LOW | `gpio_set_level(..., 1)` HIGH | **Active LOW** |
-| ช่อง **USB Port** | `gpio_set_level(..., 0)` LOW | `gpio_set_level(..., 1)` HIGH | **Active LOW** |
-
-> ⚠️ **คำเตือน:** รีเลย์ควบคุมไฟ AC หรือไฟแรงดันสูง — ต้องต่อผ่านวงจรฟิวส์และ power supply ภายนอกแยกต่างหากเสมอ **ห้ามต่อไฟ AC เข้ากับพิน KidBright โดยตรงโดยเด็ดขาด**
+V1.3 manual LOW=on examples describe their API/load context. Supplied V1.3/V1.5 MOSFET gate HIGH sinks the load drain; gate LOW leaves drain undriven. V1.5 JST OUT uses the gate net, not the drain. Determine module polarity and API behavior for the chosen endpoint. USB25 LOW=on is manual/topology evidence requiring physical confirmation, not a universal OUT truth table.
 
 ---
 
@@ -2044,85 +1897,23 @@ Emitter ของ NPN → GND
 
 ---
 
-## 19. PORT CAPABILITY RULES — V1.5 Rev 3.1 / V1.3 / V1.6 Comparison
-> **AI INSTRUCTION:** ความสามารถของพอร์ตแตกต่างกันระหว่างแต่ละเวอร์ชัน ต้องตรวจสอบบอร์ดเวอร์ชันก่อนใช้งาน Analog Input บนพอร์ต IN1–IN4
+## 19. PORT CAPABILITY RULES — V1.3 / supplied V1.5
 
-### 19.1 Port Capability Comparison Table
+Updated 2026-10-22. Read [version comparison](kidbright32_versions.md); this table replaces the obsolete blanket Rev3.1/3.1G ADC ban and universal active-low OUT table.
 
-| KidBright Pin | GPIO | Digital Input | Digital Output | Analog Input (ADC) | Analog Output |
-|---|---|---|---|---|---|
-| **IN1** | GPIO32 | ✅ All versions | ❌ | ✅ **iA / V1.6 เท่านั้น** (ADC1_CH4) | ❌ |
-| **IN2** | GPIO33 | ✅ All versions | ❌ | ✅ **iA / V1.6 เท่านั้น** (ADC1_CH5) | ❌ |
-| **IN3** | GPIO34 | ✅ All versions | ❌ | ✅ **iA / V1.6 เท่านั้น** (ADC1_CH6) | ❌ |
-| **IN4** | GPIO35 | ✅ All versions | ❌ | ✅ **iA / V1.6 เท่านั้น** (ADC1_CH7) | ❌ |
-| **Out1** | GPIO26 | ❌ | ✅ All versions | ❌ | ✅ All versions (DAC2) |
-| **Out2** | GPIO27 | ❌ | ✅ All versions | ❌ | ❌ |
-| **IO18** | GPIO18 | ✅ All versions | ✅ All versions | ❌ | ✅ All versions |
-| **IO19** | GPIO19 | ✅ All versions | ✅ All versions | ❌ | ✅ All versions |
-| **IO23** | GPIO23 | ✅ All versions | ✅ All versions | ❌ | ✅ All versions |
-
-> ✅ = รองรับ | ❌ = ไม่รองรับ
-
----
-
-### 19.2 Critical Differences — V1.5 Rev 3.1 vs Rev 3.1G vs iA vs V1.6
-
-| Feature | V1.5 Rev 3.1 (NECTEC) | V1.5 Rev 3.1**G** (Gravitech OEM) | V1.5 iA (INEX) | V1.6 (Gravitech) |
-|---|---|---|---|---|
-| **SW2 GPIO** | **GPIO14** | **GPIO14** | GPIO17 | GPIO17 |
-| Analog Input บน IN1–IN4 | ❌ ไม่รองรับ | ❌ ไม่รองรับ | ✅ รองรับ (ADC1_CH4–CH7) | ✅ รองรับ (ADC1_CH4–CH7) |
-| Accelerometer | ❌ ไม่มี | ❌ ไม่มี | ✅ KXTJ3-1057 (I2C_NUM_0, 0x0E) | ✅ มี |
-| Gyroscope | ❌ ไม่มี | ❌ ไม่มี | ❌ ไม่มี | ✅ มี |
-| Magnetometer | ❌ ไม่มี | ❌ ไม่มี | ❌ ไม่มี | ✅ มี |
-| RGB LED on-board | ❌ ไม่มี | ❌ ไม่มี | ❌ ไม่มี | ✅ มี (6 ดวง) |
-| Servo Connector | ❌ ไม่มี | ❌ ไม่มี | ❌ ไม่มี | ✅ มี (SERVO1=GPIO15, SERVO2=GPIO17) |
-| USB Connector | **Micro-USB** | **Micro-USB** | **USB-C** | USB-C |
-| USB Host (Type-A) | ✅ มี (GPIO25, Active LOW) | ✅ มี (GPIO25, Active LOW) | ✅ มี | ✅ มี |
-| LDR Sensor | ✅ GPIO36 / ADC1_CH0 | ✅ GPIO36 / ADC1_CH0 | ✅ GPIO36 / ADC1_CH0 | ✅ |
-| Temperature Sensor | ✅ LM73 (I2C1, 0x4D) | ✅ LM73 (I2C1, 0x4D) | ✅ LM73 (I2C1, 0x4D) | ✅ LM73 |
-| I2C_NUM_0 devices | HT16K33 (0x70) only | HT16K33 (0x70) only | HT16K33 (0x70) + KXTJ3 (0x0E) | HT16K33 + Accel/Gyro/Mag |
-| I2C_NUM_1 devices | LM73 (0x4D) + RTC (0x6F) | LM73 (0x4D) + RTC (0x6F) | LM73 (0x4D) | LM73 (0x4D) |
-
-> ⚠️ **AI CRITICAL — SW2 PIN DIFFERENCE:**
-> - V1.5 Rev 3.1 (NECTEC): SW2 = **GPIO14**
-> - V1.5 Rev 3.1G (Gravitech OEM): SW2 = **GPIO14** (corrected — same as Rev 3.1/iA)
-> ตรวจสอบ PCB silkscreen หรือ I2C scan result ก่อนเขียนโค้ดเสมอ
->
-> ⚠️ **AI CRITICAL:** V1.5 Rev 3.1 และ Rev 3.1G ใช้ **Micro-USB** ไม่ใช่ USB-C และ **ไม่มี KXTJ3** — ห้ามเขียนโค้ดที่ init KXTJ3 สำหรับบอร์ดทั้งสอง
-
----
-
-### 19.3 GPIO Output Logic Rules Summary
-
-> ⚠️ **AI INSTRUCTION: กฎ Active HIGH / Active LOW ต้องตรงกับช่องเชื่อมต่อ** — ผิดพลาดทำให้อุปกรณ์ทำงานกลับทิศ
-
-| ช่องเชื่อมต่อ | GPIO | เปิดอุปกรณ์ | ปิดอุปกรณ์ |
+| Endpoint | GPIO | V1.3 | Supplied V1.5 S1 |
 |---|---|---|---|
-| ขา **18** | GPIO18 | `HIGH (1)` | `LOW (0)` |
-| ขา **19** | GPIO19 | `HIGH (1)` | `LOW (0)` |
-| ขา **23** | GPIO23 | `HIGH (1)` | `LOW (0)` |
-| ช่อง **Out1** | GPIO26 | **`LOW (0)`** | **`HIGH (1)`** |
-| ช่อง **Out2** | GPIO27 | **`LOW (0)`** | **`HIGH (1)`** |
-| ช่อง **USB Port** | IO25 (V1.6) | **`LOW (0)`** | **`HIGH (1)`** |
-| ช่อง **IN1–IN4** (Input) | GPIO32–35 | `HIGH (1)` | `LOW (0)` |
-| ช่อง **3-pin connector O1** (V1.6) | IO26 | **`LOW (0)`** | **`HIGH (1)`** |
-| ช่อง **3-pin connector O2** (V1.6) | IO27 | **`LOW (0)`** | **`HIGH (1)`** |
+| IN1 / IN2 | 32 / 33 | Digital-buffer input; no connector ADC | Input with ADC1_CH4/CH5 when U7/U8=N/A and 0Ω bypass are fitted |
+| IN3 / IN4 | 34 / 35 | Digital-buffer input; no connector ADC | Input with ADC1_CH6/CH7 under the same assembly condition; no internal pulls/output |
+| OUT gate control | 26 / 27 | Gate signal, distinct from load drain | Gate signal, also routed to JST OUT1/OUT2 |
+| Banana OUT load | Controlled by 26 / 27 | MOSFET drain; not DAC/push-pull | MOSFET drain OUTPUT1/OUTPUT2; not JST gate |
+| Expansion | 18 / 19 / 23 | Digital input/output and PWM, no ADC/DAC | Same design allocation |
+| GPIO15 | 15 | NTP LED | Servo1, J8 pin 2 |
+| GPIO17 | 17 | Dedicated Servo connector unestablished | Servo2, J8 pin 1 |
 
----
+Gate HIGH sinks drain to GND; gate LOW turns the MOSFET off without driving drain HIGH. Manual LOW=on examples describe their API/load context, not every endpoint. USB25 LOW=on remains a topology/manual claim requiring physical confirmation; USB-A is switched load power, not demonstrated host data.
 
-### 19.4 Input Port Rules Summary
-
-| ช่องเชื่อมต่อ | GPIO | Digital In | Analog In | ข้อจำกัด |
-|---|---|---|---|---|
-| **IN1** | GPIO32 | ✅ | ✅ (V1.6 only) | ต้องการ external pull-up/down ถ้าไม่มีบน sensor module |
-| **IN2** | GPIO33 | ✅ | ✅ (V1.6 only) | ต้องการ external pull-up/down ถ้าไม่มีบน sensor module |
-| **IN3** | GPIO34 | ✅ | ✅ (V1.6 only) | **Input-only** ไม่มี internal pull-up/down |
-| **IN4** | GPIO35 | ✅ | ✅ (V1.6 only) | **Input-only** ไม่มี internal pull-up/down |
-| **IO18** | GPIO18 | ✅ | ❌ | รองรับ Digital Input + Output |
-| **IO19** | GPIO19 | ✅ | ❌ | รองรับ Digital Input + Output |
-| **IO23** | GPIO23 | ✅ | ❌ | รองรับ Digital Input + Output |
-
-> ⚠️ **GPIO34 / GPIO35 (IN3 / IN4): ไม่มี internal pull-up หรือ pull-down** — ถ้า sensor ไม่มี pull-up resistor ในตัว ต้องต่อ external pull-up (10 kΩ ไปยัง 3.3V) เสมอ มิฉะนั้น pin จะ floating และอ่านค่าสุ่ม
+Rev.3 PDF alone does not confirm fitted input buffers/bypass. Rev3.1/3.1G identity remains unresolved beyond existing scoped recipes. INEX iA/iP use [their own evidence](inex_ia_ip.md); V1.6 is not assigned inheritance from the attached report. No new hardware pass is recorded.
 
 ---
 

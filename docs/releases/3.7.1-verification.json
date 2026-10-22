@@ -1,0 +1,47 @@
+{
+  "version": "3.7.1",
+  "base_tag": "v3.7.0",
+  "base_commit": "a593b0d4956a08ac711f60184aa6d62ff30f7304",
+  "branch": "hotfix/3.7.1",
+  "supplied_source_zip_sha256": "0a77b45cb31793b6bae591405a8cc1550880fea7ec1562805a8fb404d5cbb54a",
+  "supplied_source_matches_base_tag": true,
+  "frontend_tests": {
+    "passed": 93,
+    "failed": 0
+  },
+  "rust_library_tests": {
+    "passed": 59,
+    "failed": 0
+  },
+  "frontend_release_build": true,
+  "windows_nsis_build": true,
+  "compiled_ui_probe": {
+    "version": "3.7.1",
+    "compiled_ui": true,
+    "native_ipc_fixture": true,
+    "classic_only": true,
+    "legacy_board_preference_normalized": true,
+    "auto_install_once": true,
+    "ready_without_reload": true,
+    "missed_progress_event_handled": true,
+    "sdk_status_refreshed": true,
+    "page_errors": [],
+    "external_requests": [],
+    "live_provider": false,
+    "real_sdk_installed": false
+  },
+  "native_toolchain_test": "Temporary filesystem fixture; verifies final Python path and sentinel after activation",
+  "new_project_tests": "Request routing, edit/negation/reference exclusions, duplicate-name rejection and previous project preservation",
+  "main_workspace_version_unchanged": "3.7.4",
+  "live_ai_called": false,
+  "real_toolchain_installed": false,
+  "installer_executed": false,
+  "hardware_flashed": false,
+  "published": false,
+  "limits": [
+    "Creation routing covers tested Thai/English requests; live model behavior was not graded.",
+    "Windows installer was built, not installed over the user application.",
+    "macOS was not built or tested.",
+    "Nonfatal baseline Vite bundle warnings and unused test helper warnings remain."
+  ]
+}

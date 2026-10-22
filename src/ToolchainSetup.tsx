@@ -62,6 +62,16 @@ export default function ToolchainSetup({
   const [showUrlInput, setShowUrlInput] = useState(false);
   const [logs, setLogs] = useState<string[]>([]);
   const logsRef = useRef<HTMLDivElement>(null);
+  const onReadyRef = useRef(onReady);
+  onReadyRef.current = onReady;
+  const readyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const notifyReady = () => {
+    if (readyTimerRef.current !== null) clearTimeout(readyTimerRef.current);
+    readyTimerRef.current = setTimeout(() => {
+      readyTimerRef.current = null;
+      onReadyRef.current();
+    }, 500);
+  };
   // Auto-start countdown (ไม่สามารถยกเลิกได้)
   const [countdown, setCountdown] = useState<number | null>(null);
   // Mini widget state
@@ -78,11 +88,12 @@ export default function ToolchainSetup({
   useEffect(() => {
     const unlisten = listen<ToolchainProgress>("toolchain-progress", (event) => {
       const p = event.payload;
-      setProgress(p);
+      setProgress(p.stage === "done" ? { stage: "extracting", percent: 99, message: "Verifying installed toolchain paths..." } : p);
       setLogs((prev) => [...prev, `[${p.stage.toUpperCase()}] ${p.message}`]);
 
       if (p.stage === "done") {
-        setTimeout(() => onReady(), 800); // brief pause to show 100%
+        setIsDownloading(false);
+        void checkToolchain();
       }
       if (p.stage === "error") {
         setIsDownloading(false);
@@ -91,9 +102,10 @@ export default function ToolchainSetup({
     });
 
     return () => {
-      unlisten.then((f) => f());
+      if (readyTimerRef.current !== null) clearTimeout(readyTimerRef.current);
+      unlisten.then((f) => f()).catch(console.error);
     };
-  }, [onReady]);
+  }, []);
 
   // ── Check toolchain status on mount ─────────────────────────────────────
   useEffect(() => {
@@ -108,7 +120,7 @@ export default function ToolchainSetup({
       if (status.status === "ready") {
         // Toolchain มีอยู่แล้ว → ผ่านไฟเลย
         setProgress({ stage: "done", percent: 100, message: `Toolchain v${status.version} ready.` });
-        setTimeout(() => onReady(), 500);
+        notifyReady();
       } else {
         // not_installed → เริ่ม auto-countdown 5 วินาที (ไม่สามารถยกเลิกได้)
         setCountdown(5);
@@ -138,7 +150,8 @@ export default function ToolchainSetup({
       await invoke("download_toolchain", {
         url: customUrl.trim() || null,
       });
-      // onReady จะถูกเรียกจาก event listener ตอน stage === "done"
+      setIsDownloading(false);
+      await checkToolchain(); // Also handles a missed progress event.
     } catch (err) {
       const msg = String(err);
       setErrorMsg(msg);

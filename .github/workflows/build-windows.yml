@@ -1,7 +1,7 @@
 name: Build Windows Installer
 on:
   push:
-    branches: [ main ]
+    branches: [ hotfix/3.7.1 ]
   workflow_dispatch:
 
 permissions:
@@ -160,6 +160,8 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.get_version.outputs.TAG }}
+          target_commitish: ${{ github.sha }}
+          make_latest: false
           name: 'vibeKidbright ${{ steps.get_version.outputs.TAG }} (Windows)'
           body: 'ดาวน์โหลดไฟล์ .exe ด้านล่างเพื่อติดตั้งบน Windows'
           draft: true

@@ -1,23 +1,28 @@
 # KidBright Hardware Schematics & Pinout Rules
+> **ปรับ V1.3/V1.5 วันที่ 22 ตุลาคม 2026:** ใช้ [ข้อมูลรายรุ่น](kidbright32_versions.md) แทนการรวม revision ตาราง minibike ด้านล่างเป็นชุดมอเตอร์แบบเฉพาะ ไม่ใช่ pinout กลางของปลั๊กอิน BDC/BLDC ดู `compatibility/README.md`
 > เอกสารอ้างอิงฮาร์ดแวร์และการเชื่อมต่อพินจาก Schematic PDFs
 
 เอกสารนี้รวบรวมกฎการเชื่อมต่อและใช้งานพินที่ได้จาก Schematic PDF ทั้งหมดเพื่อลดข้อผิดพลาดในการพัฒนา Firmware บน Vibe KidBright IDE
 
 ---
 
-## 1. KidBright32 V1.5 Rev 3.1 / Rev 3.1G (บอร์ดหลัก)
-อ้างอิงจากไฟล์: `Sch_KidBright32_updated.pdf` และ `PCB_KIDBRIGHT32_V1_5_Rev3_1.pdf`
+## 1. KidBright32 V1.3 และ V1.5 ตาม design ที่ส่ง
 
-| สัญญาณ / โมดูล | GPIO | หมายเหตุ / กฎการใช้งาน |
-|--------------|------|----------------------|
-| **I2C Bus 0** | SDA=21, SCL=22 | จอ LED Matrix (HT16K33 `0x70`), RTC (MCP7940N `0x6F`), พอร์ตต่อขยาย |
-| **I2C Bus 1** | SDA=4, SCL=5 | เซ็นเซอร์อุณหภูมิ LM73 (`0x4D`) |
-| **LDR (แสง)** | 36 (ADC1_CH0) | Input-only ห้าม pull-up |
-| **Buzzer** | 13 | ต้องขับด้วย PWM (LEDC) |
-| **SW1 (Left)** | 16 | Active LOW (กด=0), ต้อง Pull-up |
-| **SW2 (Right)**| 14 | Active LOW (กด=0), ต้อง Pull-up |
-| **IN1 .. IN4** | 32, 33, 34, 35 | IN3/IN4 (34/35) เป็น Input-only |
-| **OUT1, OUT2** | 26, 27 | Digital I/O |
+อ้างอิง [V1.3](kidbright32_v13.md) และ [V1.5](kidbright32_v15.md) จาก Markdown ที่ผู้ใช้ส่ง ไม่รวม Rev3.1/3.1G เป็นวงจรเดียวกันโดยอัตโนมัติ PDF V1.5 ชื่อไฟล์ Rev3_1 แต่ title block ระบุ Rev.3
+
+| สัญญาณ | GPIO | ขอบเขต |
+|---|---|---|
+| SDA0/SCL0 | 21/22 | HT16K33 matrix และ expansion ตาม design; ชื่อเน็ตไม่บังคับ controller ID |
+| SDA1/SCL1 | 4/5 | LM73, MCP79411 RTC และ KB Chain แชร์บัสนี้; address ใช้หลักฐาน part/software แยก |
+| LDR | 36 | ADC1_CH0; input-only ไม่มี internal pull |
+| Buzzer | 13 | PWM ผ่านวงจรขับ |
+| SW1/SW2 | 16/14 | Active-low; ใช้ pull-up/debounce ให้เหมาะสม |
+| IN1–IN4 | 32/33/34/35 | V1.3 digital buffer ไม่รองรับ analog; V1.5 ภาพ S1 มี bypass 0Ω และ U7/U8=N/A; ตรวจการประกอบจริง |
+| OUT1/OUT2 control | 26/27 | แยก GPIO/gate, JST gate ใน V1.5 และ banana MOSFET drain |
+| GPIO15/GPIO17 | 15/17 | V1.3 GPIO15=NTP LED ไม่มีหลักฐานช่อง Servo เฉพาะ; V1.5 Servo1=15, Servo2=17 |
+| USB_SW | 25 | USB-A สำหรับสั่งไฟโหลด ไม่ยืนยัน USB host data |
+
+Gate HIGH ทำให้ drain sink ลง GND; gate LOW ปิด MOSFET ไม่ได้ขับ drain เป็น HIGH ไม่เหมารวมกับข้อความ OUT LOW=เปิดในตัวอย่างคู่มือหรือคำสั่ง API ขาไฟ banana ของ V1.3 กับ V1.5 ต่างกัน และ Servo +5VExt แยกจาก USB +5V ดูตาราง connector รายรุ่นก่อนต่อสาย
 
 ---
 
@@ -64,7 +69,7 @@ Controller เป็นโมดูล ESP32 เปล่าที่ต่อ�
 ---
 
 ## สรุปข้อระวังสำหรับ AI (System Rules)
-1. **ห้ามเดา Pinout:** ให้ยึดตามเอกสารชุดนี้เป็นที่สิ้นสุด 
-2. **การเรียกใช้ ADC:** หากเป็นโค้ดของ Controller ให้ใช้ Legacy API (driver/adc.h)
+1. **ห้ามเดา Pinout:** ตรวจเอกสารผู้ผลิตของ PCB ที่ตรงรุ่น หากข้อมูลในไฟล์นี้ขัดกันให้หยุดยืนยันก่อน ดู `support_scope.md`
+2. **การเรียกใช้ ADC:** เลือก API ตาม SDK ที่ติดตั้ง ไม่ผูก legacy ADC กับชื่อ Controller; ตัวอย่าง sender ปัจจุบันใช้ ADC oneshot
 3. **พอร์ตจำกัด:** GPIO34, 35, 36, 39 บน ESP32 เป็นพอร์ต Input-only ไม่สามารถสร้างสัญญาณ Output หรือ Pull-up ได้ ต้องกำหนดเป็นระดับอินพุตล้วน
-4. **ความถี่ Servo:** เซอร์โวบังคับเลี้ยวต้องใช้ PWM ที่ความถี่ 50Hz (คาบ 20ms) โดย Duty cycle มีสัดส่วนตั้งแต่ 1ms ถึง 2ms
+4. **ความถี่ Servo:** ตรวจรุ่น servo และช่วง pulse ที่โปรแกรมต้นฉบับใช้ ตัวอย่าง legacy บางชุดใช้ 0.5–2.5ms ที่50Hz จึงห้ามแทนด้วย 1–2ms โดยไม่แจ้งการเปลี่ยนพฤติกรรม

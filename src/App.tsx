@@ -441,7 +441,7 @@ function App({
 
   // Board type selector (KidBright32 vs MiuAiPlus)
   const [selectedBoard, setSelectedBoard] = useState<BoardType>(() => {
-    return (localStorage.getItem("vibe-selected-board") as BoardType) || "kidbright32";
+    return "kidbright32"; // This maintenance release supports classic KidBright only.
   });
   const [adbDevices, setAdbDevices] = useState<string[]>([]);
   const [selectedAdbDevice, setSelectedAdbDevice] = useState("");
@@ -1087,6 +1087,11 @@ function App({
       addLog("⚠️ ESP-IDF not found. Click \"Setup / Repair ESP-IDF\" to install.");
     }
   };
+
+  // A successful background install must refresh SDK status in this session.
+  useEffect(() => {
+    if (toolchainReady) void checkEnvironment();
+  }, [toolchainReady]);
 
   const toggleSerialMonitor = async () => {
     if (isSerialConnected) {
@@ -1881,7 +1886,6 @@ function App({
                 title="Select Board Type"
               >
                 <option value="kidbright32">KidBright32</option>
-                <option value="miuaiplus">MiuAiPlus</option>
               </select>
 
               {/* Port/Device Controls — conditional based on board type */}

@@ -253,7 +253,7 @@ fn get_tools() -> Value {
             "type": "function",
             "function": {
                 "name": "create_project_workspace",
-                "description": "Create a new project workspace directory. Prompts the user to pick a folder, then makes a subfolder with project_name inside it, and switches the IDE workspace to it.",
+                "description": "Create a NEW project workspace for an explicit creation request, even when another project is open. Prompts for a base folder and creates a fresh child folder. Cancellation or name conflicts must never fall back to the previous workspace.",
                 "parameters": {
                     "type": "object",
                     "properties": {
@@ -873,7 +873,7 @@ fn get_google_tools() -> Value {
             { "name": "web_search", "description": "Search the internet for technical docs.", "parameters": { "type": "OBJECT", "properties": { "query": { "type": "STRING" } }, "required": ["query"] } },
             { "name": "knowledge_search", "description": "Search the local knowledge_base folder.", "parameters": { "type": "OBJECT", "properties": { "query": { "type": "STRING" } }, "required": ["query"] } },
             { "name": "read_knowledge_file", "description": "Read the FULL content of a file from the knowledge_base folder. Use this when knowledge_search returns partial/truncated results or says the KB is not loaded.", "parameters": { "type": "OBJECT", "properties": { "file_name": { "type": "STRING", "description": "File name relative to knowledge_base/, e.g. 'formula_kid_controller.md'" } }, "required": ["file_name"] } },
-            { "name": "create_project_workspace", "description": "Create a new project workspace directory. Call FIRST when no workspace is open.", "parameters": { "type": "OBJECT", "properties": { "project_name": { "type": "STRING" } }, "required": ["project_name"] } }
+            { "name": "create_project_workspace", "description": "Create a new project workspace directory. Call FIRST for explicit new-project creation, even if another workspace is open. Never reuse the previous workspace on cancellation or name conflict.", "parameters": { "type": "OBJECT", "properties": { "project_name": { "type": "STRING" } }, "required": ["project_name"] } }
         ]
     }])
 }

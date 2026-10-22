@@ -111,6 +111,14 @@ fn replace_install_directory(staging_dir: &Path, final_dir: &Path) -> Result<(),
     Ok(())
 }
 
+fn activate_toolchain(staging: &Path, installed: &Path) -> Result<(), String> {
+    replace_install_directory(staging, installed)?;
+    patch_venv_paths(installed)?;
+    std::fs::write(installed.join(SENTINEL_FILE), TOOLCHAIN_VERSION)
+        .map_err(|e| format!("Failed to mark installed toolchain ready: {e}"))?;
+    Ok(())
+}
+
 // ── Progress event payload ────────────────────────────────────────────────────
 
 #[derive(Clone, serde::Serialize)]
@@ -157,6 +165,8 @@ fn is_toolchain_ready(toolchain_dir: &Path) -> bool {
 #[tauri::command]
 pub async fn check_toolchain(app_handle: AppHandle) -> Result<serde_json::Value, String> {
     let dir = get_toolchain_dir(&app_handle)?;
+    crate::esp_idf::invalidate_idf_environment();
+    auto_repair_on_startup(&dir);
 
     if is_toolchain_ready(&dir) {
         // อ่าน version จาก sentinel file
@@ -204,6 +214,9 @@ pub async fn download_toolchain(
 
     // ถ้ามีอยู่แล้ว ข้ามเลย
     if is_toolchain_ready(&toolchain_dir) {
+        auto_repair_on_startup(&toolchain_dir);
+        crate::esp_idf::invalidate_idf_environment();
+        emit_progress(&app_handle, "done", 100, "Toolchain ready.");
         return Ok(format!(
             "Toolchain already installed at {}",
             toolchain_dir.display()
@@ -254,10 +267,12 @@ pub async fn download_toolchain(
         return Err(error);
     }
 
-    if let Err(error) = replace_install_directory(&staging_dir, &toolchain_dir) {
+    if let Err(error) = activate_toolchain(&staging_dir, &toolchain_dir) {
         let _ = std::fs::remove_dir_all(&staging_dir);
         return Err(error);
     }
+    crate::esp_idf::invalidate_idf_environment();
+    emit_progress(&app_handle, "done", 100, "Toolchain ready; paths refreshed.");
     Ok(format!(
         "Toolchain installed at {}",
         toolchain_dir.display()
@@ -280,6 +295,7 @@ pub async fn remove_toolchain(app_handle: AppHandle) -> Result<String, String> {
         return Ok("Toolchain directory does not exist, nothing to remove.".to_string());
     }
 
+    crate::esp_idf::invalidate_idf_environment();
     std::fs::remove_dir_all(&toolchain_dir)
         .map_err(|e| format!("Failed to remove toolchain: {}", e))?;
 
@@ -304,6 +320,7 @@ pub async fn repair_toolchain_paths(app_handle: AppHandle) -> Result<String, Str
         .await
         .map_err(|e| format!("Task panicked: {}", e))??;
 
+    crate::esp_idf::invalidate_idf_environment();
     Ok(format!(
         "Python venv paths repaired successfully in {}",
         toolchain_dir.display()
@@ -628,32 +645,6 @@ fn download_and_extract(
         let _ = std::fs::remove_file(zip_path);
         res?;
     }
-
-    // ─── Phase 4: Patch venv paths (fix machine-specific Python paths) ─────
-    // A bundled venv may have been created on a different machine.
-    // We rewrite pyvenv.cfg `home =` lines to point to the bundled idf-python in
-    // the actual install directory so Python can be found on any machine.
-    emit_progress(
-        app,
-        "extracting",
-        99,
-        "Patching Python venv paths for this machine...",
-    );
-    if let Err(e) = patch_venv_paths(dest_dir) {
-        // Non-fatal — log but continue.  Build will fail with a clearer message if needed.
-        eprintln!("[Toolchain] pyvenv patch warning: {}", e);
-    }
-
-    // ─── Phase 5: Sentinel file ────────────────────────────────────────────
-    std::fs::write(dest_dir.join(SENTINEL_FILE), TOOLCHAIN_VERSION)
-        .map_err(|e| format!("Failed to write sentinel: {}", e))?;
-
-    emit_progress(
-        app,
-        "done",
-        100,
-        &format!("Toolchain v{} ready!", TOOLCHAIN_VERSION),
-    );
 
     Ok(format!("Toolchain installed at {}", dest_dir.display()))
 }
@@ -1556,6 +1547,27 @@ mod tests {
 
         assert!(!staging_dir.exists());
         assert!(is_toolchain_ready(&final_dir));
+    }
+
+    #[test]
+    fn activation_patches_python_to_final_path_before_becoming_ready() {
+        let temp = tempfile::tempdir().unwrap();
+        let installed = temp.path().join("toolchain");
+        let staging = temp.path().join("toolchain.installing");
+        let python = staging.join("tools/idf-python/3.11.2");
+        let venv = staging.join("tools/python_env/idf5.5_py3.11_env");
+        fs::create_dir_all(&python).unwrap();
+        fs::create_dir_all(&venv).unwrap();
+        fs::write(python.join(if cfg!(windows) { "python.exe" } else { "python3" }), "fixture").unwrap();
+        fs::write(venv.join("pyvenv.cfg"), "home = stale-machine-path\n").unwrap();
+        assert!(!is_toolchain_ready(&installed));
+        activate_toolchain(&staging, &installed).unwrap();
+        let config = fs::read_to_string(installed.join("tools/python_env/idf5.5_py3.11_env/pyvenv.cfg")).unwrap();
+        let home = config.lines().find_map(|line| line.strip_prefix("home = ")).unwrap();
+        assert_eq!(dunce::canonicalize(home).unwrap(), dunce::canonicalize(installed.join("tools/idf-python/3.11.2")).unwrap());
+        assert!(!config.contains(".installing"));
+        assert!(!staging.exists());
+        assert!(is_toolchain_ready(&installed));
     }
 
     // ── extract_gdrive_token ──────────────────────────────────────────────────
