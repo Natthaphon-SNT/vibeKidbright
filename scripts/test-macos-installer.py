@@ -80,7 +80,9 @@ def verify_app(app, expected_version):
 
 def probe(image, report_path, expected_version, expected_arch, sdk_idf=None, sdk_tools=None):
     with tempfile.TemporaryDirectory(prefix="vibekidbright-macos-") as temporary:
-        scratch = Path(temporary)
+        # macOS /var aliases /private/var. Tauri rejects an executable launched
+        # through any symlink component; launch the copied bundle canonically.
+        scratch = Path(temporary).resolve()
         mount = scratch / "mounted image"
         mount.mkdir()
         mounted = False
