@@ -138,7 +138,7 @@ def probe(image, report_path, expected_version, expected_arch, sdk_idf=None, sdk
         # separate manual check and is not certified by a live process alone.
         gui_log = report_path.with_suffix(".gui.log")
         with gui_log.open("w", encoding="utf-8") as log:
-            child = subprocess.Popen([str(binary)], cwd=working, env=env, stdout=log, stderr=log)
+            child = subprocess.Popen([str(binary)], cwd=working, env=native_env, stdout=log, stderr=log)
             try:
                 try:
                     child.wait(timeout=12)
@@ -157,6 +157,7 @@ def probe(image, report_path, expected_version, expected_arch, sdk_idf=None, sdk
         record.update({"universal_architectures": architectures, "code_signature_verified": True,
                        "dmg_verified_and_unmounted": True, "gui_survived_startup_seconds": 12,
                        "interactive_gui_tested": False, "probe_environment": {
+                           "native_login_home_for_gui_and_keychain": True,
                            "copied_installation": True, "install_path_contains_spaces": True,
                            "separate_working_directory": True, "fresh_appdata": True,
                            "developer_paths_removed_from_environment": True, "http_proxy_closed": True,
