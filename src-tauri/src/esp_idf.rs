@@ -9,6 +9,8 @@ use std::sync::mpsc::{self, Sender, TryRecvError};
 use std::sync::{Arc, Mutex, OnceLock};
 use std::time::Duration;
 use tauri::{AppHandle, Emitter, Manager};
+#[path = "esp_idf_environment.rs"]
+mod environment;
 
 /// Windows: ซ่อน console window ที่โผล่ขึ้นมาระหว่าง idf.py/cmake/ninja
 const CREATE_NO_WINDOW: u32 = 0x0800_0000;
@@ -239,18 +241,15 @@ fn detect_host_python() -> Result<String, String> {
 /// Resolve the ESP-IDF and tools paths (runtime, bundled, or dev fallback).
 /// Priority: env override > user config > Happy Meal toolchain > runtime > bundled.
 pub(crate) fn resolve_idf_paths(app_handle: &AppHandle) -> Result<(PathBuf, PathBuf), String> {
+    let mut candidates = Vec::new();
     // 1. Environment variable override
     if let Some((idf_path, tools_path)) = resolve_env_override() {
-        if let Ok(paths) = canonical_idf_pair(&idf_path, &tools_path) {
-            return Ok(paths);
-        }
+        return environment::choose(&[(idf_path, tools_path)], std::env::consts::OS, std::env::consts::ARCH);
     }
 
     // 2. User-configured paths from GUI settings (highest user priority)
     if let Some((idf_path, tools_path)) = resolve_custom_config_paths() {
-        if let Ok(paths) = canonical_idf_pair(&idf_path, &tools_path) {
-            return Ok(paths);
-        }
+        return environment::choose(&[(idf_path, tools_path)], std::env::consts::OS, std::env::consts::ARCH);
     }
 
     // 3. Happy Meal toolchain (ดาวน์โหลดจาก GitHub Release)
@@ -274,11 +273,7 @@ pub(crate) fn resolve_idf_paths(app_handle: &AppHandle) -> Result<(PathBuf, Path
                     })
                     .collect();
                 idf_dirs.sort();
-                if let Some(idf_dir) = idf_dirs.pop() {
-                    if let Ok(paths) = canonical_idf_pair(&idf_dir, &tools_dir) {
-                        return Ok(paths);
-                    }
-                }
+                candidates.extend(idf_dirs.into_iter().rev().map(|idf| (idf, tools_dir.clone())));
             }
         }
     }
@@ -286,15 +281,16 @@ pub(crate) fn resolve_idf_paths(app_handle: &AppHandle) -> Result<(PathBuf, Path
     // 4. Runtime ESP-IDF (ติดตั้งผ่าน setup_esp_idf command)
     if let Some(runtime_idf) = maybe_find_runtime_idf(app_handle)? {
         let tools = runtime_root_dir(app_handle)?.join(".espressif");
-        if let Ok(paths) = canonical_idf_pair(&runtime_idf, &tools) {
-            return Ok(paths);
-        }
+        candidates.push((runtime_idf, tools));
     }
 
     if let Ok((default_runtime_idf, default_runtime_tools)) = runtime_default_paths(app_handle) {
-        if let Ok(paths) = canonical_idf_pair(&default_runtime_idf, &default_runtime_tools) {
-            return Ok(paths);
-        }
+        candidates.push((default_runtime_idf, default_runtime_tools));
+    }
+
+    #[cfg(target_os = "macos")]
+    if let Some(home) = directories::BaseDirs::new() {
+        candidates.extend(environment::mac_candidates(home.home_dir()));
     }
 
     let resource_path = app_handle
@@ -305,20 +301,13 @@ pub(crate) fn resolve_idf_paths(app_handle: &AppHandle) -> Result<(PathBuf, Path
     let idf_path = resource_path.join("esp-idf");
     let tools_path = resource_path.join(".espressif");
 
-    if let Ok(paths) = canonical_idf_pair(&idf_path, &tools_path) {
-        Ok(paths)
-    } else {
+    candidates.push((idf_path, tools_path));
+    #[cfg(debug_assertions)] {
         let dev_idf = PathBuf::from("../resources/esp-idf");
         let dev_tools = PathBuf::from("../resources/.espressif");
-        if let Ok(paths) = canonical_idf_pair(&dev_idf, &dev_tools) {
-            Ok(paths)
-        } else {
-            Err(
-                "ESP-IDF not found. Run setup_esp_idf() on first launch to install platform-specific tools."
-                    .to_string(),
-            )
-        }
+        candidates.push((dev_idf, dev_tools));
     }
+    environment::choose(&candidates, std::env::consts::OS, std::env::consts::ARCH)
 }
 
 /// Find the Python binary and venv path inside the ESP-IDF virtual environment.
@@ -355,12 +344,71 @@ fn find_idf_python(tools_path: &Path) -> Result<(PathBuf, PathBuf), String> {
 }
 
 /// Read the ESP-IDF version from version.txt to avoid git lookups.
-fn read_idf_version(idf_path: &Path) -> String {
-    let version_file = idf_path.join("version.txt");
-    std::fs::read_to_string(&version_file)
-        .unwrap_or_default()
-        .trim()
-        .to_string()
+fn read_idf_version(idf_path: &Path) -> String { environment::version(idf_path) }
+
+pub(crate) fn installed_sdk_status(idf: &Path, tools: &Path) -> Result<serde_json::Value,String> {
+    let (idf,tools)=canonical_idf_pair(idf,tools)?;
+    let (python, venv) = environment::validate(&idf, &tools, std::env::consts::OS, std::env::consts::ARCH)?;
+    let version=read_idf_version(&idf);
+    Ok(serde_json::json!({"status":"ready","integrity":"existing_installation_not_reverified","version":if version.is_empty(){None}else{Some(version.trim_start_matches('v').to_owned())},"path":idf,"tools_path":tools,"python_bin":python,"python_venv":venv,"source":"configured-sdk","platform":std::env::consts::OS}))
+}
+
+/// Shared by readiness, the actual build and the packaged native build probe.
+/// An unrelated shell Python/venv must never override the selected SDK.
+fn sdk_command(idf: &Path, tools: &Path, args: &[String], cwd: &Path) -> Result<Command, String> {
+    let (python, venv) = environment::validate(idf, tools, std::env::consts::OS, std::env::consts::ARCH)?;
+    let mut paths = vec![venv_bin_dir(&venv)];
+    paths.extend(environment::exported_paths(idf, tools, std::env::consts::OS, std::env::consts::ARCH));
+    paths.extend(std::env::split_paths(&build_idf_path(tools)));
+    let mut command = Command::new(python);
+    command.arg(idf.join("tools/idf.py")).args(args).current_dir(cwd)
+        .env("IDF_PATH", idf).env("IDF_TOOLS_PATH", tools).env("IDF_PYTHON_ENV_PATH", &venv)
+        .env("VIRTUAL_ENV", venv).env("ESP_IDF_VERSION", read_idf_version(idf))
+        .env("PATH", std::env::join_paths(paths).map_err(|error| error.to_string())?)
+        .env("IDF_TARGET", "esp32").env("PYTHONUTF8", "1").env("PYTHONIOENCODING", "utf-8")
+        .env("PYTHONLEGACYWINDOWSSTDIO", "0").env_remove("PYTHONHOME").env_remove("PYTHONPATH");
+    if let Some(rom) = find_esp_rom_elf_dir(tools) { command.env("ESP_ROM_ELF_DIR", rom); }
+    Ok(command)
+}
+
+pub(crate) async fn checked_sdk_status(idf: PathBuf, tools: PathBuf) -> Result<serde_json::Value, String> {
+    tokio::task::spawn_blocking(move || {
+        let mut status = installed_sdk_status(&idf, &tools)?;
+        let command = sdk_command(&idf, &tools, &["--version".into()], &idf)?;
+        let result = crate::macos_sdk::execute(command, Arc::new(|_, _| {}), Arc::new(AtomicBool::new(false)), Duration::from_secs(20))?;
+        if !result.success {
+            return Err(format!("ESP-IDF Python environment cannot run on this machine. Open Setup / Repair ESP-IDF and repair its native dependencies.\n{}{}", result.stdout, result.stderr));
+        }
+        #[cfg(target_os = "macos")]
+        for tool in environment::native_tools(&idf, &tools, "macos", std::env::consts::ARCH)? {
+            let mut command = Command::new(&tool);
+            command.arg("--version").env("PATH", build_idf_path(&tools));
+            let result = crate::macos_sdk::execute(command, Arc::new(|_, _| {}), Arc::new(AtomicBool::new(false)), Duration::from_secs(10))?;
+            if !result.success { return Err(format!("Native SDK tool {} cannot run:\n{}{}", tool.display(),result.stdout,result.stderr)); }
+        }
+        status["python_execution_checked"] = serde_json::json!(true);
+        Ok(status)
+    }).await.map_err(|error| format!("SDK readiness worker failed: {error}"))?
+}
+
+pub(crate) fn sdk_build_self_check(idf: &Path, tools: &Path, scratch: &Path) -> Result<serde_json::Value, String> {
+    let (idf, tools) = canonical_idf_pair(idf, tools)?;
+    installed_sdk_status(&idf, &tools)?;
+    std::fs::create_dir(scratch).map_err(|error| format!("SDK build check requires a new scratch directory: {error}"))?;
+    let main = scratch.join("main");
+    std::fs::create_dir(&main).map_err(|error| error.to_string())?;
+    std::fs::write(scratch.join("CMakeLists.txt"), "cmake_minimum_required(VERSION 3.16)\ninclude($ENV{IDF_PATH}/tools/cmake/project.cmake)\nproject(macos_sdk_check)\n").map_err(|error| error.to_string())?;
+    std::fs::write(main.join("CMakeLists.txt"), "idf_component_register(SRCS \"main.c\" INCLUDE_DIRS \".\")\n").map_err(|error| error.to_string())?;
+    std::fs::write(main.join("main.c"), "#include <stdio.h>\nvoid app_main(void) { printf(\"vibeKidbright native ESP32 build check\\n\"); }\n").map_err(|error| error.to_string())?;
+    let command = sdk_command(&idf, &tools, &["build".into()], scratch)?;
+    let result = crate::macos_sdk::execute(command, Arc::new(|line, _| eprintln!("{line}")), Arc::new(AtomicBool::new(false)), Duration::from_secs(600))?;
+    if !result.success { return Err(format!("Native ESP32 build check failed:\n{}{}", result.stdout, result.stderr)); }
+    let firmware = scratch.join("build/macos_sdk_check.bin");
+    let size = std::fs::metadata(&firmware).map_err(|error| format!("No firmware was produced: {error}"))?.len();
+    if size == 0 { return Err("SDK produced empty firmware.".into()); }
+    Ok(serde_json::json!({"version":env!("CARGO_PKG_VERSION"),"platform":std::env::consts::OS,
+        "architecture":std::env::consts::ARCH,"sdk_version":read_idf_version(&idf),"target":"esp32",
+        "firmware_bytes":size,"native_sdk_build":true,"hardware_flashed":false}))
 }
 
 /// Scan an ESP-IDF tools directory and add all executable directories to `paths`.
@@ -483,6 +531,9 @@ fn build_idf_path(tools_path: &Path) -> OsString {
         }
     }
 
+    #[cfg(target_os = "macos")]
+    paths.extend([PathBuf::from("/opt/homebrew/bin"),PathBuf::from("/usr/local/bin"),PathBuf::from("/usr/bin"),PathBuf::from("/bin")]);
+
     // 4. System PATH (fallback)
     if let Some(system_path) = std::env::var_os("PATH") {
         paths.extend(std::env::split_paths(&system_path));
@@ -533,7 +584,9 @@ pub fn find_esp_rom_elf_dir(tools_path: &Path) -> Option<String> {
 
 #[tauri::command]
 pub async fn check_esp_idf(app_handle: AppHandle) -> Result<String, String> {
-    let (actual_idf_path, _) = resolve_idf_paths(&app_handle)?;
+    let (actual_idf_path, tools) = resolve_idf_paths(&app_handle)?;
+    #[cfg(target_os = "macos")]
+    checked_sdk_status(actual_idf_path.clone(), tools).await?;
     Ok(format!(
         "Ready: ESP-IDF found at {}",
         actual_idf_path.display()
@@ -567,6 +620,8 @@ pub async fn set_idf_custom_paths(idf_path: String, tools_path: String) -> Resul
         return Err(format!("Tools path does not exist: '{}'", tools_path));
     }
 
+    #[cfg(target_os = "macos")]
+    checked_sdk_status(idf,tools).await?;
     let mut config = read_esp_idf_config();
     if let serde_json::Value::Object(ref mut map) = config {
         map.insert("custom_idf_path".to_string(), serde_json::json!(idf_path));
@@ -594,11 +649,29 @@ pub async fn clear_idf_custom_paths() -> Result<(), String> {
 }
 
 #[tauri::command]
+pub async fn select_native_macos_sdk() -> Result<serde_json::Value,String> {
+    #[cfg(target_os="macos")] {
+        let home=directories::BaseDirs::new().ok_or("Cannot locate home directory")?;
+        let (idf,tools)=environment::choose(&environment::mac_candidates(home.home_dir()),"macos",std::env::consts::ARCH)?;
+        let status=checked_sdk_status(idf.clone(),tools.clone()).await?;
+        let mut config=read_esp_idf_config();
+        config["custom_idf_path"]=serde_json::json!(idf);
+        config["custom_tools_path"]=serde_json::json!(tools);
+        write_esp_idf_config(&config);
+        if read_esp_idf_config()!=config {return Err("Cannot save native SDK settings".into());}
+        Ok(status)
+    }
+    #[cfg(not(target_os="macos"))]
+    Err("Native macOS setup is only available on a Mac".into())
+}
+
+#[tauri::command]
 pub async fn setup_esp_idf(
     app_handle: AppHandle,
     version: Option<String>,
     targets: Option<Vec<String>>,
 ) -> Result<String, String> {
+    if cfg!(target_os = "macos") { return Err("Use the native macOS SDK setup and Check Native SDK; Windows toolchain archives cannot run on Mac.".into()); }
     let mut requested_version = version
         .unwrap_or_else(|| DEFAULT_ESP_IDF_VERSION.to_string())
         .trim()
@@ -737,8 +810,13 @@ pub async fn run_idf_command(
     args: Vec<String>,
 ) -> Result<String, String> {
     let (actual_idf_path, actual_tools_path) = resolve_idf_paths(&app_handle)?;
-    let (python_bin, python_env_path) = find_idf_python(&actual_tools_path)?;
-    let path_env = build_idf_path(&actual_tools_path);
+    let (python_bin, python_env_path) = if cfg!(target_os = "macos") {
+        environment::validate(&actual_idf_path,&actual_tools_path,"macos",std::env::consts::ARCH)?
+    } else { find_idf_python(&actual_tools_path)? };
+    let mut sdk_paths=vec![venv_bin_dir(&python_env_path)];
+    sdk_paths.extend(environment::exported_paths(&actual_idf_path,&actual_tools_path,std::env::consts::OS,std::env::consts::ARCH));
+    sdk_paths.extend(std::env::split_paths(&build_idf_path(&actual_tools_path)));
+    let path_env=std::env::join_paths(sdk_paths).map_err(|error|error.to_string())?;
     let idf_version = read_idf_version(&actual_idf_path);
 
     let mut cmd = Command::new(&python_bin);
@@ -748,6 +826,7 @@ pub async fn run_idf_command(
         .env("IDF_PATH", &actual_idf_path)
         .env("IDF_TOOLS_PATH", &actual_tools_path)
         .env("IDF_PYTHON_ENV_PATH", &python_env_path)
+        .env("VIRTUAL_ENV",&python_env_path).env_remove("PYTHONHOME").env_remove("PYTHONPATH")
         .env("ESP_IDF_VERSION", &idf_version)
         .env("PATH", &path_env)
         // Always set IDF_TARGET so cmake never has to guess from sdkconfig
@@ -1053,10 +1132,19 @@ pub async fn run_shell_command(
     cwd: Option<String>,
 ) -> Result<CommandOutcome, String> {
     let (actual_idf_path, actual_tools_path) = resolve_idf_paths(&app_handle)?;
-    let (python_bin, python_env_path) = find_idf_python(&actual_tools_path)?;
-    let path_env = build_idf_path(&actual_tools_path);
+    let (python_bin, python_env_path) = if cfg!(target_os = "macos") {
+        environment::validate(&actual_idf_path,&actual_tools_path,"macos",std::env::consts::ARCH)?
+    } else { find_idf_python(&actual_tools_path)? };
+    let mut sdk_paths=vec![venv_bin_dir(&python_env_path)];
+    sdk_paths.extend(environment::exported_paths(&actual_idf_path,&actual_tools_path,std::env::consts::OS,std::env::consts::ARCH));
+    sdk_paths.extend(std::env::split_paths(&build_idf_path(&actual_tools_path)));
+    let path_env=std::env::join_paths(sdk_paths).map_err(|error|error.to_string())?;
     let idf_version = read_idf_version(&actual_idf_path);
 
+    #[cfg(target_os = "macos")]
+    if cwd.as_deref().is_some_and(|path|path.chars().any(char::is_whitespace)) {
+        return Err("ESP-IDF requires project paths without spaces on macOS.".into());
+    }
     // ── Auto-clean stale build directory ────────────────────────────────
     // When a project is opened on a different machine or after a partial build,
     // the build/ directory may contain a CMakeCache.txt with paths that don't
@@ -1111,6 +1199,7 @@ pub async fn run_shell_command(
         .env("IDF_PATH", &actual_idf_path)
         .env("IDF_TOOLS_PATH", &actual_tools_path)
         .env("IDF_PYTHON_ENV_PATH", &python_env_path)
+        .env("VIRTUAL_ENV",&python_env_path).env_remove("PYTHONHOME").env_remove("PYTHONPATH")
         .env("ESP_IDF_VERSION", &idf_version)
         .env("PATH", &path_env)
         // Always set IDF_TARGET so cmake never has to guess from sdkconfig
@@ -1282,6 +1371,7 @@ pub async fn list_serial_ports() -> Result<Vec<String>, String> {
         .map_err(|e| format!("Failed to list serial ports: {}", e))?
         .into_iter()
         .map(|p| p.port_name)
+        .filter(|port| !cfg!(target_os="macos") || (port.starts_with("/dev/cu.") && !port.contains("debug-console") && !port.contains("Bluetooth-Incoming-Port")))
         .collect();
     Ok(ports)
 }

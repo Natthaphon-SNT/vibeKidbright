@@ -1,3 +1,4 @@
+import MacosSdkSetup, { isMacOS } from "./MacosSdkSetup";
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
@@ -495,6 +496,7 @@ function App({
       addLog(`✅ ${result}`);
       setShowSetupModal(false);
       await checkEnvironment();
+      onRefreshToolchain?.();
     } catch (err) {
       setSetupModalError(String(err));
       addLog(`❌ Path validation failed: ${err}`);
@@ -522,6 +524,9 @@ function App({
 
   // --- 🛠 COMMAND WRAPPER HACK FOR WINDOWS 🛠 ---
   const runIdfWrappedCommand = async (baseCmd: string, args: string[], cwd: string | null) => {
+    // The native backend prepares Python/PATH directly on macOS. Never run
+    // the Windows export.bat/cmd.exe wrapper after selecting a Mac SDK.
+    if (isMacOS()) return await invoke("run_shell_command", { cmd: baseCmd, args, cwd });
     let idfPathToUse = customIdfPath;
     
     if (!idfPathToUse) {
@@ -2212,7 +2217,7 @@ function App({
             </div>
 
             {/* Tab: Auto Install */}
-            <div className="bg-neutral-900/60 border border-neutral-700 rounded-lg p-4 mb-5">
+            {isMacOS() ? <MacosSdkSetup onRecheck={async()=>{await checkEnvironment();onRefreshToolchain?.();}} /> : <div className="bg-neutral-900/60 border border-neutral-700 rounded-lg p-4 mb-5">
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-red-400 text-sm font-bold">⬇ Auto Install</span>
                 <span className="text-[10px] text-neutral-500 bg-neutral-700 px-1.5 py-0.5 rounded">GitHub Release (~2.28 GB)</span>
@@ -2227,7 +2232,7 @@ function App({
               >
                 {isSettingUpEspIdf ? "⏳ Downloading from GitHub..." : "⬇️ Start Auto Install (GitHub)"}
               </button>
-            </div>
+            </div>}
 
             <button
               onClick={() => setShowSetupModal(false)}

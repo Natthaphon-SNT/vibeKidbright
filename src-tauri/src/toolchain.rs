@@ -164,6 +164,14 @@ fn is_toolchain_ready(toolchain_dir: &Path) -> bool {
 /// Returns: "ready" | "not_installed" | { version, path }
 #[tauri::command]
 pub async fn check_toolchain(app_handle: AppHandle) -> Result<serde_json::Value, String> {
+    #[cfg(target_os="macos")] {
+        crate::esp_idf::invalidate_idf_environment();
+        let result=match crate::esp_idf::resolve_idf_paths(&app_handle) {
+            Ok((idf,tools))=>crate::esp_idf::checked_sdk_status(idf,tools).await,
+            Err(error)=>Err(error),
+        };
+        return Ok(match result {Ok(status)=>status,Err(error)=>serde_json::json!({"status":"not_installed","version":null,"path":null,"platform":"macos","error":error})});
+    }
     let dir = get_toolchain_dir(&app_handle)?;
     crate::esp_idf::invalidate_idf_environment();
     auto_repair_on_startup(&dir);
@@ -198,6 +206,7 @@ pub async fn download_toolchain(
     url: Option<String>,
 ) -> Result<String, String> {
     let _install_guard = try_acquire_install(install_flag())?;
+    if cfg!(target_os="macos") {return Err("Use native macOS setup. Windows toolchain ZIPs cannot run on this Mac.".into());}
 
     // ถ้ามี custom URL ให้ใช้เป็น single-entry มิฉะนั้นใช้ค่าเริ่มต้น (GitHub Release)
     let parts: Vec<(String, String)> = url
@@ -1078,6 +1087,7 @@ fn find_python_in_dir(dir: &Path, depth: u32, max_depth: u32) -> Option<PathBuf>
 /// reflect the current machine's toolchain install location.
 /// Safe to call even if toolchain is not installed (no-op).
 pub fn auto_repair_on_startup(toolchain_dir: &Path) {
+    if cfg!(target_os="macos") {return;}
     if !toolchain_dir.join(SENTINEL_FILE).exists() {
         return;
     }

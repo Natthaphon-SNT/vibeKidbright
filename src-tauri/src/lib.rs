@@ -1,4 +1,5 @@
 mod esp_idf;
+pub mod macos_sdk;
 mod ai_chat;
 mod toolchain;
 mod kb_store;   // SQLite vector store for RAG
@@ -63,6 +64,7 @@ pub fn run() {
             esp_idf::get_idf_custom_paths,
             esp_idf::set_idf_custom_paths,
             esp_idf::clear_idf_custom_paths,
+            esp_idf::select_native_macos_sdk,
             ai::config::get_api_key,
             ai::config::set_api_key,
             ai::config::get_model,

@@ -9,6 +9,8 @@
 import { useEffect, useRef, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
+import { isMacOS } from "./MacosSdkSetup";
+import MacosToolchainSetup from "./MacosToolchainSetup";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -45,6 +47,7 @@ export default function ToolchainSetup({
   isInstalling,
   onInstallingChange,
 }: Props) {
+  if (isMacOS()) return <MacosToolchainSetup onReady={onReady} />;
   const [checkDone, setCheckDone] = useState(false);
   const [localIsDownloading, setLocalIsDownloading] = useState(false);
   const isDownloading = isInstalling ?? localIsDownloading;

@@ -40,5 +40,7 @@ similar = "2"               # Myers diff algorithm สำหรับ diff_file 
 fastembed = "4"             # Local ONNX embedding (all-MiniLM-L6-v2 — offline, no API key needed)
 rusqlite = { version = "0.32", features = ["bundled"] }  # SQLite with bundled libsqlite3
 
+tempfile = "3"
+
 [dev-dependencies]
 tempfile = "3"              # Temporary directories for unit tests (kb_store tests)
