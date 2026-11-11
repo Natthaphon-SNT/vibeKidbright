@@ -148,6 +148,37 @@ fn malformed_registry_does_not_hide_standard_native_installation() {
 }
 
 #[test]
+fn clean_install_resolves_against_each_users_home_and_precedes_old_sdk() {
+    let temporary = tempfile::tempdir().unwrap();
+    for name in ["first-user", "second-user"] {
+        let home = temporary.path().join(name);
+        let root = home.join(".vibekidbright/macos-sdk");
+        let pair = native_sdk(&root.join("install-clean123"), "aarch64");
+        std::fs::write(root.join("current.json"), r#"{"directory":"install-clean123"}"#).unwrap();
+        let (old_idf, old_tools) = native_sdk(&home, "aarch64");
+        std::fs::write(old_tools.join("idf-env.json"), serde_json::to_vec(&serde_json::json!({
+            "idfInstalled":{"old":{"path":old_idf}}
+        })).unwrap()).unwrap();
+        let selected = choose(&mac_candidates(&home), "macos", "aarch64").unwrap();
+        assert_eq!(selected.0, dunce::canonicalize(pair.0).unwrap());
+        assert_eq!(selected.1, dunce::canonicalize(pair.1).unwrap());
+        assert!(selected.0.starts_with(dunce::canonicalize(home).unwrap()));
+    }
+}
+
+#[test]
+fn copied_or_traversing_clean_install_pointer_cannot_select_another_home() {
+    let temporary = tempfile::tempdir().unwrap();
+    let home = temporary.path();
+    let root = home.join(".vibekidbright/macos-sdk");
+    std::fs::create_dir_all(&root).unwrap();
+    for directory in ["/Users/other/.vibekidbright/macos-sdk/install-old", "install-../../other", "../install-old"] {
+        std::fs::write(root.join("current.json"), serde_json::to_vec(&serde_json::json!({"directory":directory})).unwrap()).unwrap();
+        assert!(!mac_candidates(home).iter().any(|(idf,_)| idf.starts_with(&root)));
+    }
+}
+
+#[test]
 fn mac_cmake_app_bundle_uses_espressif_platform_export_paths() {
     let temporary = tempfile::tempdir().unwrap();
     let (idf, tools) = native_sdk(temporary.path(), "aarch64");

@@ -16,9 +16,9 @@ args=parser.parse_args()
 args.report.parent.mkdir(parents=True,exist_ok=True)
 record={'version':'3.7.1','architecture':args.architecture,'status':'failed','hardware_flashed':False}
 try:
-    image=(args.installer/'VibeKidbright-IDE_3.7.1_macos-repair_universal.dmg').resolve()
+    image=(args.installer/'VibeKidbright-IDE_3.7.1_macos-clean_universal.dmg').resolve()
     with image.open('rb') as stream:digest=hashlib.file_digest(stream,'sha256').hexdigest()
-    assert f'{digest}  {image.name}' in (args.installer/'SHA256SUMS-macos-3.7.1-repair.txt').read_text().splitlines()
+    assert f'{digest}  {image.name}' in (args.installer/'SHA256SUMS-macos-3.7.1-clean.txt').read_text().splitlines()
     with tempfile.TemporaryDirectory(prefix='vibekidbright-371-repair-') as temporary:
         scratch=Path(temporary).resolve()
         mount=scratch/'mount';mount.mkdir()
@@ -43,8 +43,14 @@ try:
         env['PATH']='/usr/bin:/bin:/usr/sbin:/sbin'
         sdk_report=scratch/'sdk-report.json'
         home=Path.home()
+        sdk_root=home/'.vibekidbright/macos-sdk'
+        current=json.loads((sdk_root/'current.json').read_text())
+        generation=current['directory']
+        assert generation.startswith('install-') and all(c.isascii() and (c.isalnum() or c=='-') for c in generation)
+        active=sdk_root/generation
+        assert not (active/'old-install-marker').exists()
         with args.report.with_suffix('.sdk.log').open('w') as log:
-            result=subprocess.run([str(binary),'--sdk-self-check',str(sdk_report),str(scratch/'esp32-build'),str(home/'esp/esp-idf-v5.5.1'),str(home/'.vibekidbright/.espressif')],cwd=working,env=env,stdout=log,stderr=log,timeout=660)
+            result=subprocess.run([str(binary),'--sdk-self-check',str(sdk_report),str(scratch/'esp32-build'),str(active/'esp-idf'),str(active/'.espressif')],cwd=working,env=env,stdout=log,stderr=log,timeout=660)
         sdk=json.loads(sdk_report.read_text()) if sdk_report.is_file() else {}
         expected='aarch64' if args.architecture=='arm64' else 'x86_64'
         assert result.returncode==0 and sdk.get('native_sdk_build') and sdk.get('architecture')==expected, 'Native firmware build failed: '+json.dumps(sdk)

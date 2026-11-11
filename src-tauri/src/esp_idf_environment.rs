@@ -263,6 +263,20 @@ pub(super) fn exported_paths(idf: &Path, tools: &Path, os: &str, arch: &str) -> 
 #[cfg(any(target_os = "macos", test))]
 pub(super) fn mac_candidates(home: &Path) -> Vec<(PathBuf, PathBuf)> {
     let mut candidates = Vec::new();
+    // Clean installs publish a relative generation only after Python can run.
+    // Never reuse an absolute home directory copied from a different machine.
+    let root = home.join(".vibekidbright/macos-sdk");
+    if let Ok(bytes) = std::fs::read(root.join("current.json")) {
+        if let Ok(record) = serde_json::from_slice::<serde_json::Value>(&bytes) {
+            if let Some(directory) = record["directory"].as_str().filter(|name| {
+                name.starts_with("install-") && name.len() > 8
+                    && name.bytes().all(|c| c.is_ascii_alphanumeric() || c == b'-')
+            }) {
+                let install = root.join(directory);
+                candidates.push((install.join("esp-idf"), install.join(".espressif")));
+            }
+        }
+    }
     // idf-env.json is written by Espressif's own installer. Finder launches do
     // not inherit the IDF_PATH or PATH exported in an interactive shell.
     for tools in [
