@@ -2,9 +2,11 @@
 
 เอกสารนี้อ้างอิงซอร์สผู้ผลิต `inexglobal/pxt-iKB1z` สาขา `main` ที่อ่านวันที่ 2026-10-16 ไม่ใช่การรับรองฮาร์ดแวร์ทุก revision หรือ implementation ESP-IDF C ที่ผ่าน build แล้ว
 
+อัปเดต 2026-10-28: สำหรับ **iKB-1Z ที่ใช้เสริม KidBright หรือ MAI Plus** อ่าน [ikb_1z.md](ikb_1z.md), [ไดรเวอร์และ adapter ตาม host](drivers/README.md) และ [คู่มือต้นฉบับที่ผู้ใช้ส่ง](IKB1Z_BOARD_RULES.md) ร่วมด้วย ยังไม่มีผลทดสอบกับบอร์ดจริง ข้อขัดแย้ง UART, servo free และ motor backward=0 ในสูตร MakeCode ถูกแยกไว้ชัด ไม่ใช้ชื่อ iKB-1 รุ่นเดิมแทน iKB-1Z
+
 - **iKB-1Z:** ยืนยัน revision และสถานะ jumper ก่อนใช้ค่าด้านล่าง
 - **iKB-1 รุ่นเดิม:** แม้ README ผู้ผลิตระบุทั้งสองชื่อ ต้องตรวจคู่มือ/firmware ของบอร์ดจริงก่อนนำ address และคำสั่งไปใช้ ห้ามสมมติว่าเหมือนทุก revision
-- ไม่มี deterministic recipe, C adapter หรือผลทดสอบกับบอร์ดจริงในโปรเจกต์นี้สำหรับ iKB
+- iKB-1Z มี [C/Python driver และ host adapters](drivers/README.md) เพิ่มวันที่ 2026-10-28; ยังไม่มี deterministic behavior recipe หรือผลทดสอบกับบอร์ดจริง และไม่ได้เปิด protocol นี้ให้ iKB-1 รุ่นเดิมอัตโนมัติ
 - ตาราง MCP23017 และ address `0x20` ในเอกสารรุ่นก่อนถูกถอนแล้ว ไม่ใช่ protocol ของแหล่งอ้างอิงที่ตรวจพบนี้
 
 ## แหล่งอ้างอิงผู้ผลิต

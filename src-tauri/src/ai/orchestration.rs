@@ -51,8 +51,8 @@ pub(crate) fn classify(request: &str) -> Task {
 pub(crate) fn context(messages: &[ChatMessage]) -> String {
     let task = classify(&super::language::latest_request_text(messages));
     let strategy=match task {
-        Task::Hardware | Task::BlockConversion => "Use kidbright_reference first. Unsupported hardware/block mappings stay unsupported; do not invent a conversion.",
-        Task::Explanation | Task::Modification | Task::Diagnostics => "Use scoped read_file/search_in_files and related CMake files only as needed. Do not index or send the entire project.",
+        Task::Hardware | Task::BlockConversion => "For classic ESP32 use kidbright_reference; for Plus read kidbright_uai_plus_python.md and its test contracts. C block conversion does not apply to Plus. For iKB-1Z read ikb_1z.md and drivers/README.md while retaining the host. Unsupported hardware/block mappings stay unsupported; do not invent a conversion.",
+        Task::Explanation | Task::Modification | Task::Diagnostics => "Use scoped read_file/search_in_files and target-specific configuration only as needed. Do not index or send the entire project.",
         Task::CompilerError => "Separate source diagnostics from SDK/environment failures. Retrieve the exact API/header and confirmed SDK version before proposing a focused diff. No automatic retry loop is enabled.",
         Task::Generation | Task::Documentation => "Use knowledge_search for source-grounded references. Accept a stated board model; ask only for task-relevant missing hardware. A custom reviewed draft may target the bundled SDK reference when installed SDK context is unavailable; do not require private sharing just to generate code or claim an uninspected SDK/build.",
     };

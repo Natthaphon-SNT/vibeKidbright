@@ -1,0 +1,61 @@
+{
+  "release_id": 420779718,
+  "tag": "v3.7.1",
+  "commit": "402116994f1fdc6eae40572c099772ce137186fd",
+  "url": "https://github.com/Natthaphon-SNT/vibeKidbright/releases/tag/v3.7.1",
+  "draft": false,
+  "published_at": "2026-10-22T13:47:25Z",
+  "assets": [
+    {
+      "id": 666007750,
+      "name": "VibeKidbright.IDE_3.7.1_x64-setup.exe",
+      "size": 13065501,
+      "digest": "sha256:25cb981f55e70ed208d3b849fd2a0e6b5fe9c22df54f989b09f31b9714cba96b",
+      "url": "https://github.com/Natthaphon-SNT/vibeKidbright/releases/download/v3.7.1/VibeKidbright.IDE_3.7.1_x64-setup.exe"
+    },
+    {
+      "id": 666007927,
+      "name": "vibeKidbright-3.7.1-source.zip",
+      "size": 3660581,
+      "digest": "sha256:179cdbbec6c55bdbb8ef61a9fad2cb31483ac5aae957b2210a939d013ec279c1",
+      "url": "https://github.com/Natthaphon-SNT/vibeKidbright/releases/download/v3.7.1/vibeKidbright-3.7.1-source.zip"
+    },
+    {
+      "id": 666008000,
+      "name": "build-verification.json",
+      "size": 1767,
+      "digest": "sha256:9b591f0191030d1c611be72e4b1e486ea9bea604c0100cce9f43a6f0291a4fce",
+      "url": "https://github.com/Natthaphon-SNT/vibeKidbright/releases/download/v3.7.1/build-verification.json"
+    },
+    {
+      "id": 666008039,
+      "name": "SHA256SUMS.txt",
+      "size": 294,
+      "digest": "sha256:97c64d825d37afcdb9c031ddecde251c5e36aedc45b6416905585cfffbd1871a",
+      "url": "https://github.com/Natthaphon-SNT/vibeKidbright/releases/download/v3.7.1/SHA256SUMS.txt"
+    }
+  ],
+  "anonymous_installer_download": {
+    "http_status": 200,
+    "bytes": 13065501,
+    "sha256": "25cb981f55e70ed208d3b849fd2a0e6b5fe9c22df54f989b09f31b9714cba96b",
+    "matches": true
+  },
+  "remote_verification": {
+    "/releases/latest": "v3.7.1",
+    "/git/ref/tags/v3.7.1": "402116994f1fdc6eae40572c099772ce137186fd",
+    "/branches/main": "7d0157a71e380655e8d610dae74d32ef2c97d562"
+  },
+  "make_latest_requested": false,
+  "observed_latest_tag": "v3.7.1",
+  "scope": "Classic KidBright only; excludes muAI/Plus as explicitly confirmed by user",
+  "local_main_version": "3.7.4",
+  "local_main_commit": "7d0157a71e380655e8d610dae74d32ef2c97d562",
+  "remote_main_matches_local_head": true,
+  "frontend_tests": 93,
+  "rust_library_tests": 59,
+  "installer_authenticode": "NotSigned",
+  "installer_executed": false,
+  "real_sdk_installed": false,
+  "physical_board_tested": false
+}

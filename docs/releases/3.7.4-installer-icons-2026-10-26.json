@@ -1,0 +1,91 @@
+{
+  "date": "2026-10-26",
+  "version": "3.7.4",
+  "source_icon": {
+    "path": "src-tauri/icons/icon.ico",
+    "sha256": "40046e2d8658eefa643fb3b2d4cca465427ca0cf5ca6fa43dde912d2e40e6a39",
+    "frames": [
+      {
+        "width": 32,
+        "height": 32,
+        "bits": 32,
+        "sha256": "5139fad32336b9bdbc57991df80d379ec8e6493c74d2badee5c33a2f61ff998d"
+      },
+      {
+        "width": 16,
+        "height": 16,
+        "bits": 32,
+        "sha256": "64e316864d86e954766f801b3000741c46e4e98c2fe1e4928cc7160bb88a0745"
+      },
+      {
+        "width": 24,
+        "height": 24,
+        "bits": 32,
+        "sha256": "0670f31b17b7070c2cbdc2933aefb9543c551742c4211329329de4502d407377"
+      },
+      {
+        "width": 48,
+        "height": 48,
+        "bits": 32,
+        "sha256": "769a94f2a2e9338d6faa1323949dcec1046b7c86de4feb3fd42a3498cbb3c3db"
+      },
+      {
+        "width": 64,
+        "height": 64,
+        "bits": 32,
+        "sha256": "1ed2068e2af06e300148b3be69260e99f0a8b80256b82c5d105f79333e449971"
+      },
+      {
+        "width": 256,
+        "height": 256,
+        "bits": 32,
+        "sha256": "519be4bf132581d6ca6614bdacbb67d9644dd2cf388d6839dba01da1a4c18143"
+      }
+    ]
+  },
+  "checks": {
+    "ui_icon_matches_bundled_128px": true,
+    "nsis_installer_and_uninstaller_share_icon": true,
+    "msi_icon_table_matches_source_exactly": true,
+    "generated_nsis_uninstaller_icon_verified": true
+  },
+  "msi_product_icon": "ProductIcon",
+  "artifacts": [
+    {
+      "path": "src-tauri/target/release/bundle/nsis/VibeKidbright IDE_3.7.4_x64-setup.exe",
+      "bytes": 317901938,
+      "sha256": "b9dee13b68e5f2e96ce79a09038115b5373de08438a62a5fc53cf570752ca136",
+      "all_icon_groups_match_source": true,
+      "icon_groups": [
+        {
+          "id": 103,
+          "language": 1033,
+          "frame_count": 6
+        }
+      ]
+    },
+    {
+      "path": "src-tauri/target/release/vibe-kidbright.exe",
+      "bytes": 48308736,
+      "sha256": "4eb790d7eb75be185fcd3e41e8581b1cd23cb385b4d7dab949d44a5804ac181a",
+      "all_icon_groups_match_source": true,
+      "icon_groups": [
+        {
+          "id": 32512,
+          "language": 1033,
+          "frame_count": 6
+        }
+      ]
+    },
+    {
+      "path": "src-tauri/target/release/bundle/msi/VibeKidbright IDE_3.7.4_x64_en-US.msi",
+      "bytes": 325656576,
+      "sha256": "03e30ab2b0eb1aae7edb182500a0041017841bd8f6e0655c93b2b3246ffba76c"
+    }
+  ],
+  "limitations": [
+    "MSI shell file icons follow the Windows Installer file association; the embedded ProductIcon applies to installed product branding and shortcuts.",
+    "No installation, upgrade or uninstall was executed for this icon verification.",
+    "Local build only; no release was published."
+  ]
+}

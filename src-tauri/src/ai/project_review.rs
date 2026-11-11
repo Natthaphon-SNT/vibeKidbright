@@ -439,7 +439,7 @@ pub(crate) fn undo_ai_project(app_handle:AppHandle,project_path:String,expected_
     let previous=next.undo(&root)?;
     crate::ai::change_journal::with(|journal|journal.retire_project(&resolved))?;
     persist(&next)?;*store=next;drop(store);
-    let _=app_handle.emit("force-project-dir",previous.map(|p|p.to_string_lossy().into_owned()).unwrap_or_else(||".".into()));
+    let _=app_handle.emit("force-project-dir",json!({"projectPath":previous.map(|p|p.to_string_lossy().into_owned()).unwrap_or_else(||".".into()),"sourceProjectPath":project_path,"action":"undo"}).to_string());
     let _=app_handle.emit("ai-project-review-resolved",json!({"projectPath":project_path,"action":"undo"}).to_string());
     Ok("Project moved to a recorded recovery directory; previous workspace restored.".into())
 }

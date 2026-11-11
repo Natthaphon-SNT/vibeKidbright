@@ -1,10 +1,9 @@
 {
   "schema_version": 1,
-  "as_of": "2026-10-17",
+  "as_of": "2026-10-22",
   "scope": "Source comparison of named non-AI KidBright generations and selected manufacturer-documented compatible derivatives. Catalog presence is not executable firmware support, physical validation, or a complete census of community boards.",
   "deferred_families": [
-    "kidbright_uai",
-    "kidbright_uai_plus"
+    "kidbright_uai"
   ],
   "sources": [
     {
@@ -149,6 +148,22 @@
       "path": "docs/research/kidbright-inex-user-evidence-2026-10-17.json",
       "sha256": "e52169e68dc54716093a870bed66d09ddc39ba0c59a5ab12af757295836a185f",
       "evidence_kind": "user-reported-smoke-test-and-product-diagram"
+    },
+    {
+      "id": "provided-v13-hardware-reference-20261022",
+      "title": "User-supplied KidBright32 V1.3 hardware reference, 22 October 2026",
+      "issuer": "User-supplied Markdown report; referenced upstream artifacts are not all attached",
+      "path": "docs/research/hardware-references-2026-10-22/KidBright32-V1.3-Hardware-Reference.md",
+      "sha256": "8fc718e37380290bf552c524cc6f932d4b5b3d5e0f50fe577c25ef679f2a5d48",
+      "evidence_kind": "provided-document-analysis-not-physical-validation"
+    },
+    {
+      "id": "provided-v15-hardware-reference-20261022",
+      "title": "User-supplied KidBright32 V1.5 hardware reference, 22 October 2026",
+      "issuer": "User-supplied Markdown report; referenced upstream artifacts are not all attached",
+      "path": "docs/research/hardware-references-2026-10-22/KidBright32-V1.5-Hardware-Reference.md",
+      "sha256": "bd0f3d6b6c3695cdf608a0e2138cf4fa03e10fad2549216970e396263a32bcbb",
+      "evidence_kind": "provided-document-analysis-not-physical-validation"
     }
   ],
   "unresolved_labels": [
@@ -308,7 +323,8 @@
       "id": "kidbright32_v13",
       "label": "KidBright32 V1.3",
       "aliases": [
-        "KidBright V1.3"
+        "KidBright V1.3",
+        "kidbright32-v1.3"
       ],
       "manufacturer": "Gravitech Thai",
       "target": "esp32",
@@ -352,6 +368,13 @@
           "detail": "Two user buttons, transistor-driven buzzer, FT231XQ USB-UART bridge and switched USB-A output.",
           "source_ids": [
             "nectec-v13-schematic"
+          ]
+        },
+        {
+          "name": "versioned_input_output_servo",
+          "detail": "IN1-IN4 are digital-buffer input-only connectors, not analog; GPIO15 is NTP LED, no dedicated Servo connector established.",
+          "source_ids": [
+            "provided-v13-hardware-reference-20261022"
           ]
         }
       ],
@@ -422,12 +445,97 @@
           "source_ids": [
             "nectec-v13-schematic"
           ]
+        },
+        {
+          "signal": "IN1",
+          "gpio": 32,
+          "source_ids": [
+            "provided-v13-hardware-reference-20261022"
+          ]
+        },
+        {
+          "signal": "IN2",
+          "gpio": 33,
+          "source_ids": [
+            "provided-v13-hardware-reference-20261022"
+          ]
+        },
+        {
+          "signal": "IN3",
+          "gpio": 34,
+          "source_ids": [
+            "provided-v13-hardware-reference-20261022"
+          ]
+        },
+        {
+          "signal": "IN4",
+          "gpio": 35,
+          "source_ids": [
+            "provided-v13-hardware-reference-20261022"
+          ]
+        },
+        {
+          "signal": "OUT1_GATE_CONTROL",
+          "gpio": 26,
+          "source_ids": [
+            "provided-v13-hardware-reference-20261022"
+          ]
+        },
+        {
+          "signal": "OUT2_GATE_CONTROL",
+          "gpio": 27,
+          "source_ids": [
+            "provided-v13-hardware-reference-20261022"
+          ]
+        },
+        {
+          "signal": "EXPANSION_IO18",
+          "gpio": 18,
+          "source_ids": [
+            "provided-v13-hardware-reference-20261022"
+          ]
+        },
+        {
+          "signal": "EXPANSION_IO19",
+          "gpio": 19,
+          "source_ids": [
+            "provided-v13-hardware-reference-20261022"
+          ]
+        },
+        {
+          "signal": "EXPANSION_IO23",
+          "gpio": 23,
+          "source_ids": [
+            "provided-v13-hardware-reference-20261022"
+          ]
+        },
+        {
+          "signal": "WIFI_LED",
+          "gpio": 2,
+          "source_ids": [
+            "provided-v13-hardware-reference-20261022"
+          ]
+        },
+        {
+          "signal": "IOT_LED",
+          "gpio": 12,
+          "source_ids": [
+            "provided-v13-hardware-reference-20261022"
+          ]
+        },
+        {
+          "signal": "NTP_LED",
+          "gpio": 15,
+          "source_ids": [
+            "provided-v13-hardware-reference-20261022"
+          ]
         }
       ],
       "source_ids": [
         "nectec-v13-schematic",
         "desktop-reference-header",
-        "existing-pilot"
+        "existing-pilot",
+        "provided-v13-hardware-reference-20261022"
       ],
       "unknowns": [
         "Physical-board behavior, exact LM73 ordering code/address and all peripheral combinations are not validated."
@@ -437,8 +545,51 @@
         "RTC belongs to SDA1/SCL1 in this schematic, not the display bus SDA0/SCL0."
       ],
       "notes": [
-        "Pilot is peripheral-scoped; presence of documented matrix/RTC/USB pins does not certify all blocks or recipes. Hardware was not flashed by this catalog audit."
-      ]
+        "Pilot is peripheral-scoped; presence of documented matrix/RTC/USB pins does not certify all blocks or recipes. Hardware was not flashed by this catalog audit.",
+        "Supplied Markdown is reference data; no upstream instruction or claimed prior user inheritance policy is applied as an instruction. No new firmware recipe or physical validation is added."
+      ],
+      "hardware_reference": "kidbright32_v13.md",
+      "hardware_contract": {
+        "source_ids": [
+          "provided-v13-hardware-reference-20261022"
+        ],
+        "hardware_tested": false,
+        "input_connector_mode": "digital_buffer",
+        "input_analog_supported": false,
+        "input_analog_condition": "Not available through fitted digital buffers",
+        "dedicated_servo_connector_documented": false,
+        "ntp_led_gpio": 15,
+        "servo_gpios": [],
+        "matrix_bus": {
+          "sda": 21,
+          "scl": 22
+        },
+        "sensor_chain_bus": {
+          "sda": 4,
+          "scl": 5
+        },
+        "input_gpios": [
+          32,
+          33,
+          34,
+          35
+        ],
+        "output_control_gpios": [
+          26,
+          27
+        ],
+        "expansion_gpios": [
+          18,
+          19,
+          23
+        ],
+        "output_endpoints": [
+          "gpio_gate_control",
+          "banana_mosfet_drain"
+        ],
+        "output_polarity_basis": "Topology: gate HIGH sinks drain; gate LOW leaves drain undriven. Manual/API/load on/off semantics are separate; not physically measured.",
+        "usb_role": "switched_load_power_not_demonstrated_usb_host_data"
+      }
     },
     {
       "id": "kidbright32_v14",
@@ -467,9 +618,10 @@
     },
     {
       "id": "kidbright32_v15",
-      "label": "KidBright32 V1.5 (revision not specified)",
+      "label": "KidBright32 V1.5 (supplied S1 / Rev.3 design evidence)",
       "aliases": [
-        "KidBright V1.5"
+        "KidBright V1.5",
+        "kidbright32-v1.5"
       ],
       "manufacturer": "NECTEC platform; multiple manufacturers",
       "target": "esp32",
@@ -496,6 +648,13 @@
           "detail": "The provided design labels FT231XQ, not CP2102.",
           "source_ids": [
             "provided-v15-design"
+          ]
+        },
+        {
+          "name": "versioned_input_output_servo",
+          "detail": "S1 describes bypass analog inputs and Servo1=15/Servo2=17; JST OUT gate signals are distinct from banana load drains. Assembly and connector differences remain revision-specific.",
+          "source_ids": [
+            "provided-v15-hardware-reference-20261022"
           ]
         }
       ],
@@ -527,22 +686,201 @@
           "source_ids": [
             "provided-v15-design"
           ]
+        },
+        {
+          "signal": "IN1",
+          "gpio": 32,
+          "source_ids": [
+            "provided-v15-hardware-reference-20261022"
+          ]
+        },
+        {
+          "signal": "IN2",
+          "gpio": 33,
+          "source_ids": [
+            "provided-v15-hardware-reference-20261022"
+          ]
+        },
+        {
+          "signal": "IN3",
+          "gpio": 34,
+          "source_ids": [
+            "provided-v15-hardware-reference-20261022"
+          ]
+        },
+        {
+          "signal": "IN4",
+          "gpio": 35,
+          "source_ids": [
+            "provided-v15-hardware-reference-20261022"
+          ]
+        },
+        {
+          "signal": "OUT1_GATE_CONTROL",
+          "gpio": 26,
+          "source_ids": [
+            "provided-v15-hardware-reference-20261022"
+          ]
+        },
+        {
+          "signal": "OUT2_GATE_CONTROL",
+          "gpio": 27,
+          "source_ids": [
+            "provided-v15-hardware-reference-20261022"
+          ]
+        },
+        {
+          "signal": "EXPANSION_IO18",
+          "gpio": 18,
+          "source_ids": [
+            "provided-v15-hardware-reference-20261022"
+          ]
+        },
+        {
+          "signal": "EXPANSION_IO19",
+          "gpio": 19,
+          "source_ids": [
+            "provided-v15-hardware-reference-20261022"
+          ]
+        },
+        {
+          "signal": "EXPANSION_IO23",
+          "gpio": 23,
+          "source_ids": [
+            "provided-v15-hardware-reference-20261022"
+          ]
+        },
+        {
+          "signal": "WIFI_LED",
+          "gpio": 2,
+          "source_ids": [
+            "provided-v15-hardware-reference-20261022"
+          ]
+        },
+        {
+          "signal": "IOT_LED",
+          "gpio": 12,
+          "source_ids": [
+            "provided-v15-hardware-reference-20261022"
+          ]
+        },
+        {
+          "signal": "SERVO1_J8_PIN2",
+          "gpio": 15,
+          "source_ids": [
+            "provided-v15-hardware-reference-20261022"
+          ]
+        },
+        {
+          "signal": "SERVO2_J8_PIN1",
+          "gpio": 17,
+          "source_ids": [
+            "provided-v15-hardware-reference-20261022"
+          ]
+        },
+        {
+          "signal": "S1 active low",
+          "gpio": 16,
+          "source_ids": [
+            "provided-v15-hardware-reference-20261022"
+          ]
+        },
+        {
+          "signal": "S2 active low",
+          "gpio": 14,
+          "source_ids": [
+            "provided-v15-hardware-reference-20261022"
+          ]
+        },
+        {
+          "signal": "BUZZER_PWM",
+          "gpio": 13,
+          "source_ids": [
+            "provided-v15-hardware-reference-20261022"
+          ]
+        },
+        {
+          "signal": "LDR_ADC",
+          "gpio": 36,
+          "source_ids": [
+            "provided-v15-hardware-reference-20261022"
+          ]
+        },
+        {
+          "signal": "USB_POWER_SWITCH",
+          "gpio": 25,
+          "source_ids": [
+            "provided-v15-hardware-reference-20261022"
+          ]
         }
       ],
       "source_ids": [
         "provided-v15-design",
-        "nectec-platform-brochure"
+        "nectec-platform-brochure",
+        "provided-v15-hardware-reference-20261022"
       ],
       "unknowns": [
-        "The user's physical PCB, exact manufacturing revision and relationship between design REV3 and filename Rev3_1 remain unconfirmed."
+        "The user's physical PCB, exact manufacturing revision and relationship between design REV3 and filename Rev3_1 remain unconfirmed.",
+        "S1 image is not attached in this update; its reported N/A + bypass assembly is not independently re-read. Rev.3 PDF draws buffers and bypass without the N/A assembly note.",
+        "Supplied report names J2/J6 as 5-pin Chain but also J2 as a 2-pin boot header. J2 designator must be checked against original schematic/PCB.",
+        "I2C addresses, Servo timing, current ratings, ADC calibration and USB API polarity are not physically validated by this report."
       ],
       "conflicts": [
         "A generic V1.5 label cannot select Rev3.1, Rev3.1G or an INEX i-series profile automatically.",
-        "Old KB assertions that all V1.5 boards use CP2102 or cannot accept analog IN1-IN4 do not match this design."
+        "Old KB assertions that all V1.5 boards use CP2102 or cannot accept analog IN1-IN4 do not match this design.",
+        "Servo1=GPIO16/SW1 sharing and blanket non-analog V1.5 claims in the old developer reference are superseded for this supplied design: Servo1=15, Servo2=17, SW1=16, SW2=14."
       ],
       "notes": [
-        "Pins describe the provided design only; they are not a universal V1.5 wiring contract."
-      ]
+        "Pins describe the provided design only; they are not a universal V1.5 wiring contract.",
+        "Supplied Markdown is reference data; no upstream instruction or claimed prior user inheritance policy is applied as an instruction. No new firmware recipe or physical validation is added.",
+        "Document profile kidbright32-v1.5 is normalized to catalog kidbright32_v15 only; no automatic mapping to executable kidbright32_rev31 or inheritance to later boards."
+      ],
+      "hardware_reference": "kidbright32_v15.md",
+      "hardware_contract": {
+        "source_ids": [
+          "provided-v15-hardware-reference-20261022"
+        ],
+        "hardware_tested": false,
+        "input_connector_mode": "zero_ohm_bypass_u7_u8_na",
+        "input_analog_supported": true,
+        "input_analog_condition": "S1 N/A + 0-ohm assembly only; Rev.3 PDF alone does not confirm assembly",
+        "dedicated_servo_connector_documented": true,
+        "ntp_led_gpio": null,
+        "servo_gpios": [
+          15,
+          17
+        ],
+        "matrix_bus": {
+          "sda": 21,
+          "scl": 22
+        },
+        "sensor_chain_bus": {
+          "sda": 4,
+          "scl": 5
+        },
+        "input_gpios": [
+          32,
+          33,
+          34,
+          35
+        ],
+        "output_control_gpios": [
+          26,
+          27
+        ],
+        "expansion_gpios": [
+          18,
+          19,
+          23
+        ],
+        "output_endpoints": [
+          "gpio_gate_control",
+          "jst_gate_signal",
+          "banana_mosfet_drain"
+        ],
+        "output_polarity_basis": "Topology: gate HIGH sinks drain; gate LOW leaves drain undriven. Manual/API/load on/off semantics are separate; not physically measured.",
+        "usb_role": "switched_load_power_not_demonstrated_usb_host_data"
+      }
     },
     {
       "id": "kidbright32_rev31",
@@ -1167,6 +1505,16 @@
       "notes": [
         "Manufacturer lists ESP-IDF among available tools, but this repository has no validated KB32-FT recipe or profile."
       ]
+    }
+  ],
+  "python_project_types": [
+    {
+      "id": "kidbright_uai_plus",
+      "target": "sg2002",
+      "runtime": "maixpy4",
+      "entrypoint": "main/main.py",
+      "status": "development",
+      "physical_validation": "unverified"
     }
   ]
 }

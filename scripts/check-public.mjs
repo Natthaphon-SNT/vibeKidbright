@@ -31,12 +31,14 @@ const allowedHomeNames = new Set([
 
 const secretExtensions = new Set([".pfx", ".p12", ".pem", ".key", ".sqlite", ".db"]);
 const bundleExtensions = new Set([
-  ".c", ".h", ".jpeg", ".jpg", ".md", ".pdf", ".png", ".txt", ".webp",
+  ".c", ".h", ".py", ".jpeg", ".jpg", ".md", ".pdf", ".png", ".txt", ".webp",
 ]);
+// Reviewed public structured reference; do not admit arbitrary JSON resources.
+const bundleStructuredReferences = new Set(["compatibility/uai_plus_test_contracts.json"]);
 const textExtensions = new Set([
   ".c", ".cc", ".cpp", ".css", ".h", ".html", ".js", ".json", ".jsx",
   ".md", ".mjs", ".ps1", ".rs", ".sh", ".toml", ".ts", ".tsx", ".txt",
-  ".yaml", ".yml",
+  ".yaml", ".yml", ".py",
 ]);
 
 const errors = [];
@@ -57,7 +59,8 @@ for (const file of publishableFiles) {
     continue;
   }
 
-  if (bundleMode && !bundleExtensions.has(extension)) {
+  if (bundleMode && !bundleExtensions.has(extension)
+      && !bundleStructuredReferences.has(relative(bundleRoot, file).replaceAll("\\", "/"))) {
     errors.push(`${relative(bundleRoot, file)}: file type is not allowed in the app bundle`);
     continue;
   }

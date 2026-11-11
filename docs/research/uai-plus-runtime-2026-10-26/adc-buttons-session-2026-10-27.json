@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "recorded_date": "2026-10-27",
+  "test_id": "MP-021",
+  "board": "KidBright mAi Plus / SG2002",
+  "source": "User-pasted board test output in this conversation; the agent did not operate the board.",
+  "status": "WAIT_USER",
+  "observation": "ADC0 returned samples for three complete approximately 3-second phases. Reported min/max bands do not overlap.",
+  "version_context": {
+    "python": "3.11.6",
+    "maixpy": "4.12.5",
+    "runtime": "1.24.0",
+    "source": "Earlier user-provided board session; versions were not printed in this ADC excerpt."
+  },
+  "statistics": [
+    {
+      "phase": "released",
+      "count": 138,
+      "min": 2448,
+      "max": 2480,
+      "median": 2464,
+      "elapsed_s": 3.002
+    },
+    {
+      "phase": "s1",
+      "count": 139,
+      "min": 0,
+      "max": 13,
+      "median": 0,
+      "elapsed_s": 3.011
+    },
+    {
+      "phase": "s2",
+      "count": 139,
+      "min": 362,
+      "max": 402,
+      "median": 386,
+      "elapsed_s": 3.016
+    }
+  ],
+  "total_samples": 416,
+  "threshold_candidates": {
+    "status": "WAIT_USER",
+    "reason": "validate candidates with new presses; not applied",
+    "candidates": [
+      {
+        "between": [
+          "s1",
+          "s2"
+        ],
+        "raw_threshold": 187.5,
+        "gap_raw": 349
+      },
+      {
+        "between": [
+          "s2",
+          "released"
+        ],
+        "raw_threshold": 1425,
+        "gap_raw": 2046
+      }
+    ]
+  },
+  "validation": {
+    "midpoint_arithmetic_checked": true,
+    "reported_bands_non_overlapping": true,
+    "button_labels_source": "Sampling phase labels in the supplied log; no separate physical phase-alignment confirmation yet.",
+    "independent_repeated_press_test": "NOT_RUN",
+    "thresholds_applied": false,
+    "stop_and_menu_this_run": "NOT_REPORTED"
+  },
+  "scope": "Evidence of this ADC sampling run. Candidate thresholds belong to this measured board/session and are not shared defaults or proof of S1/S2 debounce, long press, simultaneous press, external analog IO or future firmware."
+}

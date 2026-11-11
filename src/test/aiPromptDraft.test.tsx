@@ -24,3 +24,16 @@ it('appends to an existing draft and does not repeat a consumed request',async()
     expect(screen.getByPlaceholderText('Ask about your code...')).toHaveValue('My unsent draft\n\nNew sample');
     expect(invokeMock.mock.calls.some(([command])=>command==='send_ai_message')).toBe(false);
 });
+
+it('sends the selected Plus board as separate typed context without changing the user request',async()=>{
+    const original=invokeMock.getMockImplementation()!;
+    invokeMock.mockImplementation((command:string,...args:unknown[])=>command==='get_base_url'?Promise.resolve('http://127.0.0.1:11434/v1'):original(command,...args));
+    render(<AiChat projectDir="." selectedBoard="miuaiplus" onInjectCode={()=>{}}/>);
+    await waitFor(()=>expect(invokeMock).toHaveBeenCalledWith('get_base_url'));
+    const input=screen.getByPlaceholderText('Ask about your code...');
+    fireEvent.change(input,{target:{value:'Display something on the screen'}});
+    fireEvent.keyDown(input,{key:'Enter',shiftKey:false});
+    await waitFor(()=>expect(invokeMock).toHaveBeenCalledWith('send_ai_message',expect.objectContaining({
+        selectedBoard:'miuaiplus',projectDir:'.',messages:[{role:'user',content:'Display something on the screen'}],
+    })));
+});

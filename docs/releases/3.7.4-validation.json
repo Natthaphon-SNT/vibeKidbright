@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "version": "3.7.4",
+  "validation_date": "2026-10-21",
+  "platform": "windows-x64",
+  "manifest_versions": {
+    "npm": "3.7.4",
+    "npm_lock": "3.7.4",
+    "npm_lock_root": "3.7.4",
+    "tauri": "3.7.4",
+    "cargo": "3.7.4",
+    "cargo_lock": "3.7.4"
+  },
+  "installer": {
+    "path": "src-tauri/target/release/bundle/nsis/VibeKidbright IDE_3.7.4_x64-setup.exe",
+    "bytes": 316901145,
+    "sha256": "91d5bfa1d28195eec04d7a335eb3024ea2f7466e66062c432afc2ce5daa3e61f"
+  },
+  "packaged_executable": {
+    "product_version": "3.7.4",
+    "file_version": "3.7.4",
+    "sha256": "65f4284facd188f0e2705102bb8b911ddf7aaf64c7c0b3651822991367debb07",
+    "release_binary_sha256": "2c4d3b34db34f13380cabf164002b25faa8882bd10a42dba6f45b3accdcf2d2e",
+    "matches_release_after_exact_tauri_unk_to_nss_marker_patch": true,
+    "marker_offset": 40237650
+  },
+  "checks": {
+    "frontend_test_files_passed": 19,
+    "frontend_tests_passed": 184,
+    "rust_library_tests_passed": 201,
+    "build_release_checks": "passed",
+    "production_frontend_build": "passed",
+    "rust_release_build": "passed",
+    "nsis_packaging": "passed",
+    "nsis_executable_extraction": "passed"
+  },
+  "logs": {
+    "frontend": "src-tauri/target/release-3.7.4-frontend-tests.log",
+    "rust": "src-tauri/target/release-3.7.4-rust-tests.log",
+    "build": "src-tauri/target/release-3.7.4-build.log"
+  },
+  "limitations": [
+    "Full network download and installation of the ESP-IDF toolchain was not executed.",
+    "Clean-VM GUI installation, upgrade and uninstall were not executed.",
+    "macOS packaging was not executed on this Windows host.",
+    "This is a local build; GitHub publication was not performed."
+  ]
+}

@@ -18,7 +18,7 @@ pub(crate) fn collect_kb_files_inner(root: &Path, current: &Path, result: &mut V
         if kind.is_dir() { collect_kb_files_inner(root, &path, result, include_disabled); }
         else if kind.is_file() {
             let extension = path.extension().and_then(|s|s.to_str()).unwrap_or("");
-            if matches!(extension, "md" | "txt" | "c" | "h" | "cmake") || (include_disabled && name.ends_with(".disabled")) {
+            if matches!(extension, "md" | "txt" | "c" | "h" | "py" | "cmake") || (include_disabled && name.ends_with(".disabled")) {
                 if let Ok(relative) = path.strip_prefix(root) { result.push((path.clone(), relative.to_string_lossy().replace('\\',"/"))); }
             }
         }

@@ -9,11 +9,12 @@
 import { useEffect, useRef, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
+import MacosSdkSetup, { isMacOS } from "./MacosSdkSetup";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 interface ToolchainProgress {
-  stage: "idle" | "downloading" | "extracting" | "done" | "error";
+  stage: "idle" | "downloading" | "verifying" | "extracting" | "done" | "error";
   percent: number;
   message: string;
 }
@@ -22,6 +23,8 @@ interface ToolchainStatus {
   status: "ready" | "not_installed";
   version: string | null;
   path: string | null;
+  platform?: string;
+  error?: string;
 }
 
 interface Props {
@@ -64,6 +67,7 @@ export default function ToolchainSetup({
   const logsRef = useRef<HTMLDivElement>(null);
   // Mini widget state
   const [miniExpanded, setMiniExpanded] = useState(false);
+  const [macOS, setMacOS] = useState(isMacOS);
 
   // ── Scroll logs to bottom ────────────────────────────────────────────────
   useEffect(() => {
@@ -102,12 +106,14 @@ export default function ToolchainSetup({
     try {
       const status = (await invoke("check_toolchain")) as ToolchainStatus;
       setCheckDone(true);
-
+      setMacOS(status.platform === "macos" || isMacOS());
       if (status.status === "ready") {
+        setErrorMsg("");
         // Toolchain มีอยู่แล้ว → ผ่านไฟเลย
         setProgress({ stage: "done", percent: 100, message: `Toolchain v${status.version} ready.` });
         setTimeout(() => onReady(), 500);
       } else {
+        setErrorMsg(status.error ?? "");
         setProgress({ stage: "idle", percent: 0, message: "Install toolchain when you need Build & Flash." });
       }
     } catch (err) {
@@ -131,6 +137,7 @@ export default function ToolchainSetup({
     } catch (err) {
       const msg = String(err);
       setErrorMsg(msg);
+      setLogs((prev) => [...prev, `[ERROR] ${msg}`]);
       setProgress({ stage: "error", percent: 0, message: msg });
       setIsDownloading(false);
     }
@@ -163,6 +170,7 @@ export default function ToolchainSetup({
   const stageLabel: Record<string, string> = {
     idle: "Install toolchain before Build & Flash",
     downloading: "📥 Downloading toolchain...",
+    verifying: "Checking toolchain SHA-256...",
     extracting: "📦 Extracting files...",
     done: "✅ Ready!",
     error: "❌ Error",
@@ -282,6 +290,11 @@ export default function ToolchainSetup({
         {/* Expanded section: logs + actions */}
         {miniExpanded && (
           <div style={{ padding: "0 12px 12px", borderTop: "1px solid rgba(59,130,246,0.1)" }}>
+            {isError && (
+              <p role="alert" style={{ color: "#f87171", fontSize: "11px", overflowWrap: "anywhere", userSelect: "text" }}>
+                {errorMsg || progress.message}
+              </p>
+            )}
             {/* Mandatory notice */}
             {!isReady && !isError && (
               <div style={{
@@ -323,7 +336,8 @@ export default function ToolchainSetup({
             )}
 
             {/* Retry button on error */}
-            {isError && !isDownloading && (
+            {macOS && !isReady && <MacosSdkSetup onRecheck={checkToolchain} />}
+            {!macOS && isError && !isDownloading && (
               <button
                 onClick={() => { startDownload(); }}
                 style={{
@@ -338,7 +352,7 @@ export default function ToolchainSetup({
             )}
 
             {/* Start now button (before download starts) */}
-            {!isDownloading && !isReady && !isError && checkDone && (
+            {!macOS && !isDownloading && !isReady && !isError && checkDone && (
               <button
                 onClick={() => { startDownload(); }}
                 disabled={!checkDone}
@@ -581,13 +595,13 @@ export default function ToolchainSetup({
               }}
             >
               <span style={{ transform: showUrlInput ? "rotate(90deg)" : "none", display: "inline-block", transition: "transform 0.2s" }}>▶</span>
-              Use custom toolchain URL
+              Custom toolchain URL (requires a trusted manifest)
             </button>
 
             {showUrlInput && (
               <div style={{ marginTop: "10px" }}>
                 <label style={{ fontSize: "12px", color: "#64748b", display: "block", marginBottom: "6px" }}>
-                  Toolchain ZIP URL
+                  Custom URL installation is disabled until a trusted manifest is available.
                 </label>
                 <input
                   id="toolchain-url-input"
@@ -691,7 +705,8 @@ export default function ToolchainSetup({
           )}
 
           {/* Not downloading, not ready → show install/countdown button */}
-          {!isDownloading && !isReady && (
+          {macOS && !isReady && <MacosSdkSetup onRecheck={checkToolchain} />}
+          {!macOS && !isDownloading && !isReady && (
             <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "8px" }}>
               <button
                 id="btn-start-download"
@@ -749,14 +764,14 @@ export default function ToolchainSetup({
         </div>
 
         {/* Download info note */}
-        {!isDownloading && !isReady && (
+        {!macOS && !isDownloading && !isReady && (
           <p style={{ textAlign: "center", marginTop: "16px", fontSize: "12px", color: "#334155" }}>
             Download size: ~2.3 GB · Extracted to AppData · One-time only
           </p>
         )}
 
         {/* Repair Python Paths — shown when toolchain exists but Python might be broken */}
-        {!isDownloading && (
+        {!macOS && !isDownloading && (
           <div style={{ marginTop: "12px", textAlign: "center" }}>
             <button
               id="btn-repair-paths"

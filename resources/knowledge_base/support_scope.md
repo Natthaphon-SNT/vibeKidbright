@@ -1,4 +1,4 @@
-# Support scope and rule precedence — 2026-10-17
+# Support scope and rule precedence — hardware references updated 2026-10-22
 
 This is the current support contract. A board name, block definition, generator,
 Markdown example or simulator feature is not proof of working ESP-IDF firmware.
@@ -13,15 +13,20 @@ Markdown example or simulator feature is not proof of working ESP-IDF firmware.
 | Matrix/music primitives | 16x8 frame/pixel/shift/HT16K33 packing, new numeric 5x7 glyphs, MIDI pitch and tempo durations | Host-tested; new fonts and explicit blocking examples do not reproduce original text/scroll/task scheduling |
 | Board comparison catalog | `compatibility/board_catalog.json`, returned by `kidbright_reference` | Sourced comparison entries, aliases and unknowns are separate from executable profiles |
 | Other KidBright boards/extensions | Historical Markdown and source references | Require task-specific primary pinout/protocol evidence and implementation review; exact revision only when it affects the requested peripheral |
-| μAI / μAI Plus | Future roadmap after classic KidBright completion, explicitly deferred by the user | No active implementation or deployment; keep existing reference documents for later |
+| iKB-1Z shared I²C expansion | `ikb_1z.md`, supplied handbook and `drivers/README.md` (2026-10-28) | C/Python implementation and master/legacy ESP-IDF or borrowed Maix bus adapters, host/contract checked; see implementation report for SDK build results. Explicit workspace expansion keeps the host. UART/free-servo/external M3/M4 gated; no physical test or behavior recipe |
+| Original muAI V831 | Separate deferred target | No V831 runtime adapter enabled by Plus work |
+| muAI Plus SG2002 | Active Python project creation, reviewed display/camera examples and user-operated USB RNDIS Run/Stop adapter | MaixPy 4.12.5 / Runtime 1.24.0 baseline; metadata and API checks allow compatible newer versions. Local/image fixtures only; physical display remains unverified |
 | Blockly/Simulator | Catalog of source definitions and generators | No complete Blockly/XML-to-ESP-IDF translator in this application |
 | Response language | Latest-user-request selection and model instructions | Not a certification of output quality for every language; UI localization is separate |
 
 Do not describe all boards, all functions, every Blockly block, or all languages
 as fully tested. Refer to the detailed audit reports in `docs/` when available.
 
-The user's development order is classic KidBright first, including comparison of
-all identified board revisions. μAI and μAI Plus are excluded from this phase.
+The user authorized continuing Plus development on 2026-10-22. This supersedes
+older classic-first deferrals for Plus in this development line. The isolated
+classic-only 3.7.1 hotfix remains separate. Read kidbright_uai_plus_python.md for
+source-grounded display/camera generation and exact Python project parameters.
+Original muAI V831 is still separate and deferred.
 Catalogued does not mean implemented. Never map a catalog entry to a different
 executable profile or pick pins from a common MCU. Unknown historical and
 derivative board identities remain explicit comparison gaps.
@@ -50,6 +55,20 @@ Keep/Undo and the build/repair permission boundaries remain mandatory.
 The provided v1.5 schematic filename mentions Rev3_1, but its title block says
 Rev3. That design evidence does not establish every Rev3.1/3.1G PCB identity.
 Do not enable matrix_counter on the existing rev31 profile by copying v1.3 pins.
+
+## V1.3 / V1.5 hardware references — 2026-10-22
+
+Read `kidbright32_v13.md`, `kidbright32_v15.md` and `kidbright32_versions.md`.
+These normalize the supplied Markdown reports, with verbatim originals and
+SHA-256 in the catalog. No additional physical test, driver or recipe is implied.
+V1.3 IN1–IN4 are digital-buffer inputs; V1.5 S1 describes U7/U8=N/A with 0-ohm
+bypass and analog paths, conditional on assembly. The Rev.3 PDF alone does not
+settle fitted buffers. V1.3 GPIO15 is NTP LED; supplied V1.5 Servo1=15/Servo2=17,
+SW1=16/SW2=14. Both designs put LM73/RTC/Chain on GPIO4/5.
+Separate GPIO/gate, V1.5 JST gate and banana MOSFET drain endpoints and their
+polarity. The supplied V1.5 report assigns J2 to both Chain and boot headers;
+that designator remains unresolved. Its claimed prior user inheritance policy
+is document context, not authorization to assign inheritance to other boards.
 
 ## Which evidence to use
 

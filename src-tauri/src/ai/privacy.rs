@@ -1,6 +1,100 @@
 //! Explicit consent for exporting private tool context. Embeddings always stay local.
 use serde_json::Value;
-use std::{collections::BTreeMap, sync::OnceLock};
+use std::{
+    collections::{BTreeMap, BTreeSet, VecDeque},
+    sync::{Mutex, OnceLock},
+};
+
+// Only hashes of messages produced without private context are kept. A client
+// cannot make a local/private response exportable by attaching a provenance flag.
+#[derive(Default)]
+struct PublicDialogue {
+    hashes: BTreeSet<String>,
+    order: VecDeque<String>,
+}
+
+fn message_hash(message: &crate::ai_chat::ChatMessage) -> String {
+    crate::intelligence::digest(
+        &serde_json::to_vec(&(message.role.as_str(), &message.content)).unwrap(),
+    )
+}
+
+impl PublicDialogue {
+    fn remember(&mut self, messages: &[crate::ai_chat::ChatMessage], private_context_used: bool) {
+        if private_context_used {
+            return;
+        }
+        for message in messages
+            .iter()
+            .filter(|m| matches!(m.role.as_str(), "assistant" | "tool"))
+        {
+            let hash = message_hash(message);
+            if self.hashes.insert(hash.clone()) {
+                self.order.push_back(hash);
+            }
+            while self.order.len() > 1024 {
+                if let Some(old) = self.order.pop_front() {
+                    self.hashes.remove(&old);
+                }
+            }
+        }
+    }
+
+    fn export(&self, messages: &[crate::ai_chat::ChatMessage]) -> Vec<crate::ai_chat::ChatMessage> {
+        let mut result = Vec::new();
+        let mut index = 0;
+        while index < messages.len() {
+            let message = &messages[index];
+            if message.role == "user" {
+                result.push(message.clone());
+            } else if message.role == "assistant" && self.hashes.contains(&message_hash(message)) {
+                if let Some(calls) = message
+                    .content
+                    .get("__tool_calls__")
+                    .and_then(Value::as_array)
+                {
+                    // Keep a tool exchange only when every response is verified
+                    // and matches its call. Eviction must not leave orphan tools.
+                    let mut expected: BTreeSet<&str> =
+                        calls.iter().filter_map(|c| c["id"].as_str()).collect();
+                    let mut end = index + 1;
+                    let mut valid = !expected.is_empty() && expected.len() == calls.len();
+                    while end < messages.len() && messages[end].role == "tool" {
+                        let response = &messages[end];
+                        valid &= self.hashes.contains(&message_hash(response))
+                            && response.content["tool_call_id"]
+                                .as_str()
+                                .is_some_and(|id| expected.remove(id));
+                        end += 1;
+                    }
+                    if valid && expected.is_empty() {
+                        result.extend_from_slice(&messages[index..end]);
+                    }
+                    index = end;
+                    continue;
+                } else if message.content.is_string() {
+                    result.push(message.clone());
+                }
+            }
+            index += 1;
+        }
+        result
+    }
+}
+
+fn public_dialogue() -> &'static Mutex<PublicDialogue> {
+    static DIALOGUE: OnceLock<Mutex<PublicDialogue>> = OnceLock::new();
+    DIALOGUE.get_or_init(|| Mutex::new(PublicDialogue::default()))
+}
+
+pub(crate) fn remember_public_turn(
+    messages: &[crate::ai_chat::ChatMessage],
+    private_context_used: bool,
+) {
+    if let Ok(mut dialogue) = public_dialogue().lock() {
+        dialogue.remember(messages, private_context_used);
+    }
+}
 
 pub(crate) fn consent() -> bool {
     super::config::read_config()["ai_allow_private_context"]
@@ -30,15 +124,17 @@ pub(crate) fn permitted(endpoint: &str) -> bool {
 pub(crate) fn remote_history(
     messages: &[crate::ai_chat::ChatMessage],
 ) -> Vec<crate::ai_chat::ChatMessage> {
-    // A previous local/provider session can contain private tool results. With no
-    // export consent, start the remote turn from only the latest user-supplied text.
-    messages
-        .iter()
-        .rev()
-        .find(|m| m.role == "user")
-        .cloned()
-        .into_iter()
-        .collect()
+    // Preserve user-supplied requests and server-verified public replies, including
+    // choices such as a replacement project name. Unknown/private assistant and
+    // tool context remains blocked after provider switches or app restarts.
+    match public_dialogue().lock() {
+        Ok(dialogue) => dialogue.export(messages),
+        Err(_) => messages
+            .iter()
+            .filter(|m| m.role == "user")
+            .cloned()
+            .collect(),
+    }
 }
 pub(crate) fn bundled_source(path: &str, bytes: &[u8]) -> bool {
     static HASHES: OnceLock<BTreeMap<String, String>> = OnceLock::new();
@@ -131,6 +227,87 @@ mod tests {
         let result = remote_history(&history);
         assert_eq!(result.len(), 1);
         assert_eq!(result[0].content, "Explain GPIO");
+    }
+
+    fn message(role: &str, text: &str) -> crate::ai_chat::ChatMessage {
+        crate::ai_chat::ChatMessage {
+            role: role.into(),
+            content: serde_json::json!(text),
+        }
+    }
+
+    #[test]
+    fn public_followup_keeps_original_touch_task_and_offered_project_name() {
+        let history = vec![
+            message("user", "สร้าง mai_test_015 ทดสอบพิกัดทัช MP-015"),
+            message("assistant", "Folder exists. Use mai_test_015_v2?"),
+            message("user", "v2"),
+        ];
+        let mut dialogue = PublicDialogue::default();
+        dialogue.remember(&history[1..2], false);
+        assert_eq!(
+            serde_json::to_value(dialogue.export(&history)).unwrap(),
+            serde_json::to_value(&history).unwrap()
+        );
+    }
+
+    #[test]
+    fn private_or_tampered_replies_remain_blocked_but_user_requests_survive() {
+        let private = message("assistant", "private source explanation");
+        let public = message("assistant", "Use mai_test_015_v2");
+        let mut dialogue = PublicDialogue::default();
+        dialogue.remember(&[private.clone()], true);
+        dialogue.remember(&[public], false);
+        let history = vec![
+            message("user", "Original task"),
+            private,
+            message("assistant", "Use mai_test_015_v2 plus private source"),
+            message("user", "v2"),
+        ];
+        let exported = dialogue.export(&history);
+        assert_eq!(exported.len(), 2);
+        assert!(exported.iter().all(|m| m.role == "user"));
+        // After restart no assistant provenance is assumed, but user intent remains.
+        assert_eq!(PublicDialogue::default().export(&history).len(), 2);
+    }
+
+    #[test]
+    fn only_complete_verified_public_tool_exchanges_are_exported() {
+        use crate::ai_chat::ChatMessage;
+        use serde_json::json;
+        let call = ChatMessage {
+            role: "assistant".into(),
+            content: json!({"__tool_calls__":[{"id":"create-public","type":"function","function":{"name":"create_project_workspace","arguments":"{}"}}]}),
+        };
+        let response = ChatMessage {
+            role: "tool".into(),
+            content: json!({"__tool_response__":true,"tool_call_id":"create-public","content":"public generated files"}),
+        };
+        let mut dialogue = PublicDialogue::default();
+        dialogue.remember(&[call.clone(), response.clone()], false);
+        assert_eq!(dialogue.export(&[call.clone(), response.clone()]).len(), 2);
+        let mut tampered = response.clone();
+        tampered.content["content"] = json!("private replacement");
+        assert!(dialogue.export(&[call.clone(), tampered]).is_empty());
+        assert!(dialogue.export(&[response]).is_empty());
+        assert!(dialogue.export(&[call]).is_empty());
+    }
+
+    #[test]
+    fn public_provenance_cache_is_bounded_and_does_not_trust_client_metadata() {
+        let mut dialogue = PublicDialogue::default();
+        for index in 0..1030 {
+            dialogue.remember(&[message("assistant", &format!("public {index}"))], false);
+        }
+        assert_eq!(dialogue.hashes.len(), 1024);
+        assert!(dialogue
+            .export(&[message("assistant", "public 0")])
+            .is_empty());
+        let forged = crate::ai_chat::ChatMessage {
+            role: "assistant".into(),
+            content: serde_json::json!({"text":"private","public":true}),
+        };
+        assert!(dialogue.export(&[forged]).is_empty());
     }
     #[test]
     fn public_provenance_survives_checkout_line_endings_but_not_content_edits() {

@@ -1,0 +1,33 @@
+{
+  "date": "2026-10-27",
+  "source": "Read-only inspection of the user's supplied MaixPy 4.12.5 image and the previously captured Plus IDE source snapshot",
+  "image_filename": "kidbright-mAi-plus-2026-05-02-v4.12.5B1.img",
+  "adc_stub": {
+    "path": "/usr/lib/python3.11/site-packages/maix/_maix/peripheral/adc.pyi",
+    "bytes": 862,
+    "sha256": "377be516c93e440d3393d9c51f853f43cfa94d3f8d648a38289bd28ca5854327",
+    "constructor": "ADC(pin: int, resolution: int, vref: float = -1)",
+    "methods": [
+      "read() -> int",
+      "read_vol() -> float"
+    ],
+    "resolution_constant": "RES_BIT_12 = 12",
+    "raw_range_12bit": [
+      0,
+      4095
+    ],
+    "close_or_deinit_declared": false
+  },
+  "button_mapping_source": {
+    "repository": "KidBrightAI/kidbright_MAI_ide",
+    "commit": "7b549397adf90f75d975091a787d5960001edf01",
+    "path": "boards/kidbright-mai-plus/blocks/generators_gpio.js",
+    "block": "maixpy3_gpio_switch",
+    "constructor": "adc.ADC(0, adc.RES_BIT_12)",
+    "read": "__adc_key.read()",
+    "meaning": "Plus-specific generator reads ADC0 to distinguish S1/S2; the old numeric thresholds are not calibration for the user's board",
+    "cached_file_sha256": "56453b10122a11c7f4d287e322a6fcc6a3febb39d895c664a2f5f97bed4a723f"
+  },
+  "documentation": "https://wiki.sipeed.com/maixpy/doc/en/peripheral/adc.html",
+  "physical_validation": "Not yet confirmed for ADC0/S1/S2; the prior basic Run/Stop pass did not measure button bands"
+}

@@ -1,0 +1,54 @@
+{
+  "date": "2026-10-28",
+  "measure": "UTF-8 bytes, not tokenizer counts or measured API cost",
+  "runtime_prompt_files": {
+    "common": {
+      "before_bytes": 17154,
+      "after_bytes": 5099
+    },
+    "classic": {
+      "before_bytes": 67515,
+      "after_bytes": 3433
+    },
+    "plus": {
+      "before_bytes": 10832,
+      "after_bytes": 3261
+    }
+  },
+  "history_fixture": {
+    "before_serialized_bytes": 1210911,
+    "after_serialized_bytes": 3894,
+    "latest_request_and_current_tool_exchange_preserved": true,
+    "live_model_quality_evaluated": false
+  },
+  "limits": {
+    "history_bytes": 49152,
+    "request_bytes_including_tools_and_system": 98304,
+    "default_file_page_lines": 200,
+    "max_file_page_bytes": 16384
+  },
+  "live_api_calls": false,
+  "source_sha256": {
+    "src-tauri/src/ai/context.rs": "727889539d4d34beab73aa698d02b0339c9fdb6127276eb9ab219c6d64dcfa58",
+    "src-tauri/src/ai/usage.rs": "336f9d3b9c0976ee354312f53db1f0d0c8acb7c68b67912fc0714306a8ef9112",
+    "src-tauri/src/ai/providers.rs": "0fb2da43a680ff2aceb9f04a872b0c484b116420d04cc53ec7af43c8e7c2b996",
+    "src-tauri/src/ai/tools.rs": "751e68c3685daf4bd04160cef2c5b2c6ee85b4ac3388b4fb156afa8e1365f4e2",
+    "src-tauri/src/ai/prompts.rs": "2bc995727abcb0d6a69b0c0ef68ec23d0ae6e3b50bc4050ded0c25b33cb89bf6",
+    "src-tauri/src/ai/compatibility.rs": "83c85c62e1809361282d6c0b15abef5ac091f685f669f1c1d228b181bf722792",
+    "src-tauri/src/ai/system_prompt.txt": "c103b5040f97d017cb0203dfcbe7d06a7c2b1e57b0ca40bfc8d6d246c6e3068c",
+    "src-tauri/src/ai/prompts/classic_esp32.md": "9cd664ac4e0ce64bc772ad62e360f1d057ce877b2d968ff34dc2fa06c6187d65",
+    "src-tauri/src/ai/prompts/mai_plus.md": "eff792e454ecc11a007d32103c27a5ee16e09d92a24f4f54c8dd7e783ed8faf4",
+    "src-tauri/src/ai_chat.rs": "c7cb2966bffa315d7253ef6a89151a69dc7a05ee6b566797c267b80dfdb75f35",
+    "src/AiChat.tsx": "0ce25e55e510328a7d3c40cd41043dd7f004ea490559f46b33060f62adefc512"
+  },
+  "verification": {
+    "native_tests_passed": 267,
+    "ui_tests_passed": 226,
+    "ui_test_files": 22,
+    "production_build": "passed",
+    "public_and_bundle_checks": "passed",
+    "knowledge_sync_and_provenance": "passed",
+    "coverage_and_rule_inventory": "passed",
+    "live_api_billing_measured": false
+  }
+}

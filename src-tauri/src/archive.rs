@@ -6,8 +6,20 @@ use std::{
     sync::atomic::{AtomicBool, Ordering},
 };
 
-pub(crate) fn extract_zip(
+#[cfg(test)]
+fn extract_zip(
     source: &Path,
+    destination: &Path,
+    cancel: &AtomicBool,
+    progress: impl FnMut(usize, usize, &str),
+) -> Result<(), String> {
+    let file = std::fs::File::open(source).map_err(|e| e.to_string())?;
+    extract_zip_reader(file, destination, cancel, progress)
+}
+
+// Production callers pass the private snapshot held by VerifiedArchive.
+pub(crate) fn extract_zip_reader(
+    source: impl Read + std::io::Seek,
     destination: &Path,
     cancel: &AtomicBool,
     mut progress: impl FnMut(usize, usize, &str),
@@ -17,8 +29,7 @@ pub(crate) fn extract_zip(
     }
     std::fs::create_dir_all(destination).map_err(|e| e.to_string())?;
     let root = dunce::canonicalize(destination).map_err(|e| e.to_string())?;
-    let file = std::fs::File::open(source).map_err(|e| e.to_string())?;
-    let mut archive = zip::ZipArchive::new(file).map_err(|e| format!("Invalid ZIP: {e}"))?;
+    let mut archive = zip::ZipArchive::new(source).map_err(|e| format!("Invalid ZIP: {e}"))?;
     let total = archive.len();
     if total > 250000 {
         return Err("SDK ZIP exceeds entry limit".into());
@@ -52,7 +63,14 @@ pub(crate) fn extract_zip(
         let parent = path.parent().ok_or("Missing SDK output parent")?;
         std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
         crate::ai::change_journal::checked_path(&root, &path)?;
-        let mut temporary = tempfile::NamedTempFile::new_in(parent).map_err(|e| e.to_string())?;
+        // tempfile's Windows persist calls Win32 directly, without Rust's
+        // automatic long-path conversion. Keep the canonical verbatim prefix
+        // for both paths, including when only the final filename exceeds MAX_PATH.
+        let parent = std::fs::canonicalize(parent)
+            .map_err(|e| format!("Cannot resolve SDK output directory for {name}: {e}"))?;
+        let output = parent.join(path.file_name().ok_or("Missing SDK output filename")?);
+        let mut temporary = tempfile::NamedTempFile::new_in(&parent)
+            .map_err(|e| format!("Cannot create SDK temporary file for {name}: {e}"))?;
         let mut buffer = [0u8; 65536];
         let mut size = 0u64;
         loop {
@@ -87,7 +105,9 @@ pub(crate) fn extract_zip(
             }
         }
         crate::ai::change_journal::checked_path(&root, &path)?;
-        temporary.persist(&path).map_err(|e| e.to_string())?;
+        temporary.persist(&output).map_err(|e| {
+            format!("Cannot save SDK file {name} to {}: {}", output.display(), e.error)
+        })?;
     }
     Ok(())
 }
@@ -117,6 +137,41 @@ mod tests {
         zip(&source, "../outside.txt", "escape");
         assert!(extract_zip(&source, &root, &AtomicBool::new(false), |_, _, _| {}).is_err());
         assert!(!temp.path().join("outside.txt").exists());
+    }
+    #[cfg(windows)]
+    #[test]
+    fn long_windows_file_name_is_persisted() {
+        use std::os::windows::ffi::OsStrExt;
+        let temp = tempfile::tempdir().unwrap();
+        let source = temp.path().join("sdk.zip");
+        let root = temp.path().join("toolchain.installing");
+        let padding = 200usize.saturating_sub(root.as_os_str().encode_wide().count() + 1).max(1);
+        let name = format!("{}/{}.txt", "d".repeat(padding), "x".repeat(80));
+        let target = root.join(&name);
+        assert!(target.as_os_str().encode_wide().count() > 260);
+        zip(&source, &name, "SDK data");
+        extract_zip(&source, &root, &AtomicBool::new(false), |_, _, _| {}).unwrap();
+        assert_eq!(std::fs::read_to_string(target).unwrap(), "SDK data");
+    }
+    #[cfg(windows)]
+    #[test]
+    fn long_windows_paths_extract_and_replace_existing_files() {
+        use std::os::windows::ffi::OsStrExt;
+        let temp = tempfile::tempdir().unwrap();
+        let source = temp.path().join("sdk.zip");
+        let root = temp.path().join("toolchain.installing");
+        let name = format!(
+            "frameworks/esp-idf/components/{}/{}.txt",
+            "nested/".repeat(35),
+            "x".repeat(80)
+        );
+        let target = root.join(&name);
+        assert!(target.as_os_str().encode_wide().count() > 260);
+        zip(&source, &name, "first");
+        extract_zip(&source, &root, &AtomicBool::new(false), |_, _, _| {}).unwrap();
+        zip(&source, &name, "replacement");
+        extract_zip(&source, &root, &AtomicBool::new(false), |_, _, _| {}).unwrap();
+        assert_eq!(std::fs::read_to_string(target).unwrap(), "replacement");
     }
     #[test]
     fn cancelled_extraction_does_not_replace_existing_data() {

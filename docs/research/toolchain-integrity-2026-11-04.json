@@ -1,0 +1,69 @@
+{
+  "checked_date": "2026-11-04",
+  "purpose": "Public metadata observations only; not approved expected hashes or publisher identity verification.",
+  "releases": [
+    {
+      "url": "https://api.github.com/repos/Natthaphon-SNT/vibeKidbright/releases/tags/framework",
+      "checked_date": "2026-11-04",
+      "id": 349411794,
+      "tag_name": "framework",
+      "target_commitish": "main",
+      "immutable": false,
+      "body": "**Full Changelog**: https://github.com/Natthaphon-SNT/vibeKidbright/compare/v3.0.0...framework",
+      "assets": [
+        {
+          "id": 467878450,
+          "name": "frameworks.zip",
+          "size": 300555002,
+          "digest": "sha256:57eac23280db220c1b4947b016f97c56659a36aa360fc522cf6b65adb92da5d6",
+          "browser_download_url": "https://github.com/Natthaphon-SNT/vibeKidbright/releases/download/framework/frameworks.zip",
+          "created_at": "2026-07-06T08:27:37Z",
+          "updated_at": "2026-07-06T08:29:54Z"
+        }
+      ]
+    },
+    {
+      "url": "https://api.github.com/repos/Natthaphon-SNT/vibeKidbright/releases/tags/toolchain",
+      "checked_date": "2026-11-04",
+      "id": 349410633,
+      "tag_name": "toolchain",
+      "target_commitish": "main",
+      "immutable": false,
+      "body": "",
+      "assets": [
+        {
+          "id": 467876766,
+          "name": "tools.zip",
+          "size": 1981584946,
+          "digest": "sha256:93f570df1acf8cc38e99c6b7b6a9b3513a82ff834798d3fc504ced2030dc9fec",
+          "browser_download_url": "https://github.com/Natthaphon-SNT/vibeKidbright/releases/download/toolchain/tools.zip",
+          "created_at": "2026-07-06T08:25:10Z",
+          "updated_at": "2026-07-06T08:34:37Z"
+        }
+      ]
+    }
+  ],
+  "attestation_lookups": [
+    {
+      "url": "https://api.github.com/repos/Natthaphon-SNT/vibeKidbright/attestations/sha256:57eac23280db220c1b4947b016f97c56659a36aa360fc522cf6b65adb92da5d6",
+      "checked_date": "2026-11-04",
+      "status": 404,
+      "body": "{\"message\":\"Not Found\",\"documentation_url\":\"https://docs.github.com/rest/repos/attestations#list-attestations\",\"status\":\"404\"}"
+    },
+    {
+      "url": "https://api.github.com/repos/Natthaphon-SNT/vibeKidbright/attestations/sha256:93f570df1acf8cc38e99c6b7b6a9b3513a82ff834798d3fc504ced2030dc9fec",
+      "checked_date": "2026-11-04",
+      "status": 404,
+      "body": "{\"message\":\"Not Found\",\"documentation_url\":\"https://docs.github.com/rest/repos/attestations#list-attestations\",\"status\":\"404\"}"
+    }
+  ],
+  "artifact_downloads": [],
+  "decision": {
+    "production_assets": "unverified",
+    "expected_sha256": null,
+    "version": "1.0.1 is the application requested bundle version, not an authenticated upstream release version",
+    "platform": "windows-x86_64 is the former intended target; archive platform binding is not authenticated",
+    "trust_requirement": "Review an independently authenticated publisher checksum/attestation and its key or workflow identity; bind exact asset identity, version, platform and SHA-256 before changing any asset to verified.",
+    "lookup_limit": "Unauthenticated API 404 responses do not prove that no attestations exist elsewhere."
+  }
+}

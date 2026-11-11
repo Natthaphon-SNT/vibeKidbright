@@ -5,6 +5,8 @@ import { toast } from "./Toast";
 import ProjectCreationReview from "./ProjectCreationReview";
 import CompilerRepairReview from "./CompilerRepairReview";
 import PrivateContextConsent from "./PrivateContextConsent";
+import { summarizeUsage, upsertUsageReport, usageDetails, usageReportFromEvent, usageText } from "./aiUsage";
+import type { TokenUsageReport } from "./aiUsage";
 
 interface Message {
     id: string;
@@ -52,7 +54,7 @@ function ApplyButton({ onApply, targetFile }: { onApply: () => void, targetFile?
 }
 
 
-function AiChat({ projectDir, onInjectCode, onApplyToFile, sendApiRef, hasUnsavedChanges = false, draftRequest, onDraftConsumed }: { projectDir: string, onInjectCode: (code: string) => void, onApplyToFile?: (filePath: string, code: string) => void, sendApiRef?: { current: ((text: string) => void) | null }, hasUnsavedChanges?: boolean, draftRequest?: { id: number; text: string } | null, onDraftConsumed?: (id: number) => void }) {
+function AiChat({ projectDir, selectedBoard = "kidbright32", onInjectCode, onApplyToFile, sendApiRef, hasUnsavedChanges = false, draftRequest, onDraftConsumed }: { projectDir: string, selectedBoard?: "kidbright32" | "miuaiplus", onInjectCode: (code: string) => void, onApplyToFile?: (filePath: string, code: string) => void, sendApiRef?: { current: ((text: string) => void) | null }, hasUnsavedChanges?: boolean, draftRequest?: { id: number; text: string } | null, onDraftConsumed?: (id: number) => void }) {
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState("");
     const [isLoading, setIsLoading] = useState(false);
@@ -65,6 +67,13 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile, sendApiRef, hasUnsave
     // Stores the full API-level conversation (including tool_calls + tool responses)
     // so that follow-up messages preserve the complete tool-call history.
     const [conversationHistory, setConversationHistory] = useState<any[]>([]);
+    const lastSentBoardRef = useRef<typeof selectedBoard | null>(null);
+    const activeRequestRef = useRef<string | null>(null);
+    const [contextStats, setContextStats] = useState<{ bytes: number; compacted: boolean } | null>(null);
+    const [tokenReports, setTokenReports] = useState<TokenUsageReport[]>([]);
+    const [usageFinished, setUsageFinished] = useState(false);
+    const [usageFailed, setUsageFailed] = useState(false);
+    const legacyUsageIdRef = useRef(0);
     useEffect(() => {
         let mounted = true;
         const unlisten = listen<string>("ai-project-review-resolved", event => {
@@ -184,6 +193,21 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile, sendApiRef, hasUnsave
         const unlistenActiveModel = listen("ai-active-model", (event) => {
             setActiveModelBadge(event.payload as string);
         });
+        const unlistenContext = listen<string>("ai-context-report", event => {
+            try {
+                const data = JSON.parse(event.payload);
+                if (data.message_id !== activeRequestRef.current || !Number.isSafeInteger(data.request_bytes)) return;
+                setContextStats({ bytes: data.request_bytes, compacted: data.history?.compacted === true });
+            } catch { /* Missing data is not an invented token count. */ }
+        });
+        const unlistenUsage = listen<string>("ai-token-usage", event => {
+            try {
+                const data = JSON.parse(event.payload);
+                if (data.message_id !== activeRequestRef.current) return;
+                const report = usageReportFromEvent(data, `legacy-${++legacyUsageIdRef.current}`);
+                if (report) setTokenReports(previous => upsertUsageReport(previous, report));
+            } catch { /* Some providers/aborted streams omit usage. */ }
+        });
 
         const unlistenDelta = listen("ai-chat-delta", (event) => {
             setStreamingText((prev) => prev + (event.payload as string));
@@ -217,6 +241,7 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile, sendApiRef, hasUnsave
         });
 
         const unlistenDone = listen("ai-chat-done", (event) => {
+            setUsageFinished(true);
             const data = (() => { try { return JSON.parse(event.payload as string); } catch { return {}; } })();
             // Capture the full API-level history (including tool_calls sequences) returned
             // by the backend so follow-up messages keep the complete context.
@@ -229,10 +254,10 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile, sendApiRef, hasUnsave
                     if (last && last.role === "assistant") {
                         return [
                             ...msgs.slice(0, -1),
-                            { ...last, content: prev },
+                            { ...last, content: typeof data.text === "string" ? data.text : prev },
                         ];
                     }
-                    return [...msgs, { id: crypto.randomUUID(), role: "assistant", content: prev }];
+                    return [...msgs, { id: crypto.randomUUID(), role: "assistant", content: typeof data.text === "string" ? data.text : prev }];
                 });
                 return "";
             });
@@ -241,6 +266,9 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile, sendApiRef, hasUnsave
         });
 
         const unlistenError = listen("ai-chat-error", (event) => {
+            setUsageFinished(true);
+            setUsageFailed(true);
+            setConversationHistory([]);
             setIsLoading(false);
             setStreamingText("");
             setActiveTools([]);
@@ -256,6 +284,8 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile, sendApiRef, hasUnsave
 
         return () => {
             unlistenActiveModel.then((f) => f());
+            unlistenContext.then((f) => f());
+            unlistenUsage.then((f) => f());
             unlistenDelta.then((f) => f());
             unlistenToolStart.then((f) => f());
             unlistenToolResult.then((f) => f());
@@ -306,6 +336,8 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile, sendApiRef, hasUnsave
     }, [messages, currentSessionId]);
 
     const createNewChat = () => {
+        activeRequestRef.current = null;
+        setContextStats(null); setTokenReports([]); setUsageFinished(false); setUsageFailed(false);
         setCurrentSessionId(crypto.randomUUID());
         setMessages([]);
         setConversationHistory([]);
@@ -315,16 +347,20 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile, sendApiRef, hasUnsave
     const loadSession = (id: string) => {
         const session = sessions.find(s => s.id === id);
         if (session) {
+            activeRequestRef.current = null;
+            setContextStats(null); setTokenReports([]); setUsageFinished(false); setUsageFailed(false);
             setCurrentSessionId(id);
             setMessages(session.messages);
-            // Tool call history is not persisted — reset so the next message
-            // starts a fresh API context (the UI messages still show prior content).
+            // Reconstruct the saved dialogue on the next send. Tool results are
+            // not persisted; native privacy checks still decide what may export.
             setConversationHistory([]);
             setShowHistory(false);
         }
     };
 
     const clearChat = () => {
+        activeRequestRef.current = null;
+        setContextStats(null); setTokenReports([]); setUsageFinished(false); setUsageFailed(false);
         if (currentSessionId) {
             setSessions(prev => {
                 const updated = prev.filter(s => s.id !== currentSessionId);
@@ -396,6 +432,8 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile, sendApiRef, hasUnsave
         }
 
         const messageId = crypto.randomUUID();
+        activeRequestRef.current = messageId;
+        setContextStats(null); setTokenReports([]); setUsageFinished(false); setUsageFailed(false);
         const userMessage: Message = { id: crypto.randomUUID(), role: "user", content: textToSend };
         const newMessages = [...messages, userMessage];
         setMessages(newMessages);
@@ -415,15 +453,25 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile, sendApiRef, hasUnsave
         // not bypass private-context permission by masquerading as user content.
         const userContent = textToSend;
         const newUserApiMsg = { role: "user", content: userContent };
-        const apiMessages = [...conversationHistory, newUserApiMsg];
+        const priorHistory = conversationHistory.length > 0
+            ? conversationHistory
+            : messages.filter(message => message.content.trim()).map(({ role, content }) => ({ role, content }));
+        const apiMessages = [...priorHistory, newUserApiMsg];
+        const selectedBoardChanged = lastSentBoardRef.current !== selectedBoard;
+        lastSentBoardRef.current = selectedBoard;
 
         try {
             await invoke("send_ai_message", {
                 messages: apiMessages,
                 projectDir,
+                selectedBoard,
+                selectedBoardChanged,
                 messageId
             });
         } catch (err) {
+            setUsageFinished(true);
+            setUsageFailed(true);
+            setConversationHistory([]);
             setIsLoading(false);
             setMessages((prev) => [
                 ...prev.slice(0, -1), // Remove placeholder
@@ -723,6 +771,14 @@ function AiChat({ projectDir, onInjectCode, onApplyToFile, sendApiRef, hasUnsave
                     </button>
                 </div>
             </div>
+
+            {(contextStats || tokenReports.length > 0 || usageFinished) && <div className="px-4 py-1 text-[10px] shrink-0 flex flex-wrap gap-x-3" style={{ color: 'var(--text-secondary)', borderBottom: '1px solid var(--border-color)' }} role="status" aria-label="AI context and token usage">
+                {contextStats && <span title="Serialized size of the latest model request, including rules and tools. This is bytes, not a token estimate. Chat history stays available in this panel.">
+                    Context {(contextStats.bytes / 1024).toFixed(1)} KiB{contextStats.compacted ? ' · older details compacted' : ''}
+                </span>}
+                <span title={usageDetails(tokenReports)}>{usageText(tokenReports, usageFinished, usageFailed)}</span>
+                {tokenReports.length > 0 && <span title={usageDetails(tokenReports)}>{summarizeUsage(tokenReports).providers.join(' / ')}</span>}
+            </div>}
 
             {/* History Modal */}
             {showHistory && (

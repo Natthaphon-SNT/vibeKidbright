@@ -46,10 +46,17 @@ export function getBasename(path: string): string {
 }
 
 /**
- * Normalise a file path for comparison: backslashes → forward slashes, lower-case.
+ * Compare normalized separators; ignore case only for Windows drive/UNC paths.
  */
 export function normPath(path: string): string {
-  return path.replace(/\\/g, '/').toLowerCase();
+  let normalized = path.replace(/\\/g, '/');
+  const windows = /^(?:[a-z]:\/|\/\/)/i.test(normalized);
+  const unc = normalized.startsWith('//');
+  normalized = normalized.replace(/\/{2,}/g, '/');
+  if (unc) normalized = '/' + normalized;
+  normalized = normalized.replace(/\/+$/, '') || '/';
+  if (/^[a-z]:$/i.test(normalized)) normalized += '/';
+  return windows ? normalized.toLowerCase() : normalized;
 }
 
 /**

@@ -18,6 +18,8 @@ pub(crate) fn completion_url(base: &str) -> Result<String, String> {
 
 #[tauri::command]
 pub async fn wiki_ai_request(system_prompt: String, user_prompt: String) -> Result<String, String> {
+    #[cfg(debug_assertions)]
+    if super::config::evaluation_isolated() { return super::pilot::actual_preflight().map(|_| String::new()); }
     if user_prompt.trim().is_empty() || system_prompt.len() + user_prompt.len() > 200_000 {
         return Err("Enter a Wiki request shorter than 200 KB.".into());
     }

@@ -24,40 +24,84 @@
   ],
   "repository_snapshot": [
     {
+      "path": "knowledge_base/IKB1Z_BOARD_RULES.md",
+      "sha256": "5fb5e476510c6277dc34ca9ea27c878d1c911a913b24aba732fecf306a87d00c"
+    },
+    {
       "path": "knowledge_base/README.md",
-      "sha256": "c0443aadcc7cd17d38c3da83e70030c857d6a8663db3c290aa73e4cdaa38ff63"
+      "sha256": "87ee5736f59f771476f93188f55bee045eef31cb0393a88245dcded8d6d9a36c"
     },
     {
       "path": "knowledge_base/all_models.md",
-      "sha256": "c408745c35c3455added1766e54b53d99ed1a072f20bd0c6afcba027d4aacc25"
+      "sha256": "642667720fbe6fa2d5876c13a7e289a0c92cc705fb42a794e11e97b77168d27b"
     },
     {
       "path": "knowledge_base/compatibility/README.md",
-      "sha256": "02b74e3b3a9aeec6ee4ed3a100adb4e8ec92096dcda32bdc86819570c9d8ad51"
+      "sha256": "aeea84ecef9ddbf76b5c7fc100756d22cfdd71a66e3742f21fcbf98c40dc74df"
+    },
+    {
+      "path": "knowledge_base/drivers/README.md",
+      "sha256": "7284c0a46d9863ae716c9f7510488e80b20a6d4d6705d2a7a052df338185248b"
     },
     {
       "path": "knowledge_base/formula_kid_controller.md",
       "sha256": "6a89d84cb57400618170903b4ffdbdc1670b0741ef63a9ecb6a6316574506252"
     },
     {
+      "path": "knowledge_base/guides/classic_esp32.md",
+      "sha256": "97b3483ff10475e49ba1d486d2df4f2428a12a641240477eeb29009f240d0e1b"
+    },
+    {
+      "path": "knowledge_base/guides/mai_plus.md",
+      "sha256": "644a63d96a019d7171c60d6a28e535bf4835855d2c7c4c982a9171daaac62e01"
+    },
+    {
+      "path": "knowledge_base/guides/workflow_reference.md",
+      "sha256": "e8ec532b2d5cc0f516ed5636b231ebcd01363193e0abfa958f80d5b55fc5ce0b"
+    },
+    {
       "path": "knowledge_base/hardware_schematics_rules.md",
-      "sha256": "d061dca09f95fbfea9ec4dfa9bea0f398031f84ba023ee209892c5025e1a3829"
+      "sha256": "21416bb3fb39ee22a53469c17795dddc29c3100d3b4909193951072c5eae6983"
     },
     {
       "path": "knowledge_base/iKB-1.md",
-      "sha256": "fe11a41c5ab368f8cf201ebb77211104c3bd6f8832357f31f33dbe9445fda437"
+      "sha256": "7c90785f4ca9563db698ab4b356fa01da7cf220c10d86067cd6e2fb05212e3a5"
+    },
+    {
+      "path": "knowledge_base/ikb_1z.md",
+      "sha256": "5cd90815db5f7d984df09590323df724cfbb978a4b5d9b61b21f946f13f441dc"
     },
     {
       "path": "knowledge_base/inex_ia_ip.md",
       "sha256": "f6836b75e4f4a04ad764b6c3098838afe7cfa7dd782306d8e2693779f598ed00"
     },
     {
+      "path": "knowledge_base/kidbright32_v13.md",
+      "sha256": "2522e784a2ed252293459b81eec1174893f27b7dd9da5980ec5fbc97dfd9c1e7"
+    },
+    {
+      "path": "knowledge_base/kidbright32_v15.md",
+      "sha256": "b2d99f20a39a386d4b3a10823eba9c897337a0e7d6e5ac5536b4a44a0351f2a9"
+    },
+    {
+      "path": "knowledge_base/kidbright32_versions.md",
+      "sha256": "a16fda28b4ccdd1c7fd504034a0f514fde0195fe052c306a218e7f4ab6265d72"
+    },
+    {
       "path": "knowledge_base/kidbright32iA.md",
-      "sha256": "b127926bde6e19c9e1e3ea6c9e056bcd3f3c74ccd9bf2959780c24b4703c78b1"
+      "sha256": "6abb38e57ae82afd4495924900f36807ddfe3a0b529c501c070d07835dfed718"
     },
     {
       "path": "knowledge_base/kidbright_uai.md",
-      "sha256": "6e1c6ef51e541a8e5588b3de6e35a17099c2eeca699b76767e9d003b81d0b0a5"
+      "sha256": "a26daeaa768923ba15f90d652520c1c68a5fdc22159783c71f40c839cb5be149"
+    },
+    {
+      "path": "knowledge_base/kidbright_uai_plus_python.md",
+      "sha256": "6221f76901c7427a5a50a9c8124f03865cc24bd6210d7cce84e376ec55bdeaa3"
+    },
+    {
+      "path": "knowledge_base/kidbright_uai_plus_test_contracts.md",
+      "sha256": "bb2490deb98cc574871a9f3406eb4b1feba8fc62acf5a70562d738714e316f0c"
     },
     {
       "path": "knowledge_base/led_16x8_matrix_mapping.md",
@@ -77,11 +121,23 @@
     },
     {
       "path": "knowledge_base/support_scope.md",
-      "sha256": "2303a4b4b3604d9a2c60cc3492c670c2214b09cc30953b3574a361266bd317b1"
+      "sha256": "1f2fac488f02fcd6a8906533db06bf406e46050dd7e49c9d82b3c1a32191a4e3"
+    },
+    {
+      "path": "src-tauri/src/ai/prompts/classic_esp32.md",
+      "sha256": "9cd664ac4e0ce64bc772ad62e360f1d057ce877b2d968ff34dc2fa06c6187d65"
+    },
+    {
+      "path": "src-tauri/src/ai/prompts/ikb_1z.md",
+      "sha256": "fad1c85ce8a41bb033fcb7a7c146f4ea6faa6503234fbc49b8d059e8c59a3908"
+    },
+    {
+      "path": "src-tauri/src/ai/prompts/mai_plus.md",
+      "sha256": "eff792e454ecc11a007d32103c27a5ee16e09d92a24f4f54c8dd7e783ed8faf4"
     },
     {
       "path": "src-tauri/src/ai/system_prompt.txt",
-      "sha256": "f70ea53f0e6cc7709d5ec2491bfb806340662e2910bbd3b300b8bdf8b8f7977c"
+      "sha256": "c103b5040f97d017cb0203dfcbe7d06a7c2b1e57b0ca40bfc8d6d246c6e3068c"
     },
     {
       "path": "knowledge_base/compatibility/button_buzzer.c",
@@ -122,6 +178,22 @@
     {
       "path": "knowledge_base/compatibility/temperature_serial.c",
       "sha256": "57cfb940c7038b478ebbdccb8466e08888baf0ed266ab58535f0a9596c61b1f3"
+    },
+    {
+      "path": "knowledge_base/drivers/ikb1z.c",
+      "sha256": "eb0241e7085661e190c0605bd490c3e03d24523d74d0a65506a192ddef7c6765"
+    },
+    {
+      "path": "knowledge_base/drivers/ikb1z.h",
+      "sha256": "efd801e81d828dd31fcc3e8e22c8fe4a963eff8689e7c17a036c1beb5ac2c583"
+    },
+    {
+      "path": "knowledge_base/drivers/ikb1z_esp_idf.c",
+      "sha256": "8c45e58427f63109deb6860422ae0d153bf509a55e17e045c2a77ca39b4174d2"
+    },
+    {
+      "path": "knowledge_base/drivers/ikb1z_esp_idf.h",
+      "sha256": "4fd9ed2644022fff6c6a4e4ef8ae85b0b79320592b172c7a7b2779b8818ce880"
     },
     {
       "path": "knowledge_base/sensor_examples/accel_kxtj3.c",
@@ -185,7 +257,7 @@
     },
     {
       "path": "src-tauri/src/ai/compatibility.rs",
-      "sha256": "c53ab5724a6e9137e476f009ee72d6db4273c470b0b67e7f72afd891ae22bf8d"
+      "sha256": "83c85c62e1809361282d6c0b15abef5ac091f685f669f1c1d228b181bf722792"
     }
   ],
   "caveats": [
@@ -3042,6 +3114,172 @@
       "note": "Reference file presence is not a certified implementation of every related block or every board"
     },
     {
+      "path": "knowledge_base/drivers/ikb1z.c",
+      "sha256": "eb0241e7085661e190c0605bd490c3e03d24523d74d0a65506a192ddef7c6765",
+      "extraction": "static-C-like-signature-candidates-not-a-C-parser",
+      "function_candidates": [
+        {
+          "name": "valid_mask",
+          "line": 3
+        },
+        {
+          "name": "ikb1z_init",
+          "line": 8
+        },
+        {
+          "name": "ikb1z_encode_io",
+          "line": 20
+        },
+        {
+          "name": "ikb1z_encode_motor",
+          "line": 28
+        },
+        {
+          "name": "ikb1z_encode_servo",
+          "line": 38
+        },
+        {
+          "name": "ikb1z_decode_adc10",
+          "line": 48
+        },
+        {
+          "name": "exchange",
+          "line": 59
+        },
+        {
+          "name": "ikb1z_output",
+          "line": 69
+        },
+        {
+          "name": "read_byte",
+          "line": 76
+        },
+        {
+          "name": "ikb1z_input",
+          "line": 91
+        },
+        {
+          "name": "ikb1z_adc8",
+          "line": 93
+        },
+        {
+          "name": "ikb1z_adc_percent",
+          "line": 95
+        },
+        {
+          "name": "ikb1z_adc10",
+          "line": 98
+        },
+        {
+          "name": "ikb1z_motor",
+          "line": 108
+        },
+        {
+          "name": "ikb1z_stop",
+          "line": 117
+        },
+        {
+          "name": "ikb1z_servo",
+          "line": 119
+        },
+        {
+          "name": "ikb1z_reset",
+          "line": 126
+        },
+        {
+          "name": "ikb1z_servo_free",
+          "line": 132
+        },
+        {
+          "name": "ikb1z_uart_read",
+          "line": 138
+        }
+      ],
+      "arduino_markers": false,
+      "full_file_build_status": "no-current-hash-matched-build-evidence",
+      "build_evidence": {
+        "path": "docs/research/kidbright-expansion-2026-10-17-validation.json",
+        "host_suites": [],
+        "firmware_builds": []
+      },
+      "note": "Reference file presence is not a certified implementation of every related block or every board"
+    },
+    {
+      "path": "knowledge_base/drivers/ikb1z.h",
+      "sha256": "efd801e81d828dd31fcc3e8e22c8fe4a963eff8689e7c17a036c1beb5ac2c583",
+      "extraction": "static-C-like-signature-candidates-not-a-C-parser",
+      "function_candidates": [],
+      "arduino_markers": false,
+      "full_file_build_status": "no-current-hash-matched-build-evidence",
+      "build_evidence": {
+        "path": "docs/research/kidbright-expansion-2026-10-17-validation.json",
+        "host_suites": [],
+        "firmware_builds": []
+      },
+      "note": "Reference file presence is not a certified implementation of every related block or every board"
+    },
+    {
+      "path": "knowledge_base/drivers/ikb1z_esp_idf.c",
+      "sha256": "8c45e58427f63109deb6860422ae0d153bf509a55e17e045c2a77ca39b4174d2",
+      "extraction": "static-C-like-signature-candidates-not-a-C-parser",
+      "function_candidates": [
+        {
+          "name": "mapped",
+          "line": 5
+        },
+        {
+          "name": "budget_ticks",
+          "line": 11
+        },
+        {
+          "name": "remaining",
+          "line": 17
+        },
+        {
+          "name": "valid_config",
+          "line": 24
+        },
+        {
+          "name": "idf_exchange",
+          "line": 30
+        },
+        {
+          "name": "ikb1z_esp_idf_init_legacy",
+          "line": 74
+        },
+        {
+          "name": "ikb1z_esp_idf_attach",
+          "line": 86
+        },
+        {
+          "name": "ikb1z_esp_idf_detach",
+          "line": 109
+        }
+      ],
+      "arduino_markers": false,
+      "full_file_build_status": "no-current-hash-matched-build-evidence",
+      "build_evidence": {
+        "path": "docs/research/kidbright-expansion-2026-10-17-validation.json",
+        "host_suites": [],
+        "firmware_builds": []
+      },
+      "note": "Reference file presence is not a certified implementation of every related block or every board"
+    },
+    {
+      "path": "knowledge_base/drivers/ikb1z_esp_idf.h",
+      "sha256": "4fd9ed2644022fff6c6a4e4ef8ae85b0b79320592b172c7a7b2779b8818ce880",
+      "extraction": "static-C-like-signature-candidates-not-a-C-parser",
+      "function_candidates": [],
+      "arduino_markers": false,
+      "full_file_build_status": "no-current-hash-matched-build-evidence",
+      "build_evidence": {
+        "path": "docs/research/kidbright-expansion-2026-10-17-validation.json",
+        "host_suites": [],
+        "firmware_builds": []
+      },
+      "note": "Reference file presence is not a certified implementation of every related block or every board"
+    },
+    {
       "path": "knowledge_base/sensor_examples/accel_kxtj3.c",
       "sha256": "6064a198d3f6ba660cd922f57f06cd36fb35dce982e12748976fac11f8e48653",
       "extraction": "static-C-like-signature-candidates-not-a-C-parser",
@@ -4634,8 +4872,8 @@
             "line": 89
           },
           {
-            "path": "src-tauri/src/ai/system_prompt.txt",
-            "line": 79
+            "path": "knowledge_base/guides/classic_esp32.md",
+            "line": 18
           }
         ]
       },
@@ -11836,28 +12074,80 @@
         "generic_word_ambiguous": true,
         "matches": [
           {
-            "path": "knowledge_base/kidbright32iA.md",
-            "line": 267
+            "path": "knowledge_base/guides/classic_esp32.md",
+            "line": 138
+          },
+          {
+            "path": "knowledge_base/guides/classic_esp32.md",
+            "line": 290
+          },
+          {
+            "path": "knowledge_base/guides/classic_esp32.md",
+            "line": 299
+          },
+          {
+            "path": "knowledge_base/guides/classic_esp32.md",
+            "line": 354
+          },
+          {
+            "path": "knowledge_base/guides/classic_esp32.md",
+            "line": 426
+          },
+          {
+            "path": "knowledge_base/guides/classic_esp32.md",
+            "line": 434
+          },
+          {
+            "path": "knowledge_base/guides/classic_esp32.md",
+            "line": 435
+          },
+          {
+            "path": "knowledge_base/guides/classic_esp32.md",
+            "line": 436
+          },
+          {
+            "path": "knowledge_base/guides/classic_esp32.md",
+            "line": 437
+          },
+          {
+            "path": "knowledge_base/guides/workflow_reference.md",
+            "line": 92
           },
           {
             "path": "knowledge_base/kidbright32iA.md",
-            "line": 595
+            "line": 198
           },
           {
             "path": "knowledge_base/kidbright32iA.md",
-            "line": 691
+            "line": 508
           },
           {
             "path": "knowledge_base/kidbright32iA.md",
-            "line": 742
+            "line": 604
           },
           {
             "path": "knowledge_base/kidbright32iA.md",
-            "line": 1167
+            "line": 655
           },
           {
             "path": "knowledge_base/kidbright32iA.md",
-            "line": 2035
+            "line": 1078
+          },
+          {
+            "path": "knowledge_base/kidbright32iA.md",
+            "line": 1888
+          },
+          {
+            "path": "knowledge_base/kidbright_uai_plus_python.md",
+            "line": 158
+          },
+          {
+            "path": "knowledge_base/kidbright_uai_plus_test_contracts.md",
+            "line": 102
+          },
+          {
+            "path": "knowledge_base/kidbright_uai_plus_test_contracts.md",
+            "line": 109
           },
           {
             "path": "knowledge_base/led_16x8_matrix_mapping.md",
@@ -11881,47 +12171,7 @@
           },
           {
             "path": "knowledge_base/support_scope.md",
-            "line": 73
-          },
-          {
-            "path": "src-tauri/src/ai/system_prompt.txt",
-            "line": 199
-          },
-          {
-            "path": "src-tauri/src/ai/system_prompt.txt",
-            "line": 406
-          },
-          {
-            "path": "src-tauri/src/ai/system_prompt.txt",
-            "line": 415
-          },
-          {
-            "path": "src-tauri/src/ai/system_prompt.txt",
-            "line": 424
-          },
-          {
-            "path": "src-tauri/src/ai/system_prompt.txt",
-            "line": 475
-          },
-          {
-            "path": "src-tauri/src/ai/system_prompt.txt",
-            "line": 547
-          },
-          {
-            "path": "src-tauri/src/ai/system_prompt.txt",
-            "line": 555
-          },
-          {
-            "path": "src-tauri/src/ai/system_prompt.txt",
-            "line": 556
-          },
-          {
-            "path": "src-tauri/src/ai/system_prompt.txt",
-            "line": 557
-          },
-          {
-            "path": "src-tauri/src/ai/system_prompt.txt",
-            "line": 558
+            "line": 92
           }
         ]
       },
@@ -26179,8 +26429,8 @@
             "line": 89
           },
           {
-            "path": "src-tauri/src/ai/system_prompt.txt",
-            "line": 79
+            "path": "knowledge_base/guides/classic_esp32.md",
+            "line": 18
           }
         ]
       },
@@ -26556,19 +26806,23 @@
         "matches": [
           {
             "path": "knowledge_base/all_models.md",
-            "line": 29
+            "line": 33
           },
           {
             "path": "knowledge_base/compatibility/README.md",
             "line": 80
           },
           {
+            "path": "knowledge_base/guides/workflow_reference.md",
+            "line": 12
+          },
+          {
             "path": "knowledge_base/support_scope.md",
             "line": 11
           },
           {
-            "path": "src-tauri/src/ai/system_prompt.txt",
-            "line": 12
+            "path": "src-tauri/src/ai/prompts/classic_esp32.md",
+            "line": 2
           }
         ]
       },
@@ -35433,6 +35687,34 @@
         "generic_word_ambiguous": true,
         "matches": [
           {
+            "path": "knowledge_base/IKB1Z_BOARD_RULES.md",
+            "line": 238
+          },
+          {
+            "path": "knowledge_base/IKB1Z_BOARD_RULES.md",
+            "line": 852
+          },
+          {
+            "path": "knowledge_base/IKB1Z_BOARD_RULES.md",
+            "line": 1000
+          },
+          {
+            "path": "knowledge_base/IKB1Z_BOARD_RULES.md",
+            "line": 1065
+          },
+          {
+            "path": "knowledge_base/IKB1Z_BOARD_RULES.md",
+            "line": 1110
+          },
+          {
+            "path": "knowledge_base/IKB1Z_BOARD_RULES.md",
+            "line": 1137
+          },
+          {
+            "path": "knowledge_base/IKB1Z_BOARD_RULES.md",
+            "line": 1157
+          },
+          {
             "path": "knowledge_base/compatibility/README.md",
             "line": 87
           },
@@ -35451,6 +35733,58 @@
           {
             "path": "knowledge_base/formula_kid_controller.md",
             "line": 707
+          },
+          {
+            "path": "knowledge_base/guides/classic_esp32.md",
+            "line": 307
+          },
+          {
+            "path": "knowledge_base/guides/classic_esp32.md",
+            "line": 340
+          },
+          {
+            "path": "knowledge_base/guides/classic_esp32.md",
+            "line": 349
+          },
+          {
+            "path": "knowledge_base/guides/classic_esp32.md",
+            "line": 352
+          },
+          {
+            "path": "knowledge_base/guides/classic_esp32.md",
+            "line": 354
+          },
+          {
+            "path": "knowledge_base/guides/classic_esp32.md",
+            "line": 376
+          },
+          {
+            "path": "knowledge_base/guides/classic_esp32.md",
+            "line": 377
+          },
+          {
+            "path": "knowledge_base/guides/classic_esp32.md",
+            "line": 383
+          },
+          {
+            "path": "knowledge_base/guides/classic_esp32.md",
+            "line": 392
+          },
+          {
+            "path": "knowledge_base/guides/classic_esp32.md",
+            "line": 547
+          },
+          {
+            "path": "knowledge_base/guides/workflow_reference.md",
+            "line": 18
+          },
+          {
+            "path": "knowledge_base/kidbright_uai_plus_python.md",
+            "line": 94
+          },
+          {
+            "path": "knowledge_base/kidbright_uai_plus_python.md",
+            "line": 199
           },
           {
             "path": "knowledge_base/led_16x8_matrix_mapping.md",
@@ -35510,51 +35844,11 @@
           },
           {
             "path": "knowledge_base/support_scope.md",
-            "line": 129
+            "line": 148
           },
           {
             "path": "src-tauri/src/ai/system_prompt.txt",
-            "line": 18
-          },
-          {
-            "path": "src-tauri/src/ai/system_prompt.txt",
-            "line": 428
-          },
-          {
-            "path": "src-tauri/src/ai/system_prompt.txt",
-            "line": 461
-          },
-          {
-            "path": "src-tauri/src/ai/system_prompt.txt",
-            "line": 470
-          },
-          {
-            "path": "src-tauri/src/ai/system_prompt.txt",
-            "line": 473
-          },
-          {
-            "path": "src-tauri/src/ai/system_prompt.txt",
-            "line": 475
-          },
-          {
-            "path": "src-tauri/src/ai/system_prompt.txt",
-            "line": 497
-          },
-          {
-            "path": "src-tauri/src/ai/system_prompt.txt",
-            "line": 498
-          },
-          {
-            "path": "src-tauri/src/ai/system_prompt.txt",
-            "line": 504
-          },
-          {
-            "path": "src-tauri/src/ai/system_prompt.txt",
-            "line": 513
-          },
-          {
-            "path": "src-tauri/src/ai/system_prompt.txt",
-            "line": 669
+            "line": 3
           }
         ]
       },

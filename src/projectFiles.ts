@@ -68,6 +68,15 @@ function projectRelativePath(project: ProjectPath, path: string): string[] | nul
 }
 
 /** A lexical UI policy; the backend remains responsible for filesystem access. */
+export function isProjectFilePath(projectDir: string, path: string): boolean {
+  const project = absolutePath(projectDir);
+  if (!project) return false;
+  const relative = projectRelativePath(project, path);
+  if (!relative?.length) return false;
+  if (project.windows && relative.some(segment => /[:<>"|?*]|[. ]$/.test(segment))) return false;
+  return !relative.some(segment => segment.toLowerCase() === '.vibekidbright');
+}
+
 export function isLearnerEditablePath(projectDir: string, path: string): boolean {
   const project = absolutePath(projectDir);
   if (!project) return false;

@@ -28,6 +28,8 @@ jobs:
 
       - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
 
       - name: Cache Rust build artifacts
         uses: Swatinem/rust-cache@v2
@@ -80,9 +82,14 @@ jobs:
         shell: pwsh
 
       # ─── Run Rust Unit Tests ──────────────────────────────────────────────────
-      - name: Run Rust unit tests
+      - name: Run Rust tests (library, binaries and examples)
         working-directory: main_repo/src-tauri
-        run: cargo test --lib -- --nocapture
+        run: cargo test --all-targets --locked -- --nocapture
+        shell: pwsh
+
+      - name: Check Rust targets with Clippy
+        working-directory: main_repo/src-tauri
+        run: cargo clippy --all-targets --locked
         shell: pwsh
 
       - name: Build Tauri App

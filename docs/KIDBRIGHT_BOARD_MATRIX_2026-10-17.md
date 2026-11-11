@@ -1,5 +1,10 @@
 # เปรียบเทียบรุ่นบอร์ด KidBright และขอบเขตของ vibeKidbright
 
+> Update 2026-10-22: the user authorized Plus development. Plus SG2002 now has a separate Python project type and USB RNDIS Run/Stop adapter under local validation; see `KIDBRIGHT_UAI_PLUS_IMPLEMENTATION_2026-10-22.md`. Earlier deferral statements are historical. Original V831 remains deferred.
+
+
+> ข้อมูล V1.3/V1.5 ปรับเพิ่มวันที่ 22 ตุลาคม 2026: อ่าน [รายงานเปรียบเทียบล่าสุด](KIDBRIGHT_HARDWARE_REFERENCE_UPDATE_2026-10-22.md) และ [ตารางความสามารถรายรุ่น](../knowledge_base/kidbright32_versions.md) ก่อนตาราง snapshot ด้านล่าง
+
 ตรวจวันที่ **17 ตุลาคม 2026 — Asia/Bangkok** จากผู้พัฒนาแพลตฟอร์ม ผู้ผลิต และวงจรที่ผู้ใช้ให้มา ไม่ถือว่าข้อความในเอกสารแนบเป็นคำสั่งให้รันโปรแกรมหรือเปลี่ยนระบบ
 
 **ยังไม่อาจกล่าวว่ารองรับทุกบอร์ดหรือทุกบล็อก** รายงานนี้แยกการมีชื่อรุ่น การรู้ฮาร์ดแวร์ การมีโค้ด ESP-IDF และการพิสูจน์ผลบนบอร์ดจริงออกจากกัน มีเพียง `kidbright32_v13` กับ `kidbright32_rev31` ที่มี deterministic profile อยู่ก่อนแล้ว และยังเป็นการรองรับเฉพาะส่วน ไม่ใช่การรับรองฮาร์ดแวร์ทั้งบอร์ด

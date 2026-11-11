@@ -1,17 +1,9 @@
-// ── toolchain.rs ─────────────────────────────────────────────────────────────
-// "Happy Meal" Toolchain Manager
-//
-// แทนที่จะให้ Rust ไปสั่งดาวน์โหลด ESP-IDF, Python, Git ทีละตัว
-// โมดูลนี้จะดาวน์โหลด pre-packaged ZIP (kb_compiler_v1.zip) จาก Cloud
-// แล้วแตกไฟล์ลงใน AppData ทันที — ผู้ใช้แค่รอ Loading bar ครั้งแรกครั้งเดียว
-//
-// Flow:
-//   1. check_toolchain()    → ตรวจสอบว่ามีอยู่แล้วหรือยัง
-//   2. download_toolchain() → โหลด ZIP + แตกไฟล์ พร้อม emit progress events
-//   3. get_toolchain_dir()  → คืนค่า path ของ toolchain ให้ build_firmware() ใช้
-// ─────────────────────────────────────────────────────────────────────────────
+//! Managed toolchain installation: trusted manifest -> private archive snapshot ->
+//! SHA-256 -> guarded staging extraction -> SHA-256 recheck -> activation.
+//! Legacy installation readiness does not certify integrity.
 
-use std::io::{BufWriter, Read, Write};
+use std::io::{Read, Write};
+use crate::toolchain_integrity::{Asset, Manifest, VerifiedArchive};
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, OnceLock};
@@ -19,30 +11,6 @@ use tauri::{AppHandle, Emitter, Manager};
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-/// GitHub Releases framework & toolchain — มี 2 ไฟล์แยกกัน:
-///   frameworks.zip  (~300 MB)  → แตกลง toolchain/
-///   tools.zip       (~1.98 GB) → แตกลง toolchain/
-///
-/// โครงสร้างหลังแตกไฟล์:
-///   toolchain/
-///     esp-idf/          ← มาจาก frameworks.zip
-///     .espressif/       ← มาจาก tools.zip
-///     .toolchain_ready  ← sentinel file
-///
-/// รองรับ Google Drive URL ด้วย (แปลงอัตโนมัติ)
-const TOOLCHAIN_PARTS: &[(&str, &str)] = &[
-    // (URL, label)
-    (
-        "https://github.com/Natthaphon-SNT/vibeKidbright/releases/download/framework/frameworks.zip",
-        "frameworks (~300 MB)",
-    ),
-    (
-        "https://github.com/Natthaphon-SNT/vibeKidbright/releases/download/toolchain/tools.zip",
-        "tools (~1.98 GB)",
-    ),
-];
-
-/// ชื่อ "sentinel file" — ถ้าไฟล์นี้มีอยู่ แปลว่า toolchain สมบูรณ์แล้ว
 const SENTINEL_FILE: &str = ".toolchain_ready";
 
 /// เวอร์ชัน toolchain
@@ -82,31 +50,47 @@ fn install_flag() -> Arc<AtomicBool> {
         .clone()
 }
 
-fn replace_install_directory(staging_dir: &Path, final_dir: &Path) -> Result<(), String> {
-    let backup_dir = final_dir.with_extension("backup");
-    if backup_dir.exists() {
-        std::fs::remove_dir_all(&backup_dir)
-            .map_err(|e| format!("Failed to remove stale toolchain backup: {}", e))?;
+fn activate_toolchain(
+    staging_dir: &Path,
+    final_dir: &Path,
+    archives: &mut [VerifiedArchive],
+    cancel: &AtomicBool,
+) -> Result<(), String> {
+    // Re-read every retained snapshot immediately before marking/activation.
+    // Never delete a previous run's staging, cached ZIP or recovery directory.
+    if archives.len() != crate::toolchain_integrity::PART_IDS.len() {
+        return Err("Toolchain integrity: incomplete activation plan.".into());
     }
+    for archive in archives { archive.verify(cancel)?; }
+    if cancel.load(Ordering::SeqCst) { return Err("Toolchain installation cancelled before activation.".into()); }
+    std::fs::write(staging_dir.join(SENTINEL_FILE), TOOLCHAIN_VERSION)
+        .map_err(|e| format!("Cannot mark staged toolchain ready ({:?}).", e.kind()))?;
+    let backup_dir = staging_dir.with_file_name("previous");
+    if backup_dir.exists() { return Err("Toolchain recovery directory already exists; activation stopped.".into()); }
 
     let had_previous = final_dir.exists();
     if had_previous {
         std::fs::rename(final_dir, &backup_dir)
-            .map_err(|e| format!("Failed to stage previous toolchain: {}", e))?;
+            .map_err(|e| format!("Cannot preserve previous toolchain ({:?}); activation stopped.", e.kind()))?;
     }
 
     if let Err(error) = std::fs::rename(staging_dir, final_dir) {
         if had_previous {
-            let _ = std::fs::rename(&backup_dir, final_dir);
+            std::fs::rename(&backup_dir, final_dir).map_err(|_| "Toolchain activation and rollback failed; the previous toolchain is preserved in this install session's recovery directory.".to_string())?;
         }
         return Err(format!(
-            "Failed to activate downloaded toolchain: {}",
-            error
+            "Failed to activate downloaded toolchain ({:?}); the previous toolchain was restored.",
+            error.kind()
         ));
     }
 
     if had_previous {
         let _ = std::fs::remove_dir_all(backup_dir);
+    }
+    // The bundled Python home must reference the activated directory, never
+    // the temporary .installing directory that no longer exists after rename.
+    if let Err(error) = patch_venv_paths(final_dir) {
+        eprintln!("[Toolchain] pyvenv patch warning: {}", error);
     }
     Ok(())
 }
@@ -115,7 +99,7 @@ fn replace_install_directory(staging_dir: &Path, final_dir: &Path) -> Result<(),
 
 #[derive(Clone, serde::Serialize)]
 pub struct ToolchainProgress {
-    /// "downloading" | "extracting" | "done" | "error" | "cancelled"
+    /// "downloading" | "verifying" | "extracting" | "done" | "error" | "cancelled"
     pub stage: String,
     /// 0–100
     pub percent: u8,
@@ -146,6 +130,7 @@ pub fn get_toolchain_dir(app: &AppHandle) -> Result<PathBuf, String> {
 }
 
 /// ตรวจสอบว่า toolchain พร้อมใช้งานหรือยัง
+#[cfg(test)]
 fn is_toolchain_ready(toolchain_dir: &Path) -> bool {
     toolchain_dir.join(SENTINEL_FILE).exists()
 }
@@ -156,32 +141,21 @@ fn is_toolchain_ready(toolchain_dir: &Path) -> bool {
 /// Returns: "ready" | "not_installed" | { version, path }
 #[tauri::command]
 pub async fn check_toolchain(app_handle: AppHandle) -> Result<serde_json::Value, String> {
-    let dir = get_toolchain_dir(&app_handle)?;
-
-    if is_toolchain_ready(&dir) {
-        // อ่าน version จาก sentinel file
-        let sentinel = dir.join(SENTINEL_FILE);
-        let version = std::fs::read_to_string(&sentinel)
-            .unwrap_or_else(|_| "unknown".to_string())
-            .trim()
-            .to_string();
-
-        Ok(serde_json::json!({
-            "status": "ready",
-            "version": version,
-            "path": dir.to_string_lossy()
-        }))
-    } else {
-        // An existing user-configured/runtime SDK is usable without downloading
-        // the managed bundle or manufacturing its installation sentinel.
-        if let Ok((idf,tools))=crate::esp_idf::resolve_idf_paths(&app_handle) {
-            if let Ok(status)=crate::esp_idf::installed_sdk_status(&idf,&tools) {return Ok(status);}
-        }
-        Ok(serde_json::json!({
+    // A marker records an earlier installation; it cannot prove that Python or
+    // the compiler can run on this machine. Use exactly the build resolver.
+    let status = match crate::esp_idf::resolve_idf_paths(&app_handle) {
+        Ok((idf, tools)) => crate::esp_idf::checked_sdk_status(idf, tools).await,
+        Err(error) => Err(error),
+    };
+    match status {
+        Ok(status) => Ok(status),
+        Err(error) => Ok(serde_json::json!({
             "status": "not_installed",
             "version": null,
-            "path": null
-        }))
+            "path": null,
+            "platform": std::env::consts::OS,
+            "error": error
+        })),
     }
 }
 
@@ -194,79 +168,24 @@ pub async fn download_toolchain(
 ) -> Result<String, String> {
     let _install_guard = try_acquire_install(install_flag())?;
 
-    // ถ้ามี custom URL ให้ใช้เป็น single-entry มิฉะนั้นใช้ค่าเริ่มต้น (GitHub Release)
-    let parts: Vec<(String, String)> = url
-        .filter(|u| !u.trim().is_empty())
-        .map(|u| vec![(u, "custom".to_string())])
-        .unwrap_or_else(|| {
-            TOOLCHAIN_PARTS
-                .iter()
-                .map(|(u, l)| (u.to_string(), l.to_string()))
-                .collect()
-        });
-
+    // Resolve trust before touching AppData, making requests or accepting a ZIP.
+    let parts = Manifest::parse(crate::toolchain_integrity::MANIFEST)?.plan(
+        &crate::toolchain_integrity::host_platform(), TOOLCHAIN_VERSION, url.as_deref(),
+    )?;
     let toolchain_dir = get_toolchain_dir(&app_handle)?;
-
-    // ถ้ามีอยู่แล้ว ข้ามเลย
-    if is_toolchain_ready(&toolchain_dir) {
-        return Ok(format!(
-            "Toolchain already installed at {}",
-            toolchain_dir.display()
-        ));
-    }
-
-    // Reset cancel flag
     cancel_flag().store(false, Ordering::SeqCst);
-
-    // Download and extract away from the live directory. Only a complete install
-    // (including its sentinel) is renamed into place.
-    let staging_dir = toolchain_dir.with_extension("installing");
-    if staging_dir.exists() {
-        std::fs::remove_dir_all(&staging_dir)
-            .map_err(|e| format!("Failed to clean stale install directory: {}", e))?;
-    }
-    std::fs::create_dir_all(&staging_dir)
-        .map_err(|e| format!("Failed to create install directory: {}", e))?;
-
-    emit_progress(
-        &app_handle,
-        "downloading",
-        0,
-        &format!(
-            "Starting download ({} file(s)): {}",
-            parts.len(),
-            parts
-                .iter()
-                .map(|(_, l)| l.as_str())
-                .collect::<Vec<_>>()
-                .join(" + ")
-        ),
-    );
-
-    let app_clone = app_handle.clone();
-    let dir_clone = staging_dir.clone();
     let cancel = cancel_flag();
-
-    // รันใน blocking thread
-    let result = tokio::task::spawn_blocking(move || {
-        download_and_extract(&app_clone, &parts, &dir_clone, cancel)
-    })
-    .await
-    .map_err(|e| format!("Task panicked: {}", e))?;
-
-    if let Err(error) = result {
-        let _ = std::fs::remove_dir_all(&staging_dir);
-        return Err(error);
-    }
-
-    if let Err(error) = replace_install_directory(&staging_dir, &toolchain_dir) {
-        let _ = std::fs::remove_dir_all(&staging_dir);
-        return Err(error);
-    }
-    Ok(format!(
-        "Toolchain installed at {}",
-        toolchain_dir.display()
-    ))
+    let app = app_handle.clone();
+    tokio::task::spawn_blocking(move || {
+        let _install_guard = _install_guard;
+        let client = make_http_client()?;
+        install_verified_parts(&toolchain_dir, &parts, &cancel,
+            |asset, output| download_archive(&app, &client, asset, output, &cancel),
+            |stage, percent, message| emit_progress(&app, stage, percent, message),
+        )
+    }).await.map_err(|_| "Toolchain installation task failed; the existing toolchain was retained.".to_string())??;
+    emit_progress(&app_handle, "done", 100, "Toolchain integrity checked and installation complete.");
+    Ok("Toolchain integrity checked and installation complete.".into())
 }
 
 /// ยกเลิกการดาวน์โหลดที่กำลังดำเนินอยู่
@@ -279,6 +198,7 @@ pub async fn cancel_toolchain_download() -> Result<(), String> {
 /// ลบ toolchain ทั้งหมดออก (สำหรับ "Reinstall" หรือแก้ปัญหา)
 #[tauri::command]
 pub async fn remove_toolchain(app_handle: AppHandle) -> Result<String, String> {
+    let _install_guard = try_acquire_install(install_flag())?;
     let toolchain_dir = get_toolchain_dir(&app_handle)?;
 
     if !toolchain_dir.exists() {
@@ -298,6 +218,15 @@ pub async fn remove_toolchain(app_handle: AppHandle) -> Result<String, String> {
 /// เรียกใช้บนเครื่องที่ติดตั้ง toolchain แล้วแต่ build ไม่ผ่านด้วย "No Python at ..." error
 #[tauri::command]
 pub async fn repair_toolchain_paths(app_handle: AppHandle) -> Result<String, String> {
+    let _install_guard = try_acquire_install(install_flag())?;
+    #[cfg(target_os = "macos")]
+    {
+        let (idf, tools) = crate::esp_idf::resolve_idf_paths(&app_handle)?;
+        crate::esp_idf::checked_sdk_status(idf.clone(), tools).await?;
+        return Ok(format!("Native macOS SDK is ready at {}. No Windows venv paths were rewritten.", idf.display()));
+    }
+    #[cfg(not(target_os = "macos"))]
+    {
     let toolchain_dir = get_toolchain_dir(&app_handle)?;
     if !toolchain_dir.exists() {
         return Err("Toolchain not installed yet. Please install it first.".to_string());
@@ -308,42 +237,36 @@ pub async fn repair_toolchain_paths(app_handle: AppHandle) -> Result<String, Str
     tokio::task::spawn_blocking(move || patch_venv_paths(&dir))
         .await
         .map_err(|e| format!("Task panicked: {}", e))??;
+    let (idf, tools) = crate::esp_idf::resolve_idf_paths(&app_handle)?;
+    crate::esp_idf::checked_sdk_status(idf, tools).await?;
 
     Ok(format!(
         "Python venv paths repaired successfully in {}",
         toolchain_dir.display()
     ))
+    }
 }
 
 /// คืนค่า path สำคัญต่างๆ ของ toolchain ให้ frontend ตรวจสอบ
 #[tauri::command]
 pub async fn get_toolchain_paths(app_handle: AppHandle) -> Result<serde_json::Value, String> {
     let base = get_toolchain_dir(&app_handle)?;
-    let idf_path = base.join("esp-idf");
-    let tools_path = base.join(".espressif");
-    let python_env_dir = tools_path.join("python_env");
-
-    // หา python venv ที่มีอยู่
-    let python_venv = find_first_venv(&python_env_dir);
-    let python_bin = python_venv.as_deref().map(|v| {
-        if cfg!(windows) {
-            v.join("Scripts").join("python.exe")
-        } else {
-            v.join("bin").join("python3")
-        }
-    });
-
-    Ok(serde_json::json!({
-        "toolchain_dir":  base.to_string_lossy(),
-        "idf_path":       idf_path.to_string_lossy(),
-        "tools_path":     tools_path.to_string_lossy(),
-        "idf_exists":     idf_path.join("tools/idf.py").exists(),
-        "tools_exists":   tools_path.exists(),
-        "python_venv":    python_venv.as_deref().map(|p| p.to_string_lossy().to_string()),
-        "python_bin":     python_bin.as_deref().map(|p| p.to_string_lossy().to_string()),
-        "python_ready":   python_bin.map(|p| p.exists()).unwrap_or(false),
-        "ready":          is_toolchain_ready(&base),
-    }))
+    let status = match crate::esp_idf::resolve_idf_paths(&app_handle) {
+        Ok((idf, tools)) => crate::esp_idf::checked_sdk_status(idf, tools).await,
+        Err(error) => Err(error),
+    };
+    match status {
+        Ok(status) => Ok(serde_json::json!({
+            "toolchain_dir": base, "idf_path":status["path"], "tools_path":status["tools_path"],
+            "idf_exists":true, "tools_exists":true, "python_venv":status["python_venv"],
+            "python_bin":status["python_bin"], "python_ready":true, "ready":true,
+        })),
+        Err(error) => Ok(serde_json::json!({
+            "toolchain_dir":base, "idf_path":null, "tools_path":null, "idf_exists":false,
+            "tools_exists":false, "python_venv":null, "python_bin":null, "python_ready":false,
+            "ready":false, "error":error,
+        })),
+    }
 }
 
 // ── Core Logic: Download + Extract ───────────────────────────────────────────
@@ -355,7 +278,7 @@ fn make_http_client() -> Result<reqwest::blocking::Client, String> {
         .timeout(std::time::Duration::from_secs(600)) // total timeout 10 นาที
         .user_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
         .redirect(reqwest::redirect::Policy::limited(15))
-        .cookie_store(true) // จำเป็นสำหรับ Google Drive confirmation cookie
+        .https_only(true)
         .tcp_keepalive(std::time::Duration::from_secs(30)) // keepalive ป้องกัน connection drop
         .build()
         .map_err(|e| format!("Failed to create HTTP client: {}", e))
@@ -364,6 +287,7 @@ fn make_http_client() -> Result<reqwest::blocking::Client, String> {
 /// แปลง URL ให้เป็น direct download URL
 /// - Google Drive share URL → drive.usercontent.google.com/download?id=...&confirm=t
 /// - URL อื่นๆ → คืนค่าเดิม
+#[cfg(test)]
 fn resolve_download_url(url: &str) -> String {
     // ตรวจว่าเป็น Google Drive URL หรือไม่
     if !url.contains("drive.google.com") && !url.contains("docs.google.com") {
@@ -406,276 +330,74 @@ fn resolve_download_url(url: &str) -> String {
     )
 }
 
-fn download_and_extract(
-    app: &AppHandle,
-    parts: &[(String, String)], // (url, label)
-    dest_dir: &Path,
-    cancel: Arc<AtomicBool>,
-) -> Result<String, String> {
-    let client = make_http_client()?;
-    let total_parts = parts.len();
-
-    // ─── Phase 1: HEAD เพื่อรวม total size (best-effort) ───────────────────
-    let global_total: u64 = {
-        let mut total = 0u64;
-        for (url, _) in parts {
-            let resolved = resolve_download_url(url);
-            if let Ok(resp) = client
-                .head(&resolved)
-                .header("Accept", "application/octet-stream,*/*")
-                .send()
-            {
-                total += resp.content_length().unwrap_or(0);
-            }
-        }
-        total
-    };
-
-    // ─── Phase 2: ดาวน์โหลด ทุกไฟล์พร้อมกัน (parallel) ──────────────────
-    // Shared atomic counter สำหรับ progress รวมจากทุก thread
-    let global_downloaded = Arc::new(std::sync::atomic::AtomicU64::new(0));
-
-    let zip_paths: Vec<PathBuf> = (0..total_parts)
-        .map(|i| dest_dir.join(format!("_download_{}.zip", i)))
-        .collect();
-
-    // ใช้ thread::scope ดาวน์โหลดทุกไฟล์พร้อมกัน
-    emit_progress(
-        app,
-        "downloading",
-        1,
-        &format!("เริ่มดาวน์โหลด {} ไฟล์พร้อมกัน...", total_parts),
-    );
-
-    let download_errors: Vec<Result<(), String>> = std::thread::scope(|scope| {
-        let handles: Vec<_> = parts
-            .iter()
-            .zip(zip_paths.iter())
-            .enumerate()
-            .map(|(idx, ((url, label), zip_path))| {
-                let client = client.clone();
-                let app = app.clone();
-                let cancel = cancel.clone();
-                let gd = global_downloaded.clone();
-                let url = url.clone();
-                let label = label.clone();
-                let zip_path = zip_path.clone();
-
-                scope.spawn(move || -> Result<(), String> {
-                    let resolved = resolve_download_url(&url);
-                    emit_progress(&app, "downloading", 1,
-                        &format!("[{}/{}] Connecting {}...", idx + 1, total_parts, label));
-
-                    // Connect
-                    let mut resp = client.get(&resolved)
-                        .header("Accept", "application/octet-stream,*/*")
-                        .send()
-                        .map_err(|e| format!("Connect failed ({}): {}", label, e))?;
-
-                    // จัดการ GDrive HTML confirm page
-                    let ct = resp.headers()
-                        .get("content-type")
-                        .and_then(|v| v.to_str().ok())
-                        .unwrap_or("").to_string();
-                    if ct.contains("text/html") && url.contains("drive.google.com") {
-                        let html = resp.text().map_err(|e| e.to_string())?;
-                        let token = extract_gdrive_token(&html);
-                        let file_id = resolved.split("id=").nth(1)
-                            .and_then(|s| s.split('&').next()).unwrap_or("");
-                        let retry = if let Some(t) = token {
-                            format!("https://drive.usercontent.google.com/download?id={}&export=download&confirm={}", file_id, t)
-                        } else {
-                            format!("https://drive.google.com/uc?export=download&id={}&confirm=t", file_id)
-                        };
-                        resp = client.get(&retry)
-                            .header("Accept", "application/octet-stream,*/*")
-                            .send().map_err(|e| format!("GDrive retry failed: {}", e))?;
-                    }
-
-                    if !resp.status().is_success() {
-                        return Err(format!("Server {} for {}", resp.status(), label));
-                    }
-
-                    let part_size = resp.content_length().unwrap_or(0);
-
-                    // Stream ลงไฟล์ด้วย BufWriter (8 MB read buffer + 4 MB write buffer)
-                    let raw_file = std::fs::File::create(&zip_path)
-                        .map_err(|e| format!("Cannot create temp ({}): {}", label, e))?;
-                    let mut file = BufWriter::with_capacity(4 * 1024 * 1024, raw_file);
-                    let mut buf = vec![0u8; 8 * 1024 * 1024]; // 8 MB read buffer
-                    let mut local_done: u64 = 0;
-
-                    // Throttle: emit progress ทุก 3 วินาที ลด UI lag
-                    let mut last_emit = std::time::Instant::now();
-                    let emit_interval = std::time::Duration::from_secs(3);
-                    // Speed tracking
-                    let download_start = std::time::Instant::now();
-                    let mut bytes_since_last_emit: u64 = 0;
-
-                    loop {
-                        if cancel.load(Ordering::SeqCst) {
-                            let _ = std::fs::remove_file(&zip_path);
-                            return Err("Cancelled.".to_string());
-                        }
-
-                        let n = resp.read(&mut buf)
-                            .map_err(|e| format!("Read error ({}): {}", label, e))?;
-                        if n == 0 { break; }
-
-                        file.write_all(&buf[..n])
-                            .map_err(|e| format!("Write error ({}): {}", label, e))?;
-
-                        local_done += n as u64;
-                        bytes_since_last_emit += n as u64;
-                        let combined = gd.fetch_add(n as u64, Ordering::Relaxed) + n as u64;
-
-                        // Emit ทุก 3 วินาที (ไม่ใช่ทุก chunk) เพื่อลด UI lag
-                        if last_emit.elapsed() >= emit_interval {
-                            let elapsed_secs = last_emit.elapsed().as_secs_f64();
-                            last_emit = std::time::Instant::now();
-
-                            // คำนวณ speed จาก bytes ที่โหลดในช่วง interval นี้
-                            let speed_mbps = (bytes_since_last_emit as f64 / 1_048_576.0) / elapsed_secs;
-                            bytes_since_last_emit = 0;
-
-                            // คำนวณ ETA จาก average speed ตลอดการโหลด
-                            let total_elapsed = download_start.elapsed().as_secs_f64();
-                            let avg_speed = if total_elapsed > 0.0 { local_done as f64 / total_elapsed } else { 1.0 };
-                            let remaining_bytes = part_size.saturating_sub(local_done);
-                            let eta_secs = if avg_speed > 0.0 { remaining_bytes as f64 / avg_speed } else { 0.0 };
-
-                            let eta_str = if eta_secs > 3600.0 {
-                                format!("{:.0}h {:.0}m", eta_secs / 3600.0, (eta_secs % 3600.0) / 60.0)
-                            } else if eta_secs > 60.0 {
-                                format!("{:.0}m {:.0}s", eta_secs / 60.0, eta_secs % 60.0)
-                            } else {
-                                format!("{:.0}s", eta_secs)
-                            };
-
-                            let percent = if global_total > 0 {
-                                ((combined as f64 / global_total as f64) * 49.0) as u8
-                            } else {
-                                (combined / 1_048_576 % 48 + 1) as u8
-                            };
-
-                            let mb_done_total = combined as f64 / 1_048_576.0;
-                            let mb_total = global_total as f64 / 1_048_576.0;
-                            let mb_local = local_done as f64 / 1_048_576.0;
-                            let mb_part  = part_size as f64  / 1_048_576.0;
-
-                            emit_progress(&app, "downloading", percent,
-                                &format!("[{}/{}] {} — {:.1}/{:.1} MB  ⚡ {:.1} MB/s  ⏱ ETA {}",
-                                    idx + 1, total_parts, label,
-                                    mb_local, mb_part,
-                                    speed_mbps,
-                                    if remaining_bytes == 0 { "done".to_string() } else { eta_str }));
-
-                            let _ = mb_done_total + mb_total; // suppress unused warning
-                        }
-                    }
-
-                    // Flush BufWriter ก่อนปิด
-                    file.flush()
-                        .map_err(|e| format!("Flush error ({}): {}", label, e))?;
-
-                    Ok(())
-                })
-            })
-            .collect();
-
-        handles
-            .into_iter()
-            .map(|h| {
-                h.join()
-                    .unwrap_or_else(|_| Err("Thread panicked".to_string()))
-            })
-            .collect()
-    });
-
-    // ตรวจสอบ error จาก download threads
-    for (i, res) in download_errors.into_iter().enumerate() {
-        if let Err(e) = res {
-            // ลบ temp ที่สำเร็จแล้ว
-            for zip_path in &zip_paths {
-                let _ = std::fs::remove_file(zip_path);
-            }
-            return Err(format!("ดาวน์โหลดไฟล์ที่ {} ล้มเหลว: {}", i + 1, e));
-        }
+/// All archive sources (network or local/cache fixtures) enter this transaction.
+/// No archive is extracted until every part has passed verification.
+fn install_verified_parts(
+    final_dir: &Path,
+    parts: &[Asset],
+    cancel: &AtomicBool,
+    mut acquire: impl FnMut(&Asset, &mut std::fs::File) -> Result<(), String>,
+    mut progress: impl FnMut(&str, u8, &str),
+) -> Result<(), String> {
+    if parts.len() != crate::toolchain_integrity::PART_IDS.len() {
+        return Err("Toolchain integrity: incomplete installation plan.".into());
     }
-
-    // ─── Phase 3: Extract ทีละไฟล์ (sequential) ───────────────────────────────
-    for (file_idx, ((_, label), zip_path)) in parts.iter().zip(zip_paths.iter()).enumerate() {
+    let parent = final_dir.parent().ok_or("Cannot resolve toolchain parent directory.")?;
+    std::fs::create_dir_all(parent).map_err(|e| format!("Cannot create install workspace ({:?}).", e.kind()))?;
+    let workspace = tempfile::Builder::new().prefix(".toolchain-install-").tempdir_in(parent)
+        .map_err(|e| format!("Cannot create private staging directory ({:?}).", e.kind()))?;
+    let staging = workspace.path().join("staging");
+    let mut archives = Vec::new();
+    for asset in parts {
         if cancel.load(Ordering::SeqCst) {
-            for zp in &zip_paths {
-                let _ = std::fs::remove_file(zp);
-            }
-            return Err("Cancelled before extraction.".to_string());
+            return Err("Toolchain installation cancelled; the existing toolchain was retained.".into());
         }
-
-        let extract_base = 50u8 + (file_idx as u8 * (49 / total_parts as u8));
-        let extract_range = 49u8 / total_parts as u8;
-
-        emit_progress(
-            app,
-            "extracting",
-            extract_base,
-            &format!("[{}/{}] Extracting {}...", file_idx + 1, total_parts, label),
-        );
-
-        let res = extract_zip_ranged(
-            app,
-            zip_path,
-            dest_dir,
-            &cancel,
-            extract_base,
-            extract_range,
-        );
-        let _ = std::fs::remove_file(zip_path);
-        res?;
+        progress("verifying", 1, "Acquiring archive and checking SHA-256 against the trusted manifest...");
+        archives.push(VerifiedArchive::acquire(asset.clone(), cancel, |file| acquire(asset, file))?);
     }
-
-    // ─── Phase 4: Patch venv paths (fix machine-specific Python paths) ─────
-    // A bundled venv may have been created on a different machine.
-    // We rewrite pyvenv.cfg `home =` lines to point to the bundled idf-python in
-    // the actual install directory so Python can be found on any machine.
-    emit_progress(
-        app,
-        "extracting",
-        99,
-        "Patching Python venv paths for this machine...",
-    );
-    if let Err(e) = patch_venv_paths(dest_dir) {
-        // Non-fatal — log but continue.  Build will fail with a clearer message if needed.
-        eprintln!("[Toolchain] pyvenv patch warning: {}", e);
+    for (index, archive) in archives.iter_mut().enumerate() {
+        progress("extracting", 50, "Extracting verified archive into staging...");
+        archive.extract(&staging, cancel, |i, total, _name| {
+            let percent = 50 + ((index as f64 + i as f64 / total.max(1) as f64) / parts.len() as f64 * 48.0) as u8;
+            progress("extracting", percent, "Extracting verified archive into staging...");
+        })?;
     }
-
-    // ─── Phase 5: Sentinel file ────────────────────────────────────────────
-    std::fs::write(dest_dir.join(SENTINEL_FILE), TOOLCHAIN_VERSION)
-        .map_err(|e| format!("Failed to write sentinel: {}", e))?;
-
-    emit_progress(
-        app,
-        "done",
-        100,
-        &format!("Toolchain v{} ready!", TOOLCHAIN_VERSION),
-    );
-
-    Ok(format!("Toolchain installed at {}", dest_dir.display()))
+    progress("verifying", 99, "Rechecking archive SHA-256 before activation...");
+    let result = activate_toolchain(&staging, final_dir, &mut archives, cancel);
+    if result.is_err() && workspace.path().join("previous").exists() {
+        // A failed OS rollback must not cause TempDir to delete the old install.
+        let _ = workspace.keep();
+    }
+    result
 }
 
-/// `base_percent` = \u0e40\u0e23\u0e34\u0e48\u0e21\u0e15\u0e49\u0e19\u0e17\u0e35\u0e48 (0–99), `range` = \u0e08\u0e33\u0e19\u0e27\u0e19 percent \u0e17\u0e35\u0e48\u0e43\u0e0a\u0e49\u0e2a\u0e33\u0e2b\u0e23\u0e31\u0e1a\u0e44\u0e1f\u0e25\u0e4c\u0e19\u0e35\u0e49
-fn extract_zip_ranged(
+fn download_archive(
     app: &AppHandle,
-    zip_path: &Path,
-    dest_dir: &Path,
-    cancel: &Arc<AtomicBool>,
-    base_percent: u8,
-    range: u8,
+    client: &reqwest::blocking::Client,
+    asset: &Asset,
+    output: &mut std::fs::File,
+    cancel: &AtomicBool,
 ) -> Result<(), String> {
-    crate::archive::extract_zip(zip_path,dest_dir,cancel,|i,total,name| {
-        let percent=base_percent+((i as f64/total.max(1) as f64)*range as f64) as u8;
-        emit_progress(app,"extracting",percent,&format!("Extracting... ({}/{}) {}",i+1,total,name));
-    })
+    if cancel.load(Ordering::SeqCst) { return Err("Toolchain download cancelled.".into()); }
+    emit_progress(app, "downloading", 1, &format!("Downloading {}...", asset.id));
+    let mut response = client.get(&asset.download_url).send()
+        .map_err(|_| "Toolchain download connection failed; check the network and proxy.".to_string())?;
+    if !response.status().is_success() {
+        return Err(format!("Toolchain download rejected by server (HTTP {}).", response.status().as_u16()));
+    }
+    let mut buffer = [0u8; 128 * 1024];
+    let mut last_update = std::time::Instant::now();
+    loop {
+        if cancel.load(Ordering::SeqCst) { return Err("Toolchain download cancelled.".into()); }
+        let size = response.read(&mut buffer).map_err(|_| "Toolchain download was interrupted or unreadable.".to_string())?;
+        if size == 0 { break; }
+        output.write_all(&buffer[..size]).map_err(|e| format!("Cannot store toolchain archive ({:?}).", e.kind()))?;
+        if last_update.elapsed() >= std::time::Duration::from_secs(3) {
+            emit_progress(app, "downloading", 1, &format!("Downloading {}...", asset.id));
+            last_update = std::time::Instant::now();
+        }
+    }
+    output.flush().map_err(|e| format!("Cannot flush toolchain archive ({:?}).", e.kind()))
 }
 
 // ── Build Firmware using bundled toolchain ────────────────────────────────────
@@ -870,6 +592,8 @@ fn find_python_in_dir(dir: &Path, depth: u32, max_depth: u32) -> Option<PathBuf>
 /// reflect the current machine's toolchain install location.
 /// Safe to call even if toolchain is not installed (no-op).
 pub fn auto_repair_on_startup(toolchain_dir: &Path) {
+    // Windows venv rewriting cannot create native macOS Python or compilers.
+    if cfg!(target_os = "macos") { return; }
     if !toolchain_dir.join(SENTINEL_FILE).exists() {
         return;
     }
@@ -1290,6 +1014,7 @@ fn dir_has_executables(dir: &Path) -> bool {
 
 /// หา download confirmation token จาก HTML ที่ Google Drive ส่งมา
 /// Google Drive ใช้ form action หรือ query param หลายรูปแบบ
+#[cfg(test)]
 fn extract_gdrive_token(html: &str) -> Option<String> {
     for pattern in &["confirm=", "&amp;confirm="] {
         if let Some(pos) = html.find(pattern) {
@@ -1328,17 +1053,35 @@ mod tests {
     }
 
     #[test]
-    fn staged_install_is_renamed_only_when_complete() {
+    fn staged_install_is_activated_with_final_python_paths() {
         let tmp = tempfile::tempdir().unwrap();
         let final_dir = tmp.path().join("toolchain");
         let staging_dir = tmp.path().join("toolchain.installing");
         fs::create_dir_all(&staging_dir).unwrap();
         fs::write(staging_dir.join(SENTINEL_FILE), TOOLCHAIN_VERSION).unwrap();
+        let python_relative = Path::new("tools/idf-python/test-version");
+        fs::create_dir_all(staging_dir.join(python_relative)).unwrap();
+        let python_name = if cfg!(windows) { "python.exe" } else { "python3" };
+        fs::write(staging_dir.join(python_relative).join(python_name), "").unwrap();
+        let venv_relative = Path::new("tools/python_env/test-venv/pyvenv.cfg");
+        fs::create_dir_all(staging_dir.join(venv_relative).parent().unwrap()).unwrap();
+        fs::write(
+            staging_dir.join(venv_relative),
+            "home = old-machine\ninclude-system-site-packages = false\n",
+        ).unwrap();
 
-        replace_install_directory(&staging_dir, &final_dir).unwrap();
+        let mut archives = super::install_tests::archives_for_activation();
+        activate_toolchain(&staging_dir, &final_dir, &mut archives, &AtomicBool::new(false)).unwrap();
 
         assert!(!staging_dir.exists());
         assert!(is_toolchain_ready(&final_dir));
+        let config = fs::read_to_string(final_dir.join(venv_relative)).unwrap();
+        let home = config.lines().find_map(|line| line.strip_prefix("home = ")).unwrap();
+        assert_eq!(
+            dunce::canonicalize(home).unwrap(),
+            dunce::canonicalize(final_dir.join(python_relative)).unwrap()
+        );
+        assert!(!config.contains(".installing"));
     }
 
     // ── extract_gdrive_token ──────────────────────────────────────────────────
@@ -1413,3 +1156,7 @@ mod tests {
         assert!(is_toolchain_ready(tmp.path()));
     }
 }
+
+#[cfg(test)]
+#[path = "toolchain_install_tests.rs"]
+mod install_tests;

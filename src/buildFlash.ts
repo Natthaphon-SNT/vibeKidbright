@@ -2,7 +2,7 @@ export type BuildResult = "idle" | "building" | "success" | "failed";
 export type BoardType = "kidbright32" | "miuaiplus";
 
 export const MIUAI_DEPLOYMENT_UNAVAILABLE =
-  "μAI and μAI Plus deployment will be added after KidBright support is complete.";
+  "KidBright uAI Plus uses MaixPy Python. Use Connect Plus and Run Python; ESP-IDF Build & Flash does not apply.";
 
 export function isBuildFlashSupported(board: BoardType): boolean {
   return board === "kidbright32";

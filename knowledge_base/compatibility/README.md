@@ -37,7 +37,7 @@ that every KidBright block or board is supported.
   No Arduino C++ classes or Device/Driver objects are needed by this component.
 - Use the board catalog returned by `kidbright_reference` to compare revisions.
   A comparison entry is not permission to use another executable profile.
-  The current phase is classic KidBright. μAI and μAI Plus are future work only.
+  Plus SG2002 Python generation is active; read kidbright_uai_plus_python.md. Original muAI V831 remains separate and deferred.
 - The learner sidebar shows main program files. UI file actions maintain a
   managed source list in CMake. AI-created source files propose that CMake
   change for review; preserve existing dependencies and accept the diff before

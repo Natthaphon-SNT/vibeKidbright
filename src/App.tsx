@@ -1,3 +1,4 @@
+import UaiPlusControls from "./UaiPlusControls";
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
@@ -10,8 +11,9 @@ import { parseErrorLine, type ParsedBuildError } from "./errorHints";
 import BuildErrorList from "./BuildErrorList";
 import { toast, ToastHost } from "./Toast";
 import { normPath } from "./utils";
-import { learnerProjectTree, isLearnerEditablePath, type ProjectFileEntry as FileEntry } from "./projectFiles";
+import { learnerProjectTree, isLearnerEditablePath, isProjectFilePath, type ProjectFileEntry as FileEntry } from "./projectFiles";
 import SetupRepairButton from "./SetupRepairButton";
+import MacosSdkSetup, { isMacOS } from "./MacosSdkSetup";
 import {
   executeBuildLifecycle,
   isBuildFlashSupported,
@@ -317,6 +319,7 @@ function AppShell() {
         toast("⚠️ Toolchain ไม่พบ — กรุณาติดตั้งใหม่", "error");
       }
     } catch (err) {
+      setToolchainReady(false);
       toast(`❌ ตรวจสอบ Toolchain ล้มเหลว: ${err}`, "error");
     } finally {
       setIsRefreshing(false);
@@ -447,7 +450,8 @@ function App({
 
   // Persist the active project across F5 / webview reloads (restored + validated on startup).
   const [projectDir, setProjectDir] = useState<string>(() => {
-    return localStorage.getItem("vibe-project-dir") || ".";
+    const restored = localStorage.getItem("vibe-project-dir");
+    return restored && isProjectFilePath(restored, "main/main.py") ? restored : ".";
   });
   // Always-current project dir for listeners registered once (avoids stale closures).
   const projectDirRef = useRef(projectDir);
@@ -465,15 +469,22 @@ function App({
   const [serialBaud, setSerialBaud] = useState("115200");
   const [isSerialConnected, setIsSerialConnected] = useState(false);
   const serialPortRefreshInFlightRef = useRef(false);
-  const adbDeviceRefreshInFlightRef = useRef(false);
 
   // Board type selector (KidBright32 vs MiuAiPlus)
   const [selectedBoard, setSelectedBoard] = useState<BoardType>(() => {
     return (localStorage.getItem("vibe-selected-board") as BoardType) || "kidbright32";
   });
-  const [adbDevices, setAdbDevices] = useState<string[]>([]);
-  const [selectedAdbDevice, setSelectedAdbDevice] = useState("");
+  const previousBoardRef = useRef(selectedBoard);
+  useEffect(() => {
+    if (previousBoardRef.current === "miuaiplus" && selectedBoard !== "miuaiplus") {
+      void invoke("disconnect_uai_plus").catch(error => addLog(`Plus disconnect: ${error}`));
+    }
+    previousBoardRef.current = selectedBoard;
+  }, [selectedBoard]);
   const [showNewProjectModal, setShowNewProjectModal] = useState(false);
+  const newProjectModalRef = useRef(showNewProjectModal);
+  const newDirectoryRequestRef = useRef(0);
+  newProjectModalRef.current = showNewProjectModal;
   const [newProjectName, setNewProjectName] = useState("my_esp_project");
   const [newProjectPath, setNewProjectPath] = useState("");
   const [projectFiles, setProjectFiles] = useState<FileEntry[]>([]);
@@ -505,16 +516,51 @@ function App({
   const buildFlashRef = useRef<() => void>(() => {});
   const buildInFlightRef = useRef(false);
   const activeBuildProjectRef = useRef<string | null>(null);
+  const activeBuildEpochRef = useRef<number | null>(null);
   const buildCancelRequestedRef = useRef(false);
   const sdkBuildStartedRef = useRef(false);
   openFilesRef.current = openFiles;
   const projectDraftsRef = useRef(new Map<string, FileTab[]>());
+  const projectEpochRef = useRef(0);
+  const openProjectRequestRef = useRef(0);
+  const localNavigationRef = useRef<number | null>(null);
+  const fileOpenRequestRef = useRef(0);
+  const treeRequestRef = useRef(0);
+  const reloadRequestsRef = useRef(new Map<string, number>());
+  const projectWritesRef = useRef<Promise<unknown>>(Promise.resolve());
+  const captureProject = () => ({ path: projectDirRef.current, epoch: projectEpochRef.current });
+  const isCurrentProject = (snapshot: { path: string; epoch: number }) =>
+    snapshot.epoch === projectEpochRef.current && normPath(snapshot.path) === normPath(projectDirRef.current);
+  const queueProjectWrite = <T,>(snapshot: { path: string; epoch: number }, action: () => Promise<T>): Promise<T> => {
+    const operation = projectWritesRef.current.catch(() => {}).then(() => {
+      if (!isCurrentProject(snapshot)) throw new Error("Project changed before saving; reopen the intended project and save again.");
+      return action();
+    });
+    projectWritesRef.current = operation;
+    return operation;
+  };
+  const acknowledgeSaved = (snapshot: { path: string; epoch: number }, saved: Map<string, string>) => {
+    const update = (files: FileTab[]) => files.map(file => {
+      const content = saved.get(normPath(file.path));
+      return content === undefined ? file : { ...file, savedContent: content };
+    });
+    if (isCurrentProject(snapshot)) setOpenFiles(update);
+    const key = normPath(snapshot.path);
+    const cached = projectDraftsRef.current.get(key);
+    if (cached) projectDraftsRef.current.set(key, update(cached));
+  };
 
   // AI creation can change the workspace without a user navigation event.
   // Retain unsaved buffers separately so returning to that project restores them.
   const activateProject = (directory: string) => {
+    if (directory !== "." && !isProjectFilePath(directory, "main/main.py")) {
+      throw new Error("Choose an absolute project directory without path traversal.");
+    }
     const previous = projectDirRef.current;
     if (normPath(previous) === normPath(directory)) return;
+    projectEpochRef.current += 1;
+    fileOpenRequestRef.current += 1;
+    treeRequestRef.current += 1;
     const drafts = openFilesRef.current.filter(file => file.content !== file.savedContent);
     projectDraftsRef.current.set(normPath(previous), drafts);
     const restored = projectDraftsRef.current.get(normPath(directory)) || [];
@@ -523,6 +569,13 @@ function App({
     setProjectDir(directory);
     setOpenFiles(restored);
     setActiveFilePath(restored[0]?.path || "");
+    setProjectFiles([]);
+    setOpenFolders(new Set());
+    sidebarProjectRef.current = "";
+    setInlineAction(null);
+    setContextMenu(null);
+    setGotoLineRequest(null);
+    setBuildErrors([]);
     if (drafts.length || restored.length) {
       toast("Unsaved code is kept in this session. Reopen its project to continue; save before closing the app.", "info");
     }
@@ -550,6 +603,7 @@ function App({
       addLog(`✅ ${result}`);
       setShowSetupModal(false);
       await checkEnvironment();
+      onRefreshToolchain?.();
     } catch (err) {
       setSetupModalError(String(err));
       addLog(`❌ Path validation failed: ${err}`);
@@ -563,6 +617,8 @@ function App({
     setCustomIdfPath("");
     setCustomToolsPath("");
     addLog("Custom paths cleared. Using auto-detection.");
+    await checkEnvironment();
+    onRefreshToolchain?.();
   };
 
   const handlePickIdfPath = async () => {
@@ -575,10 +631,10 @@ function App({
     if (path) setCustomToolsPath(path as string);
   };
 
-  // Check the ESP-IDF environment once; port discovery is polled separately below.
+  // Keep the footer in sync after native setup/recheck changes SDK readiness.
   useEffect(() => {
     checkEnvironment();
-  }, []);
+  }, [toolchainReady]);
 
   useEffect(() => {
     const unlistenTerminal = listen("terminal-output", (event) => {
@@ -589,9 +645,10 @@ function App({
 
     const unlistenFile = listen("file-modified", async (event) => {
       const { path } = JSON.parse(event.payload as string);
-      const normP = path.replace(/\\/g, '/');
+      if (!isProjectFilePath(projectDirRef.current, path)) return;
+      const normP = normPath(path);
       const isOpen = openFilesRef.current.find(
-        f => f.path.replace(/\\/g, '/') === normP
+        f => normPath(f.path) === normP
       );
       if (isOpen) {
         void reloadFile(isOpen.path, true);
@@ -600,10 +657,37 @@ function App({
     });
 
     const unlistenForceDir = listen("force-project-dir", async (event) => {
-      const newPath = event.payload as string;
-      activateProject(newPath);
-      setActiveView("editor");
-      addLog(`Switched project to: ${newPath}`);
+      try {
+        const payload = String(event.payload);
+        const change = payload.trim().startsWith("{") ? JSON.parse(payload) as { projectPath: string; sourceProjectPath?: string; action?: string }
+          : { projectPath: payload, sourceProjectPath: undefined, action: undefined };
+        const newPath = change.projectPath;
+        if (typeof newPath !== "string") return;
+        if (localNavigationRef.current !== null || newProjectModalRef.current) {
+          addLog(`Project available at ${newPath}; the current folder choice was kept.`);
+          return;
+        }
+        if (change.sourceProjectPath && normPath(change.sourceProjectPath) !== normPath(projectDirRef.current)) {
+          addLog(`Project available at ${newPath}; the current project selection was kept.`);
+          return;
+        }
+        const snapshot = captureProject();
+        const request = ++openProjectRequestRef.current;
+        const kind = newPath === "." ? null : await invoke<string | null>("get_project_kind", { path: newPath }).catch(() => null);
+        if (!isCurrentProject(snapshot) || request !== openProjectRequestRef.current) return;
+        if (newPath !== "." && !kind) {
+          if (change.action === "undo") activateProject(".");
+          addLog(`Project could not be opened or is incomplete: ${newPath}`);
+          return;
+        }
+        activateProject(newPath);
+        if (kind) {
+          const board = kind === "kidbright_uai_plus" ? "miuaiplus" : "kidbright32";
+          setSelectedBoard(board); localStorage.setItem("vibe-selected-board", board);
+        }
+        setActiveView("editor");
+        addLog(`Switched project to: ${newPath}`);
+      } catch (error) { addLog(`Project switch failed: ${String(error)}`); }
     });
 
     const unlistenDiffPending = listen("ai-diff-pending", async (event) => {
@@ -611,25 +695,30 @@ function App({
         const data = typeof event.payload === 'string' ? JSON.parse(event.payload) : event.payload as any;
         const fullPath = String(data.fullPath || "");
         if (!fullPath) return;
+        const requestedEpoch = projectEpochRef.current;
+        const requestedRoot = projectDirRef.current;
+        if (!isProjectFilePath(requestedRoot, fullPath)) return;
+        const focus = ++fileOpenRequestRef.current;
         setActiveView("editor");
 
-        const norm = (p: string) => p.replace(/\\/g, '/').toLowerCase();
+        const norm = normPath;
         const existing = openFilesRef.current.find(f => norm(f.path) === norm(fullPath));
 
         if (!existing) {
           try {
             const pending = await invoke<{before:string|null} | null>("check_pending_diff", { path: fullPath });
             const content = pending && typeof pending === "object" && "before" in pending
-              ? (pending.before ?? "") : await invoke("read_project_file", { path: fullPath });
+              ? (pending.before ?? "") : await invoke("read_project_file", { path: fullPath, projectDir: requestedRoot });
+            if (requestedEpoch !== projectEpochRef.current || focus !== fileOpenRequestRef.current) return;
             const fileName = fullPath.split(/[\/\\]/).pop() || "file";
             const newTab: FileTab = { name: fileName, path: fullPath, content: content as string, savedContent: content as string };
-            setOpenFiles(prev => [...prev, newTab]);
+            setOpenFiles(prev => prev.some(file => norm(file.path) === norm(fullPath)) ? prev : [...prev, newTab]);
           } catch (e) {
             console.error("Failed to auto-open file for diff review:", e);
             return;
           }
         }
-        setActiveFilePath(fullPath);
+        if (requestedEpoch === projectEpochRef.current && focus === fileOpenRequestRef.current) setActiveFilePath(fullPath);
       } catch (e) {
         console.error("Error handling ai-diff-pending in App:", e);
       }
@@ -666,23 +755,31 @@ function App({
   }, []);
 
   const reloadFile = async (path: string, automatic = false) => {
+    const snapshot = captureProject();
+    if (!isProjectFilePath(snapshot.path, path)) return false;
+    const key = normPath(path);
+    const request = (reloadRequestsRef.current.get(key) ?? 0) + 1;
+    reloadRequestsRef.current.set(key, request);
     const previous = openFilesRef.current.find(file => normPath(file.path) === normPath(path));
     if (previous && previous.content !== previous.savedContent) {
       if (automatic) {
         toast("The file changed on disk. Your unsaved code was kept; use Reload to review the disk version.", "info");
-        return;
+        return true;
       }
-      if (!window.confirm("Reload this file and discard its unsaved changes?")) return;
+      if (!window.confirm("Reload this file and discard its unsaved changes?")) return false;
     }
     try {
-      const content = await invoke("read_project_file", { path });
+      const content = await invoke("read_project_file", { path, projectDir: snapshot.path });
+      if (!isCurrentProject(snapshot) || reloadRequestsRef.current.get(key) !== request) return false;
       setOpenFiles(prev => prev.map(f =>
         normPath(f.path) === normPath(path) && f.content === previous?.content
           ? { ...f, content: content as string, savedContent: content as string } : f
       ));
       addLog(`Auto-reloaded: ${path.split("/").pop()}`);
+      return true;
     } catch (err) {
-      addLog(`❌ Failed to reload file: ${err}`);
+      if (isCurrentProject(snapshot)) addLog(`❌ Failed to reload file: ${err}`);
+      return false;
     }
   };
 
@@ -699,13 +796,17 @@ function App({
   useEffect(() => {
     if (projectDir === ".") return;
     const restoredProject = projectDir;
-    invoke("validate_idf_project", { path: restoredProject })
+    const snapshot = captureProject();
+    invoke<string | null>("get_project_kind", { path: restoredProject })
       .then((ok) => {
-        if (projectDirRef.current !== restoredProject) return;
-        if (!ok) setProjectDir(".");
-        else addLog(`Restored project: ${projectDir}`);
+        if (!isCurrentProject(snapshot)) return;
+        if (!ok) activateProject(".");
+        else {
+          if (ok === "kidbright_uai_plus") { setSelectedBoard("miuaiplus"); localStorage.setItem("vibe-selected-board", "miuaiplus"); }
+          addLog(`Restored project: ${projectDir}`);
+        }
       })
-      .catch(() => { if (projectDirRef.current === restoredProject) setProjectDir("."); });
+      .catch(() => { if (isCurrentProject(snapshot)) activateProject("."); });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -716,18 +817,19 @@ function App({
   }, [logs]);
 
   const saveAllFiles = useCallback(async () => {
+    const snapshot = captureProject();
     const pendingFiles = openFilesRef.current
-      .filter(file => isLearnerEditablePath(projectDir, file.path) && file.content !== file.savedContent)
+      .filter(file => isLearnerEditablePath(snapshot.path, file.path) && file.content !== file.savedContent)
       .map(file => ({ path: file.path, content: file.content }));
     const savedContents = new Map<string, string>();
     try {
-      for (const file of pendingFiles) {
-        await invoke("write_project_file", {
-          path: file.path,
-          content: file.content
-        });
-        savedContents.set(normPath(file.path), file.content);
-      }
+      await queueProjectWrite(snapshot, async () => {
+        for (const file of pendingFiles) {
+          if (!isCurrentProject(snapshot)) throw new Error("Project changed while saving. Remaining files were kept unsaved.");
+          await invoke("write_project_file", { path: file.path, content: file.content, projectDir: snapshot.path });
+          savedContents.set(normPath(file.path), file.content);
+        }
+      });
       if (savedContents.size > 0) addLog(`✨ Saved ${savedContents.size} program files`);
     } catch (err) {
       addLog(`❌ Failed to save files: ${err}`);
@@ -735,39 +837,51 @@ function App({
     } finally {
       // Mark only bytes acknowledged by the backend as saved. Newer edits stay dirty.
       if (savedContents.size > 0) {
-        setOpenFiles(prev => prev.map(file => {
-          const content = savedContents.get(normPath(file.path));
-          return content === undefined ? file : { ...file, savedContent: content };
-        }));
+        acknowledgeSaved(snapshot, savedContents);
       }
     }
-  }, [projectDir]);
+  }, []);
   // Keep ref in sync so the keyboard shortcut always calls the latest version
   useEffect(() => { saveAllFilesRef.current = saveAllFiles; }, [saveAllFiles]);
 
   const handleSaveProjectAs = async () => {
-    if (projectDir === ".") {
+    const snapshot = captureProject();
+    const request = ++openProjectRequestRef.current;
+    if (snapshot.path === ".") {
       addLog("❌ No project open to save.");
       return;
     }
+    localNavigationRef.current = request;
 
     try {
       await saveAllFiles();
+      if (!isCurrentProject(snapshot) || request !== openProjectRequestRef.current) throw new Error("Project changed before Save As. Choose Save As again in the intended project.");
       addLog("Opening folder picker to save project as...");
-      const result = await invoke("save_project_as", { sourceDir: projectDir });
-      const [newPath, fileCount] = (result as string).split("|");
+      const result = await invoke<{ projectPath: string; filesCopied: number }>("save_project_as", { sourceDir: snapshot.path });
+      const { projectPath: newPath, filesCopied: fileCount } = result;
 
       addLog(`✨ Project successfully saved to ${newPath} (${fileCount} files copied)`);
+      if (!isCurrentProject(snapshot) || request !== openProjectRequestRef.current) return;
 
       const switchProject = window.confirm(`Project saved successfully!\n\nDo you want to switch to the new project location?\n\n${newPath}`);
 
       if (switchProject) {
+        const kind = await invoke<string | null>("get_project_kind", { path: newPath });
+        if (!isCurrentProject(snapshot) || request !== openProjectRequestRef.current) return;
+        if (!kind) throw new Error("Copied project could not be validated. The previous project remains open.");
         activateProject(newPath);
+        const next = captureProject();
+        const board = kind === "kidbright_uai_plus" ? "miuaiplus" : "kidbright32";
+        setSelectedBoard(board); localStorage.setItem("vibe-selected-board", board);
+        const loaded = await handleFileClick(`${newPath.replace(/\\/g, "/")}/main/${kind === "kidbright_uai_plus" ? "main.py" : "main.c"}`);
+        if (!isCurrentProject(next) || !loaded) return;
         addLog(`Switched project to: ${newPath}`);
       }
     } catch (err) {
       addLog(`❌ Failed to save project: ${err}`);
       toast(`Save Project As failed: ${err}`, "error");
+    } finally {
+      if (localNavigationRef.current === request) localNavigationRef.current = null;
     }
   };
 
@@ -777,6 +891,7 @@ function App({
   };
 
   const handleDeleteItem = async (path: string, isDir: boolean) => {
+    const snapshot = captureProject();
     if (!isLearnerEditablePath(projectDir, path)) return;
     const name = path.split(/[\/\\]/).pop() || "";
     if (name === "CMakeLists.txt" || name === "sdkconfig") {
@@ -789,6 +904,7 @@ function App({
 
     try {
       await invoke("delete_program_item", { projectDir, path });
+      if (!isCurrentProject(snapshot)) return;
       addLog(`✨ Deleted: ${path}`);
       loadProjectFiles();
       const removedPath = (filePath: string) => normPath(filePath) === normPath(path)
@@ -796,11 +912,13 @@ function App({
       setOpenFiles(prev => prev.filter(file => !removedPath(file.path)));
       if (removedPath(activeFilePath)) setActiveFilePath("");
     } catch (err) {
+      if (!isCurrentProject(snapshot)) return;
       toast(`Failed to delete: ${err}`, "error");
     }
   };
 
   const handleInlineSubmit = async () => {
+    const snapshot = captureProject();
     if (!inlineAction || !inlineInputValue.trim()) {
       setInlineAction(null);
       return;
@@ -818,6 +936,7 @@ function App({
           throw new Error("Only program files inside main can be renamed.");
         }
         await invoke("rename_program_item", { projectDir, oldPath: inlineAction.path, newPath });
+        if (!isCurrentProject(snapshot)) return;
         addLog(`✨ Renamed to ${value}`);
         const renamedPath = (path: string) => {
           if (normPath(path) === normPath(inlineAction.path)) return newPath;
@@ -840,20 +959,24 @@ function App({
         
         if (inlineAction.mode === "createFile") {
           await invoke("create_program_file", { projectDir, path: newPath });
+          if (!isCurrentProject(snapshot)) return;
           addLog(`✨ Created file ${value}`);
           
           await loadProjectFiles();
+          if (!isCurrentProject(snapshot)) return;
           
           const newFile: FileTab = { name: value, path: newPath, content: "", savedContent: "" };
           setOpenFiles(prev => [...prev, newFile]);
           setActiveFilePath(newPath);
         } else {
           await invoke("create_program_directory", { projectDir, path: newPath });
+          if (!isCurrentProject(snapshot)) return;
           addLog(`✨ Created directory ${value}`);
         }
         setOpenFolders(prev => new Set(prev).add(parentPath));
       }
     } catch (err) {
+      if (!isCurrentProject(snapshot)) return;
       toast(`Operation failed: ${err}`, "error");
     }
 
@@ -864,7 +987,9 @@ function App({
   const handleInlineCancel = () => setInlineAction(null);
 
   const loadProjectFiles = async () => {
-    const dir = projectDirRef.current;
+    const snapshot = captureProject();
+    const dir = snapshot.path;
+    const request = ++treeRequestRef.current;
     if (dir === ".") {
       setProjectFiles([]);
       sidebarProjectRef.current = "";
@@ -872,7 +997,7 @@ function App({
     }
     try {
       const files = await invoke("list_project_files", { path: dir });
-      if (dir !== projectDirRef.current) return; // project changed while loading
+      if (!isCurrentProject(snapshot) || request !== treeRequestRef.current) return;
       const tree = learnerProjectTree(files as FileEntry[], dir);
       setProjectFiles(tree);
       if (sidebarProjectRef.current !== dir) {
@@ -880,6 +1005,7 @@ function App({
         sidebarProjectRef.current = dir;
       }
     } catch (err) {
+      if (!isCurrentProject(snapshot) || request !== treeRequestRef.current) return;
       console.error("Failed to load project files:", err);
       toast("Could not load the project file list.", "error");
     }
@@ -909,38 +1035,10 @@ function App({
     }
   };
 
-  const loadAdbDevices = async (reportError = true) => {
-    if (adbDeviceRefreshInFlightRef.current) return;
-    adbDeviceRefreshInFlightRef.current = true;
-
-    try {
-      const devices = await invoke("list_adb_devices");
-      const list = devices as string[];
-
-      setSelectedAdbDevice(prev => {
-        if (list.length === 0) return "";
-        if (prev && list.includes(prev)) return prev;
-        return list[0];
-      });
-
-      setAdbDevices(list);
-    } catch (err) {
-      if (reportError) {
-        addLog(`❌ Failed to list ADB devices: ${err}`);
-      }
-    } finally {
-      adbDeviceRefreshInFlightRef.current = false;
-    }
-  };
-
   // Refresh the active board's port list automatically without overlapping scans.
   useEffect(() => {
     const refreshVisiblePorts = () => {
-      if (selectedBoard === "miuaiplus") {
-        void loadAdbDevices(false);
-      } else {
-        void loadSerialPorts(false);
-      }
+      if (selectedBoard === "kidbright32") void loadSerialPorts(false);
     };
 
     refreshVisiblePorts();
@@ -949,18 +1047,21 @@ function App({
   }, [selectedBoard]);
 
   const handleFileClick = async (path: string) => {
+    const snapshot = captureProject();
+    if (!isProjectFilePath(snapshot.path, path)) return false;
+    if (!/^(?:[a-z]:[\\/]|[\\/])/i.test(path)) path = `${snapshot.path.replace(/[\\/]+$/, "")}/${path}`;
+    const focus = ++fileOpenRequestRef.current;
     setActiveView("editor");
     const np = normPath(path);
-    const existing = openFiles.find(f => normPath(f.path) === np);
+    const existing = openFilesRef.current.find(f => normPath(f.path) === np);
     if (existing) {
       setActiveFilePath(existing.path);
-      return;
+      return true;
     }
 
     try {
-      const requestedProject = projectDirRef.current;
-      const content = await invoke("read_project_file", { path });
-      if (requestedProject !== projectDirRef.current) return;
+      const content = await invoke("read_project_file", { path, projectDir: snapshot.path });
+      if (!isCurrentProject(snapshot) || focus !== fileOpenRequestRef.current) return false;
       const newTab: FileTab = {
         name: path.split(/[\/\\]/).pop() || "unknown",
         path,
@@ -970,8 +1071,10 @@ function App({
       setOpenFiles(prev => prev.some(file => normPath(file.path) === np) ? prev : [...prev, newTab]);
       setActiveFilePath(path);
       addLog(`Opened: ${newTab.name}`);
+      return true;
     } catch (err) {
-      addLog(`❌ Failed to read file: ${err}`);
+      if (isCurrentProject(snapshot) && focus === fileOpenRequestRef.current) addLog(`❌ Failed to read file: ${err}`);
+      return false;
     }
   };
 
@@ -991,6 +1094,7 @@ function App({
   };
 
   const updateActiveFileContent = async (newContent: string) => {
+    const snapshot = captureProject();
     if (!activeFilePath) {
       console.warn("Attempted to update content but no file is active.");
       addLog("❌ Vibe Code: No active file selected. Please click on a file in the sidebar to open it first.");
@@ -1001,11 +1105,10 @@ function App({
     setOpenFiles(prev => prev.map(f => normPath(f.path) === np ? { ...f, content: newContent } : f));
 
     try {
-      await invoke("write_project_file", {
-        path: activeFilePath,
-        content: newContent
-      });
-      setOpenFiles(prev => prev.map(f => normPath(f.path) === np ? { ...f, savedContent: newContent } : f));
+      await queueProjectWrite(snapshot, () => invoke("write_project_file", {
+        path: activeFilePath, content: newContent, projectDir: snapshot.path
+      }));
+      acknowledgeSaved(snapshot, new Map([[np, newContent]]));
       const fileName = activeFilePath.split(/[\/\\]/).pop() || activeFilePath;
       addLog(`✨ Vibe Code Applied & Saved to: ${fileName}`);
     } catch (err) {
@@ -1027,21 +1130,31 @@ function App({
   };
 
   const handleApplyToFile = async (filePath: string, newContent: string) => {
+    const snapshot = captureProject();
     const normSlash = (p: string) => p.replace(/\\/g, '/');
-    const comparePath = (p: string) => normSlash(p).toLowerCase();
+    const comparePath = normPath;
 
     let absolutePath: string;
     if (filePath.startsWith('/') || filePath.match(/^[a-zA-Z]:[\\\/]/)) {
       absolutePath = normSlash(filePath);
     } else {
-      absolutePath = normSlash(`${projectDir}/${filePath}`);
+      absolutePath = normSlash(`${snapshot.path}/${filePath}`);
+    }
+    if (!isProjectFilePath(snapshot.path, absolutePath)) {
+      toast("AI code can only be applied to a file inside the selected project.", "error");
+      return;
     }
 
-    const confirmApply = window.confirm(`Apply AI code to: ${filePath}?`);
+    const confirmApply = window.confirm(`Apply AI code to: ${absolutePath}?`);
     if (!confirmApply) return;
+    const originalContent = openFilesRef.current.find(file => normPath(file.path) === normPath(absolutePath))?.content;
 
     try {
-      await invoke("safe_write_project_file", { path: absolutePath, content: newContent });
+      await queueProjectWrite(snapshot, () => invoke("safe_write_project_file", { path: absolutePath, content: newContent, projectDir: snapshot.path }));
+      if (!isCurrentProject(snapshot)) {
+        acknowledgeSaved(snapshot, new Map([[normPath(absolutePath), newContent]]));
+        return;
+      }
       addLog(`✨ Vibe Code check & overwrite OK: ${filePath}`);
 
       const existingFile = openFilesRef.current.find(
@@ -1051,7 +1164,7 @@ function App({
       if (existingFile) {
         setOpenFiles((prev) =>
           prev.map((f) =>
-            comparePath(f.path) === comparePath(absolutePath) ? { ...f, content: newContent, savedContent: newContent } : f
+            comparePath(f.path) === comparePath(absolutePath) ? { ...f, content: f.content === originalContent ? newContent : f.content, savedContent: newContent } : f
           )
         );
         setActiveFilePath(existingFile.path);
@@ -1069,20 +1182,48 @@ function App({
   };
 
   const handleOpenProject = async () => {
+    const request = ++openProjectRequestRef.current;
+    localNavigationRef.current = request;
+    const previousEpoch = projectEpochRef.current;
     try {
       const path = await invoke("pick_directory");
       if (!path) return;
 
-      const isValid = await invoke("validate_idf_project", { path });
+      const isValid = await invoke<string | null>("get_project_kind", { path });
+      if (request !== openProjectRequestRef.current || previousEpoch !== projectEpochRef.current) return;
       if (isValid) {
+        const board = isValid === "kidbright_uai_plus" ? "miuaiplus" : "kidbright32";
+        setSelectedBoard(board); localStorage.setItem("vibe-selected-board", board);
+        const reopening = normPath(projectDirRef.current) === normPath(path as string);
         activateProject(path as string);
+        const openedEpoch = projectEpochRef.current;
+        if (reopening) {
+          // Reopening is an explicit refresh. Preserve dirty buffers and reload
+          // saved tabs, even though React's projectDir value has not changed.
+          const refreshed = await Promise.all(openFilesRef.current.map(file => reloadFile(file.path, true)));
+          if (refreshed.some(ok => !ok)) {
+            if (openedEpoch === projectEpochRef.current) addLog(`Project refresh failed; the previous editor contents were kept: ${path}`);
+            return;
+          }
+          await loadProjectFiles();
+        }
+        if (openedEpoch !== projectEpochRef.current || request !== openProjectRequestRef.current) return;
+        const entry = `${String(path).replace(/\\/g, "/").replace(/\/$/, "")}/main/${isValid === "kidbright_uai_plus" ? "main.py" : "main.c"}`;
+        const loaded = await handleFileClick(entry);
+        if (openedEpoch !== projectEpochRef.current || request !== openProjectRequestRef.current) return;
+        if (!loaded) {
+          addLog(`Project selected, but its main program could not be loaded: ${path}`);
+          return;
+        }
         setActiveView("editor");
         addLog(`Project opened: ${path}`);
       } else {
-        toast("Not a valid ESP-IDF project (missing CMakeLists.txt)", "error");
+        toast("Choose an ESP-IDF project or a KidBright uAI Plus Python project", "error");
       }
     } catch (err) {
       addLog(`Error opening project: ${err}`);
+    } finally {
+      if (localNavigationRef.current === request) localNavigationRef.current = null;
     }
   };
 
@@ -1146,34 +1287,18 @@ function App({
       const result = await invoke("check_esp_idf");
       setStatus(result as string);
       setEspIdfSetupNote("");
-    } catch (_err) {
-      // check_esp_idf ล้มเหลว — ตรวจว่า Happy Meal toolchain มีอยู่แล้วหรือเปล่า
-      try {
-        const tc = await invoke("check_toolchain") as { status: string; version: string | null };
-        if (tc.status === "ready") {
-          setStatus(`✅ Toolchain v${tc.version || ""} Ready`);
-          setEspIdfSetupNote("");
-          return; // มี toolchain แล้ว — ไม่ต้องติดตั้งอีก
-        }
-      } catch (_tc) { /* ignore */ }
-      // ไม่มีทั้ง check_esp_idf และ toolchain — แจ้งเฟย ไม่ auto-run
-      setStatus("ESP-IDF not found");
-      setEspIdfSetupNote("⚠️ ESP-IDF not found. Use Setup / Repair ESP-IDF to install.");
-      addLog("⚠️ ESP-IDF not found. Click \"Setup / Repair ESP-IDF\" to install.");
+    } catch (err) {
+      setStatus("ESP-IDF needs setup");
+      setEspIdfSetupNote(String(err));
+      addLog(`⚠️ ${err}`);
     }
   };
 
   const toggleSerialMonitor = async () => {
     if (isSerialConnected) {
       try {
-        // Disconnect based on board type
-        if (selectedBoard === "miuaiplus") {
-          const result = await invoke("stop_adb_monitor");
-          addLog(`${result}`);
-        } else {
-          const result = await invoke("stop_serial_monitor");
-          addLog(`${result}`);
-        }
+        const result = await invoke("stop_serial_monitor");
+        addLog(`${result}`);
         setIsSerialConnected(false);
       } catch (err) {
         addLog(`❌ Failed to stop monitor: ${err}`);
@@ -1181,18 +1306,7 @@ function App({
       return;
     }
 
-    if (selectedBoard === "miuaiplus") {
-      // ADB monitor for MiuAiPlus
-      try {
-        const result = await invoke("start_adb_monitor", {
-          device: selectedAdbDevice || null
-        });
-        addLog(`${result}`);
-        setIsSerialConnected(true);
-      } catch (err) {
-        addLog(`❌ Failed to start ADB monitor: ${err}`);
-      }
-    } else {
+    if (selectedBoard === "kidbright32") {
       // Serial monitor for KidBright32
       if (!selectedSerialPort) {
         addLog("❌ No serial port selected");
@@ -1220,11 +1334,7 @@ function App({
     }
 
     try {
-      if (selectedBoard === "miuaiplus") {
-        // Send via ADB shell
-        await invoke("send_adb_input", { input: terminalInput });
-        addLog(`[ADB TX] ${terminalInput}`);
-      } else {
+      if (selectedBoard === "kidbright32") {
         // Send via serial port
         let payload = terminalInput;
         if (payload.endsWith("\r\n")) {
@@ -1249,7 +1359,10 @@ function App({
 
     // 0. Collect friendly build errors from compiler / linker / esptool output
     const parsedErr = parseErrorLine(raw);
-    if (parsedErr) {
+    const currentBuild = activeBuildProjectRef.current === null || (
+      activeBuildEpochRef.current === projectEpochRef.current
+      && normPath(activeBuildProjectRef.current) === normPath(projectDirRef.current));
+    if (parsedErr && currentBuild) {
       setBuildErrors((prev) => {
         const key = `${parsedErr.file ?? ""}:${parsedErr.line ?? 0}:${parsedErr.message}`;
         if (prev.some((e) => `${e.file ?? ""}:${e.line ?? 0}:${e.message}` === key)) return prev;
@@ -1331,7 +1444,7 @@ function App({
 
   const handleTerminalSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!terminalInput.trim()) return;
+    if (!terminalInput.trim() || selectedBoard === "miuaiplus") return;
 
     if (isSerialConnected) {
       await sendSerialText();
@@ -1375,15 +1488,18 @@ function App({
 
 
   const handleNewProject = () => {
+    newDirectoryRequestRef.current += 1;
+    newProjectModalRef.current = true;
     setShowNewProjectModal(true);
     setNewProjectName("my_esp_project");
     setNewProjectPath("");
   };
 
   const handlePickDirectory = async () => {
+    const request = ++newDirectoryRequestRef.current;
     try {
       const path = await invoke("pick_directory");
-      if (path) {
+      if (path && request === newDirectoryRequestRef.current && newProjectModalRef.current) {
         setNewProjectPath(path as string);
       }
     } catch (err) {
@@ -1393,25 +1509,36 @@ function App({
 
   const confirmCreateProject = async () => {
     if (!newProjectPath || !newProjectName) return;
+    const snapshot = captureProject();
+    const request = ++openProjectRequestRef.current;
+    localNavigationRef.current = request;
+    const board = selectedBoard;
 
     setShowNewProjectModal(false);
     addLog(`Attempting to create project '${newProjectName}' at ${newProjectPath}...`);
 
     try {
-      const result = await invoke("create_idf_project", {
+      const result = await invoke<string>(board === "miuaiplus" ? "create_uai_plus_project" : "create_idf_project", {
         path: newProjectPath,
         name: newProjectName
       });
       addLog(`Success: ${result}`);
 
-      const fullPath = `${newProjectPath}/${newProjectName}`;
+      if (!isCurrentProject(snapshot) || request !== openProjectRequestRef.current) return;
+      const fullPath = result;
       activateProject(fullPath);
+      const next = captureProject();
+      setSelectedBoard(board); localStorage.setItem("vibe-selected-board", board);
+      const loaded = await handleFileClick(`${fullPath.replace(/\\/g, "/")}/main/${board === "miuaiplus" ? "main.py" : "main.c"}`);
+      if (!isCurrentProject(next) || !loaded) return;
       setActiveView("editor");
       addLog(`Active project set to: ${fullPath}`);
     } catch (err) {
       console.error("New project error:", err);
       addLog(`❌ ERROR: ${err}`);
       toast(`Failed to create project: ${err}`, "error");
+    } finally {
+      if (localNavigationRef.current === request) localNavigationRef.current = null;
     }
   };
 
@@ -1439,8 +1566,10 @@ function App({
     }
     // Lock before any save/disconnect await, including repeated shortcut events.
     buildInFlightRef.current = true;
-    const buildProjectDir = projectDir;
+    const buildSnapshot = captureProject();
+    const buildProjectDir = buildSnapshot.path;
     activeBuildProjectRef.current = buildProjectDir;
+    activeBuildEpochRef.current = buildSnapshot.epoch;
     buildCancelRequestedRef.current = false;
     sdkBuildStartedRef.current = false;
     try {
@@ -1453,7 +1582,7 @@ function App({
           setBuildCurrentTask("Saving program files...");
           await saveAllFiles();
           if (buildCancelRequestedRef.current) throw new Error("Build cancelled before starting the SDK.");
-          if (projectDirRef.current !== buildProjectDir) throw new Error("Project changed while preparing the build. Build again in the selected project.");
+          if (!isCurrentProject(buildSnapshot)) throw new Error("Project changed while preparing the build. Build again in the selected project.");
           setBuildCurrentTask("Initializing...");
           // Release the COM port before esptool opens it.
           if (isSerialConnected) {
@@ -1462,7 +1591,7 @@ function App({
             addLog("🔌 Serial monitor disconnected automatically to free the COM port for flashing.");
             await new Promise(resolve => setTimeout(resolve, 500));
           }
-          if (projectDirRef.current !== buildProjectDir) throw new Error("Project changed while preparing the build. Build again in the selected project.");
+          if (!isCurrentProject(buildSnapshot)) throw new Error("Project changed while preparing the build. Build again in the selected project.");
           const argv = selectedSerialPort ? ["-p", selectedSerialPort, "build", "flash"] : ["build", "flash"];
           if (buildCancelRequestedRef.current) throw new Error("Build cancelled before starting the SDK.");
           if (selectedSerialPort) addLog(`Using port: ${selectedSerialPort}`);
@@ -1484,6 +1613,7 @@ function App({
     } finally {
       buildInFlightRef.current = false;
       activeBuildProjectRef.current = null;
+      activeBuildEpochRef.current = null;
       sdkBuildStartedRef.current = false;
     }
   };
@@ -1493,8 +1623,11 @@ function App({
   // Open the file from a build error (if needed) and jump to the offending line
   const jumpToError = async (err: ParsedBuildError) => {
     if (!err.file) return;
+    const snapshot = captureProject();
+    if (!isProjectFilePath(snapshot.path, err.file)) return;
+    const filePath = /^(?:[a-z]:[\\/]|[\\/])/i.test(err.file) ? err.file : `${snapshot.path.replace(/[\\/]+$/, "")}/${err.file}`;
     const target = err.line ?? 1;
-    const np = normPath(err.file);
+    const np = normPath(filePath);
     const existing = openFiles.find(f => normPath(f.path) === np);
     if (existing) {
       setActiveFilePath(existing.path);
@@ -1502,8 +1635,8 @@ function App({
       return;
     }
     try {
-      await handleFileClick(err.file);
-      setGotoLineRequest({ path: err.file, line: target, column: err.column, token: Date.now() });
+      const opened = await handleFileClick(filePath);
+      if (opened && isCurrentProject(snapshot)) setGotoLineRequest({ path: filePath, line: target, column: err.column, token: Date.now() });
     } catch {
       addLog(`❌ Failed to open ${err.file}`);
     }
@@ -1706,6 +1839,9 @@ function App({
               {espIdfSetupNote}
             </div>
           )}
+          {selectedBoard === "miuaiplus" ? <div className="text-xs rounded p-3" style={{ backgroundColor: 'var(--bg-hover)', color: 'var(--text-secondary)' }}>
+            Python · MaixPy 4<br />Use Connect Plus and Run Python in the terminal bar.
+          </div> : <>
           <button
             onClick={handleBuildFlash}
             disabled={activeView === "learning" || isBuilding || isSettingUpEspIdf || !toolchainReady || !isBuildFlashSupported(selectedBoard)}
@@ -1741,6 +1877,7 @@ function App({
               </>
             )}
           </button>
+          </>}
           {isBuilding && <button className="w-full mt-2 text-sm rounded px-3 py-2" disabled={isCancellingBuild}
             onClick={async()=>{const ownedProject=activeBuildProjectRef.current;if(!ownedProject)return;buildCancelRequestedRef.current=true;setIsCancellingBuild(true);try{if(!sdkBuildStartedRef.current){addLog("Build cancellation requested; the current save will finish, then the SDK will not start.");return;}await invoke("cancel_sdk_command",{projectDir:ownedProject});addLog("Stopping SDK process tree...");}catch(error){toast(String(error),"error");}finally{setIsCancellingBuild(false);}}}>
             {isCancellingBuild ? "Stopping..." : "Stop build"}
@@ -1937,7 +2074,7 @@ function App({
                 key={activeFile.path}
                 projectDir={projectDir}
                 sourceBuffers={openFiles.filter(file=>/\.[ch]$/i.test(file.path)).map(file=>({path:file.path,text:file.content}))}
-                onNavigateSource={(path,line,column)=>{void handleFileClick(path).then(()=>setGotoLineRequest({path,line,column,token:Date.now()}));}}
+                onNavigateSource={(path,line,column)=>{const snapshot=captureProject();void handleFileClick(path).then(ok=>{if(ok&&isCurrentProject(snapshot))setGotoLineRequest({path,line,column,token:Date.now()});});}}
                 value={activeFile.content}
                 onChange={handleEditorChange}
                 filePath={activeFile.path}
@@ -1976,9 +2113,9 @@ function App({
 
         {/* Console & Terminal */}
         <div className="h-80 flex flex-col" style={{ borderTop: '1px solid var(--border-color)', backgroundColor: 'var(--bg-terminal)', boxShadow: 'var(--shadow-lg)' }}>
-          <div className="h-9 flex items-center justify-between px-4" style={{ borderBottom: '1px solid var(--border-color)', backgroundColor: 'var(--bg-terminal)' }}>
+          <div className="min-h-9 flex flex-wrap items-center justify-between gap-1 px-4 py-1" style={{ borderBottom: '1px solid var(--border-color)', backgroundColor: 'var(--bg-terminal)' }}>
             <span className="text-[10px] font-bold uppercase tracking-[0.2em]" style={{ color: 'var(--text-muted)' }}>Interactive Terminal</span>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center justify-end gap-2">
               {/* Board Type Selector */}
               <select
                 value={selectedBoard}
@@ -1996,39 +2133,12 @@ function App({
                 title="Select Board Type"
               >
                 <option value="kidbright32">KidBright32</option>
-                <option value="miuaiplus">MiuAiPlus</option>
+                <option value="miuaiplus">mAi Plus</option>
               </select>
 
               {/* Port/Device Controls — conditional based on board type */}
               {selectedBoard === "miuaiplus" ? (
-                /* ADB Device Selector for MiuAiPlus */
-                <>
-                  <select
-                    value={selectedAdbDevice}
-                    onChange={(e) => setSelectedAdbDevice(e.target.value)}
-                    className="rounded px-2 py-1 text-[10px] w-[130px] focus:outline-none cursor-pointer"
-                    style={{ backgroundColor: 'var(--bg-input)', border: '1px solid var(--border-color)', color: 'var(--text-primary)' }}
-                    title="Auto-refreshing ADB Devices"
-                  >
-                    {adbDevices.length === 0 ? (
-                      <option value="" disabled>No ADB Devices</option>
-                    ) : (
-                      <>
-                        {!selectedAdbDevice && <option value="" disabled>Select Device</option>}
-                        {adbDevices.map((dev) => (
-                          <option key={dev} value={dev}>{dev}</option>
-                        ))}
-                      </>
-                    )}
-                  </select>
-                  <button
-                    onClick={() => void loadAdbDevices()}
-                    className="text-[10px] px-2 py-1 rounded"
-                    style={{ backgroundColor: 'var(--bg-hover)', color: 'var(--text-secondary)', border: '1px solid var(--border-color)' }}
-                  >
-                    Refresh ADB
-                  </button>
-                </>
+                <UaiPlusControls projectDir={projectDir} workspaceRevision={projectEpochRef.current} saveFiles={async () => { await saveAllFiles(); }} onLog={addLog} />
               ) : (
                 /* Serial Port Selector for KidBright32 */
                 <>
@@ -2068,6 +2178,7 @@ function App({
                   </button>
                 </>
               )}
+              {selectedBoard === "kidbright32" && <>
               <button
                 onClick={toggleSerialMonitor}
                 className="text-[10px] px-2 py-1 rounded font-bold"
@@ -2077,10 +2188,11 @@ function App({
                 }
               >
                 {isSerialConnected
-                  ? (selectedBoard === "miuaiplus" ? "Disconnect ADB" : "Disconnect Serial")
-                  : (selectedBoard === "miuaiplus" ? "Connect ADB" : "Connect Serial")
+                  ? "Disconnect Serial"
+                  : "Connect Serial"
                 }
               </button>
+              </>}
               <button
                 onClick={() => setLogs([])}
                 className="text-[10px] transition-colors uppercase font-bold"
@@ -2119,6 +2231,7 @@ function App({
               <input
                 type="text"
                 value={terminalInput}
+                disabled={selectedBoard === "miuaiplus"}
                 onChange={(e) => setTerminalInput(e.target.value)}
                 onKeyDown={(e) => {
                   const history = terminalHistoryRef.current;
@@ -2143,13 +2256,14 @@ function App({
                     }
                   }
                 }}
-                placeholder={isSerialConnected ? "Type message and press Enter to send to board..." : "Type command (e.g. idf.py) and press Enter..."}
+                placeholder={selectedBoard === "miuaiplus" ? "Plus output ? use Run Python / Stop Python above" : isSerialConnected ? "Type message and press Enter to send to board..." : "Type command (e.g. idf.py) and press Enter..."}
                 className="w-full bg-transparent border-none focus:outline-none font-mono text-sm"
                 style={{ color: 'var(--text-primary)' }}
               />
             </form>
             <button
               onClick={sendSerialText}
+              disabled={selectedBoard === "miuaiplus"}
               className="text-[10px] px-2 py-1 rounded transition-colors"
               style={{ backgroundColor: 'var(--bg-hover)', color: 'var(--text-secondary)', border: '1px solid var(--border-color)' }}
             >
@@ -2168,6 +2282,7 @@ function App({
           <AiChat
             hasUnsavedChanges={openFiles.some(file => file.content !== file.savedContent)}
             projectDir={projectDir}
+            selectedBoard={selectedBoard}
             onInjectCode={(newCode) => updateActiveFileContent(newCode)}
             onApplyToFile={handleApplyToFile}
             sendApiRef={aiChatSendRef}
@@ -2194,7 +2309,7 @@ function App({
                   type="text"
                   value={newProjectName}
                   onChange={(e) => setNewProjectName(e.target.value)}
-                  placeholder="my_esp_project"
+                  placeholder={selectedBoard === "miuaiplus" ? "my_plus_project" : "my_esp_project"}
                   className="w-full rounded-lg px-3 py-2 text-sm focus:outline-none transition-colors"
                   style={{ backgroundColor: 'var(--bg-input)', border: '1px solid var(--border-color)', color: 'var(--text-primary)' }}
                 />
@@ -2326,13 +2441,16 @@ function App({
             </div>
 
             {/* Tab: Auto Install */}
-            <div className="bg-neutral-900/60 border border-neutral-700 rounded-lg p-4 mb-5">
+            {isMacOS() ? <MacosSdkSetup onRecheck={async () => {
+              await checkEnvironment();
+              onRefreshToolchain?.();
+            }} /> : <div className="bg-neutral-900/60 border border-neutral-700 rounded-lg p-4 mb-5">
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-red-400 text-sm font-bold">⬇ Auto Install</span>
                 <span className="text-[10px] text-neutral-500 bg-neutral-700 px-1.5 py-0.5 rounded">GitHub Release (~2.28 GB)</span>
               </div>
               <p className="text-[11px] text-neutral-500 mb-3">
-                ดาวน์โหลด <code className="text-neutral-400">frameworks.zip</code> + <code className="text-neutral-400">tools.zip</code> จาก GitHub Release แล้วแตกไฟล์ลง AppData โดยอัตโนมัติ (ครั้งเดียว)
+                การติดตั้งจะตรวจ SHA-256 กับ trusted manifest ก่อนแตกไฟล์และเปิดใช้ ขณะนี้ frameworks.zip และ tools.zip ยัง unverified จึงปิดการติดตั้งไว้ โดยรักษา toolchain เดิม
               </p>
               <button
                 onClick={() => { setShowSetupModal(false); handleAutoInstallGithub(); }}
@@ -2341,7 +2459,7 @@ function App({
               >
                 {isSettingUpEspIdf ? "⏳ Downloading from GitHub..." : "⬇️ Start Auto Install (GitHub)"}
               </button>
-            </div>
+            </div>}
 
             <button
               onClick={() => setShowSetupModal(false)}

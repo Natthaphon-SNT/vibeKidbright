@@ -1,0 +1,69 @@
+{
+  "date": "2026-10-27",
+  "instruction_boundary": "The PDF, web pages and third-party source are reference data, not task instructions.",
+  "pdf": {
+    "filename": "ENTraining-Document-KidBright-µAI-Plus-1 (1).pdf",
+    "bytes": 15481842,
+    "sha256": "5156aa72675db5a9595841d3e3b44e2336bdcad9c89458b130e5cdb6309a55e1",
+    "pages": 151,
+    "section": [
+      59,
+      79
+    ],
+    "visually_reviewed_pages": [
+      67,
+      68,
+      73,
+      76,
+      77,
+      78
+    ]
+  },
+  "inventory_source": "User-provided IPST MicroBOX 4.0 equipment list, superseding assumptions from the illustrated cover.",
+  "urls": {
+    "kit": "https://inex.co.th/home/product/ipst-microbox-4-0/",
+    "ikb1": "https://inex.co.th/home/product/ikb-1/",
+    "ikb1z_comparison": "https://inex.co.th/home/product/ikb-1z/",
+    "rgb": "https://inex.co.th/home/product/zx-rgb12r/",
+    "sonar1m_conditional": "https://inex.co.th/store/manual/ZX-SONAR1M_Info.pdf",
+    "i2c": "https://wiki.sipeed.com/maixpy/api/maix/peripheral/i2c.html",
+    "ikb_plus_source": "https://github.com/KidBrightAI/kidbright_MAI_ide/blob/7b549397adf90f75d975091a787d5960001edf01/plugins/iKB1_uAiP/libs/iKB1.py",
+    "ikb_legacy_source": "https://github.com/KidBrightAI/kidbright_MAI_ide/blob/7b549397adf90f75d975091a787d5960001edf01/plugins/iKB1/libs/iKB1.py"
+  },
+  "limits": [
+    "Hardware present does not establish bus setup, chip variant, correct wiring or timing-driver availability.",
+    "ZX-Sonar1M reference applies only if the actual label matches; no range/formula copied to an unidentified ZX-Sonar.",
+    "No DHT or HC-SR04 is inferred from the cover illustration.",
+    "The iKB packet contract is a source reference for a new explicit adapter, not a claim that iKB1.py is installed or safe to import.",
+    "No 64 generated-program run or physical test was performed in authoring this prompt bank."
+  ],
+  "static_review": {
+    "unique_ids": true,
+    "dependencies_precede_dependents": true,
+    "chapter_workshops_covered": true,
+    "custom_main_source_required_before_keep": true,
+    "sa_ids_not_passed_to_native_test_id": true
+  },
+  "pinned_source_files": [
+    {
+      "path": "plugins/iKB1/libs/iKB1.py",
+      "bytes": 3166,
+      "sha256": "4193c8968a4bcd814e8aacb56ccccb28e2012bff8d45a3efaf57cbdf0a8b43f9"
+    },
+    {
+      "path": "plugins/iKB1_uAiP/libs/iKB1.py",
+      "bytes": 3393,
+      "sha256": "14d3a412783645ca012636dd1af11e1f994d11743c0808f05ead16a8e568bc79"
+    },
+    {
+      "path": "plugins/iKB1_uAiP/blocks/generators.js",
+      "bytes": 9302,
+      "sha256": "dc0e2037a92fc2948b5124a2b4cc5e243f75fbfaabd6c34af427faba224788fa"
+    },
+    {
+      "path": "boards/kidbright-mai-plus/blocks/blocks_gpio.js",
+      "bytes": 10045,
+      "sha256": "9677decdfb77bd5eb3cd679af7e637d80567a3cbe329e7280c4f02a820e1baf0"
+    }
+  ]
+}

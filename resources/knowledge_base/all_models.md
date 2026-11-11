@@ -1,6 +1,6 @@
 # KidBright: รุ่นบอร์ดและขอบเขตที่รองรับ
 
-ตรวจข้อมูลวันที่ 17 ตุลาคม 2026
+ปรับข้อมูล V1.3/V1.5 วันที่ 22 ตุลาคม 2026; รุ่นอื่นคงหลักฐานเดิมตาม source IDs
 
 ใช้ [catalog พร้อมแหล่งอ้างอิง](compatibility/board_catalog.json) และ [ขอบเขตการรองรับ](support_scope.md) ก่อนตารางเก่าหรือข้อความว่า compatible การมีชื่อรุ่นไม่ใช่หลักฐานว่ามี driver ครบหรือผ่านบอร์ดจริงแล้ว
 
@@ -11,7 +11,7 @@
 | KidBright32 V1.1 / V1.2 | ยังไม่ยืนยันวงจรเฉพาะ revision | มีหลักฐานชื่อรุ่น/USB driver; ยังไม่มี profile |
 | KidBright32 V1.3 | ESP32 | `kidbright32_v13` เฉพาะ recipe ที่ระบุ |
 | KidBright32 V1.4 | ยังไม่ยืนยันวงจรเฉพาะ revision | ยังไม่มี profile |
-| KidBright32 V1.5 ไม่ระบุ revision | ESP32 ตามแบบที่ให้มา | ต้องแยก PCB/revision ก่อนเลือก profile |
+| KidBright32 V1.5 ไม่ระบุ revision | ESP32 ตาม design ที่ส่ง | มี hardware reference แยก S1/bypass กับ PDF Rev.3; ยังไม่มี deterministic profile ของ V1.5 ทั่วไป |
 | KidBright32 V1.5 Rev3.1 | ESP32 ใน profile เดิม | `kidbright32_rev31` เฉพาะส่วนเดิม; ตัวตน PCB ยังต้องยืนยัน |
 | KidBright32 V1.5 Rev3.1G | ยังไม่ยืนยันวงจรเฉพาะ revision | ยังไม่มี profile |
 | INEX KidBright32i / V1.5i | ยังไม่ยืนยันวงจรเฉพาะ revision | ยังไม่มี profile |
@@ -24,6 +24,10 @@
 
 ตารางย่อรวม V1.1/V1.2 หนึ่งแถว ส่วน catalog แยก 16 รายการ รวมชื่อคลุมเครือและบอร์ดอนุพันธ์ ไม่ใช่ 16 PCB ที่ทดสอบครบ
 
+## บอร์ดเสริมที่ใช้ร่วมกัน
+
+[iKB-1Z](ikb_1z.md) เป็นบอร์ดขยาย I²C ใช้ประกอบกับ KidBright32 หรือ MAI Plus โดยคงบอร์ดหลักเดิม KidBright32 ใช้ ESP-IDF C ส่วน Plus SG2002 ใช้ MaixPy 4 Python มี [ไดรเวอร์และ adapter แยกตาม host](drivers/README.md) พร้อม host/contract tests แต่ยังไม่มีผลทดสอบกับบอร์ดจริง ไม่เพิ่ม iKB-1Z เป็น executable host profile อ่าน [คู่มือที่ส่ง](IKB1Z_BOARD_RULES.md) พร้อมข้อขัดแย้งในเอกสารสรุป
+
 ## ขอบเขตของ recipe
 
 `button_buzzer`, `temperature_serial`, `music_scale` ใช้กับสอง profile เดิม ส่วน `matrix_counter` จำกัด v1.3 ตาม schematic ที่ระบุรุ่นชัด ใช้ฟอนต์ตัวเลข 5×7 ที่เพิ่มใหม่ ยังไม่ได้ทำ font/Unicode/scroll/scheduler ต้นฉบับครบ
@@ -31,6 +35,8 @@
 เอกสาร v1.5 ชื่อไฟล์ Rev3_1 แต่ title block ระบุ REV3 จึงไม่เปิด matrix หรือพินใหม่ให้ rev31 อัตโนมัติ ไม่ใช้ความเหมือนของ MCU เลือก profile แทนกัน
 
 ## ความต่างที่ต้องแยกรายรุ่น
+
+อ่าน [เปรียบเทียบ V1.3/V1.5 ล่าสุด](kidbright32_versions.md): V1.3 IN เป็น digital buffer และ GPIO15=NTP LED; V1.5 ภาพ S1 เป็น bypass/analog และ Servo1=15, Servo2=17 แยก JST gate จาก banana drain ไม่สืบทอดรุ่นอื่นจากข้อความนโยบายในเอกสารแนบ
 
 - v1.3 และแบบ v1.5 ที่ให้มา: display SDA21/SCL22; LM73/RTC SDA4/SCL5; USB-UART ในวงจรเป็น FT231XQ ไม่ใช่ pin map ของทุก revision
 - INEX iA ในข้อมูลผู้ใช้และหน้าผู้ผลิตปัจจุบัน: LDR และ MC3479 ผ่าน iA-MC3479 ไม่เลือก KXTJ3 หรือโฟโต้ทรานซิสเตอร์จากตารางเก่า อ่าน [กฎ iA/iP](inex_ia_ip.md)
@@ -42,4 +48,4 @@
 
 ผล Hello/Heartbeat บน iA ยังไม่มี serial trace, build log หรือผลทดสอบอุปกรณ์ต่อพ่วง จึงไม่ขยายเป็นการรับรองทุกฟังก์ชันหรือทุกภาษา
 
-KidBright μAI และ μAI Plus เป็นแผนอนาคตหลังทำ KidBright ให้สมบูรณ์ ไม่อยู่ใน implementation/deployment รอบนี้
+Plus SG2002 now supports reviewed Python display/camera projects; see `kidbright_uai_plus_python.md`. Original muAI V831 remains a separate deferred target. Physical output is unverified.

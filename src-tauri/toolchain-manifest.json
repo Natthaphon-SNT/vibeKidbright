@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "assets": [
+    {
+      "id": "kidbright-frameworks",
+      "asset_identity": "github:Natthaphon-SNT/vibeKidbright:release:349411794:asset:467878450:frameworks.zip",
+      "platform": "windows-x86_64",
+      "version": "1.0.1",
+      "download_url": "https://github.com/Natthaphon-SNT/vibeKidbright/releases/download/framework/frameworks.zip",
+      "trust": "unverified",
+      "expected_sha256": null,
+      "provenance": null,
+      "checked_date": "2026-11-04",
+      "reason": "Only a digest from the same mutable GitHub release is available; publisher identity and the version/platform binding have not been independently verified."
+    },
+    {
+      "id": "kidbright-tools",
+      "asset_identity": "github:Natthaphon-SNT/vibeKidbright:release:349410633:asset:467876766:tools.zip",
+      "platform": "windows-x86_64",
+      "version": "1.0.1",
+      "download_url": "https://github.com/Natthaphon-SNT/vibeKidbright/releases/download/toolchain/tools.zip",
+      "trust": "unverified",
+      "expected_sha256": null,
+      "provenance": null,
+      "checked_date": "2026-11-04",
+      "reason": "Only a digest from the same mutable GitHub release is available; publisher identity and the version/platform binding have not been independently verified."
+    }
+  ]
+}

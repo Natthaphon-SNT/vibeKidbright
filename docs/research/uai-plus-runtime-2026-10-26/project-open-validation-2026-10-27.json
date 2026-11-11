@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-27",
+  "version": "3.7.4",
+  "issue": "Selected project path changed but its stored main.py was still an unfinished MP-021 seed; reopening also failed to refresh saved tabs.",
+  "fixes": [
+    "Refresh saved tabs on same-project Open while preserving dirty buffers.",
+    "Open selected project entrypoint and reject stale reads across switch-away/back generations.",
+    "Use the full file path for distinct Monaco models.",
+    "Do not log successful open after a failed main read or refresh.",
+    "Require complete main_python when creating a named Plus test with no matching complete template; no MP-021-only seed for MP-022.",
+    "Allow completing write_file proposals before Keep; keep build/run gates."
+  ],
+  "checks": {
+    "frontend_tests": 203,
+    "frontend_test_files": 21,
+    "rust_library_tests": 239,
+    "plus_python_tests": 54,
+    "typescript_check": "passed",
+    "software_only": true,
+    "hardware_run_by_agent": false
+  },
+  "recovery_project": {
+    "path": "src-tauri/target/recovery-projects/mai_test_022_checked",
+    "entrypoint": "main/main.py",
+    "calibration": "main/button_calibration.py",
+    "source": "User-provided MP-021 bands",
+    "physical_repeated_presses_verified": false
+  },
+  "source_sha256": {
+    "src/App.tsx": "11d88ce40a0e38898c0a5d9e1f6b98b3f2bc548283daa6dbef4b5d6288beede4",
+    "src/CodeEditor.tsx": "117bb7a8cd3f5e2a182ab11748d109f203e15947c4b576cc350f3ffc7805c0d0",
+    "src/test/projectSidebar.test.tsx": "0ae7dd71eaabf0c8b568c544b7622c2a00b20c3b59dde8b98d16f25fd8a29bdc",
+    "src/test/codeEditorDiff.test.tsx": "c6fb7e5b3dcb3ea8369d925154b92e5f02bb4854d1dad4c3350fff46ead9ed26",
+    "src-tauri/src/ai/uai_plus.rs": "a20dc1be9f6e91c1b253522a871bf487f58f779b2979240ff42fdd770089a062",
+    "src-tauri/src/ai/providers.rs": "f7d865f4ebf0cabc879d95259022157a8c051cba5e0ca7c5afcda7053de7cafa",
+    "src-tauri/src/ai/tools.rs": "7f8332bee3c442254d808a63711b3332062d16af40ad9fe6992ad64f151834c8",
+    "src-tauri/src/ai/system_prompt.txt": "ca793574028382ac86132c5b6a29e152cbb82dd48585fc737a07d4c4bfe60420",
+    "samples/kidbright-uai-plus/adc_s1_counter.py": "937997eac2f8e631d7c48a728088b9c12656bd4f174b044a0ff4db2b020ed391",
+    "scripts/tests/test_uai_plus_s1_counter.py": "ac863215100844c1410d327a59ea7d8776831c00270dcdb9ac7f381865ca9108"
+  },
+  "sensors_actuators_prompts": {
+    "document": "docs/KIDBRIGHT_MAI_PLUS_SENSORS_ACTUATORS_TEST_PROMPTS_TH_2026-10-27.md",
+    "cases": 64,
+    "source_inventory": "User-confirmed IPST MicroBOX 4.0; mAi Plus remains the main board",
+    "validation": "docs/research/uai-plus-sensors-actuators-2026-10-27/validation.json"
+  },
+  "installer_build": {
+    "status": "passed",
+    "build_log": "src-tauri/target/project-open-build-2026-10-27.log",
+    "bundle_log": "src-tauri/target/project-open-bundle-2026-10-27.log",
+    "artifacts": [
+      {
+        "path": "src-tauri/target/release/vibe-kidbright.exe",
+        "bytes": 48678912,
+        "sha256": "dd5fdfb020fb85091d5e63a252d237fbe60969d683f17e5ea5b1cbf20ee9fb35"
+      },
+      {
+        "path": "src-tauri/target/release/bundle/nsis/VibeKidbright IDE_3.7.4_x64-setup.exe",
+        "bytes": 318084071,
+        "sha256": "0c35925e4cb8a86be03cc6734b50245e0df1cb905a068038817007f7f4fb4684"
+      },
+      {
+        "path": "src-tauri/target/release/bundle/msi/VibeKidbright IDE_3.7.4_x64_en-US.msi",
+        "bytes": 325844992,
+        "sha256": "c3efd1bd1151bb78bc88f6cafea59b80c4a52f7cba8e49e0cfab149f465460b5"
+      }
+    ],
+    "verification": {
+      "stock_seed_rejection_in_native_executable": true,
+      "custom_main_workflow_in_native_executable": true,
+      "exact_audit_registry_in_native_executable": true,
+      "refresh_failure_guard_in_production_frontend": true,
+      "brand_icon_sha256": "40046e2d8658eefa643fb3b2d4cca465427ca0cf5ca6fa43dde912d2e40e6a39"
+    },
+    "notes": [
+      "Local build and packaging only; no app installation or board execution."
+    ]
+  },
+  "limitations": [
+    "No automatic installation, board execution or firmware changes.",
+    "Existing user project/pending review were not overwritten; the checked MP-022 project is a separate local project.",
+    "Custom source still requires review; source presence alone does not certify requested behavior.",
+    "The 64 prompts are statically reviewed procedures, not 64 generated and hardware-tested programs."
+  ]
+}

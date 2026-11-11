@@ -1,0 +1,169 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-27",
+  "version": "3.7.4",
+  "scope": "Workspace navigation, file ownership, copying and local project software integrity",
+  "report": "docs/KIDBRIGHT_WORKSPACE_PATH_AUDIT_2026-10-27.md",
+  "source_sha256": {
+    "src/App.tsx": "e90ff58da14e9793ce8624d68622d9b99f2191c592728996fa7a3cc9e49f5f77",
+    "src/CodeEditor.tsx": "d4833b7eef099f26b5fa10ed9762a14a2298e7908e8e47d179d6e8ce675b1af2",
+    "src/UaiPlusControls.tsx": "016eb1d9ef962475038621fb6327b03ab471b669f5969913ff28a3457b4f2672",
+    "src/utils.ts": "e771bbcb6a8e4d43c9db33387acee3dc0b625f74d41e730838b56eca4bdd8405",
+    "src/projectFiles.ts": "a4e718f46c78309a758321f4487d0deaab8c3dc50eeb9b6ba0025a0e63f9c5c8",
+    "src/test/workspaceSwitching.test.tsx": "7574379fc97dfcbc2265facc0a2cdb9e405756b03d12575ee033dd42c3ed1cfe",
+    "src/test/buildWorkflow.test.tsx": "160c7f877758f94c3f05c386164d525d93ad578193452c60f61aed8cf5a6ab89",
+    "src/test/projectSidebar.test.tsx": "9c36a95063109f4c6d7fbdf8ac04e5b78e8db2a4e944645e6a69795fad3d252e",
+    "src/test/codeEditorDiff.test.tsx": "b1254a659711d70103623d3c220637322b8e56283ab05e2057d4750e093392e6",
+    "src/test/uaiPlusControls.test.tsx": "fe40bb0e2d3101fe76a57b83620b8321b0321b264b2687529e7c2307286ee298",
+    "src-tauri/src/project_workspace.rs": "515caf3ccd75e5fcf9f01a47da4f022de77e8d446c635e7d64f2efda507e8f6b",
+    "src-tauri/src/esp_idf.rs": "a3dd9f3690b1ac7d34b0070c3fcee85b8f4a66a8d41422168ecd4e0b0c64d759",
+    "src-tauri/src/ai_chat.rs": "021a9a5b3ee4123972d613890290679c183748d1e8b26586683bd7f3ea5b2a20",
+    "src-tauri/src/ai/tools.rs": "ad9cbd95f378739e80fff1b5c9c726e850e120ff1ca340263d9138f0683c304f",
+    "src-tauri/src/ai/project_review.rs": "71088dce4651882c952a8bad1484da5db979b79fb76c7d6a99ec953397be5284",
+    "src-tauri/src/lib.rs": "e46422ab3b2474b58c1d227e453024fc870b1ee9ad7f5257ea4066b017b5fe59"
+  },
+  "checks": {
+    "typescript": "passed",
+    "frontend": {
+      "tests": 224,
+      "files": 22,
+      "log": "src-tauri/target/workspace-all-ui-tests-2026-10-27.log",
+      "status": "passed"
+    },
+    "rust_library": {
+      "tests": 249,
+      "log": "src-tauri/target/workspace-native-tests-2026-10-27.log",
+      "status": "passed"
+    },
+    "python_unit": {
+      "tests": 79,
+      "status": "passed",
+      "log": "src-tauri/target/workspace-python-tests-2026-10-27.log"
+    },
+    "node_unit": {
+      "tests": 12,
+      "status": "passed",
+      "log": "src-tauri/target/workspace-node-tests-2026-10-27.log"
+    },
+    "c_host": {
+      "core_checks": 122,
+      "matrix_music_checks": 368,
+      "status": "passed",
+      "log": "src-tauri/target/workspace-c-tests-2026-10-27.log"
+    },
+    "offline_token_scope": {
+      "cases": 7,
+      "status": "passed",
+      "network_used": false,
+      "credentials_read": false,
+      "command": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/tests/winget-token.tests.ps1"
+    },
+    "plus_prompt_registry": {
+      "cases": 128,
+      "status": "passed",
+      "hardware_results_reset": false
+    },
+    "whitespace_diff": "passed (CRLF-aware; audited source paths)",
+    "npm_dependency_tree": "passed: npm ls --depth=0",
+    "version_alignment": "passed: package.json, package-lock.json, tauri.conf.json at 3.7.4",
+    "release_gates": {
+      "status": "passed",
+      "runtime": true,
+      "standalone": true,
+      "kb_sync": true,
+      "kb_hashes": true,
+      "board_catalog": true,
+      "coverage": true,
+      "rules": true,
+      "public_readiness": true,
+      "bundle_resources": 48,
+      "production_frontend": true
+    }
+  },
+  "installer_build": {
+    "status": "passed",
+    "build_log": "src-tauri/target/workspace-path-build-2026-10-27.log",
+    "bundle_log": "src-tauri/target/workspace-path-bundle-2026-10-27.log",
+    "native_release": "passed",
+    "native_guard_checks": {
+      "Choose a destination outside the source project": true,
+      "Destination must be a new folder:": true,
+      "File is outside the selected workspace.": true,
+      "Cannot resolve the selected project parent:": true,
+      "sourceProjectPath": true,
+      "exact_plus_contract_registry": true
+    },
+    "frontend_guard_checks": {
+      "serialized_project_writes": true,
+      "structured_project_switch_origin": true,
+      "structured_save_as_result": true,
+      "workspace_generation_before_build": true,
+      "explicit_apply_project_boundary": true
+    },
+    "rust_warnings": 18,
+    "vite_large_chunk_warning": true,
+    "artifacts": [
+      {
+        "path": "src-tauri/target/release/vibe-kidbright.exe",
+        "bytes": 48749056,
+        "sha256": "1713ee179d006d0cd12734fadd7ff6f118b3a76b50cbc935ea29dce6e3c0761f"
+      },
+      {
+        "path": "src-tauri/target/release/bundle/nsis/VibeKidbright IDE_3.7.4_x64-setup.exe",
+        "bytes": 318087472,
+        "sha256": "1ab2857f1ed542d70001c24ea35eb6858d3024e3d937a0c1360b19a8b9b4a686"
+      },
+      {
+        "path": "src-tauri/target/release/bundle/msi/VibeKidbright IDE_3.7.4_x64_en-US.msi",
+        "bytes": 325861376,
+        "sha256": "6d6fce12ac9019846bb297edfb0fd8b8c7144beadf165d22d1fdb243c3b58378"
+      }
+    ],
+    "brand_icon_sha256": "40046e2d8658eefa643fb3b2d4cca465427ca0cf5ca6fa43dde912d2e40e6a39",
+    "source_snapshot_still_matches_after_build": true,
+    "notes": [
+      "Local release compile and NSIS/MSI packaging completed; no automatic installation or board execution.",
+      "Same version 3.7.4 rebuilt with current audited sources; identify artifacts by their hashes."
+    ],
+    "msi_verification": {
+      "status": "passed",
+      "properties": {
+        "ProductVersion": "3.7.4",
+        "ARPPRODUCTICON": "ProductIcon"
+      },
+      "icons": [
+        {
+          "name": "ProductIcon",
+          "sha256": "40046e2d8658eefa643fb3b2d4cca465427ca0cf5ca6fa43dde912d2e40e6a39"
+        }
+      ],
+      "files": [
+        {
+          "name": "5h6yeya7.exe|vibe-kidbright.exe",
+          "bytes": 48749056
+        },
+        {
+          "name": "vsb8iupy.md|kidbright_uai_plus_python.md",
+          "bytes": 16266
+        },
+        {
+          "name": "w5cwiook.jso|uai_plus_test_contracts.json",
+          "bytes": 229175
+        }
+      ],
+      "source_icon_sha256": "40046e2d8658eefa643fb3b2d4cca465427ca0cf5ca6fa43dde912d2e40e6a39",
+      "staged_icon_matches": true
+    },
+    "nsis_icon_configuration": "installerIcon and uninstallerIcon both src-tauri/icons/icon.ico"
+  },
+  "limitations": [
+    "Software/fixture checks on Windows; no installed-app GUI smoke test.",
+    "No automatic board execution, firmware update or app installation.",
+    "No user projects or pending drafts overwritten.",
+    "Save As omits .git, build, target, node_modules and __pycache__; partial destinations remain on failure.",
+    "Legacy rootless file IPC stays compatible; audited App flows explicitly supply projectDir.",
+    "IDE default automatic entrypoints remain main/main.py or main/main.c; this audit does not certify arbitrary custom entrypoint layouts.",
+    "Unsaved project buffers survive switching in the current app session only.",
+    "Rust unused/dead-code warnings are recorded; passing builds do not mean zero warnings."
+  ]
+}

@@ -143,7 +143,8 @@ function listFiles(directory) {
     return entry.isDirectory() ? listFiles(path) : [path];
   }).sort();
 }
-const ruleFiles = [...listFiles("knowledge_base").filter((file) => /\.(md|txt)$/.test(file)), "src-tauri/src/ai/system_prompt.txt"];
+const ruleFiles = [...listFiles("knowledge_base").filter((file) => /\.(md|txt)$/.test(file)),
+  ...listFiles("src-tauri/src/ai/prompts").filter((file) => /\.(md|txt)$/.test(file)), "src-tauri/src/ai/system_prompt.txt"];
 const exampleFiles = listFiles("knowledge_base").filter((file) => /\.(c|h)$/.test(file));
 const supportFiles = [...ruleFiles, ...exampleFiles, "src-tauri/tests/kidbright_core_test.c", "src-tauri/src/ai/compatibility.rs"];
 const textByFile = new Map(supportFiles.map((file) => [file, read(file)]));

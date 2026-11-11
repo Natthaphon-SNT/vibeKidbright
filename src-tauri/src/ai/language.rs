@@ -157,6 +157,10 @@ fn looks_like_log_or_code(line: &str) -> bool {
 }
 
 fn prose_only(text: &str) -> String {
+    prose_only_for(text, false)
+}
+
+fn prose_only_for(text: &str, keep_inline_names: bool) -> String {
     let text = remove_reference_regions(&strip_application_wrappers(text));
     let mut fence: Option<char> = None;
     let mut prose = Vec::new();
@@ -178,7 +182,7 @@ fn prose_only(text: &str) -> String {
         {
             continue;
         }
-        let line = remove_inline_quotes_and_code(trimmed);
+        let line = if keep_inline_names { trimmed.to_owned() } else { remove_inline_quotes_and_code(trimmed) };
         if line.chars().filter(|c| c.is_alphabetic()).take(2).count() >= 2 {
             prose.push(line.trim().to_owned());
         }
@@ -211,6 +215,13 @@ fn latest_user_prose(messages: &[ChatMessage]) -> Option<UserProse> {
 
 pub(crate) fn latest_request_text(messages: &[ChatMessage]) -> String {
     latest_user_prose(messages).map(|value| value.prose).unwrap_or_default()
+}
+
+/// Routing may use a product name in inline quotes/backticks. Fenced code,
+/// tagged references, quoted blocks and logs still do not select hardware.
+pub(crate) fn latest_routing_text(messages: &[ChatMessage]) -> String {
+    messages.iter().rev().filter_map(user_text)
+        .map(|text| prose_only_for(&text, true)).find(|text|!text.is_empty()).unwrap_or_default()
 }
 
 /// Attach language evidence to an existing user turn in a temporary payload copy.

@@ -1,7 +1,7 @@
 {
   "name": "vibe-kidbright",
   "private": true,
-  "version": "3.7.3",
+  "version": "3.7.4",
   "type": "module",
   "engines": {
     "node": "^20.19.0 || >=22.12.0",
@@ -10,6 +10,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "build:macos": "node scripts/build-macos.mjs",
+    "test:macos-installer": "python3 scripts/test-macos-installer.py",
     "build:release": "npm run check:runtime && npm run check:standalone && npm run sync:kb && npm run check:kb && npm run check:boards && npm run check:coverage && npm run check:rules && npm run check:public && npm run check:bundle && npm run build",
     "check:boards": "node scripts/check-kidbright-board-catalog.mjs",
     "sync:kb": "node scripts/sync-knowledge-base.mjs --write",
@@ -19,6 +21,7 @@
     "audit:rules": "node scripts/audit-rule-documents.mjs",
     "check:rules": "node scripts/audit-rule-documents.mjs --check",
     "test:compat": "node scripts/test-kidbright-compat.mjs",
+    "test:ikb": "node scripts/test-ikb1z.mjs",
     "preview": "vite preview",
     "tauri": "tauri",
     "check:public": "node scripts/check-public.mjs",
@@ -54,7 +57,7 @@
     "postcss": "^8.5.6",
     "tailwindcss": "^4.2.1",
     "typescript": "~5.8.3",
-    "vite": "^7.0.4",
+    "vite": "7.3.7",
     "vite-plugin-monaco-editor": "^1.1.0",
     "vitest": "^4.1.12"
   },

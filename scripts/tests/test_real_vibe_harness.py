@@ -1,4 +1,5 @@
 import json
+import os
 from pathlib import Path
 import subprocess
 import tempfile
@@ -78,7 +79,7 @@ class RealVibeHarnessTests(unittest.TestCase):
             result=self.run_case('--output',str(output),'--run','--authorize-local-inference',
                 '--endpoint','http://127.0.0.1:1234/v1','--model','public-fixture')
             self.assertNotEqual(result.returncode,0)
-            self.assertIn('native HTTP-request/retry and USD budget enforcement is not implemented',result.stderr)
+            self.assertIn('verified provider/model cost bound',result.stderr)
             self.assertIn('No desktop connection or model discovery was attempted',result.stderr)
             self.assertFalse(output.exists())
 
@@ -86,6 +87,38 @@ class RealVibeHarnessTests(unittest.TestCase):
         result=self.run_case('--run','--authorize-local-inference','--endpoint','https://api.openai.com/v1','--model','test')
         self.assertNotEqual(result.returncode,0)
         self.assertIn('Only explicit local HTTP endpoints',result.stderr)
+
+    def test_environment_cannot_authorize_actual_run_or_enable_metadata_bypass(self):
+        # Owned synthetic server: any accidental metadata/provider call is counted,
+        # never forwarded to a real provider. No credentials are loaded.
+        import http.server
+        import threading
+        calls=[]
+        class SyntheticHandler(http.server.BaseHTTPRequestHandler):
+            def do_GET(self):
+                calls.append(self.path)
+                self.send_response(200); self.end_headers(); self.wfile.write(b'{"data":[]}')
+            def log_message(self,*_args):
+                pass
+        server=http.server.ThreadingHTTPServer(('127.0.0.1',0),SyntheticHandler)
+        worker=threading.Thread(target=server.serve_forever,daemon=True);worker.start()
+        try:
+            with tempfile.TemporaryDirectory(dir=ROOT/'src-tauri/target') as directory:
+                output=Path(directory)/'not-created.json'
+                env=os.environ.copy()
+                env.update({'VIBEKIDBRIGHT_EVAL_RUN':'1','VIBEKIDBRIGHT_EVAL_BYPASS_PREFLIGHT':'1',
+                    'VIBEKIDBRIGHT_PILOT_PRICING':'synthetic','VIBEKIDBRIGHT_MAX_REQUESTS':'999',
+                    'VIBEKIDBRIGHT_MAX_USD':'999','VIBEKIDBRIGHT_VERIFIED_COST_BOUND':'true'})
+                result=subprocess.run(['node','scripts/evaluate-vibe-coder-real.mjs','--run',
+                    '--authorize-local-inference','--endpoint',f'http://127.0.0.1:{server.server_port}/v1',
+                    '--model','synthetic-not-a-provider','--output',str(output)],cwd=ROOT,env=env,text=True,capture_output=True)
+                self.assertNotEqual(result.returncode,0)
+                self.assertIn('verified provider/model cost bound',result.stderr)
+                self.assertIn('No desktop connection or model discovery was attempted',result.stderr)
+                self.assertFalse(output.exists())
+                self.assertEqual(calls,[])
+        finally:
+            server.shutdown();server.server_close();worker.join(timeout=5)
 
     def test_output_cannot_escape_workspace(self):
         result=self.run_case('--output',str(ROOT.parent/'not-allowed.json'))

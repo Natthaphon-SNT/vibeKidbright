@@ -1,0 +1,4062 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-27",
+  "board": "kidbright_uai_plus",
+  "target": "sg2002",
+  "maixpy_reference": "4.12.5",
+  "runtime_user_reported": "1.24.0",
+  "method": "Manual case-by-case contract review plus image AST symbol verification and local tests of the named templates. No live-model generation or device execution for this audit.",
+  "physical_results_unchanged": true,
+  "live_model_generation_tested": false,
+  "all_cases_have_generated_programs": false,
+  "guide": "kidbright_uai_plus_test_contracts.md",
+  "api_evidence": "docs/research/uai-plus-runtime-2026-10-26/api-contracts-2026-10-27.json",
+  "api_evidence_sha256": "436fb75b46d824a30c0033812338a65005af2b0b77594e83b5cf7cfd188fe076",
+  "contracts": {
+    "discovery": {
+      "symbols": {
+        "sys": [
+          "device_name"
+        ],
+        "peripheral.pinmap": [
+          "get_pins",
+          "get_pin_functions"
+        ]
+      },
+      "note": "Read-only capabilities template; device_id optional/UNKNOWN. No peripheral constructors except display. Node/symbol discovery is not ownership or wiring.",
+      "declarations": {
+        "sys": {
+          "device_name": {
+            "kind": "function",
+            "signature": "",
+            "returns": "str"
+          }
+        },
+        "peripheral.pinmap": {
+          "get_pins": {
+            "kind": "function",
+            "signature": "",
+            "returns": "list[str]"
+          },
+          "get_pin_functions": {
+            "kind": "function",
+            "signature": "pin: str",
+            "returns": "list[str]"
+          }
+        }
+      },
+      "guide": "kidbright_uai_plus_test_contracts.md",
+      "image_evidence": "docs/research/uai-plus-runtime-2026-10-26/api-contracts-2026-10-27.json"
+    },
+    "display": {
+      "symbols": {
+        "display": [
+          "Display.__init__",
+          "Display.width",
+          "Display.height",
+          "Display.show",
+          "Display.close",
+          "Display.get_backlight",
+          "Display.set_backlight"
+        ],
+        "image": [
+          "Image.__init__",
+          "Image.draw_rect",
+          "Image.draw_line",
+          "Image.draw_circle",
+          "Image.draw_string",
+          "Image.save",
+          "load"
+        ]
+      },
+      "note": "Integer geometry and actual orientation. Backlight 0–100 with saved value; no direct PWM10. Thai font requires a real font file.",
+      "declarations": {
+        "display": {
+          "Display.__init__": {
+            "kind": "function",
+            "signature": "self, width: int=-1, height: int=-1, format: maix._maix.image.Format=..., device: str=None, open: bool=True",
+            "returns": "None"
+          },
+          "Display.width": {
+            "kind": "function",
+            "signature": "self",
+            "returns": "int"
+          },
+          "Display.height": {
+            "kind": "function",
+            "signature": "self",
+            "returns": "int"
+          },
+          "Display.show": {
+            "kind": "function",
+            "signature": "self, img: maix._maix.image.Image, fit: maix._maix.image.Fit=...",
+            "returns": "maix._maix.err.Err"
+          },
+          "Display.close": {
+            "kind": "function",
+            "signature": "self",
+            "returns": "maix._maix.err.Err"
+          },
+          "Display.get_backlight": {
+            "kind": "function",
+            "signature": "self",
+            "returns": "float"
+          },
+          "Display.set_backlight": {
+            "kind": "function",
+            "signature": "self, value: float",
+            "returns": "None"
+          }
+        },
+        "image": {
+          "Image.__init__": {
+            "kind": "function",
+            "signature": "self, width: int, height: int, format: Format=...",
+            "returns": "None"
+          },
+          "Image.draw_rect": {
+            "kind": "function",
+            "signature": "self, x: int, y: int, w: int, h: int, color: Color, thickness: int=1",
+            "returns": "Image"
+          },
+          "Image.draw_line": {
+            "kind": "function",
+            "signature": "self, x1: int, y1: int, x2: int, y2: int, color: Color, thickness: int=1",
+            "returns": "Image"
+          },
+          "Image.draw_circle": {
+            "kind": "function",
+            "signature": "self, x: int, y: int, radius: int, color: Color, thickness: int=1",
+            "returns": "Image"
+          },
+          "Image.draw_string": {
+            "kind": "function",
+            "signature": "self, x: int, y: int, textstring: str, color: Color=..., scale: float=1, thickness: int=-1, wrap: bool=True, wrap_space: int=4, font: str=''",
+            "returns": "Image"
+          },
+          "Image.save": {
+            "kind": "function",
+            "signature": "self, path: str, quality: int=95",
+            "returns": "maix._maix.err.Err"
+          },
+          "load": {
+            "kind": "function",
+            "signature": "path: str, format: Format=...",
+            "returns": "Image"
+          }
+        }
+      },
+      "guide": "kidbright_uai_plus_test_contracts.md",
+      "image_evidence": "docs/research/uai-plus-runtime-2026-10-26/api-contracts-2026-10-27.json"
+    },
+    "touch": {
+      "symbols": {
+        "touchscreen": [
+          "TouchScreen.__init__",
+          "TouchScreen.read",
+          "TouchScreen.available",
+          "TouchScreen.close"
+        ]
+      },
+      "note": "One [x,y,pressed] point; pressed-gated hit tests, edge detection and fit offsets. No multi-touch guarantee.",
+      "declarations": {
+        "touchscreen": {
+          "TouchScreen.__init__": {
+            "kind": "function",
+            "signature": "self, device: str='', open: bool=True",
+            "returns": "None"
+          },
+          "TouchScreen.read": {
+            "kind": "function",
+            "signature": "self",
+            "returns": "list[int]"
+          },
+          "TouchScreen.available": {
+            "kind": "function",
+            "signature": "self, timeout: int=0",
+            "returns": "bool"
+          },
+          "TouchScreen.close": {
+            "kind": "function",
+            "signature": "self",
+            "returns": "maix._maix.err.Err"
+          }
+        }
+      },
+      "guide": "kidbright_uai_plus_test_contracts.md",
+      "image_evidence": "docs/research/uai-plus-runtime-2026-10-26/api-contracts-2026-10-27.json"
+    },
+    "adc": {
+      "symbols": {
+        "peripheral.adc": [
+          "ADC.__init__",
+          "ADC.read",
+          "RES_BIT_12"
+        ]
+      },
+      "note": "Plus source maps ADC0 to S1/S2. Use measured MP-021 bands, not old constants; no guaranteed close/deinit.",
+      "declarations": {
+        "peripheral.adc": {
+          "ADC.__init__": {
+            "kind": "function",
+            "signature": "self, pin: int, resolution: int, vref: float=-1",
+            "returns": "None"
+          },
+          "ADC.read": {
+            "kind": "function",
+            "signature": "self",
+            "returns": "int"
+          },
+          "RES_BIT_12": {
+            "kind": "constant",
+            "annotation": "int"
+          }
+        }
+      },
+      "guide": "kidbright_uai_plus_test_contracts.md",
+      "image_evidence": "docs/research/uai-plus-runtime-2026-10-26/api-contracts-2026-10-27.json"
+    },
+    "led": {
+      "symbols": {},
+      "note": "Verify led-user node, ownership and original active trigger/brightness before writes. Restore bracketed active trigger; on/off is not PWM dimming.",
+      "declarations": {},
+      "guide": "kidbright_uai_plus_test_contracts.md",
+      "image_evidence": "docs/research/uai-plus-runtime-2026-10-26/api-contracts-2026-10-27.json"
+    },
+    "gpio": {
+      "symbols": {
+        "peripheral.gpio": [
+          "GPIO.__init__",
+          "GPIO.value",
+          "GPIO.reset",
+          "Mode.IN",
+          "Mode.OUT",
+          "Pull.PULL_NONE"
+        ],
+        "peripheral.pinmap": [
+          "get_pins",
+          "get_pin_functions",
+          "set_pin_function"
+        ]
+      },
+      "note": "Source aliases are not physical PCB proof. P24/IO7 unresolved. No get_pin_function or GPIO.close declaration. Reserve A16/A17; fixture and safe LOW/START gate required.",
+      "declarations": {
+        "peripheral.gpio": {
+          "GPIO.__init__": {
+            "kind": "function",
+            "signature": "self, pin: str, mode: Mode=..., pull: Pull=...",
+            "returns": "None"
+          },
+          "GPIO.value": {
+            "kind": "function",
+            "signature": "self, value: int=-1",
+            "returns": "int"
+          },
+          "GPIO.reset": {
+            "kind": "function",
+            "signature": "self, mode: Mode, pull: Pull",
+            "returns": "maix._maix.err.Err"
+          },
+          "Mode.IN": {
+            "kind": "constant",
+            "annotation": "typing.ClassVar[Mode]"
+          },
+          "Mode.OUT": {
+            "kind": "constant",
+            "annotation": "typing.ClassVar[Mode]"
+          },
+          "Pull.PULL_NONE": {
+            "kind": "constant",
+            "annotation": "typing.ClassVar[Pull]"
+          }
+        },
+        "peripheral.pinmap": {
+          "get_pins": {
+            "kind": "function",
+            "signature": "",
+            "returns": "list[str]"
+          },
+          "get_pin_functions": {
+            "kind": "function",
+            "signature": "pin: str",
+            "returns": "list[str]"
+          },
+          "set_pin_function": {
+            "kind": "function",
+            "signature": "pin: str, func: str",
+            "returns": "maix._maix.err.Err"
+          }
+        }
+      },
+      "guide": "kidbright_uai_plus_test_contracts.md",
+      "image_evidence": "docs/research/uai-plus-runtime-2026-10-26/api-contracts-2026-10-27.json"
+    },
+    "pwm": {
+      "symbols": {
+        "peripheral.pwm": [
+          "PWM.__init__",
+          "PWM.freq",
+          "PWM.duty",
+          "PWM.disable"
+        ]
+      },
+      "note": "ID/function/pin are separate; duty is percent. C906Servo helper not found at selected image paths. No IO7 actuation until channel/backend proven.",
+      "declarations": {
+        "peripheral.pwm": {
+          "PWM.__init__": {
+            "kind": "function",
+            "signature": "self, id: int, freq: int=1000, duty: float=0, enable: bool=True, duty_val: int=-1",
+            "returns": "None"
+          },
+          "PWM.freq": {
+            "kind": "function",
+            "signature": "self, freq: int=-1",
+            "returns": "int"
+          },
+          "PWM.duty": {
+            "kind": "function",
+            "signature": "self, duty: float=-1",
+            "returns": "float"
+          },
+          "PWM.disable": {
+            "kind": "function",
+            "signature": "self",
+            "returns": "maix._maix.err.Err"
+          }
+        }
+      },
+      "guide": "kidbright_uai_plus_test_contracts.md",
+      "image_evidence": "docs/research/uai-plus-runtime-2026-10-26/api-contracts-2026-10-27.json"
+    },
+    "i2c": {
+      "symbols": {
+        "peripheral.i2c": [
+          "list_devices",
+          "I2C.__init__",
+          "I2C.scan",
+          "I2C.writeto",
+          "I2C.readfrom"
+        ]
+      },
+      "note": "Confirm external backend/pins/ownership and module protocol first. Software bus 5 is not automatically present. No invented readfrom timeout or implicit insmod.",
+      "declarations": {
+        "peripheral.i2c": {
+          "list_devices": {
+            "kind": "function",
+            "signature": "",
+            "returns": "list[int]"
+          },
+          "I2C.__init__": {
+            "kind": "function",
+            "signature": "self, id: int, mode: Mode, freq: int=100000, addr_size: AddrSize=...",
+            "returns": "None"
+          },
+          "I2C.scan": {
+            "kind": "function",
+            "signature": "self, addr: int=-1",
+            "returns": "list[int]"
+          },
+          "I2C.writeto": {
+            "kind": "function",
+            "signature": "self, addr: int, data: maix.Bytes(bytes)",
+            "returns": "int"
+          },
+          "I2C.readfrom": {
+            "kind": "function",
+            "signature": "*args, **kwargs",
+            "returns": null
+          }
+        }
+      },
+      "guide": "kidbright_uai_plus_test_contracts.md",
+      "image_evidence": "docs/research/uai-plus-runtime-2026-10-26/api-contracts-2026-10-27.json"
+    },
+    "imu": {
+      "symbols": {
+        "ext_dev.imu": [
+          "IMU.__init__",
+          "IMU.read",
+          "Mode.DUAL"
+        ]
+      },
+      "note": "DUAL contract is six axes; seventh temperature not guaranteed. No unconditional [6], x10 conversion, sign remap or unsupported hardware tap.",
+      "declarations": {
+        "ext_dev.imu": {
+          "IMU.__init__": {
+            "kind": "function",
+            "signature": "self, driver: str, i2c_bus: int=-1, addr: int=107, freq: int=400000, mode: Mode=..., acc_scale: AccScale=..., acc_odr: AccOdr=..., gyro_scale: GyroScale=..., gyro_odr: GyroOdr=..., block: bool=True",
+            "returns": "None"
+          },
+          "IMU.read": {
+            "kind": "function",
+            "signature": "self",
+            "returns": "list[float]"
+          },
+          "Mode.DUAL": {
+            "kind": "constant",
+            "annotation": "typing.ClassVar[Mode]"
+          }
+        }
+      },
+      "guide": "kidbright_uai_plus_test_contracts.md",
+      "image_evidence": "docs/research/uai-plus-runtime-2026-10-26/api-contracts-2026-10-27.json"
+    },
+    "rtc": {
+      "symbols": {
+        "ext_dev.bm8563": [
+          "BM8563.__init__",
+          "BM8563.now",
+          "BM8563.datetime",
+          "BM8563.deinit"
+        ]
+      },
+      "note": "Module bm8563, not rtc. Actual chip/bus and RTC/NTP ownership need confirmation. Read-only kernel node preferred; no time writes or automatic service changes.",
+      "declarations": {
+        "ext_dev.bm8563": {
+          "BM8563.__init__": {
+            "kind": "function",
+            "signature": "self, i2c_bus: int=-1",
+            "returns": "None"
+          },
+          "BM8563.now": {
+            "kind": "function",
+            "signature": "self",
+            "returns": "list[int]"
+          },
+          "BM8563.datetime": {
+            "kind": "function",
+            "signature": "self, timetuple: list[int]=[]",
+            "returns": "list[int]"
+          },
+          "BM8563.deinit": {
+            "kind": "function",
+            "signature": "self",
+            "returns": "maix._maix.err.Err"
+          }
+        }
+      },
+      "guide": "kidbright_uai_plus_test_contracts.md",
+      "image_evidence": "docs/research/uai-plus-runtime-2026-10-26/api-contracts-2026-10-27.json"
+    },
+    "uart": {
+      "symbols": {
+        "peripheral.uart": [
+          "list_devices",
+          "UART.__init__",
+          "UART.read",
+          "UART.write",
+          "UART.close"
+        ]
+      },
+      "note": "Read timeout is milliseconds, 0 immediate and -1 blocking. Confirm user connector and free port; do not open UART0/A16/A17 owned by the protocol.",
+      "declarations": {
+        "peripheral.uart": {
+          "list_devices": {
+            "kind": "function",
+            "signature": "",
+            "returns": "list[str]"
+          },
+          "UART.__init__": {
+            "kind": "function",
+            "signature": "self, port: str='', baudrate: int=115200, databits: BITS=..., parity: PARITY=..., stopbits: STOP=..., flow_ctrl: FLOW_CTRL=...",
+            "returns": "None"
+          },
+          "UART.read": {
+            "kind": "function",
+            "signature": "*args, **kwargs",
+            "returns": null
+          },
+          "UART.write": {
+            "kind": "function",
+            "signature": "self, data: maix.Bytes(bytes)",
+            "returns": "int"
+          },
+          "UART.close": {
+            "kind": "function",
+            "signature": "self",
+            "returns": "maix._maix.err.Err"
+          }
+        }
+      },
+      "guide": "kidbright_uai_plus_test_contracts.md",
+      "image_evidence": "docs/research/uai-plus-runtime-2026-10-26/api-contracts-2026-10-27.json"
+    },
+    "camera": {
+      "symbols": {
+        "camera": [
+          "Camera.__init__",
+          "Camera.read",
+          "Camera.close",
+          "Camera.width",
+          "Camera.height",
+          "Camera.hmirror",
+          "Camera.vflip",
+          "Camera.set_resolution"
+        ],
+        "image": [
+          "Image.find_blobs",
+          "Image.find_qrcodes",
+          "Image.find_barcodes",
+          "Image.save",
+          "QRCode.payload",
+          "BarCode.payload"
+        ]
+      },
+      "note": "Real sensor/frame geometry, RGB888 and FPS from actual successful frames. Each overlay before show; close camera. QR data never executes commands.",
+      "declarations": {
+        "camera": {
+          "Camera.__init__": {
+            "kind": "function",
+            "signature": "self, width: int=-1, height: int=-1, format: maix._maix.image.Format=..., device: str=None, fps: float=-1, buff_num: int=3, open: bool=True, raw: bool=False",
+            "returns": "None"
+          },
+          "Camera.read": {
+            "kind": "function",
+            "signature": "self, buff: capsule=None, buff_size: int=0, block: bool=True, block_ms: int=-1",
+            "returns": "maix._maix.image.Image"
+          },
+          "Camera.close": {
+            "kind": "function",
+            "signature": "self",
+            "returns": "None"
+          },
+          "Camera.width": {
+            "kind": "function",
+            "signature": "self",
+            "returns": "int"
+          },
+          "Camera.height": {
+            "kind": "function",
+            "signature": "self",
+            "returns": "int"
+          },
+          "Camera.hmirror": {
+            "kind": "function",
+            "signature": "self, value: int=-1",
+            "returns": "int"
+          },
+          "Camera.vflip": {
+            "kind": "function",
+            "signature": "self, value: int=-1",
+            "returns": "int"
+          },
+          "Camera.set_resolution": {
+            "kind": "function",
+            "signature": "self, width: int, height: int",
+            "returns": "maix._maix.err.Err"
+          }
+        },
+        "image": {
+          "Image.find_blobs": {
+            "kind": "function",
+            "signature": "self, thresholds: list[list[int]]=[], invert: bool=False, roi: list[int]=[], x_stride: int=2, y_stride: int=1, area_threshold: int=10, pixels_threshold: int=10, merge: bool=False, margin: int=0, x_hist_bins_max: int=0, y_hist_bins_max: int=0",
+            "returns": "list[Blob]"
+          },
+          "Image.find_qrcodes": {
+            "kind": "function",
+            "signature": "self, roi: list[int]=[]",
+            "returns": "list[QRCode]"
+          },
+          "Image.find_barcodes": {
+            "kind": "function",
+            "signature": "self, roi: list[int]=[]",
+            "returns": "list[BarCode]"
+          },
+          "Image.save": {
+            "kind": "function",
+            "signature": "self, path: str, quality: int=95",
+            "returns": "maix._maix.err.Err"
+          },
+          "QRCode.payload": {
+            "kind": "function",
+            "signature": "self",
+            "returns": "str"
+          },
+          "BarCode.payload": {
+            "kind": "function",
+            "signature": "self",
+            "returns": "str"
+          }
+        }
+      },
+      "guide": "kidbright_uai_plus_test_contracts.md",
+      "image_evidence": "docs/research/uai-plus-runtime-2026-10-26/api-contracts-2026-10-27.json"
+    },
+    "audio": {
+      "symbols": {
+        "audio": [
+          "Player.__init__",
+          "Player.play",
+          "Recorder.__init__",
+          "Recorder.record",
+          "Recorder.finish",
+          "Format.FMT_S16_LE"
+        ]
+      },
+      "note": "Player.stop/close absent and Player.volume documented unsupported. Use low-amplitude raw PCM and short chunks; recorder.record() can be empty, finish recorder, no guessed audio.read/close.",
+      "declarations": {
+        "audio": {
+          "Player.__init__": {
+            "kind": "function",
+            "signature": "self, path: str='', sample_rate: int=48000, format: Format=..., channel: int=1",
+            "returns": "None"
+          },
+          "Player.play": {
+            "kind": "function",
+            "signature": "self, data: maix.Bytes(bytes)=b''",
+            "returns": "maix._maix.err.Err"
+          },
+          "Recorder.__init__": {
+            "kind": "function",
+            "signature": "self, path: str='', sample_rate: int=48000, format: Format=..., channel: int=1",
+            "returns": "None"
+          },
+          "Recorder.record": {
+            "kind": "function",
+            "signature": "*args, **kwargs",
+            "returns": null
+          },
+          "Recorder.finish": {
+            "kind": "function",
+            "signature": "self",
+            "returns": "maix._maix.err.Err"
+          },
+          "Format.FMT_S16_LE": {
+            "kind": "constant",
+            "annotation": "typing.ClassVar[Format]"
+          }
+        }
+      },
+      "guide": "kidbright_uai_plus_test_contracts.md",
+      "image_evidence": "docs/research/uai-plus-runtime-2026-10-26/api-contracts-2026-10-27.json"
+    },
+    "network": {
+      "symbols": {
+        "network.wifi": [
+          "Wifi.__init__",
+          "Wifi.get_ip",
+          "Wifi.get_ssid"
+        ]
+      },
+      "note": "Use Python socket/urllib/http.server with finite timeout. maix.http is not HTTP GET/POST. MQTT/WebSocket packages and endpoints must be supplied/verified; no pip or RNDIS changes.",
+      "declarations": {
+        "network.wifi": {
+          "Wifi.__init__": {
+            "kind": "function",
+            "signature": "self, iface: str='wlan0'",
+            "returns": "None"
+          },
+          "Wifi.get_ip": {
+            "kind": "function",
+            "signature": "self",
+            "returns": "str"
+          },
+          "Wifi.get_ssid": {
+            "kind": "function",
+            "signature": "self, from_cache: bool=True",
+            "returns": "str"
+          }
+        }
+      },
+      "guide": "kidbright_uai_plus_test_contracts.md",
+      "image_evidence": "docs/research/uai-plus-runtime-2026-10-26/api-contracts-2026-10-27.json"
+    },
+    "files": {
+      "symbols": {},
+      "note": "Python 3.11 pathlib/os/json/csv/hashlib/wave as applicable. Writable unique test directory, bounded bytes, atomic replace on same filesystem. No system files, full-card or forced-power-loss tests.",
+      "declarations": {},
+      "guide": "kidbright_uai_plus_test_contracts.md",
+      "image_evidence": "docs/research/uai-plus-runtime-2026-10-26/api-contracts-2026-10-27.json"
+    },
+    "models": {
+      "symbols": {
+        "nn": [
+          "Classifier.__init__",
+          "Classifier.classify",
+          "YOLOv5.__init__",
+          "YOLOv5.detect",
+          "YOLOv8.detect",
+          "YOLO11.detect"
+        ]
+      },
+      "note": "Requires actual compatible model/labels/input and audio preprocessing. API presence is not model or output compatibility; no fake inference.",
+      "declarations": {
+        "nn": {
+          "Classifier.__init__": {
+            "kind": "function",
+            "signature": "self, model: str='', dual_buff: bool=True",
+            "returns": "None"
+          },
+          "Classifier.classify": {
+            "kind": "function",
+            "signature": "self, img: maix._maix.image.Image, softmax: bool=True, fit: maix._maix.image.Fit=...",
+            "returns": "list[tuple[int, float]]"
+          },
+          "YOLOv5.__init__": {
+            "kind": "function",
+            "signature": "self, model: str='', dual_buff: bool=True",
+            "returns": "None"
+          },
+          "YOLOv5.detect": {
+            "kind": "function",
+            "signature": "self, img: maix._maix.image.Image, conf_th: float=0.5, iou_th: float=0.45, fit: maix._maix.image.Fit=...",
+            "returns": "list[Object]"
+          },
+          "YOLOv8.detect": {
+            "kind": "function",
+            "signature": "self, img: maix._maix.image.Image, conf_th: float=0.5, iou_th: float=0.45, fit: maix._maix.image.Fit=..., keypoint_th: float=0.5",
+            "returns": "..."
+          },
+          "YOLO11.detect": {
+            "kind": "function",
+            "signature": "self, img: maix._maix.image.Image, conf_th: float=0.5, iou_th: float=0.45, fit: maix._maix.image.Fit=..., keypoint_th: float=0.5",
+            "returns": "..."
+          }
+        }
+      },
+      "guide": "kidbright_uai_plus_test_contracts.md",
+      "image_evidence": "docs/research/uai-plus-runtime-2026-10-26/api-contracts-2026-10-27.json"
+    },
+    "lifecycle": {
+      "symbols": {
+        "app": [
+          "need_exit",
+          "set_exit_flag"
+        ]
+      },
+      "note": "User-operated Run/Stop; adapter owns Launcher/process group. Intentionally failing tests expect nonzero exits. No physical PASS from compile/upload; synthetic fixtures are not newer installed versions.",
+      "declarations": {
+        "app": {
+          "need_exit": {
+            "kind": "function",
+            "signature": "",
+            "returns": "bool"
+          },
+          "set_exit_flag": {
+            "kind": "function",
+            "signature": "exit: bool",
+            "returns": "None"
+          }
+        }
+      },
+      "guide": "kidbright_uai_plus_test_contracts.md",
+      "image_evidence": "docs/research/uai-plus-runtime-2026-10-26/api-contracts-2026-10-27.json"
+    },
+    "extensions": {
+      "symbols": {},
+      "note": "Discovery/manual procedure only until actual exposed bus/driver/ownership and power configuration are proven. No USB role switch, kernel module loading or motor actuation by default.",
+      "declarations": {},
+      "guide": "kidbright_uai_plus_test_contracts.md",
+      "image_evidence": "docs/research/uai-plus-runtime-2026-10-26/api-contracts-2026-10-27.json"
+    }
+  },
+  "summary": {
+    "TEMPLATE_CHECKED": 7,
+    "DRAFT_REFERENCE": 43,
+    "NEEDS_SETUP": 60,
+    "HOLD": 18
+  },
+  "tests": [
+    {
+      "id": "MP-001",
+      "title": "สำรวจเวอร์ชันจริง",
+      "category": "สำรวจบอร์ดและ runtime",
+      "state": "TEMPLATE_CHECKED",
+      "state_label": "มีตัวอย่างตรงงานและทดสอบ fixture แล้ว",
+      "contracts": [
+        "discovery",
+        "display"
+      ],
+      "prerequisites": [],
+      "depends_on": [],
+      "template": "capabilities",
+      "correction": "ใช้ capabilities; sys.device_id ไม่มีใน stub รุ่นนี้จึงเป็น optional/UNKNOWN ห้ามเรียก device_key",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "แสดง Python, MaixPy, Runtime, OS และ device ID ที่ตรวจพบจริงบนจอและ Terminal โดยอ่าน metadata ก่อน native import เมื่อทำได้ ถ้าข้อมูลใดไม่มีให้แสดง UNKNOWN และอย่าเปลี่ยนเวอร์ชันที่ติดตั้ง",
+      "expected_when_ready": "ค่าที่ตรวจได้มีหลักฐานจากบอร์ด ไม่ใส่ค่า 4.12.5/1.24.0 ทับ UNKNOWN",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": true,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-002",
+      "title": "สำรวจ API ทีละโมดูล",
+      "category": "สำรวจบอร์ดและ runtime",
+      "state": "TEMPLATE_CHECKED",
+      "state_label": "มีตัวอย่างตรงงานและทดสอบ fixture แล้ว",
+      "contracts": [
+        "discovery",
+        "display"
+      ],
+      "prerequisites": [],
+      "depends_on": [],
+      "template": "capabilities",
+      "correction": "ตรวจ symbol แบบไม่สร้างอุปกรณ์ รายงาน ext_dev.bm8563 ไม่ใช่ ext_dev.rtc และไม่ import package เสริม",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ตรวจโมดูล display, image, touchscreen, camera, audio, gpio, pinmap, pwm, adc, i2c, uart, IMU และ RTC ที่ติดตั้ง โดยยังไม่เปิดใช้อุปกรณ์ทุกตัวพร้อมกัน แสดงชื่อ API ที่พบและข้อผิดพลาดรายโมดูล ไม่ให้โมดูลเดียวล้มทั้งรายงาน",
+      "expected_when_ready": "รายงาน AVAILABLE/MISSING/ERROR แยกกันและยัง Stop ได้",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": true,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-003",
+      "title": "สำรวจพอร์ตและ pinmux",
+      "category": "สำรวจบอร์ดและ runtime",
+      "state": "TEMPLATE_CHECKED",
+      "state_label": "มีตัวอย่างตรงงานและทดสอบ fixture แล้ว",
+      "contracts": [
+        "discovery",
+        "display"
+      ],
+      "prerequisites": [],
+      "depends_on": [],
+      "template": "capabilities",
+      "correction": "มี get_pins/get_pin_functions แต่ไม่มี get_pin_function ใน reference 4.12.5; IO7/P24 ยังไม่ใช่ routing ที่ยืนยัน",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "สร้างรายงาน IO2–IO8 โดยเทียบตารางอ้างอิงกับรายการ pins/functions จาก runtime แบบอ่านอย่างเดียว ไม่สลับ pinmux และไม่อ้างว่ารายการ function พิสูจน์การเดินสายจริง บันทึก mapping ที่ยังยืนยันไม่ได้",
+      "expected_when_ready": "ครบเจ็ดช่อง ไม่มีการขับเอาต์พุตหรือแตะ A16/A17",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": true,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-004",
+      "title": "สำรวจอุปกรณ์ Linux",
+      "category": "สำรวจบอร์ดและ runtime",
+      "state": "TEMPLATE_CHECKED",
+      "state_label": "มีตัวอย่างตรงงานและทดสอบ fixture แล้ว",
+      "contracts": [
+        "discovery",
+        "display"
+      ],
+      "prerequisites": [],
+      "depends_on": [],
+      "template": "capabilities",
+      "correction": "อ่านเฉพาะ node/name ที่ระบุ ไม่ dump process command line, credential หรือเปิด serial แย่งเจ้าของ",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "รายงาน /dev/input, /dev/i2c-*, /dev/ttyS*, /sys/class/leds และพื้นที่เก็บข้อมูลที่อ่านได้อย่างมีขอบเขต ไม่เขียน sysfs ไม่เปิด serial ที่กำลังมีเจ้าของ และไม่พิมพ์รหัสผ่านหรือ credential",
+      "expected_when_ready": "เห็นรายการอุปกรณ์หรือเหตุผลที่อ่านไม่ได้โดยไม่เปลี่ยนค่าระบบ",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": true,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-005",
+      "title": "ระบุอุปกรณ์ที่อาจต่างจากแคตตาล็อก",
+      "category": "สำรวจบอร์ดและ runtime",
+      "state": "TEMPLATE_CHECKED",
+      "state_label": "มีตัวอย่างตรงงานและทดสอบ fixture แล้ว",
+      "contracts": [
+        "discovery",
+        "display"
+      ],
+      "prerequisites": [],
+      "depends_on": [],
+      "template": "capabilities",
+      "correction": "แยก sensor_cfg กับชนิด IMU/RTC ที่ยัง UNKNOWN; ชื่อโมดูลไม่ใช่ chip ID",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "อ่านข้อมูลกล้องจาก sensor_cfg ที่มีและข้อมูลไดรเวอร์ IMU/RTC แบบอ่านอย่างเดียว เปรียบเทียบสิ่งที่ตรวจพบกับเอกสาร แสดง UNKNOWN เมื่อยืนยันไม่ได้ อย่าเลือก OV2685 หรือรุ่น RTC จากชื่อโฆษณาเพียงอย่างเดียว",
+      "expected_when_ready": "รายงานแยก detected, documented และ unknown โดยไม่แก้ไฟล์ระบบ",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": true,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-006",
+      "title": "จัดแผนตามอุปกรณ์ที่มี",
+      "category": "สำรวจบอร์ดและ runtime",
+      "state": "DRAFT_REFERENCE",
+      "state_label": "มี API อ้างอิง; ต้องสร้างและตรวจโค้ดตามงาน",
+      "contracts": [
+        "discovery",
+        "display"
+      ],
+      "prerequisites": [],
+      "depends_on": [],
+      "template": null,
+      "correction": "เป็น planner ไม่ขับพอร์ตหรืออ้างผล self-test จน fixture ของชุดนั้นพร้อม",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "สร้างหน้าเลือกชุดทดสอบ onboard, GPIO, I2C, UART, servo และ AI แต่ยังไม่เริ่มขับพอร์ต ให้กรอกรุ่นโมดูล การต่อสาย และแรงดันก่อนเปิดชุดที่ต้องใช้ fixture ที่ยังไม่มีให้เป็น SKIP",
+      "expected_when_ready": "ไม่มีผล PASS ปลอมจากอุปกรณ์ที่ไม่ได้ต่อ",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-007",
+      "title": "สีพื้นเต็มจอ",
+      "category": "จอและกราฟิก",
+      "state": "DRAFT_REFERENCE",
+      "state_label": "มี API อ้างอิง; ต้องสร้างและตรวจโค้ดตามงาน",
+      "contracts": [
+        "display"
+      ],
+      "prerequisites": [],
+      "depends_on": [],
+      "template": null,
+      "correction": "ทดสอบสีเป็นแกนหลัก; input เสริมใช้ได้หลัง MP-015 หรือ MP-021 ผ่านเท่านั้น",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "สลับแดง เขียว น้ำเงิน ขาว ดำทุกหนึ่งวินาที ใช้ขนาดจาก display จริง และให้ S1 หรือปุ่มทัชเปลี่ยนสีได้เมื่อ input พร้อมใช้ จบด้วยหน้ารอการยืนยันสีจากผู้ทดสอบ",
+      "expected_when_ready": "สีเต็มพื้นที่ ไม่มีช่องตกขอบ และผู้ทดสอบยืนยันสีตรง",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-008",
+      "title": "ขอบและทิศทางจอ",
+      "category": "จอและกราฟิก",
+      "state": "DRAFT_REFERENCE",
+      "state_label": "มี API อ้างอิง; ต้องสร้างและตรวจโค้ดตามงาน",
+      "contracts": [
+        "display"
+      ],
+      "prerequisites": [],
+      "depends_on": [],
+      "template": null,
+      "correction": "ปรับขนาดข้อความให้เห็นขอบและ orientation จริง ไม่อิง 640x480 ตายตัว",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "วาดกรอบห่างขอบจอ 2 พิกเซล พร้อม TOP LEFT RIGHT BOTTOM และพิกัดสี่มุม ตรวจ width/height จริง ไม่บังคับแนวนอน 640x480 ถ้า runtime ให้คนละทิศ",
+      "expected_when_ready": "เห็นกรอบและข้อความครบ ไม่กลับด้านหรือถูกตัด",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-009",
+      "title": "ข้อความและตัวเลข",
+      "category": "จอและกราฟิก",
+      "state": "DRAFT_REFERENCE",
+      "state_label": "มี API อ้างอิง; ต้องสร้างและตรวจโค้ดตามงาน",
+      "contracts": [
+        "display"
+      ],
+      "prerequisites": [],
+      "depends_on": [],
+      "template": null,
+      "correction": "ASCII เป็น baseline; หน้าไทยแยก conditional ต้องมีไฟล์ font ที่มีจริง",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "แสดง ASCII ตัวพิมพ์เล็กใหญ่ ตัวเลข เครื่องหมาย ค่าติดลบ และทศนิยมหลายขนาด ถ้ามี font ไทยที่ตรวจพบจริงให้เพิ่มหน้าทดสอบไทยโดยไม่ดาวน์โหลด font เอง",
+      "expected_when_ready": "ASCII อ่านได้ ค่าทศนิยมไม่ทำให้ API พิกัดล้ม ส่วนไทย PASS ได้ต่อเมื่อมี font และตรวจด้วยตา",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-010",
+      "title": "รูปทรงและการซ้อนภาพ",
+      "category": "จอและกราฟิก",
+      "state": "DRAFT_REFERENCE",
+      "state_label": "มี API อ้างอิง; ต้องสร้างและตรวจโค้ดตามงาน",
+      "contracts": [
+        "display"
+      ],
+      "prerequisites": [],
+      "depends_on": [],
+      "template": null,
+      "correction": "ใช้ draw_line/draw_rect/draw_circle และพิกัด integer จาก reference ที่บันเดิล",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "วาดเส้น สี่เหลี่ยม วงกลม แบบโปร่งและทึบ พร้อมทดสอบลำดับการซ้อน ใช้พิกัดจำนวนเต็มและ image buffer เดียวก่อน show",
+      "expected_when_ready": "ตำแหน่งและสีตรงตามหน้าตัวอย่าง ไม่มี exception",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-011",
+      "title": "ภาพเคลื่อนไหวและ FPS",
+      "category": "จอและกราฟิก",
+      "state": "DRAFT_REFERENCE",
+      "state_label": "มี API อ้างอิง; ต้องสร้างและตรวจโค้ดตามงาน",
+      "contracts": [
+        "display"
+      ],
+      "prerequisites": [],
+      "depends_on": [],
+      "template": null,
+      "correction": "FPS วัดจากเฟรมที่ show สำเร็จ/monotonic elapsed ไม่ตั้งเกณฑ์ FPS ที่ยังไม่มี benchmark",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ทำลูกบอลชนขอบพร้อมเลขเฟรมและ FPS ที่วัดจริง ไม่เปิดกล้อง รัน 60 วินาทีแล้วแสดงสถิติ frame time และคงหน้าผลให้ดูจน Stop",
+      "expected_when_ready": "ลูกบอลเคลื่อนต่อเนื่อง ตัวเลขเฟรมเพิ่ม และสรุป FPS จากเวลาจริง",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-012",
+      "title": "ภาพขนาดเล็กกับการปรับสเกล",
+      "category": "จอและกราฟิก",
+      "state": "DRAFT_REFERENCE",
+      "state_label": "มี API อ้างอิง; ต้องสร้างและตรวจโค้ดตามงาน",
+      "contracts": [
+        "display"
+      ],
+      "prerequisites": [],
+      "depends_on": [],
+      "template": null,
+      "correction": "fit และอัตราส่วนจากขนาดจริง; อย่าคาดว่าภาพ 240x240 ต้องเต็มจอโดยไม่เกิด letterbox",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "เปรียบเทียบ canvas ขนาด 240x240 กับ canvas เท่าจอ แสดงวงกลมและเส้นกริด ตรวจโหมด fit ที่ API มีจริง และอธิบายขอบดำตามอัตราส่วน",
+      "expected_when_ready": "วงกลมไม่ผิดรูป และบอกพื้นที่แสดงผลที่คำนวณจริง",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-013",
+      "title": "ความสว่างจอ",
+      "category": "จอและกราฟิก",
+      "state": "DRAFT_REFERENCE",
+      "state_label": "มี API อ้างอิง; ต้องสร้างและตรวจโค้ดตามงาน",
+      "contracts": [
+        "display"
+      ],
+      "prerequisites": [],
+      "depends_on": [],
+      "template": null,
+      "correction": "get_backlight/set_backlight ใช้ 0–100; ต้องอ่านค่าเดิมได้ก่อนจึงเปลี่ยน และคืนใน finally",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ตรวจ API backlight ที่มีจริง ถ้าปรับได้ให้เริ่มระดับกลาง ทดสอบช่วง 20–80 เปอร์เซ็นต์ และคืนค่าเดิมใน finally ถ้าไม่มี API ให้ SKIP ไม่เขียน PWM10 หรือ sysfs แบบเดา",
+      "expected_when_ready": "ผู้ทดสอบเห็นความสว่างเปลี่ยนและกลับค่าเดิม หรือได้ SKIP พร้อมเหตุผล",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-014",
+      "title": "จอเปิดทิ้งต่อเนื่อง",
+      "category": "จอและกราฟิก",
+      "state": "DRAFT_REFERENCE",
+      "state_label": "มี API อ้างอิง; ต้องสร้างและตรวจโค้ดตามงาน",
+      "contracts": [
+        "display"
+      ],
+      "prerequisites": [],
+      "depends_on": [],
+      "template": null,
+      "correction": "ไม่สมมติ partial update API; ใช้ buffer ที่มีขอบเขตและเก็บสถิติจริง",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "แสดงกริดนาฬิกาจับเวลา 10 นาที อัปเดตเพียงพื้นที่จำเป็นเมื่อ API รองรับ เก็บหน่วยความจำและ frame time เป็นช่วง ไม่สร้าง display ใหม่ทุกเฟรม",
+      "expected_when_ready": "จออัปเดตตลอด ไม่มีหน่วยความจำเพิ่มต่อเนื่อง และ Stop คืนเมนูได้",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-015",
+      "title": "ทัชพิกัดจริง",
+      "category": "หน้าจอสัมผัส",
+      "state": "TEMPLATE_CHECKED",
+      "state_label": "มีตัวอย่างตรงงานและทดสอบ fixture แล้ว",
+      "contracts": [
+        "touch",
+        "display"
+      ],
+      "prerequisites": [],
+      "depends_on": [],
+      "template": "touchscreen",
+      "correction": "ใช้ python_example=touchscreen ซึ่งมี marker และ press/release จริง ไม่ใช่ display-only skeleton",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ใช้ touchscreen API ที่ตรวจพบ แสดง x,y,pressed พร้อม marker ตามนิ้วและนับ press/release ถ้าไม่มีไดรเวอร์ให้รายงานตรง ๆ",
+      "expected_when_ready": "markerตามจุดสัมผัสและปล่อยแล้วสถานะกลับ ไม่ค้าง pressed",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": true,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-016",
+      "title": "ทัชเก้าจุด",
+      "category": "หน้าจอสัมผัส",
+      "state": "DRAFT_REFERENCE",
+      "state_label": "มี API อ้างอิง; ต้องสร้างและตรวจโค้ดตามงาน",
+      "contracts": [
+        "touch",
+        "display"
+      ],
+      "prerequisites": [],
+      "depends_on": [
+        "MP-015"
+      ],
+      "template": null,
+      "correction": "แตะเป้าทีละจุด เก็บ raw และระยะคลาดเคลื่อน; ไม่เขียน calibration ถาวร",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ให้แตะเป้าแบบ 3x3 ครบเก้าจุด แสดงค่าคลาดเคลื่อนจากศูนย์กลางเป้าและเก็บค่าดิบ ไม่เขียน calibration ถาวร",
+      "expected_when_ready": "แตะมุมและกลางจอได้ครบ พร้อมค่าคลาดเคลื่อนให้ผู้ทดสอบประเมิน",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-017",
+      "title": "ลากวาดเส้น",
+      "category": "หน้าจอสัมผัส",
+      "state": "DRAFT_REFERENCE",
+      "state_label": "มี API อ้างอิง; ต้องสร้างและตรวจโค้ดตามงาน",
+      "contracts": [
+        "touch",
+        "display"
+      ],
+      "prerequisites": [],
+      "depends_on": [
+        "MP-015"
+      ],
+      "template": null,
+      "correction": "CLEAR/EXIT ต้องตรวจ pressed และขอบกด; ไม่ลากเส้นข้ามช่วงปล่อยนิ้ว",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ทำกระดานวาดเส้นด้วยนิ้ว มี CLEAR และ EXIT ไม่เชื่อมเส้นข้ามช่วงที่ปล่อยนิ้ว และจำกัดจำนวนจุดที่เก็บ",
+      "expected_when_ready": "เส้นตามนิ้ว ยกนิ้วแล้วเริ่มเส้นใหม่ CLEAR ทำงาน",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-018",
+      "title": "ปุ่มทัชกดค้างและกดซ้ำ",
+      "category": "หน้าจอสัมผัส",
+      "state": "DRAFT_REFERENCE",
+      "state_label": "มี API อ้างอิง; ต้องสร้างและตรวจโค้ดตามงาน",
+      "contracts": [
+        "touch",
+        "display"
+      ],
+      "prerequisites": [],
+      "depends_on": [
+        "MP-015"
+      ],
+      "template": null,
+      "correction": "ใช้ monotonic edge/hold timer แยกจาก rendering loop ไม่เพิ่มตัวนับทุกเฟรม",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ทำปุ่มนับจำนวนสองแบบ หนึ่งครั้งต่อการแตะ และกดค้างเพื่อเพิ่มซ้ำหลังครบ 500ms แสดงสถานะ debounce กับเวลาจริง",
+      "expected_when_ready": "แตะครั้งเดียวเพิ่มครั้งเดียว ส่วนการกดค้างเกิดซ้ำตามเงื่อนไข",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-019",
+      "title": "ทัชกับภาพที่ถูกย่อขยาย",
+      "category": "หน้าจอสัมผัส",
+      "state": "DRAFT_REFERENCE",
+      "state_label": "มี API อ้างอิง; ต้องสร้างและตรวจโค้ดตามงาน",
+      "contracts": [
+        "touch",
+        "display"
+      ],
+      "prerequisites": [],
+      "depends_on": [
+        "MP-015"
+      ],
+      "template": null,
+      "correction": "รวม scale และ letterbox offset ทั้งสองทิศทาง; ทดสอบขอบดำและขอบปุ่ม",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "วาดปุ่มบน canvas 240x240 แล้ว fit ลงจอจริง แปลงพิกัด touch กลับสู่ canvas โดยรวม offset ขอบดำ ใช้ API mapping ถ้ามีหรือคำนวณเอง",
+      "expected_when_ready": "แตะตรงปุ่มที่เห็นจึงทำงาน แตะขอบดำไม่กดปุ่ม",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-020",
+      "title": "ความสามารถหลายจุดสัมผัส",
+      "category": "หน้าจอสัมผัส",
+      "state": "HOLD",
+      "state_label": "รอหลักฐานก่อนทดสอบฮาร์ดแวร์ตามขอบเขตนี้",
+      "contracts": [
+        "touch"
+      ],
+      "prerequisites": [
+        "This single-point API cannot establish multi-touch; restrict this case to capability discovery."
+      ],
+      "depends_on": [],
+      "template": null,
+      "correction": "ลดขอบเขตเป็น SINGLE_TOUCH_ONLY capability report เพราะ API นี้ส่งได้หนึ่งจุด ไม่ใช้สองนิ้วเป็นเกณฑ์ผ่าน",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ตรวจว่าระดับไดรเวอร์และ API ส่งได้กี่จุด ถ้ารองรับหลายจุดให้แสดงแต่ละจุด ถ้า API ส่งได้เพียงจุดเดียวให้แสดง SINGLE_TOUCH_ONLY ไม่สร้างข้อมูลจุดที่สอง",
+      "expected_when_ready": "รายงานความสามารถจริง ไม่ตัดสินว่าแผงเสียเพราะ API จำกัดหนึ่งจุด",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "discovery_or_manual_only",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-021",
+      "title": "สำรวจ ADC ของปุ่ม",
+      "category": "ปุ่ม S1/S2 และ LED บนบอร์ด",
+      "state": "TEMPLATE_CHECKED",
+      "state_label": "มีตัวอย่างตรงงานและทดสอบ fixture แล้ว",
+      "contracts": [
+        "adc",
+        "display"
+      ],
+      "prerequisites": [],
+      "depends_on": [],
+      "template": "adc_buttons",
+      "correction": "ใช้ python_example=adc_buttons; วัด 3 วินาที/สถานะก่อนเสนอ threshold และไม่ใช้ threshold เก่า",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "อ่าน ADC0 แบบที่ runtime รองรับ แล้วให้ผู้ทดสอบเก็บค่าไม่กด กด S1 และกด S2 อย่างละ 3 วินาที แสดง min/max/median ก่อนกำหนด threshold ไม่ใช้เลข threshold เดิมโดยไม่ตรวจ",
+      "expected_when_ready": "ข้อมูลสามสถานะมีการบันทึกจริง และแจ้งถ้าช่วงซ้อนกัน",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": true,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-022",
+      "title": "ปุ่ม S1 หนึ่งครั้งต่อการกด",
+      "category": "ปุ่ม S1/S2 และ LED บนบอร์ด",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "adc",
+        "display"
+      ],
+      "prerequisites": [
+        "Measured non-overlapping released/S1/S2 bands and tester confirmation."
+      ],
+      "depends_on": [
+        "MP-021"
+      ],
+      "template": null,
+      "correction": "ใช้ bands จาก MP-021; กด 20 ครั้งเป็น ground truth ที่ผู้ทดสอบยืนยัน",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "อ่าน S1 ด้วยเส้นทางปุ่มของ Plus ที่ตรวจแล้ว นับขอบกดพร้อม debounce ทดสอบกด 20 ครั้ง กดค้าง และปล่อย แสดง raw กับสถานะที่ตีความ",
+      "expected_when_ready": "กดค้างไม่ถูกนับเพิ่มหลายครั้ง และจำนวนตรงกับผู้ทดสอบ",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-023",
+      "title": "ปุ่ม S2 และกดค้าง",
+      "category": "ปุ่ม S1/S2 และ LED บนบอร์ด",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "adc",
+        "display"
+      ],
+      "prerequisites": [
+        "Measured non-overlapping released/S1/S2 bands and tester confirmation."
+      ],
+      "depends_on": [
+        "MP-021"
+      ],
+      "template": null,
+      "correction": "threshold จาก calibration; long press ใช้ monotonic และเกิดครั้งเดียวต่อรอบ",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ทดสอบ S2 ด้วยการกดสั้นและกดค้าง 2 วินาที แสดง event DOWN UP LONG_PRESS กับเวลาที่วัด และคงประวัติเพียง 20 event ล่าสุด",
+      "expected_when_ready": "แต่ละ event เกิดครบและ LONG_PRESS เกิดครั้งเดียวต่อรอบ",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-024",
+      "title": "ปุ่มสองตัวและสถานะกำกวม",
+      "category": "ปุ่ม S1/S2 และ LED บนบอร์ด",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "adc",
+        "display"
+      ],
+      "prerequisites": [
+        "Measured non-overlapping released/S1/S2 bands and tester confirmation."
+      ],
+      "depends_on": [
+        "MP-021"
+      ],
+      "template": null,
+      "correction": "ไม่กดพร้อมกันจนบันทึก bands แยกแล้ว; รายงาน AMBIGUOUS เมื่อแยกไม่ได้",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ทดสอบ S1, S2, ไม่กด และกดพร้อมกัน ถ้าเป็นวงจร ADC ladder ที่แยกพร้อมกันไม่ได้ให้รายงาน AMBIGUOUS ไม่อ้างว่าตรวจสองปุ่มอิสระได้",
+      "expected_when_ready": "สถานะกำกวมไม่ถูกนับเป็นการกดที่มั่นใจ",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-025",
+      "title": "LED ผู้ใช้บนบอร์ด",
+      "category": "ปุ่ม S1/S2 และ LED บนบอร์ด",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "led",
+        "display"
+      ],
+      "prerequisites": [
+        "Actual led-user path/ownership and saved active trigger/brightness."
+      ],
+      "depends_on": [],
+      "template": null,
+      "correction": "restore เฉพาะ active trigger ที่อยู่ในวงเล็บกับ brightness เดิม ไม่เขียนรายการ trigger ทั้งบรรทัดกลับ",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ค้นหา led-user ที่มีจริง เก็บ trigger/brightness เดิม กระพริบช้า 10 รอบแล้วคืนค่าเดิม อย่าเปลี่ยนไฟ power หรือ WiFi ถ้าแยกเจ้าของไม่ได้",
+      "expected_when_ready": "ผู้ทดสอบเห็น LED ที่ระบุติดดับและค่าเดิมถูกคืน",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-026",
+      "title": "ปุ่มควบคุมจอและ LED",
+      "category": "ปุ่ม S1/S2 และ LED บนบอร์ด",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "adc",
+        "led",
+        "display"
+      ],
+      "prerequisites": [
+        "MP-021 bands and verified user LED node."
+      ],
+      "depends_on": [
+        "MP-021",
+        "MP-025"
+      ],
+      "template": null,
+      "correction": "init ADC ครั้งเดียว; ใช้ calibration จริงและ LED node ที่ยืนยันแล้ว",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ทำ S1 เพิ่มตัวนับ S2 ล้างตัวนับ และให้ LED ผู้ใช้ติดตามสถานะที่ตรวจได้จริง ใช้ loop แบบไม่บล็อกจอและไม่แย่ง ADC object ซ้ำหลายตัว",
+      "expected_when_ready": "จอ ปุ่ม และ LED ทำงานร่วมกันโดยตัวนับไม่กระโดด",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-027",
+      "title": "IO2 digital output",
+      "category": "IO2–IO8 แยก input/output ทุกช่อง",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "gpio",
+        "display"
+      ],
+      "prerequisites": [
+        "Confirmed runtime pin/function and connector wiring; correct voltage/pull/LED or instrument fixture."
+      ],
+      "depends_on": [
+        "MP-003"
+      ],
+      "template": null,
+      "correction": "ยืนยัน pin/function ของ connector นี้จาก MP-003 และ fixture จริง; ไม่มี get_pin_function หรือ GPIO.close ใน reference baseline",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ทดสอบ IO2 โดย mapping อ้างอิงคือ A23 ยืนยันชื่อ pin และ GPIO function กับ runtime ก่อน ต่อ LED หรือเครื่องมือวัดตามระดับสัญญาณที่บอร์ดรองรับ เริ่ม LOW รอ START จากผู้ทดสอบ แล้วสลับ HIGH/LOW อย่างละหนึ่งวินาที 10 รอบ ตั้ง LOW และคืนทรัพยากรใน finally",
+      "expected_when_ready": "วัดหรือเห็นสัญญาณที่ IO2 ตรงกับคำสั่งครบ 10 รอบ ไม่ใช้การอ่านค่าที่สั่งเองเป็นหลักฐานทางกายภาพ",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-028",
+      "title": "IO2 digital input",
+      "category": "IO2–IO8 แยก input/output ทุกช่อง",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "gpio",
+        "display"
+      ],
+      "prerequisites": [
+        "Confirmed runtime pin/function and connector wiring; correct voltage/pull/LED or instrument fixture."
+      ],
+      "depends_on": [
+        "MP-003"
+      ],
+      "template": null,
+      "correction": "ยืนยัน pin/function ของ connector นี้จาก MP-003 และ fixture จริง; ไม่มี get_pin_function หรือ GPIO.close ใน reference baseline",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ทดสอบ IO2 โดย mapping อ้างอิงคือ A23 ตั้งเป็น input ตาม API ที่มี ใช้สวิตช์หรือแหล่งลอจิกที่ระดับถูกต้องพร้อม pull ที่เหมาะสม แสดง raw HIGH/LOW นับขอบและ debounce อย่าอ้างว่า floating input ต้องคงค่า",
+      "expected_when_ready": "สลับ input ที่ต่อจริงแล้วค่าบนจอและ Terminal เปลี่ยนตรงทุกครั้ง",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-029",
+      "title": "IO3 digital output",
+      "category": "IO2–IO8 แยก input/output ทุกช่อง",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "gpio",
+        "display"
+      ],
+      "prerequisites": [
+        "Confirmed runtime pin/function and connector wiring; correct voltage/pull/LED or instrument fixture."
+      ],
+      "depends_on": [
+        "MP-003"
+      ],
+      "template": null,
+      "correction": "ยืนยัน pin/function ของ connector นี้จาก MP-003 และ fixture จริง; ไม่มี get_pin_function หรือ GPIO.close ใน reference baseline",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ทดสอบ IO3 โดย mapping อ้างอิงคือ A27 ยืนยันชื่อ pin และ GPIO function กับ runtime ก่อน ต่อ LED หรือเครื่องมือวัดตามระดับสัญญาณที่บอร์ดรองรับ เริ่ม LOW รอ START จากผู้ทดสอบ แล้วสลับ HIGH/LOW อย่างละหนึ่งวินาที 10 รอบ ตั้ง LOW และคืนทรัพยากรใน finally",
+      "expected_when_ready": "วัดหรือเห็นสัญญาณที่ IO3 ตรงกับคำสั่งครบ 10 รอบ ไม่ใช้การอ่านค่าที่สั่งเองเป็นหลักฐานทางกายภาพ",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-030",
+      "title": "IO3 digital input",
+      "category": "IO2–IO8 แยก input/output ทุกช่อง",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "gpio",
+        "display"
+      ],
+      "prerequisites": [
+        "Confirmed runtime pin/function and connector wiring; correct voltage/pull/LED or instrument fixture."
+      ],
+      "depends_on": [
+        "MP-003"
+      ],
+      "template": null,
+      "correction": "ยืนยัน pin/function ของ connector นี้จาก MP-003 และ fixture จริง; ไม่มี get_pin_function หรือ GPIO.close ใน reference baseline",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ทดสอบ IO3 โดย mapping อ้างอิงคือ A27 ตั้งเป็น input ตาม API ที่มี ใช้สวิตช์หรือแหล่งลอจิกที่ระดับถูกต้องพร้อม pull ที่เหมาะสม แสดง raw HIGH/LOW นับขอบและ debounce อย่าอ้างว่า floating input ต้องคงค่า",
+      "expected_when_ready": "สลับ input ที่ต่อจริงแล้วค่าบนจอและ Terminal เปลี่ยนตรงทุกครั้ง",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-031",
+      "title": "IO4 digital output",
+      "category": "IO2–IO8 แยก input/output ทุกช่อง",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "gpio",
+        "display"
+      ],
+      "prerequisites": [
+        "Confirmed runtime pin/function and connector wiring; correct voltage/pull/LED or instrument fixture."
+      ],
+      "depends_on": [
+        "MP-003"
+      ],
+      "template": null,
+      "correction": "ยืนยัน pin/function ของ connector นี้จาก MP-003 และ fixture จริง; ไม่มี get_pin_function หรือ GPIO.close ใน reference baseline",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ทดสอบ IO4 โดย mapping อ้างอิงคือ A25 ยืนยันชื่อ pin และ GPIO function กับ runtime ก่อน ต่อ LED หรือเครื่องมือวัดตามระดับสัญญาณที่บอร์ดรองรับ เริ่ม LOW รอ START จากผู้ทดสอบ แล้วสลับ HIGH/LOW อย่างละหนึ่งวินาที 10 รอบ ตั้ง LOW และคืนทรัพยากรใน finally",
+      "expected_when_ready": "วัดหรือเห็นสัญญาณที่ IO4 ตรงกับคำสั่งครบ 10 รอบ ไม่ใช้การอ่านค่าที่สั่งเองเป็นหลักฐานทางกายภาพ",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-032",
+      "title": "IO4 digital input",
+      "category": "IO2–IO8 แยก input/output ทุกช่อง",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "gpio",
+        "display"
+      ],
+      "prerequisites": [
+        "Confirmed runtime pin/function and connector wiring; correct voltage/pull/LED or instrument fixture."
+      ],
+      "depends_on": [
+        "MP-003"
+      ],
+      "template": null,
+      "correction": "ยืนยัน pin/function ของ connector นี้จาก MP-003 และ fixture จริง; ไม่มี get_pin_function หรือ GPIO.close ใน reference baseline",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ทดสอบ IO4 โดย mapping อ้างอิงคือ A25 ตั้งเป็น input ตาม API ที่มี ใช้สวิตช์หรือแหล่งลอจิกที่ระดับถูกต้องพร้อม pull ที่เหมาะสม แสดง raw HIGH/LOW นับขอบและ debounce อย่าอ้างว่า floating input ต้องคงค่า",
+      "expected_when_ready": "สลับ input ที่ต่อจริงแล้วค่าบนจอและ Terminal เปลี่ยนตรงทุกครั้ง",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-033",
+      "title": "IO5 digital output",
+      "category": "IO2–IO8 แยก input/output ทุกช่อง",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "gpio",
+        "display"
+      ],
+      "prerequisites": [
+        "Confirmed runtime pin/function and connector wiring; correct voltage/pull/LED or instrument fixture."
+      ],
+      "depends_on": [
+        "MP-003"
+      ],
+      "template": null,
+      "correction": "ยืนยัน pin/function ของ connector นี้จาก MP-003 และ fixture จริง; ไม่มี get_pin_function หรือ GPIO.close ใน reference baseline",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ทดสอบ IO5 โดย mapping อ้างอิงคือ A22 ยืนยันชื่อ pin และ GPIO function กับ runtime ก่อน ต่อ LED หรือเครื่องมือวัดตามระดับสัญญาณที่บอร์ดรองรับ เริ่ม LOW รอ START จากผู้ทดสอบ แล้วสลับ HIGH/LOW อย่างละหนึ่งวินาที 10 รอบ ตั้ง LOW และคืนทรัพยากรใน finally",
+      "expected_when_ready": "วัดหรือเห็นสัญญาณที่ IO5 ตรงกับคำสั่งครบ 10 รอบ ไม่ใช้การอ่านค่าที่สั่งเองเป็นหลักฐานทางกายภาพ",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-034",
+      "title": "IO5 digital input",
+      "category": "IO2–IO8 แยก input/output ทุกช่อง",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "gpio",
+        "display"
+      ],
+      "prerequisites": [
+        "Confirmed runtime pin/function and connector wiring; correct voltage/pull/LED or instrument fixture."
+      ],
+      "depends_on": [
+        "MP-003"
+      ],
+      "template": null,
+      "correction": "ยืนยัน pin/function ของ connector นี้จาก MP-003 และ fixture จริง; ไม่มี get_pin_function หรือ GPIO.close ใน reference baseline",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ทดสอบ IO5 โดย mapping อ้างอิงคือ A22 ตั้งเป็น input ตาม API ที่มี ใช้สวิตช์หรือแหล่งลอจิกที่ระดับถูกต้องพร้อม pull ที่เหมาะสม แสดง raw HIGH/LOW นับขอบและ debounce อย่าอ้างว่า floating input ต้องคงค่า",
+      "expected_when_ready": "สลับ input ที่ต่อจริงแล้วค่าบนจอและ Terminal เปลี่ยนตรงทุกครั้ง",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-035",
+      "title": "IO6 digital output",
+      "category": "IO2–IO8 แยก input/output ทุกช่อง",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "gpio",
+        "display"
+      ],
+      "prerequisites": [
+        "Confirmed runtime pin/function and connector wiring; correct voltage/pull/LED or instrument fixture."
+      ],
+      "depends_on": [
+        "MP-003"
+      ],
+      "template": null,
+      "correction": "ยืนยัน pin/function ของ connector นี้จาก MP-003 และ fixture จริง; ไม่มี get_pin_function หรือ GPIO.close ใน reference baseline",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ทดสอบ IO6 โดย mapping อ้างอิงคือ A24 ยืนยันชื่อ pin และ GPIO function กับ runtime ก่อน ต่อ LED หรือเครื่องมือวัดตามระดับสัญญาณที่บอร์ดรองรับ เริ่ม LOW รอ START จากผู้ทดสอบ แล้วสลับ HIGH/LOW อย่างละหนึ่งวินาที 10 รอบ ตั้ง LOW และคืนทรัพยากรใน finally",
+      "expected_when_ready": "วัดหรือเห็นสัญญาณที่ IO6 ตรงกับคำสั่งครบ 10 รอบ ไม่ใช้การอ่านค่าที่สั่งเองเป็นหลักฐานทางกายภาพ",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-036",
+      "title": "IO6 digital input",
+      "category": "IO2–IO8 แยก input/output ทุกช่อง",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "gpio",
+        "display"
+      ],
+      "prerequisites": [
+        "Confirmed runtime pin/function and connector wiring; correct voltage/pull/LED or instrument fixture."
+      ],
+      "depends_on": [
+        "MP-003"
+      ],
+      "template": null,
+      "correction": "ยืนยัน pin/function ของ connector นี้จาก MP-003 และ fixture จริง; ไม่มี get_pin_function หรือ GPIO.close ใน reference baseline",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ทดสอบ IO6 โดย mapping อ้างอิงคือ A24 ตั้งเป็น input ตาม API ที่มี ใช้สวิตช์หรือแหล่งลอจิกที่ระดับถูกต้องพร้อม pull ที่เหมาะสม แสดง raw HIGH/LOW นับขอบและ debounce อย่าอ้างว่า floating input ต้องคงค่า",
+      "expected_when_ready": "สลับ input ที่ต่อจริงแล้วค่าบนจอและ Terminal เปลี่ยนตรงทุกครั้ง",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-037",
+      "title": "IO7 digital output",
+      "category": "IO2–IO8 แยก input/output ทุกช่อง",
+      "state": "HOLD",
+      "state_label": "รอหลักฐานก่อนทดสอบฮาร์ดแวร์ตามขอบเขตนี้",
+      "contracts": [
+        "gpio",
+        "display"
+      ],
+      "prerequisites": [
+        "IO7=P24 alias/function/routing not proven; read-only discovery first."
+      ],
+      "depends_on": [
+        "MP-003"
+      ],
+      "template": null,
+      "correction": "HOLD การขับ IO7: P24 เป็นค่าจาก dropdown ไม่ใช่ข้อพิสูจน์ว่า native runtime รับ alias นี้",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ทดสอบ IO7 โดย mapping อ้างอิงคือ P24 ยืนยันชื่อ pin และ GPIO function กับ runtime ก่อน ต่อ LED หรือเครื่องมือวัดตามระดับสัญญาณที่บอร์ดรองรับ เริ่ม LOW รอ START จากผู้ทดสอบ แล้วสลับ HIGH/LOW อย่างละหนึ่งวินาที 10 รอบ ตั้ง LOW และคืนทรัพยากรใน finally",
+      "expected_when_ready": "วัดหรือเห็นสัญญาณที่ IO7 ตรงกับคำสั่งครบ 10 รอบ ไม่ใช้การอ่านค่าที่สั่งเองเป็นหลักฐานทางกายภาพ",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "discovery_or_manual_only",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-038",
+      "title": "IO7 digital input",
+      "category": "IO2–IO8 แยก input/output ทุกช่อง",
+      "state": "HOLD",
+      "state_label": "รอหลักฐานก่อนทดสอบฮาร์ดแวร์ตามขอบเขตนี้",
+      "contracts": [
+        "gpio",
+        "display"
+      ],
+      "prerequisites": [
+        "IO7=P24 alias/function/routing not proven; read-only discovery first."
+      ],
+      "depends_on": [
+        "MP-003"
+      ],
+      "template": null,
+      "correction": "HOLD การตั้ง IO7 เป็น input เช่นเดียวกัน ห้ามเปลี่ยนเป็น A24 แทน",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ทดสอบ IO7 โดย mapping อ้างอิงคือ P24 ตั้งเป็น input ตาม API ที่มี ใช้สวิตช์หรือแหล่งลอจิกที่ระดับถูกต้องพร้อม pull ที่เหมาะสม แสดง raw HIGH/LOW นับขอบและ debounce อย่าอ้างว่า floating input ต้องคงค่า",
+      "expected_when_ready": "สลับ input ที่ต่อจริงแล้วค่าบนจอและ Terminal เปลี่ยนตรงทุกครั้ง",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "discovery_or_manual_only",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-039",
+      "title": "IO8 digital output",
+      "category": "IO2–IO8 แยก input/output ทุกช่อง",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "gpio",
+        "display"
+      ],
+      "prerequisites": [
+        "Confirmed runtime pin/function and connector wiring; correct voltage/pull/LED or instrument fixture."
+      ],
+      "depends_on": [
+        "MP-003"
+      ],
+      "template": null,
+      "correction": "ยืนยัน pin/function ของ connector นี้จาก MP-003 และ fixture จริง; ไม่มี get_pin_function หรือ GPIO.close ใน reference baseline",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ทดสอบ IO8 โดย mapping อ้างอิงคือ A15 ยืนยันชื่อ pin และ GPIO function กับ runtime ก่อน ต่อ LED หรือเครื่องมือวัดตามระดับสัญญาณที่บอร์ดรองรับ เริ่ม LOW รอ START จากผู้ทดสอบ แล้วสลับ HIGH/LOW อย่างละหนึ่งวินาที 10 รอบ ตั้ง LOW และคืนทรัพยากรใน finally",
+      "expected_when_ready": "วัดหรือเห็นสัญญาณที่ IO8 ตรงกับคำสั่งครบ 10 รอบ ไม่ใช้การอ่านค่าที่สั่งเองเป็นหลักฐานทางกายภาพ",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-040",
+      "title": "IO8 digital input",
+      "category": "IO2–IO8 แยก input/output ทุกช่อง",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "gpio",
+        "display"
+      ],
+      "prerequisites": [
+        "Confirmed runtime pin/function and connector wiring; correct voltage/pull/LED or instrument fixture."
+      ],
+      "depends_on": [
+        "MP-003"
+      ],
+      "template": null,
+      "correction": "ยืนยัน pin/function ของ connector นี้จาก MP-003 และ fixture จริง; ไม่มี get_pin_function หรือ GPIO.close ใน reference baseline",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ทดสอบ IO8 โดย mapping อ้างอิงคือ A15 ตั้งเป็น input ตาม API ที่มี ใช้สวิตช์หรือแหล่งลอจิกที่ระดับถูกต้องพร้อม pull ที่เหมาะสม แสดง raw HIGH/LOW นับขอบและ debounce อย่าอ้างว่า floating input ต้องคงค่า",
+      "expected_when_ready": "สลับ input ที่ต่อจริงแล้วค่าบนจอและ Terminal เปลี่ยนตรงทุกครั้ง",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-041",
+      "title": "สำรวจ input เจ็ดช่องพร้อมกัน",
+      "category": "GPIO หลายช่องและ loopback",
+      "state": "HOLD",
+      "state_label": "รอหลักฐานก่อนทดสอบฮาร์ดแวร์ตามขอบเขตนี้",
+      "contracts": [
+        "gpio",
+        "display"
+      ],
+      "prerequisites": [
+        "All seven connector mappings, including IO7/P24, and all-channel safe fixture must be established."
+      ],
+      "depends_on": [
+        "MP-003"
+      ],
+      "template": null,
+      "correction": "HOLD การอ่านครบเจ็ดช่องจน IO7 ยืนยัน; floating input ไม่เป็น FAIL ของพอร์ต",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "อ่าน IO2–IO8 เป็น input ทั้งหมด แสดงตาราง bit raw และเวลาที่เปลี่ยนล่าสุด ถ้ายังไม่ได้ต่อ fixture ให้แสดง FLOATING/UNVERIFIED อย่าให้ PASS จากการอ่านได้เฉย ๆ",
+      "expected_when_ready": "เปลี่ยน fixture ทีละช่องแล้วเปลี่ยนเฉพาะช่องที่เกี่ยวข้อง",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "discovery_or_manual_only",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-042",
+      "title": "walking-one output",
+      "category": "GPIO หลายช่องและ loopback",
+      "state": "HOLD",
+      "state_label": "รอหลักฐานก่อนทดสอบฮาร์ดแวร์ตามขอบเขตนี้",
+      "contracts": [
+        "gpio",
+        "display"
+      ],
+      "prerequisites": [
+        "All seven connector mappings, including IO7/P24, and all-channel safe fixture must be established."
+      ],
+      "depends_on": [
+        "MP-003"
+      ],
+      "template": null,
+      "correction": "HOLD all-seven output; ห้ามขับ alias ที่ยังไม่ยืนยันเพื่อให้ครบตาราง",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ตั้งเอาต์พุต IO2–IO8 ที่ยืนยันแล้ว เริ่มทุกช่อง LOW รอ START แล้วให้ HIGH เพียงหนึ่งช่องไล่ทีละช่อง ทุกรอบต้องมีป้ายชื่อช่องที่กำลังขับ",
+      "expected_when_ready": "เห็น HIGH เพียงหนึ่งช่องและลำดับ IO2 ถึง IO8 ตรง",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "discovery_or_manual_only",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-043",
+      "title": "walking-zero output",
+      "category": "GPIO หลายช่องและ loopback",
+      "state": "HOLD",
+      "state_label": "รอหลักฐานก่อนทดสอบฮาร์ดแวร์ตามขอบเขตนี้",
+      "contracts": [
+        "gpio",
+        "display"
+      ],
+      "prerequisites": [
+        "All seven connector mappings, including IO7/P24, and all-channel safe fixture must be established."
+      ],
+      "depends_on": [
+        "MP-003"
+      ],
+      "template": null,
+      "correction": "walking-zero ต้องประเมินกระแสรวม fixture ไม่เท่ากับการขับ GPIO ทุกช่องพร้อมกันโดยไร้เงื่อนไข",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ทำแพตเทิร์นทุกช่อง HIGH ยกเว้นหนึ่งช่อง LOW ไล่เจ็ดช่อง แล้วกลับ LOW ทั้งหมด จำกัดการทดสอบเฉพาะ LED โหลดต่ำที่ต่อถูกต้อง",
+      "expected_when_ready": "แต่ละรอบมี LOW เพียงช่องเดียว ไม่มีกระแสโหลดเกินพอร์ต",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "discovery_or_manual_only",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-044",
+      "title": "loopback IO2 → IO3",
+      "category": "GPIO หลายช่องและ loopback",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "gpio",
+        "display"
+      ],
+      "prerequisites": [
+        "Verified pins, one output per loopback pair, series resistor/safe LED fixture and START gate."
+      ],
+      "depends_on": [
+        "MP-003"
+      ],
+      "template": null,
+      "correction": "IO2 output → IO3 input ผ่าน series resistor; อีกด้านไม่เป็น output",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ยืนยันว่าต่อ IO2 output ไป IO3 input ผ่านตัวต้านทานและไม่มีโหลดอื่น จากนั้นส่งแพตเทิร์นบิตช้า 100 บิต อ่าน input เทียบทีละบิต ใช้ timeout และหยุดขับเมื่อผิดพลาด",
+      "expected_when_ready": "จำนวนบิตตรงและรายงาน mismatch จากการอ่าน IO3 จริง",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-045",
+      "title": "loopback IO4 → IO5",
+      "category": "GPIO หลายช่องและ loopback",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "gpio",
+        "display"
+      ],
+      "prerequisites": [
+        "Verified pins, one output per loopback pair, series resistor/safe LED fixture and START gate."
+      ],
+      "depends_on": [
+        "MP-003"
+      ],
+      "template": null,
+      "correction": "IO4 output → IO5 input มี timeout ใน loop ที่ควบคุมเองและวัด input จริง",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ทดสอบ IO4 output ไป IO5 input ด้วยแพตเทิร์น 00110101 ซ้ำที่ 5Hz เปรียบเทียบค่าที่อ่านจริงและสรุปจำนวนผิด ห้ามตั้งขาทั้งสองเป็น output พร้อมกัน",
+      "expected_when_ready": "input ตามแพตเทิร์นครบและจบโดย output เป็น LOW",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-046",
+      "title": "loopback IO6 → IO8",
+      "category": "GPIO หลายช่องและ loopback",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "gpio",
+        "display"
+      ],
+      "prerequisites": [
+        "Verified pins, one output per loopback pair, series resistor/safe LED fixture and START gate."
+      ],
+      "depends_on": [
+        "MP-003"
+      ],
+      "template": null,
+      "correction": "latency เป็น userspace-observed เท่านั้น ไม่ใช่สเปก hardware GPIO",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ทดสอบ IO6 output ไป IO8 input ด้วยการสลับช้า วัดเวลาที่พบการเปลี่ยนแบบ userspace และรายงานว่าเป็น software-observed latency ไม่ใช่สเปกเวลาขา GPIO",
+      "expected_when_ready": "ข้อมูลรับตรงและไม่กล่าวอ้างความแม่นยำระดับไมโครวินาที",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-047",
+      "title": "ปุ่มภายนอกสั่ง LED คนละช่อง",
+      "category": "GPIO หลายช่องและ loopback",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "gpio",
+        "display"
+      ],
+      "prerequisites": [
+        "Verified pins, one output per loopback pair, series resistor/safe LED fixture and START gate."
+      ],
+      "depends_on": [
+        "MP-003"
+      ],
+      "template": null,
+      "correction": "กรอก active-high/low และ pull ตามสวิตช์จริง อย่าเดาว่าปล่อยต้องเป็น HIGH",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ทำ IO2 input ควบคุม IO3 output พร้อม debounce และแสดง input/output บนจอ กดค้างและกดเร็วแล้วตรวจว่าตามเงื่อนไข ตั้ง LED ดับเมื่อ Stop",
+      "expected_when_ready": "สวิตช์ที่ต่อจริงควบคุม LED ได้ ไม่แกว่งเมื่อปล่อย",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-048",
+      "title": "Stop ระหว่างขับ GPIO",
+      "category": "GPIO หลายช่องและ loopback",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "gpio",
+        "display"
+      ],
+      "prerequisites": [
+        "Verified pins, one output per loopback pair, series resistor/safe LED fixture and START gate."
+      ],
+      "depends_on": [
+        "MP-003"
+      ],
+      "template": null,
+      "correction": "ใช้ GPIO ที่ยืนยันแล้วกับ LED เท่านั้น; forced kill อาจไม่รัน finally ต้องตรวจ LOW จริงหรือ UNKNOWN",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ทำแพตเทิร์น IO ที่ตรวจ mapping แล้วและรองรับ finally ให้ผู้ทดสอบกด Stop ระหว่าง HIGH ตรวจระดับจริงหลัง Stop และบันทึกว่า cleanup สำเร็จหรือเป็น UNKNOWN หากถูก kill ก่อน finally",
+      "expected_when_ready": "LED/สัญญาณกลับสภาวะที่กำหนดและเมนูกลับมา โดยไม่อ้าง cleanup หากวัดไม่ได้",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-049",
+      "title": "สำรวจ PWM ที่ออกมาที่ connector",
+      "category": "PWM และ servo",
+      "state": "DRAFT_REFERENCE",
+      "state_label": "มี API อ้างอิง; ต้องสร้างและตรวจโค้ดตามงาน",
+      "contracts": [
+        "gpio",
+        "pwm"
+      ],
+      "prerequisites": [],
+      "depends_on": [
+        "MP-003"
+      ],
+      "template": null,
+      "correction": "discovery เท่านั้น ไม่มีการสร้าง PWM; pin/function/channel เป็นคนละข้อมูล",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ตรวจ IO7 และทางเลือก PWM จาก runtime กับเอกสาร Plus สรุป pin, function, channel และข้อขัดแย้ง โดยยังไม่สร้าง PWM อย่าเหมารวมว่า IO ทุกช่องมี hardware PWM",
+      "expected_when_ready": "ได้ mapping ที่ตรวจได้หรือ UNKNOWN ไม่มีการเปลี่ยน backlight channel",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-050",
+      "title": "วัด PWM บน IO7",
+      "category": "PWM และ servo",
+      "state": "HOLD",
+      "state_label": "รอหลักฐานก่อนทดสอบฮาร์ดแวร์ตามขอบเขตนี้",
+      "contracts": [
+        "gpio",
+        "pwm",
+        "touch"
+      ],
+      "prerequisites": [
+        "Confirmed IO7 PWM pin/function/channel/backend; instrument proof before servo; actual servo pulse limits/power."
+      ],
+      "depends_on": [
+        "MP-049"
+      ],
+      "template": null,
+      "correction": "HOLD จน mapping/backend แน่นอน; ต้องใช้เครื่องมือวัดก่อนต่อ servo ไม่เดา PWM2 จาก helper ที่ไม่พบ",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "เมื่อยืนยัน mapping IO7/PWM แล้ว สร้างสัญญาณ 50Hz duty ต่ำที่กำหนดได้ วัด period และ pulse width จากเครื่องมือจริง ไม่ต่อ servo ระหว่างวัด และ disable PWM ใน finally",
+      "expected_when_ready": "ค่าจากเครื่องมือตรงกับค่าที่ตั้งใน tolerance ที่ผู้ทดสอบกำหนด",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "discovery_or_manual_only",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-051",
+      "title": "LED ปรับ duty บน IO7",
+      "category": "PWM และ servo",
+      "state": "HOLD",
+      "state_label": "รอหลักฐานก่อนทดสอบฮาร์ดแวร์ตามขอบเขตนี้",
+      "contracts": [
+        "gpio",
+        "pwm",
+        "touch"
+      ],
+      "prerequisites": [
+        "Confirmed IO7 PWM pin/function/channel/backend; instrument proof before servo; actual servo pulse limits/power."
+      ],
+      "depends_on": [
+        "MP-049"
+      ],
+      "template": null,
+      "correction": "duty เป็นเปอร์เซ็นต์; HOLD จน IO7 PWM ยืนยัน ห้ามใช้ช่อง backlight แทน",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ใช้ hardware PWM ของ IO7 ที่ยืนยันแล้วที่ 1kHz ไล่ duty 0,25,50,75,100 เปอร์เซ็นต์ แสดงแต่ละขั้น คงแต่ละขั้นหนึ่งวินาทีและปิดท้ายด้วย duty 0",
+      "expected_when_ready": "เครื่องมือวัด duty ตรง หรือผู้ทดสอบยืนยันความสว่างเป็นผลเชิงสายตา",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "discovery_or_manual_only",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-052",
+      "title": "servo เริ่มกลางช่วง",
+      "category": "PWM และ servo",
+      "state": "HOLD",
+      "state_label": "รอหลักฐานก่อนทดสอบฮาร์ดแวร์ตามขอบเขตนี้",
+      "contracts": [
+        "gpio",
+        "pwm",
+        "touch"
+      ],
+      "prerequisites": [
+        "Confirmed IO7 PWM pin/function/channel/backend; instrument proof before servo; actual servo pulse limits/power."
+      ],
+      "depends_on": [
+        "MP-049"
+      ],
+      "template": null,
+      "correction": "servo.C906Servo ยังไม่ใช่ dependency ที่ยืนยันใน image; ห้าม import แล้วอ้างว่าพร้อม",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ใช้ servo บน IO7 ตามไดรเวอร์ Plus ที่มีจริง กำหนดช่วง pulse จาก datasheet ของ servo เริ่มตำแหน่งกลางก่อน ขยับเฉพาะช่วงปลอดการติดขัดที่ผู้ทดสอบกำหนด ไม่ลองสุดมุม 0/180 โดยอัตโนมัติ",
+      "expected_when_ready": "servo เคลื่อนตามคำสั่งโดยไม่ติดกลไกและไฟเลี้ยงบอร์ดไม่ตก",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "discovery_or_manual_only",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-053",
+      "title": "servo ควบคุมด้วย touch",
+      "category": "PWM และ servo",
+      "state": "HOLD",
+      "state_label": "รอหลักฐานก่อนทดสอบฮาร์ดแวร์ตามขอบเขตนี้",
+      "contracts": [
+        "gpio",
+        "pwm",
+        "touch"
+      ],
+      "prerequisites": [
+        "Confirmed IO7 PWM pin/function/channel/backend; instrument proof before servo; actual servo pulse limits/power."
+      ],
+      "depends_on": [
+        "MP-049",
+        "MP-015"
+      ],
+      "template": null,
+      "correction": "ต้องผ่าน MP-015 และ mapping/pulse limits ของ servo ก่อนรับค่า slider",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ทำ slider บนจอควบคุม servo IO7 จำกัดมุมและอัตราการเคลื่อน แสดง pulse width จริงที่สั่ง ปล่อยนิ้วแล้วหยุดเปลี่ยนเป้าหมาย และให้ปุ่มยุติการส่ง PWM",
+      "expected_when_ready": "servo ตาม slider ภายในขอบเขต ไม่มีการกระชากจากพิกัดผิด",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "discovery_or_manual_only",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-054",
+      "title": "PWM กับ Stop และการรันใหม่",
+      "category": "PWM และ servo",
+      "state": "HOLD",
+      "state_label": "รอหลักฐานก่อนทดสอบฮาร์ดแวร์ตามขอบเขตนี้",
+      "contracts": [
+        "gpio",
+        "pwm",
+        "touch"
+      ],
+      "prerequisites": [
+        "Confirmed IO7 PWM pin/function/channel/backend; instrument proof before servo; actual servo pulse limits/power."
+      ],
+      "depends_on": [
+        "MP-049"
+      ],
+      "template": null,
+      "correction": "ต้องวัดสัญญาณหลัง Stop จริง; disable() มีใน API แต่ไม่รับประกัน cleanup เมื่อ kill",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ให้ผู้ทดสอบ Run → Stop ระหว่าง PWM → ตรวจสัญญาณหยุด → Run ซ้ำ เมื่อ mapping/backend ยืนยันแล้ว ใช้ disable() ตาม API บันทึก channel busy และตรวจสัญญาณจริงหลัง Stop ไม่อ้างว่าคืน pinmux เดิมเมื่อไม่รู้ค่าเดิม หรือ finally ทำงานหลัง forced kill",
+      "expected_when_ready": "ไม่เกิด channel busy จากรอบก่อน และมีหลักฐานว่าสัญญาณหยุดหลัง Stop",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "discovery_or_manual_only",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-055",
+      "title": "สำรวจ I2C connector จริง",
+      "category": "I2C เซนเซอร์ภายนอก และ ADC ภายนอก",
+      "state": "DRAFT_REFERENCE",
+      "state_label": "มี API อ้างอิง; ต้องสร้างและตรวจโค้ดตามงาน",
+      "contracts": [
+        "i2c"
+      ],
+      "prerequisites": [],
+      "depends_on": [],
+      "template": null,
+      "correction": "list_devices/node เป็น discovery ไม่ scan หรือเปิดบัสภายใน และไม่ insmod อัตโนมัติ",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ตรวจ external I2C ของ Plus ทั้ง KB-CHAIN/GROVE จากเอกสารและ device node ที่มี แยกจากบัสกล้อง/IMU ตรวจว่า image ใช้ hardware bus หรือ i2c-gpio ที่เตรียมไว้ ห้ามเดา bus 1/5 หรือ insmod แก้ระบบเอง",
+      "expected_when_ready": "มี bus/pin/backend ที่มีหลักฐานหรือแสดงสิ่งที่ขาดก่อนทดสอบ",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-056",
+      "title": "scan I2C ภายนอกแบบควบคุม",
+      "category": "I2C เซนเซอร์ภายนอก และ ADC ภายนอก",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "i2c",
+        "files"
+      ],
+      "prerequisites": [
+        "Actual external bus/backend, correct module wiring/voltage/address and matching device protocol/driver. No implicit module loading."
+      ],
+      "depends_on": [
+        "MP-055"
+      ],
+      "template": null,
+      "correction": "scan เป็น probe ที่อาจมีผลต่ออุปกรณ์ ไม่ใช่ read-only discovery; จำกัด bus/address/operation ตามโมดูล",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "บนบัสภายนอกที่ยืนยันแล้ว ตรวจ ACK เฉพาะช่วง address ที่คู่มืออุปกรณ์อนุญาต หรือใช้ probe ที่ไดรเวอร์รองรับ แสดง address 7-bit ไม่ scan บัสภายในที่ไม่เกี่ยวข้องและไม่เขียน register แบบสุ่ม",
+      "expected_when_ready": "พบ address ของอุปกรณ์ที่ต่อจริงโดยอธิบายชนิด probe",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-057",
+      "title": "อ่านเซนเซอร์ SHT31",
+      "category": "I2C เซนเซอร์ภายนอก และ ADC ภายนอก",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "i2c",
+        "files"
+      ],
+      "prerequisites": [
+        "Actual external bus/backend, correct module wiring/voltage/address and matching device protocol/driver. No implicit module loading."
+      ],
+      "depends_on": [
+        "MP-055"
+      ],
+      "template": null,
+      "correction": "ต้องมี external bus และ SHT31 protocol ที่ตรงรุ่น; ตรวจ None/length/CRC ก่อนแปลงค่าจริง",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "อ่านอุณหภูมิและความชื้นจาก SHT31 ที่ address ที่ยืนยันแล้ว ตรวจ CRC ของข้อมูลถ้ารองรับ แสดงค่าพร้อมหน่วยและเก็บ min/max 60 วินาที แยก NACK/CRC failure จากค่าปกติ",
+      "expected_when_ready": "ได้ค่าจริงและมีข้อมูลคุณภาพ ไม่คืน 0 เป็นค่าปกติเมื่ออ่านล้ม",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-058",
+      "title": "อ่านเซนเซอร์แสง I2C",
+      "category": "I2C เซนเซอร์ภายนอก และ ADC ภายนอก",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "i2c",
+        "files"
+      ],
+      "prerequisites": [
+        "Actual external bus/backend, correct module wiring/voltage/address and matching device protocol/driver. No implicit module loading."
+      ],
+      "depends_on": [
+        "MP-055"
+      ],
+      "template": null,
+      "correction": "ระบุรุ่น/measurement command/conversion ของโมดูล ไม่ใช้ค่า raw ของบัสเป็น lux",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ใช้ไดรเวอร์ตรงรุ่น อ่านแสงเป็น lux และกราฟตามเวลา ให้บัง/เปิดแสงตามขั้นตอน ถ้าไม่ใช่ BH1750 อย่าใช้ register ของมันแทน",
+      "expected_when_ready": "ค่าตอบสนองการบังแสงและแสดงหน่วยที่ไดรเวอร์ยืนยัน",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-059",
+      "title": "จอ OLED ภายนอก",
+      "category": "I2C เซนเซอร์ภายนอก และ ADC ภายนอก",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "i2c",
+        "files"
+      ],
+      "prerequisites": [
+        "Actual external bus/backend, correct module wiring/voltage/address and matching device protocol/driver. No implicit module loading."
+      ],
+      "depends_on": [
+        "MP-055"
+      ],
+      "template": null,
+      "correction": "ระบุ controller SSD1306/SH1106 และ resolution จากโมดูลจริง ไม่เดาด้วย address",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ตรวจว่าเป็น SSD1306 หรือ SH1106 และขนาดจริงก่อนใช้ไดรเวอร์ จากนั้นแสดงลายกริดกับตัวนับพร้อมจอหลัก ไม่เขียน address อื่นเพื่อเดารุ่น",
+      "expected_when_ready": "OLED แสดงตรงขอบเขตที่กำหนด จอหลักและ Stop ยังทำงาน",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-060",
+      "title": "หลายอุปกรณ์บน I2C",
+      "category": "I2C เซนเซอร์ภายนอก และ ADC ภายนอก",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "i2c",
+        "files"
+      ],
+      "prerequisites": [
+        "Actual external bus/backend, correct module wiring/voltage/address and matching device protocol/driver. No implicit module loading."
+      ],
+      "depends_on": [
+        "MP-055"
+      ],
+      "template": null,
+      "correction": "ตรวจ address conflict และแชร์ bus handle; ไม่สร้างหลายเจ้าของอุปกรณ์เดียวกัน",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "อ่านเซนเซอร์สองตัวบน external bus เดียวกัน ใช้ bus object ร่วมและเวลาแยกกัน แสดงจำนวน transaction กับ error ต่ออุปกรณ์ แยกสาเหตุ address ชนก่อนเริ่ม",
+      "expected_when_ready": "อุปกรณ์ทั้งสองอัปเดตโดยไม่รบกวนกัน",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-061",
+      "title": "ADC ภายนอกกับ potentiometer",
+      "category": "I2C เซนเซอร์ภายนอก และ ADC ภายนอก",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "i2c",
+        "files"
+      ],
+      "prerequisites": [
+        "Actual external bus/backend, correct module wiring/voltage/address and matching device protocol/driver. No implicit module loading."
+      ],
+      "depends_on": [
+        "MP-055"
+      ],
+      "template": null,
+      "correction": "ใช้ external ADC ตามชนิด/gain/reference จริง; ADC0 onboard เป็นปุ่ม ไม่ใช่พอร์ต POT ทั่วไป",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ใช้ ADC I2C ตรงรุ่นอ่าน potentiometer ในช่วงแรงดันที่ ADC/โมดูลอนุญาต แสดง raw, gain และแรงดันตาม reference จริง ไม่เรียก ADC ของ ESP32 และไม่เสียบ analog เข้าขา IO2–IO8 โดยสมมติว่าอ่านได้",
+      "expected_when_ready": "ค่าต่ำ กลาง สูงเปลี่ยนต่อเนื่องและสูตรตรงกับ ADC ที่ใช้",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-062",
+      "title": "ADC ภายนอกทุกช่อง",
+      "category": "I2C เซนเซอร์ภายนอก และ ADC ภายนอก",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "i2c",
+        "files"
+      ],
+      "prerequisites": [
+        "Actual external bus/backend, correct module wiring/voltage/address and matching device protocol/driver. No implicit module loading."
+      ],
+      "depends_on": [
+        "MP-055"
+      ],
+      "template": null,
+      "correction": "เลือกชนิด single-ended/differential และช่วงแรงดันจริง ก่อนทดสอบทุกช่อง ADC ภายนอก",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ไล่ทุกช่องของ ADC ที่ต่อจริง ระบุ single-ended หรือ differential ชัดเจน บันทึก sample rate, gain, raw และค่าจากมัลติมิเตอร์อ้างอิง ไม่อ้างว่าเทียบแล้วถ้าไม่ได้กรอกค่ามิเตอร์",
+      "expected_when_ready": "มีผลแต่ละช่องพร้อมค่าคลาดเคลื่อนที่คำนวณได้จริง",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-063",
+      "title": "I2C ไม่มีอุปกรณ์และ NACK",
+      "category": "I2C เซนเซอร์ภายนอก และ ADC ภายนอก",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "i2c",
+        "files"
+      ],
+      "prerequisites": [
+        "Actual external bus/backend, correct module wiring/voltage/address and matching device protocol/driver. No implicit module loading."
+      ],
+      "depends_on": [
+        "MP-055"
+      ],
+      "template": null,
+      "correction": "API readfrom รุ่นนี้ไม่มี timeout ที่ยืนยัน; แยก NACK/None จาก native call ค้าง และใช้ Stop supervisor ตามจริง",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ทดสอบรอบไม่มีอุปกรณ์และรอบต่ออุปกรณ์บนบัสภายนอกที่ยืนยัน ให้ผู้ทดสอบปิดไฟก่อนเปลี่ยนสาย แยก NACK/None/exception จาก native call ค้าง ไม่แต่ง timeout argument ให้ I2C.readfrom หากค้างให้ผู้ทดสอบ Stop ผ่าน supervisor และบันทึกเวลาจนออก ไม่รีบูตเอง",
+      "expected_when_ready": "รายงานสาเหตุถูกและกลับ Run ได้เมื่อแก้สาย",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-064",
+      "title": "อ่าน ADC ผ่าน iKB-1Z",
+      "category": "I2C เซนเซอร์ภายนอก และ ADC ภายนอก",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "i2c",
+        "files"
+      ],
+      "prerequisites": [
+        "Actual external bus/backend, correct module wiring/voltage/address and matching device protocol/driver. No implicit module loading."
+      ],
+      "depends_on": [
+        "MP-055"
+      ],
+      "template": null,
+      "correction": "iKB-1Z ต้องมี protocol/driver และการจ่ายไฟตามคู่มือรุ่นจริง ไม่ถือว่ามี Python library ติดตั้งแล้ว",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ตรวจ protocol/ไลบรารีของ iKB-1Z ที่มีจริง แล้วอ่านทุกช่อง ADC ที่คู่มือรุ่นนั้นระบุ พร้อมให้กรอกการจ่ายไฟและการต่อ I2C ตามผู้ผลิตก่อนเริ่ม ไม่ต่อไฟย้อนจากสองแหล่งโดยเดา",
+      "expected_when_ready": "ระบุบอร์ดขยาย ช่องจริง และค่าที่เปลี่ยนตาม fixture ครบ",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-065",
+      "title": "IMU raw หกแกนและตรวจข้อมูลเพิ่มเติม",
+      "category": "IMU และนาฬิกา RTC",
+      "state": "DRAFT_REFERENCE",
+      "state_label": "มี API อ้างอิง; ต้องสร้างและตรวจโค้ดตามงาน",
+      "contracts": [
+        "imu",
+        "display"
+      ],
+      "prerequisites": [],
+      "depends_on": [],
+      "template": null,
+      "correction": "read() รับประกันหกแกนใน dual mode ไม่ใช่เจ็ดค่า; ตรวจ len และอย่า index [6] เพื่ออุณหภูมิโดยไม่มีหลักฐาน",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "เปิด IMU ที่ยืนยันว่าเป็น QMI8658 อ่าน acceleration x/y/z และ gyro x/y/z หลังตรวจความยาวข้อมูล API dual mode รับประกันหกแกนเท่านั้น อุณหภูมิเป็น optional เมื่อ runtime มีข้อมูลและหน่วยที่ยืนยัน ห้าม index [6] โดยเดา",
+      "expected_when_ready": "ครบค่าที่ API มีจริงและหน่วยถูกระบุชัด",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-066",
+      "title": "IMU หกทิศทาง",
+      "category": "IMU และนาฬิกา RTC",
+      "state": "DRAFT_REFERENCE",
+      "state_label": "มี API อ้างอิง; ต้องสร้างและตรวจโค้ดตามงาน",
+      "contracts": [
+        "imu",
+        "display"
+      ],
+      "prerequisites": [],
+      "depends_on": [
+        "MP-065"
+      ],
+      "template": null,
+      "correction": "ใช้หน่วย/ทิศแกนที่ยืนยัน; raw ผ่านหกท่าไม่ใช่ calibration ที่ใช้กับทุกบอร์ด",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "แนะนำให้วางบอร์ดหงาย คว่ำ และตั้งแต่ละด้าน เก็บค่าเฉลี่ยทุกท่าและระบุทิศแกนตามข้อมูลจริงก่อนทำ remap",
+      "expected_when_ready": "แกนที่รับแรงโน้มถ่วงเปลี่ยนสอดคล้องกับท่า ไม่อ้าง calibration สำเร็จจากค่าชั่วคราว",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-067",
+      "title": "gyro ขณะนิ่งและหมุน",
+      "category": "IMU และนาฬิกา RTC",
+      "state": "DRAFT_REFERENCE",
+      "state_label": "มี API อ้างอิง; ต้องสร้างและตรวจโค้ดตามงาน",
+      "contracts": [
+        "imu",
+        "display"
+      ],
+      "prerequisites": [],
+      "depends_on": [
+        "MP-065"
+      ],
+      "template": null,
+      "correction": "bias เป็นชั่วคราวใน RAM; ระบุหน่วย gyro ที่ตรวจแล้ว ไม่เขียนถาวร",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "เก็บ bias ขณะนิ่ง 5 วินาทีแบบไม่เขียนถาวร จากนั้นให้หมุนรอบสามแกน แสดงค่าดิบกับค่าหัก bias พร้อม rate และหน่วยจากไดรเวอร์",
+      "expected_when_ready": "ขณะนิ่งค่าคงที่กว่าเดิมและการหมุนสะท้อนแกนที่ถูกต้อง",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-068",
+      "title": "ลูกบอลตามความเอียง",
+      "category": "IMU และนาฬิกา RTC",
+      "state": "DRAFT_REFERENCE",
+      "state_label": "มี API อ้างอิง; ต้องสร้างและตรวจโค้ดตามงาน",
+      "contracts": [
+        "imu",
+        "display"
+      ],
+      "prerequisites": [],
+      "depends_on": [
+        "MP-065"
+      ],
+      "template": null,
+      "correction": "ไม่คัด x10/sign inversion ของ generator เป็น universal mapping; จำกัดตำแหน่งบนจอจริง",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ใช้ค่า accelerometer ขยับลูกบอลบนจอ จำกัดขอบและทำ low-pass filter ที่ปรับได้ วางบอร์ดนิ่งแล้วเปรียบเทียบ raw/filtered ไม่ใช้ค่าอุณหภูมิเป็น ambient temperature",
+      "expected_when_ready": "ทิศลูกบอลสัมพันธ์กับท่าที่กำหนดและไม่หลุดขอบ",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-069",
+      "title": "เขย่าและ tap แบบระบุวิธี",
+      "category": "IMU และนาฬิกา RTC",
+      "state": "DRAFT_REFERENCE",
+      "state_label": "มี API อ้างอิง; ต้องสร้างและตรวจโค้ดตามงาน",
+      "contracts": [
+        "imu",
+        "display"
+      ],
+      "prerequisites": [],
+      "depends_on": [
+        "MP-065"
+      ],
+      "template": null,
+      "correction": "software shake ไม่ใช่ hardware tap; ห้ามใช้ msa311 แทน QMI8658",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ทำ shake detector จาก acceleration magnitude พร้อม threshold/refractory period ถ้าไม่มี hardware tap API ให้ระบุว่าเป็น software shake ห้าม import msa311 โดยสมมติว่าเป็นเซนเซอร์บนบอร์ดนี้",
+      "expected_when_ready": "รายงาน event ตามวิธีที่ใช้และไม่อ้างรองรับ hardware tap ที่ไม่ได้ตรวจ",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-070",
+      "title": "RTC อ่านเวลาและแหล่งข้อมูล",
+      "category": "IMU และนาฬิกา RTC",
+      "state": "DRAFT_REFERENCE",
+      "state_label": "มี API อ้างอิง; ต้องสร้างและตรวจโค้ดตามงาน",
+      "contracts": [
+        "rtc",
+        "files"
+      ],
+      "prerequisites": [],
+      "depends_on": [],
+      "template": null,
+      "correction": "ใช้ kernel RTC ที่มีจริงหรือ bm8563 API หลังยืนยัน chip/bus; ext_dev.rtc ไม่มีใน stub นี้",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "อ่านเวลาระบบกับ hardware RTC ที่เข้าถึงได้ แสดง UTC/timezone/เวลาท้องถิ่นแยกกัน ตรวจรุ่นจากไดรเวอร์จริง ไม่เลือกระหว่าง BM8653/BM8563 จากการสะกดที่คล้ายกัน และยังไม่ตั้งเวลา",
+      "expected_when_ready": "เห็นแหล่งเวลาแต่ละชุดและอ่าน RTC ไม่ได้ก็รายงานตรง",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-071",
+      "title": "RTC เทียบเวลาจริง",
+      "category": "IMU และนาฬิกา RTC",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "rtc",
+        "files"
+      ],
+      "prerequisites": [
+        "Actual hardware RTC source plus separately recorded reference times."
+      ],
+      "depends_on": [
+        "MP-070"
+      ],
+      "template": null,
+      "correction": "ต้องมีเวลาอ้างอิงจริงสองจุดและแยก wall clock jump/NTP ก่อนอ้าง drift",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "อ่าน RTC ต่อเนื่อง 10 นาที บันทึกจุดเริ่ม/จบและให้กรอกเวลาอ้างอิงเอง คำนวณ offset/drift โดยยังไม่เปลี่ยนเวลาเครื่อง",
+      "expected_when_ready": "มีผลเปรียบเทียบที่อาศัยเวลาอ้างอิงจริง ไม่ใช่ RTC เทียบตัวเอง",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-072",
+      "title": "RTC สำรองไฟ",
+      "category": "IMU และนาฬิกา RTC",
+      "state": "HOLD",
+      "state_label": "รอหลักฐานก่อนทดสอบฮาร์ดแวร์ตามขอบเขตนี้",
+      "contracts": [
+        "rtc",
+        "lifecycle"
+      ],
+      "prerequisites": [
+        "Manual retention protocol excluding automatic RTC/NTP sync; orderly power-off. No automatic power-cycle or service changes."
+      ],
+      "depends_on": [
+        "MP-070"
+      ],
+      "template": null,
+      "correction": "HOLD battery pass จนแยก NTP/auto RTC sync ได้; ไม่สั่งปิดไฟหรือแก้ service อัตโนมัติ",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "สร้างขั้นตอนจดเวลาและปิดโปรแกรมให้เรียบร้อย จากนั้นให้ผู้ทดสอบปิดไฟบอร์ดตามปกติ รอหนึ่งนาทีแล้วเปิดใหม่ อ่าน RTC ก่อนการ sync เครือข่าย ถ้าพิสูจน์ว่า NTP ยังไม่แทรกไม่ได้ให้ผล INCONCLUSIVE",
+      "expected_when_ready": "ยืนยันการเดินต่อของ hardware RTC ได้เฉพาะเมื่อแยกผล NTP ได้",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "discovery_or_manual_only",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-073",
+      "title": "สำรวจ UART และเจ้าของพอร์ต",
+      "category": "UART และ USB-UART",
+      "state": "DRAFT_REFERENCE",
+      "state_label": "มี API อ้างอิง; ต้องสร้างและตรวจโค้ดตามงาน",
+      "contracts": [
+        "uart"
+      ],
+      "prerequisites": [],
+      "depends_on": [],
+      "template": null,
+      "correction": "UART0/A16/A17 มีเจ้าของจาก log เดิม; list_devices ไม่ได้แปลว่าพอร์ตว่าง",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "แสดง serial device ที่มีและเจ้าของพอร์ตเมื่ออ่านได้ เทียบ connector กับ pinmux จริง ทำเครื่องหมาย UART0/A16/A17 ว่าอาจถูกใช้โดย Maix Comm Protocol ไม่ปิดบริการหรือเปิดพอร์ตทับ",
+      "expected_when_ready": "ระบุพอร์ตว่างที่ใช้งานได้จริง หรือ SKIP เมื่อแยกพอร์ตไม่ได้",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-074",
+      "title": "UART loopback",
+      "category": "UART และ USB-UART",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "uart",
+        "display"
+      ],
+      "prerequisites": [
+        "Free user UART path, actual connector pinmap, correct logic-level fixture/peer and matching framing/baud."
+      ],
+      "depends_on": [
+        "MP-073"
+      ],
+      "template": null,
+      "correction": "ใช้ user UART ที่ยืนยันและ read(timeout หน่วย ms) เท่านั้น ไม่ใช้พอร์ตระบบเป็น loopback",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ใช้ UART สำหรับผู้ใช้ที่ว่างจริง ต่อ TX กับ RX ผ่านวงจรที่เหมาะสม ส่ง payload มี sequence/checksum ที่ 115200 ใช้ read timeout และนับ packet loss ห้ามแย่งพอร์ตระบบ",
+      "expected_when_ready": "ข้อมูลรับกลับตรง sequence และ checksum",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-075",
+      "title": "UART ต่อคอมพิวเตอร์",
+      "category": "UART และ USB-UART",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "uart",
+        "display"
+      ],
+      "prerequisites": [
+        "Free user UART path, actual connector pinmap, correct logic-level fixture/peer and matching framing/baud."
+      ],
+      "depends_on": [
+        "MP-073"
+      ],
+      "template": null,
+      "correction": "USB-UART console กับ user UART แยกหน้าที่; ต้องยืนยัน connector/path ก่อนเปิด",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ทำ echo server บน UART ว่างของ connector ที่ยืนยันแล้ว รับข้อความจบบรรทัด ส่งตอบพร้อมหมายเลขและเวลา โดยแยกจาก USB-UART console ของระบบ",
+      "expected_when_ready": "ข้อความสองทิศทางถูกต้องและมีหลักฐานจากอีกฝั่ง",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-076",
+      "title": "UART ข้อมูลไบนารีและ partial read",
+      "category": "UART และ USB-UART",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "uart",
+        "display"
+      ],
+      "prerequisites": [
+        "Free user UART path, actual connector pinmap, correct logic-level fixture/peer and matching framing/baud."
+      ],
+      "depends_on": [
+        "MP-073"
+      ],
+      "template": null,
+      "correction": "ใช้ byte framing และ bounded partial buffer ไม่ decode arbitrary bytes เป็นข้อความ",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "รับข้อมูลไบนารีรวม 00,0A,0D,7F,80,FF ใช้ framing และ length/checksum รองรับการอ่านแตกหลายรอบกับหลาย packet ในรอบเดียว จำกัด buffer",
+      "expected_when_ready": "payload ไม่เสียจากการ decode เป็น text และ packet ถูกประกอบครบ",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-077",
+      "title": "UART timeout และสายไม่ต่อ",
+      "category": "UART และ USB-UART",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "uart",
+        "display"
+      ],
+      "prerequisites": [
+        "Free user UART path, actual connector pinmap, correct logic-level fixture/peer and matching framing/baud."
+      ],
+      "depends_on": [
+        "MP-073"
+      ],
+      "template": null,
+      "correction": "read timeout=0 คือ immediate, -1 คือ block; ห้ามใช้ -1 ใน Stop-responsiveness test",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ทดลองกรณีอีกฝั่งไม่ส่งข้อมูล ใช้ finite timeout และแสดงสถานะรอที่จอ กด Stop ระหว่าง read ต้องจบได้ จากนั้นค่อยต่อสายใหม่เมื่อปิดไฟ",
+      "expected_when_ready": "โปรแกรมไม่แขวนและ UART ถูกคืนหลังจบ",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-078",
+      "title": "UART เปรียบเทียบ baud rate",
+      "category": "UART และ USB-UART",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "uart",
+        "display"
+      ],
+      "prerequisites": [
+        "Free user UART path, actual connector pinmap, correct logic-level fixture/peer and matching framing/baud."
+      ],
+      "depends_on": [
+        "MP-073"
+      ],
+      "template": null,
+      "correction": "ตั้ง baud อีกฝั่งตรงทุกครั้ง เก็บ checksum/sequence และรายงานค่าที่ driver ปฏิเสธแยกกัน",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ทดสอบ 9600,38400,115200 เฉพาะค่าที่ไดรเวอร์รองรับ ส่งแพตเทิร์น 100 packet ต่อค่า วัด error จาก checksum และบอกให้ตั้งอีกฝั่งตรงทุกครั้ง",
+      "expected_when_ready": "แสดงผลแยกแต่ละ baud ไม่ตีความค่าที่ไม่รองรับว่าเป็นพอร์ตเสีย",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-079",
+      "title": "ภาพสดจากกล้อง",
+      "category": "กล้องและประมวลผลภาพพื้นฐาน",
+      "state": "DRAFT_REFERENCE",
+      "state_label": "มี API อ้างอิง; ต้องสร้างและตรวจโค้ดตามงาน",
+      "contracts": [
+        "camera",
+        "display"
+      ],
+      "prerequisites": [],
+      "depends_on": [],
+      "template": null,
+      "correction": "ตัวอย่าง camera seed เดิมยังไม่มี FPS; ต้องเพิ่ม measured FPS และ close จริงก่อนเรียกว่า MP-079 ครบ",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "เปิดกล้อง RGB888 ขนาดเริ่มต้นที่ runtime รองรับเพียงครั้งเดียว แสดงภาพสดพร้อม FPS ตรวจข้อมูล sensor ที่พบจริง ไม่บังคับรุ่นจากแคตตาล็อก และ close ใน finally",
+      "expected_when_ready": "เห็นภาพเปลี่ยนเมื่อขยับวัตถุและ Stop คืนเมนู",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-080",
+      "title": "กล้องพร้อมข้อความและวงกลม",
+      "category": "กล้องและประมวลผลภาพพื้นฐาน",
+      "state": "DRAFT_REFERENCE",
+      "state_label": "มี API อ้างอิง; ต้องสร้างและตรวจโค้ดตามงาน",
+      "contracts": [
+        "camera",
+        "display"
+      ],
+      "prerequisites": [],
+      "depends_on": [
+        "MP-079"
+      ],
+      "template": null,
+      "correction": "camera_overlay เป็น seed ของ overlay ต้องเพิ่มรายละเอียดตามพรอมท์ก่อนถือว่าครบ MP-080",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "อ่านเฟรมใหม่แต่ละรอบ วาดเลขเฟรม เวลาที่ผ่าน และวงกลมลงเฟรมก่อน show ไม่วาด overlay ครั้งเดียวทิ้งไว้นอก loop",
+      "expected_when_ready": "ภาพสดและ overlay อัปเดตพร้อมกัน ไม่สะสมรอยจากเฟรมก่อน",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-081",
+      "title": "ทิศภาพและพิกัด",
+      "category": "กล้องและประมวลผลภาพพื้นฐาน",
+      "state": "DRAFT_REFERENCE",
+      "state_label": "มี API อ้างอิง; ต้องสร้างและตรวจโค้ดตามงาน",
+      "contracts": [
+        "camera",
+        "display"
+      ],
+      "prerequisites": [],
+      "depends_on": [
+        "MP-079"
+      ],
+      "template": null,
+      "correction": "hmirror/vflip มี API แต่ต้องรู้ค่าเดิมก่อนเปลี่ยน/restore; ไม่ยืนยัน orientation จากรูปนิ่ง",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "แสดง crosshair กลางภาพและป้ายซ้ายขวา ให้ผู้ทดสอบขยับมือเพื่อยืนยันทิศ ทดลอง flip/mirror เฉพาะที่ API รองรับโดยคืนค่าหลังจบ",
+      "expected_when_ready": "ทิศภาพและการวาดพิกัดสอดคล้องและตั้งค่ากลับได้",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-082",
+      "title": "ความละเอียดหลายค่า",
+      "category": "กล้องและประมวลผลภาพพื้นฐาน",
+      "state": "DRAFT_REFERENCE",
+      "state_label": "มี API อ้างอิง; ต้องสร้างและตรวจโค้ดตามงาน",
+      "contracts": [
+        "camera",
+        "display"
+      ],
+      "prerequisites": [],
+      "depends_on": [
+        "MP-079"
+      ],
+      "template": null,
+      "correction": "ปิด device เดิมก่อนเปิด resolution ใหม่ อ่านขนาดจริงและไม่สร้างกล้องทุกเฟรม",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ทดสอบ 320x240 กับ 640x480 เมื่อไดรเวอร์รองรับ ปิดกล้องก่อนเปิดค่าถัดไป บันทึกขนาดเฟรมจริง FPS และหน่วยความจำ ไม่อ้างว่าสูงกว่าที่ API ส่งมา",
+      "expected_when_ready": "ได้ผลแยกแต่ละความละเอียดพร้อมเหตุผลของค่าที่ใช้ไม่ได้",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-083",
+      "title": "ถ่ายภาพเมื่อกดปุ่ม",
+      "category": "กล้องและประมวลผลภาพพื้นฐาน",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "camera",
+        "adc",
+        "files"
+      ],
+      "prerequisites": [
+        "MP-021 bands and a chosen bounded test output directory."
+      ],
+      "depends_on": [
+        "MP-021",
+        "MP-079"
+      ],
+      "template": null,
+      "correction": "capture หนึ่งครั้งต่อ press edge ใช้ bands จาก MP-021 และบันทึกเฉพาะ directory ทดสอบ",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "แสดง live preview แล้วให้ S1 บันทึก JPEG หนึ่งไฟล์ต่อการกดลงไดเรกทอรีทดสอบ ชื่อไม่ชน ตรวจอ่านกลับและแสดง path/ขนาด ห้ามบันทึกทุกเฟรมเมื่อกดค้าง",
+      "expected_when_ready": "จำนวนไฟล์ตรงกับจำนวนกดและไฟล์เปิดกลับได้",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-084",
+      "title": "ตรวจสีและติดตามวัตถุ",
+      "category": "กล้องและประมวลผลภาพพื้นฐาน",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "camera",
+        "display"
+      ],
+      "prerequisites": [
+        "Actual colored targets or known QR/barcode payloads and the measured thresholds/geometry."
+      ],
+      "depends_on": [
+        "MP-079"
+      ],
+      "template": null,
+      "correction": "threshold ตามแสง/วัตถุจริง; centroid/area ไม่ใช่ AI confidence",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ตรวจความสามารถ color blob ก่อนใช้ ให้ผู้ทดสอบเลือกสีและปรับ threshold แสดงกรอบ centroid และพื้นที่ blob พร้อมค่าที่ใช้ ไม่มีโมเดล AI ก็ทำได้ถ้า API ภาพมี",
+      "expected_when_ready": "กรอบตามวัตถุและแจ้งว่า threshold มีผลตามสภาพแสง",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-085",
+      "title": "อ่าน QR และบาร์โค้ด",
+      "category": "กล้องและประมวลผลภาพพื้นฐาน",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "camera",
+        "display"
+      ],
+      "prerequisites": [
+        "Actual colored targets or known QR/barcode payloads and the measured thresholds/geometry."
+      ],
+      "depends_on": [
+        "MP-079"
+      ],
+      "template": null,
+      "correction": "payload API ยืนยัน แต่ห้ามเปิด URL หรือ execute QR payload อัตโนมัติ",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ตรวจ API ที่มี แล้วอ่าน QR หรือ barcode แสดงชนิดกับข้อความทั้ง Terminal/จอ จำกัดความถี่ log และทำ deduplicate ถ้ารูปแบบใดไม่มี API ให้ SKIP",
+      "expected_when_ready": "ข้อความที่อ่านตรงต้นฉบับ ไม่เปิด URL หรือสั่งงานตาม payload อัตโนมัติ",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-086",
+      "title": "กล้องทำงานต่อเนื่อง",
+      "category": "กล้องและประมวลผลภาพพื้นฐาน",
+      "state": "DRAFT_REFERENCE",
+      "state_label": "มี API อ้างอิง; ต้องสร้างและตรวจโค้ดตามงาน",
+      "contracts": [
+        "camera",
+        "display",
+        "lifecycle"
+      ],
+      "prerequisites": [],
+      "depends_on": [
+        "MP-079"
+      ],
+      "template": null,
+      "correction": "FPS/memory/Stop เป็นสิ่งที่ต้องวัด ไม่รับรอง 10 นาทีจาก fixture สามเฟรม",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "เปิด preview 10 นาที เก็บ FPS/frame time/memory เป็นช่วงแล้วคงหน้าสรุป จัดการ None/error จาก read และให้ Stop กลางการจับภาพได้ ไม่เปิด Camera ใหม่ทุกเฟรม",
+      "expected_when_ready": "ไม่มี frame buffer เติบโตไม่จำกัดและ Stop/Run กล้องซ้ำทำได้",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-087",
+      "title": "เล่นเสียงทดสอบ",
+      "category": "ไมโครโฟนและลำโพง",
+      "state": "DRAFT_REFERENCE",
+      "state_label": "มี API อ้างอิง; ต้องสร้างและตรวจโค้ดตามงาน",
+      "contracts": [
+        "audio",
+        "files",
+        "lifecycle"
+      ],
+      "prerequisites": [],
+      "depends_on": [],
+      "template": null,
+      "correction": "Player.volume ใน stub ระบุ unsupported; ใช้ PCM amplitude ต่ำแทนการพึ่ง setter และไม่ใช้ stop()/close() ที่ไม่มี",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ตรวจ audio.Player และสร้าง raw PCM สั้นแบบ FMT_S16_LE ที่ amplitude ต่ำ ระบุ sample rate/channels เล่นรวมหนึ่งวินาทีเป็น chunk สั้นพร้อมเช็ก exit และปล่อย references เมื่อจบ ไม่พึ่ง volume() ซึ่ง reference ระบุ unsupported และไม่เรียก stop()/close() ที่ไม่มี",
+      "expected_when_ready": "ผู้ทดสอบได้ยินเสียงชัดและหยุดตามเวลา",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-088",
+      "title": "ไมโครโฟนแสดงระดับเสียง",
+      "category": "ไมโครโฟนและลำโพง",
+      "state": "DRAFT_REFERENCE",
+      "state_label": "มี API อ้างอิง; ต้องสร้างและตรวจโค้ดตามงาน",
+      "contracts": [
+        "audio",
+        "files",
+        "lifecycle"
+      ],
+      "prerequisites": [],
+      "depends_on": [],
+      "template": null,
+      "correction": "Recorder.record() คืน buffered PCM หรือ empty; ไม่มี Recorder.read(); RMS/peak ไม่ใช่ calibrated dB SPL",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "อ่าน PCM จากไมโครโฟนด้วย sample format ที่ตรวจแล้ว คำนวณ RMS/peak แสดง VU meter ขณะเงียบและพูด อย่าเรียกค่าดังกล่าวว่า dB SPL ถ้าไม่มีการสอบเทียบ",
+      "expected_when_ready": "ค่าเปลี่ยนตามเสียงจริงและแยก silent input จาก read failure",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-089",
+      "title": "อัดเสียงแล้วเล่นกลับ",
+      "category": "ไมโครโฟนและลำโพง",
+      "state": "DRAFT_REFERENCE",
+      "state_label": "มี API อ้างอิง; ต้องสร้างและตรวจโค้ดตามงาน",
+      "contracts": [
+        "audio",
+        "files",
+        "lifecycle"
+      ],
+      "prerequisites": [],
+      "depends_on": [
+        "MP-087",
+        "MP-088"
+      ],
+      "template": null,
+      "correction": "ปิด recorder ด้วย finish(), ใช้ WAV metadata จริงและลด PCM playback amplitude; ไม่ผูก Stop กับ record_ms=5000 ที่ block",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "อัดคำพูด 5 วินาทีลง WAV ในโฟลเดอร์ทดสอบ ปิด recorder ก่อนเปิด player แล้วเล่นกลับหนึ่งครั้ง แสดง sample rate/channels/bit depth ที่ใช้จริง",
+      "expected_when_ready": "ผู้ทดสอบได้ยินคำพูดเดิมและ metadata ของ WAV ถูกต้อง",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-090",
+      "title": "เสียง clipping และความเงียบ",
+      "category": "ไมโครโฟนและลำโพง",
+      "state": "DRAFT_REFERENCE",
+      "state_label": "มี API อ้างอิง; ต้องสร้างและตรวจโค้ดตามงาน",
+      "contracts": [
+        "audio",
+        "files",
+        "lifecycle"
+      ],
+      "prerequisites": [],
+      "depends_on": [
+        "MP-088"
+      ],
+      "template": null,
+      "correction": "signedness/endian/width ตรง Format.FMT_S16_LE; clipping ratio ต้องคำนวณจาก PCM จริง",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "เก็บช่วงเงียบ พูดปกติ และเสียงดังในระยะเหมาะสม วัด RMS/peak กับสัดส่วนตัวอย่างชนขอบช่วง PCM ใช้กราฟเปรียบเทียบโดยไม่อ้างว่าเป็นเครื่องวัดเสียงสอบเทียบ",
+      "expected_when_ready": "เห็นสัญญาณจริงและระบุ clipping จากข้อมูล PCM",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-091",
+      "title": "audio กับ Stop",
+      "category": "ไมโครโฟนและลำโพง",
+      "state": "DRAFT_REFERENCE",
+      "state_label": "มี API อ้างอิง; ต้องสร้างและตรวจโค้ดตามงาน",
+      "contracts": [
+        "audio",
+        "files",
+        "lifecycle"
+      ],
+      "prerequisites": [],
+      "depends_on": [],
+      "template": null,
+      "correction": "Player ไม่มี stop/close ใน baseline; ใช้ short PCM chunks/exit loop และปล่อย references; ไม่อ้างว่า finally รันหลัง kill",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ทำโหมดบันทึกหรือเล่นเสียงเป็น chunk สั้นที่หยุดได้ ให้ผู้ทดสอบกด Stop กลางงาน ใช้ Recorder.finish() และปิดไฟล์ใน finally ส่วน Player ปล่อย references ตาม API ไม่แต่ง stop()/close() ตรวจรอบใหม่และไม่ทำ feedback ไมค์ออกลำโพง",
+      "expected_when_ready": "เสียงหยุด ไฟล์ที่ปิดครบอ่านได้ และเปิด audio รอบถัดไปได้",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-092",
+      "title": "เสียงพร้อมกล้องและจอ",
+      "category": "ไมโครโฟนและลำโพง",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "audio",
+        "camera",
+        "display"
+      ],
+      "prerequisites": [
+        "Camera and microphone pass independently; concurrent operation is still to be measured."
+      ],
+      "depends_on": [
+        "MP-079",
+        "MP-088"
+      ],
+      "template": null,
+      "correction": "full-duplex/resource sharing ยังต้องวัด ไม่เปิด loopback ไมค์→ลำโพงเอง",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "แสดงภาพกล้องพร้อม VU meter จากไมค์โดยไม่เล่นออกลำโพง จำกัดอัตราอัปเดตแต่ละส่วน วัด dropped frames และ latency ที่สังเกตจริง ถ้ารuntime แชร์ทรัพยากรไม่ได้ให้รายงานข้อจำกัด",
+      "expected_when_ready": "ทั้งสองข้อมูลอัปเดต หรือได้ข้อผิดพลาดที่ระบุ subsystem ชัด",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-093",
+      "title": "สำรวจ WiFi/RNDIS",
+      "category": "เครือข่ายและ IoT",
+      "state": "DRAFT_REFERENCE",
+      "state_label": "มี API อ้างอิง; ต้องสร้างและตรวจโค้ดตามงาน",
+      "contracts": [
+        "network",
+        "files"
+      ],
+      "prerequisites": [],
+      "depends_on": [],
+      "template": null,
+      "correction": "อ่าน interface/route แบบ bounded ไม่พิมพ์รหัสผ่าน token หรือ device_key",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "อ่าน interface, IP, route และสถานะ WiFi แบบไม่เปลี่ยน config ไม่เผยรหัสผ่านหรือ token แยก USB RNDIS ที่ใช้ IDE กับ WiFi ที่ใช้เข้าบริการ",
+      "expected_when_ready": "รายงานสองเส้นทางชัด และ Connect Plus ยังอยู่",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-094",
+      "title": "ทดสอบ WiFi ที่เชื่อมอยู่",
+      "category": "เครือข่ายและ IoT",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "network",
+        "lifecycle"
+      ],
+      "prerequisites": [
+        "Explicit allowed endpoint/broker/LAN address/port; existing network; compatible MQTT/WebSocket package when used."
+      ],
+      "depends_on": [
+        "MP-093"
+      ],
+      "template": null,
+      "correction": "ใช้ network เดิมกับ endpoint ที่อนุญาต ไม่เปลี่ยน SSID/route/RNDIS เพื่อให้เทสผ่าน",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ใช้การเชื่อม WiFi เดิมทดสอบถึง gateway/ปลายทางที่ผู้ทดสอบระบุ ใช้ timeout วัด round trip แยก DNS/TCP failure ไม่สั่งเปลี่ยน SSID หรือปิด RNDIS",
+      "expected_when_ready": "บอกได้ว่าล้มที่ชั้นใดโดยไม่ตัดการเชื่อม IDE",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-095",
+      "title": "HTTP GET JSON",
+      "category": "เครือข่ายและ IoT",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "network",
+        "lifecycle"
+      ],
+      "prerequisites": [
+        "Explicit allowed endpoint/broker/LAN address/port; existing network; compatible MQTT/WebSocket package when used."
+      ],
+      "depends_on": [
+        "MP-093"
+      ],
+      "template": null,
+      "correction": "ใช้ urllib.request ไม่ใช่ maix.http.get ซึ่งไม่มีใน API นี้; timeout/status/schema แยกกัน",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ดึง JSON ด้วย timeout ตรวจ HTTP status กับ schema แสดงค่าบนจอ รองรับ JSON เสีย/field ขาด ไม่ใส่ข้อมูลส่วนตัวใน URL",
+      "expected_when_ready": "แสดงข้อมูลจริงและ error ที่ถูกต้อง ไม่ใช้ข้อมูลจำลองแทนเมื่อเน็ตล้ม",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-096",
+      "title": "HTTP POST ผลทดสอบ",
+      "category": "เครือข่ายและ IoT",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "network",
+        "lifecycle"
+      ],
+      "prerequisites": [
+        "Explicit allowed endpoint/broker/LAN address/port; existing network; compatible MQTT/WebSocket package when used."
+      ],
+      "depends_on": [
+        "MP-093"
+      ],
+      "template": null,
+      "correction": "ส่งได้เฉพาะ endpoint/payload ที่ผู้ทดสอบระบุ ไม่สร้างปลายทางสาธารณะหรือส่งภาพ/เสียงเอง",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ส่งเฉพาะ test ID, ค่าที่วัด และสถานะไป endpoint ที่กำหนด ตรวจ response หลีกเลี่ยง token ใน log และไม่ส่งเสียง ภาพ หรือ credential ออกไป",
+      "expected_when_ready": "ฝั่งรับยืนยันข้อมูลตรงและไม่มี secret ใน Terminal",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-097",
+      "title": "MQTT publish/subscribe",
+      "category": "เครือข่ายและ IoT",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "network",
+        "lifecycle"
+      ],
+      "prerequisites": [
+        "Explicit allowed endpoint/broker/LAN address/port; existing network; compatible MQTT/WebSocket package when used."
+      ],
+      "depends_on": [
+        "MP-093"
+      ],
+      "template": null,
+      "correction": "ต้องมี compatible MQTT package/broker/topic/credential จริง ไม่ assume maix.network.mqtt หรือ pip เอง",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ตรวจ MQTT library ที่มีจริง ใช้ namespace topic เฉพาะทดสอบ ส่ง IMU หรือตัวนับและรับคำสั่งเปลี่ยนสีจอ กำหนด reconnect/backoff ไม่ hard-code credential",
+      "expected_when_ready": "เห็น publish และ subscribe จริงทั้งสองฝั่งและไม่ใช้ retained command เก่าขับโหลด",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-098",
+      "title": "เครือข่ายหลุดแล้วกลับมา",
+      "category": "เครือข่ายและ IoT",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "network",
+        "lifecycle"
+      ],
+      "prerequisites": [
+        "Explicit allowed endpoint/broker/LAN address/port; existing network; compatible MQTT/WebSocket package when used."
+      ],
+      "depends_on": [
+        "MP-093"
+      ],
+      "template": null,
+      "correction": "จำกัด queue/backoff และทดสอบปลายทางหลุดโดยไม่ตัด USB ที่ใช้ IDE",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ทำหน้าสถานะออนไลน์/offline ใช้ request timeout และ backoff แล้วให้ผู้ทดสอบทำปลายทางใช้งานไม่ได้ชั่วคราวโดยไม่ถอด USB RNDIS ไม่เขียน queue ไม่จำกัด",
+      "expected_when_ready": "จอไม่ค้าง queue มีขอบเขตและกลับออนไลน์ได้",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-099",
+      "title": "WebSocket แอปแยกจาก IDE",
+      "category": "เครือข่ายและ IoT",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "network",
+        "lifecycle"
+      ],
+      "prerequisites": [
+        "Explicit allowed endpoint/broker/LAN address/port; existing network; compatible MQTT/WebSocket package when used."
+      ],
+      "depends_on": [
+        "MP-093"
+      ],
+      "template": null,
+      "correction": "ต้องมี WebSocket package/API จริง แยก port 5050 ของ IDE และปิดตาม library ที่เลือก",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "เปิด WebSocket สำหรับแอปบน URL/port ที่กำหนดต่างจากพอร์ต 5050 ของ IDE รับส่ง sequence และ heartbeat มี timeout ปิด socket ใน finally ไม่แย่ง ws_shell",
+      "expected_when_ready": "ข้อมูลสองทิศทางตรงและ Stop/Connect IDE ยังทำงาน",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-100",
+      "title": "HTTP server ใน LAN",
+      "category": "เครือข่ายและ IoT",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "network",
+        "lifecycle"
+      ],
+      "prerequisites": [
+        "Explicit allowed endpoint/broker/LAN address/port; existing network; compatible MQTT/WebSocket package when used."
+      ],
+      "depends_on": [
+        "MP-093"
+      ],
+      "template": null,
+      "correction": "ใช้ HTTPServer.timeout + handle_request ใน exit-aware loop แล้ว server_close; หลีกเลี่ยง same-thread shutdown deadlock",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ทำเว็บสถานะ read-only บน port ว่างที่ไม่ใช่ 5050 ให้ client อ่านตัวนับ/IMU เป็น JSON จำกัดจำนวน client และปิด server เมื่อ Stop ไม่เปิดพอร์ต router หรือเผยแพร่สู่ Internet",
+      "expected_when_ready": "อ่านได้จากอีกเครื่องใน LAN และ port ถูกคืนหลัง Stop",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-101",
+      "title": "พื้นที่จัดเก็บและ permission",
+      "category": "ไฟล์ การ์ด และข้อมูลคงอยู่",
+      "state": "DRAFT_REFERENCE",
+      "state_label": "มี API อ้างอิง; ต้องสร้างและตรวจโค้ดตามงาน",
+      "contracts": [
+        "files"
+      ],
+      "prerequisites": [],
+      "depends_on": [],
+      "template": null,
+      "correction": "read-only storage inventory ไม่มี format/fsck หรือเขียนทดสอบจนเต็ม",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "รายงาน mount, พื้นที่ว่างและตำแหน่งที่เขียนทดสอบได้อย่างมีขอบเขต อ่านอย่างเดียวก่อน ไม่ format ไม่ fsck ไม่แตะ partition image",
+      "expected_when_ready": "แสดงพื้นที่/สิทธิ์จริงและระบุตำแหน่งทดสอบชัด",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-102",
+      "title": "เขียนอ่านไฟล์เล็ก",
+      "category": "ไฟล์ การ์ด และข้อมูลคงอยู่",
+      "state": "DRAFT_REFERENCE",
+      "state_label": "มี API อ้างอิง; ต้องสร้างและตรวจโค้ดตามงาน",
+      "contracts": [
+        "files"
+      ],
+      "prerequisites": [],
+      "depends_on": [],
+      "template": null,
+      "correction": "unique test file ภายใต้พื้นที่ของโปรแกรม ขนาด 64KiB; ปิดแล้วอ่านกลับเทียบ hash",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "เขียนไฟล์ทดสอบขนาด 64KiB เฉพาะโฟลเดอร์ที่กำหนด flush/close แล้วอ่านกลับเทียบ SHA-256 ไม่ใช้ RAM cache ของแอปเป็นหลักฐาน และไม่เขียนเต็มการ์ด การอ่านกลับเทียบ hash ตรวจความถูกต้องของ file I/O เท่านั้น ไม่พิสูจน์การเขียนลงสื่อจริงหรือการคงข้อมูลหลังไฟดับ และไม่สั่งล้าง kernel cache",
+      "expected_when_ready": "hash ของข้อมูลที่อ่านกลับตรงและไฟล์อยู่นอก system directory",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-103",
+      "title": "CSV บันทึกเซนเซอร์",
+      "category": "ไฟล์ การ์ด และข้อมูลคงอยู่",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "files"
+      ],
+      "prerequisites": [
+        "Actual sensor inputs for logging or a chosen persistent directory for config across new /tmp runs."
+      ],
+      "depends_on": [],
+      "template": null,
+      "correction": "sensor ต้องผ่านแยกก่อน; log error/status ไม่เติมเลข 0 เป็นข้อมูล sensor ปกติ",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "บันทึก timestamp แบบ monotonic ควบคู่เวลาปฏิทิน ค่าเซนเซอร์และ status ลง CSV สองนาที จำกัดขนาดไฟล์และปิดครบใน finally แสดงจำนวนแถวที่อ่านตรวจกลับได้",
+      "expected_when_ready": "CSV เปิดอ่านได้ จำนวนแถวตรง และไม่ใส่ค่าเซนเซอร์ปลอมเมื่อ read error",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-104",
+      "title": "บันทึก config แบบ atomic",
+      "category": "ไฟล์ การ์ด และข้อมูลคงอยู่",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "files"
+      ],
+      "prerequisites": [
+        "Actual sensor inputs for logging or a chosen persistent directory for config across new /tmp runs."
+      ],
+      "depends_on": [],
+      "template": null,
+      "correction": "แต่ละ Run ใช้ /tmp ใหม่ จึงต้องเลือก persistent directory ก่อนอ้าง config อยู่ข้าม Run",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ทำ config JSON สำหรับสีจอและค่าทดสอบในโฟลเดอร์เฉพาะ เขียน temp แล้ว replace รองรับไฟล์ JSON เสียโดยแจ้งเตือนและใช้ค่า default ไม่ทับ config ของ IDE/Launcher",
+      "expected_when_ready": "เปิดรอบใหม่อ่านค่าเดิมได้และไฟล์เสียไม่ทำแอปล้ม",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-105",
+      "title": "ไฟล์และ path ที่มีช่องว่าง/ไทย",
+      "category": "ไฟล์ การ์ด และข้อมูลคงอยู่",
+      "state": "DRAFT_REFERENCE",
+      "state_label": "มี API อ้างอิง; ต้องสร้างและตรวจโค้ดตามงาน",
+      "contracts": [
+        "files"
+      ],
+      "prerequisites": [],
+      "depends_on": [],
+      "template": null,
+      "correction": "ใช้ Python path/file API ไม่ต่อชื่อไทยหรือชื่อมีช่องว่างเข้าคำสั่ง shell",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "สร้างอ่านไฟล์ทดสอบชื่อมีช่องว่างและภาษาไทยผ่าน pathlib/open ไม่ต่อชื่อเข้า shell ตรวจเนื้อหา UTF-8 แล้วลบเฉพาะไฟล์ที่โปรแกรมสร้างเมื่อผู้ทดสอบเลือก cleanup",
+      "expected_when_ready": "path ไม่ถูกตัดหรือ shell ตีความและเนื้อหาตรง",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-106",
+      "title": "Run ชั่วคราวกับข้อมูลถาวร",
+      "category": "ไฟล์ การ์ด และข้อมูลคงอยู่",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "files",
+        "lifecycle"
+      ],
+      "prerequisites": [
+        "Chosen persistent test directory; closed files and orderly restart procedure."
+      ],
+      "depends_on": [],
+      "template": null,
+      "correction": "ยืนยันตำแหน่งถาวรและ orderly restart; ห้ามแนะนำถอดไฟระหว่างเขียน SD",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "แสดงว่าโค้ดรันอยู่ใต้ /tmp และให้เลือกโฟลเดอร์ข้อมูลถาวรเอง สร้าง counter ขนาดเล็กที่นั่น ทดสอบ Stop/Run แล้วค่อยปิดเปิดบอร์ดตามปกติหลังปิดไฟล์ครบ ไม่ติดตั้ง boot app",
+      "expected_when_ready": "ข้อมูลคงอยู่ตามพื้นที่จริงโดยแยกจากอายุโฟลเดอร์ /tmp",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-107",
+      "title": "ตรวจไฟล์โมเดลก่อน inference",
+      "category": "AI แบบมีโมเดลที่เข้ากันได้",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "models",
+        "camera",
+        "audio"
+      ],
+      "prerequisites": [
+        "Real SG2002-compatible model/labels/input metadata; exact audio preprocessing when applicable; ground-truth fixtures."
+      ],
+      "depends_on": [],
+      "template": null,
+      "correction": "ตรวจ compatible model metadata จากไฟล์จริง ไม่ถือว่า NN API มีแล้วโมเดลใดก็โหลดได้",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ตรวจ model file, label, input/output metadata และ API ที่จะใช้ แสดงหน่วยความจำก่อนโหลด ไม่โหลด ONNX/TFLite ตรง ๆ ถ้า runtime ต้องใช้รูปแบบเฉพาะ และไม่ดาวน์โหลดหรือเทรนโมเดลเอง",
+      "expected_when_ready": "แจ้งได้ว่าโมเดลพร้อมหรือขาดอะไร โดยไม่สร้างผล inference จำลอง",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-108",
+      "title": "image classification",
+      "category": "AI แบบมีโมเดลที่เข้ากันได้",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "models",
+        "camera",
+        "audio"
+      ],
+      "prerequisites": [
+        "Real SG2002-compatible model/labels/input metadata; exact audio preprocessing when applicable; ground-truth fixtures."
+      ],
+      "depends_on": [
+        "MP-107"
+      ],
+      "template": null,
+      "correction": "Classifier.classify ยืนยัน API แต่ต้องมี model/labels/preprocessing/ground truth ที่ตรงกัน",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "โหลดโมเดลครั้งเดียว รันภาพที่กำหนด แสดง label, score, preprocessing และเวลาที่วัดจริง เทียบกับคำตอบที่ผู้ทดสอบระบุ แยกความแม่นยำออกจากการโหลดสำเร็จ",
+      "expected_when_ready": "มีผลจากโมเดลจริงและนับถูก/ผิดตามชุดทดสอบ",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-109",
+      "title": "object detection",
+      "category": "AI แบบมีโมเดลที่เข้ากันได้",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "models",
+        "camera",
+        "audio"
+      ],
+      "prerequisites": [
+        "Real SG2002-compatible model/labels/input metadata; exact audio preprocessing when applicable; ground-truth fixtures."
+      ],
+      "depends_on": [
+        "MP-107",
+        "MP-079"
+      ],
+      "template": null,
+      "correction": "YOLO API รุ่นนี้มี v5/v8/11; เลือกจาก model metadata ไม่เดาจากนามสกุลอย่างเดียว",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "แสดงกล้องพร้อมกรอบ detection ทำ mapping พิกัดจาก input โมเดลกลับสู่ภาพอย่างถูกต้อง ระบุ confidence/NMS และ inference time ไม่อ้าง FPS จากเฟรมจอแทนโมเดล",
+      "expected_when_ready": "กรอบตรงวัตถุและผลเป็น inference จริง",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-110",
+      "title": "เสียง classification",
+      "category": "AI แบบมีโมเดลที่เข้ากันได้",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "models",
+        "camera",
+        "audio"
+      ],
+      "prerequisites": [
+        "Real SG2002-compatible model/labels/input metadata; exact audio preprocessing when applicable; ground-truth fixtures."
+      ],
+      "depends_on": [
+        "MP-107",
+        "MP-088"
+      ],
+      "template": null,
+      "correction": "audio preprocessing เป็นของแต่ละโมเดล ต้องมี specification ก่อน inference; ไม่ใช้ Speech แทน generic classifier",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ตรวจ sample rate, window และ preprocessing ของโมเดลให้ตรงกับ PCM ไมค์ แสดง top-k และเวลาประมวลผล เทียบอย่างน้อยสามประเภทพร้อมเสียงนอกกลุ่ม",
+      "expected_when_ready": "ไม่ป้อนข้อมูลผิดรูปแบบและมีผลเทียบ ground truth ที่ผู้ใช้กำหนด",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-111",
+      "title": "AI สั่ง LED ด้วย threshold",
+      "category": "AI แบบมีโมเดลที่เข้ากันได้",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "models",
+        "camera",
+        "audio",
+        "led",
+        "gpio"
+      ],
+      "prerequisites": [
+        "Real SG2002-compatible model/labels/input metadata; exact audio preprocessing when applicable; ground-truth fixtures.",
+        "A passing chosen inference test, plus a verified user LED (MP-025) or an individually verified GPIO LED fixture."
+      ],
+      "depends_on": [],
+      "template": null,
+      "correction": "ต้องผ่าน inference และ GPIO แยกก่อน; first fixture เป็น LED ไม่เป็น relay/motor",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ให้ผล AI ที่เกิน threshold ต่อเนื่องตามจำนวนครั้งที่กำหนดจึงติด LED ใช้ hysteresis/cooldown และดับเมื่อ inference error หรือ Stop ไม่ต่อ motor/relay ในชุดแรก",
+      "expected_when_ready": "LED ตอบสนองผลจริงโดยไม่กระพริบจาก label แกว่ง",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-112",
+      "title": "AI หลายรอบและคืนหน่วยความจำ",
+      "category": "AI แบบมีโมเดลที่เข้ากันได้",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "models",
+        "camera",
+        "audio"
+      ],
+      "prerequisites": [
+        "Real SG2002-compatible model/labels/input metadata; exact audio preprocessing when applicable; ground-truth fixtures.",
+        "A passing chosen inference test (MP-108, MP-109 or MP-110), with its actual cleanup contract."
+      ],
+      "depends_on": [],
+      "template": null,
+      "correction": "โหลดโมเดลครั้งเดียวต่อรอบ ไม่สร้าง NN/Camera ทุกเฟรม; leak ต้องวัดจริงหลายรอบ",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ให้ผู้ทดสอบ Run inference → Stop → Run ซ้ำห้ารอบ เก็บ memory ก่อน/หลังและเวลาที่โมเดลโหลดจริง ปิด camera/audio ตามที่ใช้ ไม่สร้าง instance โมเดลทุกเฟรม",
+      "expected_when_ready": "รอบใหม่ไม่เจอ resource busy และรายงานแนวโน้ม memory ตามข้อมูลจริง",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-113",
+      "title": "Run/Stop จอซ้ำ 20 รอบ",
+      "category": "Run/Stop ข้อผิดพลาด และความทนทาน",
+      "state": "DRAFT_REFERENCE",
+      "state_label": "มี API อ้างอิง; ต้องสร้างและตรวจโค้ดตามงาน",
+      "contracts": [
+        "lifecycle",
+        "display"
+      ],
+      "prerequisites": [],
+      "depends_on": [],
+      "template": null,
+      "correction": "ผู้ทดสอบกด Run/Stop จาก IDE 20 รอบ ไม่ให้ main.py คุม Launcher หรือสร้างผลผ่านเอง",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "สร้างแอปจอแสดง RUN กับเวลาที่ผ่านและ exit-aware loop พร้อม finally log ให้ผู้ทดสอบ Run/Stop 20 รอบจาก IDE จดเวลาเข้าโปรแกรม ออกโปรแกรม และเมนูกลับ ห้ามให้ main.py ฆ่า Launcher เอง",
+      "expected_when_ready": "แต่ละรอบรับ exit status จริงและผู้ทดสอบยืนยันเมนูกลับครบ",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-114",
+      "title": "จบโปรแกรมตามปกติ",
+      "category": "Run/Stop ข้อผิดพลาด และความทนทาน",
+      "state": "DRAFT_REFERENCE",
+      "state_label": "มี API อ้างอิง; ต้องสร้างและตรวจโค้ดตามงาน",
+      "contracts": [
+        "lifecycle",
+        "display"
+      ],
+      "prerequisites": [],
+      "depends_on": [],
+      "template": null,
+      "correction": "return/exit 0 ปกติและ finally cleanup; ไม่ใช้ os._exit ที่ข้าม cleanup",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "แสดง countdown ห้าวินาทีแล้วจบ main.py เองด้วย exit code 0 ปิดทรัพยากรใน finally ไม่ใช้ os._exit และไม่เรียก restart Launcher เอง",
+      "expected_when_ready": "IDE เห็น exit 0 และ adapter คืนเมนูได้",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-115",
+      "title": "Python exception ที่ตั้งใจให้เกิด",
+      "category": "Run/Stop ข้อผิดพลาด และความทนทาน",
+      "state": "DRAFT_REFERENCE",
+      "state_label": "มี API อ้างอิง; ต้องสร้างและตรวจโค้ดตามงาน",
+      "contracts": [
+        "lifecycle",
+        "display"
+      ],
+      "prerequisites": [],
+      "depends_on": [],
+      "template": null,
+      "correction": "NEGATIVE TEST: RuntimeError/nonzero เป็นผลที่ตั้งใจและต้องตรวจ traceback/menu ไม่ใช่ hardware PASS",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "แสดงภาพสองวินาทีแล้ว raise RuntimeError ที่มี test ID อย่างตั้งใจ ให้ finally พิมพ์ cleanup log โดยไม่กลบ exception ตรวจจาก IDE ว่าได้ traceback และ nonzero exit ไม่ใช่ PASS",
+      "expected_when_ready": "ข้อผิดพลาดมองเห็น เมนูคืน และ Run โปรแกรมปกติถัดไปได้",
+      "expected_failure": true,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-116",
+      "title": "SyntaxError ก่อนเปิดอุปกรณ์",
+      "category": "Run/Stop ข้อผิดพลาด และความทนทาน",
+      "state": "DRAFT_REFERENCE",
+      "state_label": "มี API อ้างอิง; ต้องสร้างและตรวจโค้ดตามงาน",
+      "contracts": [
+        "lifecycle",
+        "display"
+      ],
+      "prerequisites": [],
+      "depends_on": [],
+      "template": null,
+      "correction": "NEGATIVE TEST: SyntaxError ตั้งใจไม่ผ่าน compile ต้องใช้โปรเจกต์แยกและไม่แก้โปรแกรมใช้งานจริง",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "เตรียมสำเนาโปรแกรมสำหรับทดสอบ SyntaxError โดยไม่แก้โปรเจกต์ใช้งานจริง อธิบายว่าความล้มเหลวเป็นผลที่ตั้งใจ แล้วให้ทดสอบผ่าน IDE ว่า log/exit/menu ถูกต้อง",
+      "expected_when_ready": "ไม่รายงาน success เมื่อ parser ล้ม และแก้ไฟล์แล้วรันใหม่ได้",
+      "expected_failure": true,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-117",
+      "title": "ImportError ของโมดูลที่ไม่มี",
+      "category": "Run/Stop ข้อผิดพลาด และความทนทาน",
+      "state": "DRAFT_REFERENCE",
+      "state_label": "มี API อ้างอิง; ต้องสร้างและตรวจโค้ดตามงาน",
+      "contracts": [
+        "lifecycle",
+        "display"
+      ],
+      "prerequisites": [],
+      "depends_on": [],
+      "template": null,
+      "correction": "แยก missing-package SKIP กับ intentional ImportError/nonzero ไม่ติดตั้ง dependency เอง",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ทำโหมด preflight ที่แจ้งโมดูลขาดอย่างเป็นระเบียบ กับโหมดทดสอบ ImportError ที่ปล่อย exception ตั้งใจ ทั้งคู่ต้องปิดทรัพยากรที่เปิดแล้ว ไม่ติดตั้งแพ็กเกจอัตโนมัติ",
+      "expected_when_ready": "แยก SKIP จาก runtime failure ชัดเจน และไม่ค้าง Launcher",
+      "expected_failure": true,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-118",
+      "title": "Stop ระหว่างรอ I/O",
+      "category": "Run/Stop ข้อผิดพลาด และความทนทาน",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "uart",
+        "network",
+        "lifecycle"
+      ],
+      "prerequisites": [
+        "A chosen documented finite-timeout I/O path and controlled test peer. Native I2C timeout is not assumed."
+      ],
+      "depends_on": [],
+      "template": null,
+      "correction": "ใช้ I/O ที่มี finite-timeout จริง; ห้ามสมมติว่า I2C ทุก native call หยุดได้จาก Python loop",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ทำการอ่าน UART/socket แบบ finite timeout ให้ Stop ผ่าน exit-aware loop และ signal cleanup ทดสอบไม่มีข้อมูลเข้าพร้อมจับเวลาจน exit ห้ามใช้ลูปรอข้อมูลไม่สิ้นสุด",
+      "expected_when_ready": "Stop จบในเวลาที่อธิบายได้และไม่มีเจ้าของพอร์ตตกค้าง",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-119",
+      "title": "ทรัพยากรหลายส่วนทำงานนาน",
+      "category": "Run/Stop ข้อผิดพลาด และความทนทาน",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "display",
+        "touch",
+        "imu",
+        "camera",
+        "lifecycle"
+      ],
+      "prerequisites": [
+        "Separate passing results for every selected subsystem; memory/log bounds."
+      ],
+      "depends_on": [
+        "MP-015",
+        "MP-065",
+        "MP-079"
+      ],
+      "template": null,
+      "correction": "เลือกเฉพาะ subsystem ที่ผ่านก่อน จำกัด memory/log และไม่จงใจ OOM",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "รวมจอ IMU touch และกล้องตามที่อุปกรณ์รองรับ ทำงาน 30 นาที เก็บ memory/CPU/FPS/error เป็นช่วง จำกัด buffer/log และหยุดได้ทุกช่วง ไม่จงใจทำ OOM หรือเขียนเต็มการ์ด",
+      "expected_when_ready": "มีสถิติตลอดรอบ ไม่อ้าง PASS ด้านที่ผู้ทดสอบยังไม่ยืนยัน",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-120",
+      "title": "API รุ่นใหม่หรือบางตัวหาย",
+      "category": "Run/Stop ข้อผิดพลาด และความทนทาน",
+      "state": "HOLD",
+      "state_label": "รอหลักฐานก่อนทดสอบฮาร์ดแวร์ตามขอบเขตนี้",
+      "contracts": [
+        "lifecycle"
+      ],
+      "prerequisites": [
+        "Desktop synthetic compatibility fixtures only; do not upload as a newer-runtime hardware test."
+      ],
+      "depends_on": [],
+      "template": null,
+      "correction": "DESKTOP SYNTHETIC ONLY ไม่ส่งขึ้นบอร์ดเพื่ออ้างว่าได้ทดสอบเวอร์ชันใหม่ที่ติดตั้ง",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "แยก preflight ของแต่ละฟีเจอร์ ถ้าขาด API ให้แจ้งชื่อและ SKIP ฟีเจอร์นั้น ทดสอบ logic ด้วย fixture รุ่นสมมติบนคอมพิวเตอร์และติดป้าย SYNTHETIC ห้ามเปลี่ยนเวอร์ชันหรืออัปเดต OS บอร์ดเอง",
+      "expected_when_ready": "baseline ใช้ API ที่มีได้ รุ่นสมมติไม่ถูกนับเป็น hardware pass ของรุ่นใหม่",
+      "expected_failure": false,
+      "desktop_only": true,
+      "action": "discovery_or_manual_only",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-121",
+      "title": "SPI เฉพาะเมื่อมี connector/pinmux ที่ยืนยัน",
+      "category": "ส่วนขยายที่ต้องยืนยันเพิ่ม และชุดรวม",
+      "state": "HOLD",
+      "state_label": "รอหลักฐานก่อนทดสอบฮาร์ดแวร์ตามขอบเขตนี้",
+      "contracts": [
+        "extensions"
+      ],
+      "prerequisites": [
+        "Actual exposed peripheral/adapter, pinmux/driver, ownership and matching public device documentation."
+      ],
+      "depends_on": [],
+      "template": null,
+      "correction": "HOLD SPI จนมี connector/pinmux/driver/ownership ของ Plus จริง ไม่ยืม pinout MaixCAM2",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ตรวจว่ามี SPI ที่ออก connector ของ Plus และไม่ได้ชนจอ การ์ด WiFi หรือ system owner จริงหรือไม่ ถ้ายืนยันไม่ได้ให้ SKIP ถ้าได้ให้อ่าน ID register ที่เอกสารอุปกรณ์ระบุและเทียบค่า โดยไม่เขียน flash",
+      "expected_when_ready": "มีหลักฐาน pin/bus/ID จริง หรือ SKIP ที่ระบุสิ่งที่ขาด",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "discovery_or_manual_only",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-122",
+      "title": "Bluetooth แบบตรวจความพร้อม",
+      "category": "ส่วนขยายที่ต้องยืนยันเพิ่ม และชุดรวม",
+      "state": "HOLD",
+      "state_label": "รอหลักฐานก่อนทดสอบฮาร์ดแวร์ตามขอบเขตนี้",
+      "contracts": [
+        "extensions"
+      ],
+      "prerequisites": [
+        "Actual exposed peripheral/adapter, pinmux/driver, ownership and matching public device documentation."
+      ],
+      "depends_on": [],
+      "template": null,
+      "correction": "HOLD Bluetooth จนพบ adapter และ driver จริง WiFi ไม่พิสูจน์ Bluetooth",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ตรวจว่าฮาร์ดแวร์และ driver Bluetooth มีจริงก่อน อย่าอนุมานจากการมี WiFi ถ้ามีให้ scan เฉพาะอุปกรณ์ทดสอบของผู้ใช้และแสดง capability ถ้าไม่มีให้ SKIP ไม่ติดตั้ง driver",
+      "expected_when_ready": "รายงานตาม adapter จริงและไม่มีการจับคู่อุปกรณ์อื่นอัตโนมัติ",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "discovery_or_manual_only",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-123",
+      "title": "USB-OTG และ USB-UART",
+      "category": "ส่วนขยายที่ต้องยืนยันเพิ่ม และชุดรวม",
+      "state": "DRAFT_REFERENCE",
+      "state_label": "มี API อ้างอิง; ต้องสร้างและตรวจโค้ดตามงาน",
+      "contracts": [
+        "extensions",
+        "discovery"
+      ],
+      "prerequisites": [],
+      "depends_on": [],
+      "template": null,
+      "correction": "เป็นขั้นตอน manual/discovery แยก OTG/RNDIS กับ console ไม่แก้ boot config หรือ USB role",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ทำคู่มือทดสอบแยก USB RNDIS/IDE กับ USB-UART console ตรวจ enumerated device และทิศทางสาย ไม่สลับ OTG เป็น host ระหว่างรันผ่าน RNDIS และไม่เปลี่ยน console boot config",
+      "expected_when_ready": "ระบุได้ว่าขั้วใดใช้หน้าที่ใดโดย IDE ไม่ถูกตัดจากการตั้งค่าของแอป",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "discovery_or_manual_only",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-124",
+      "title": "อุปกรณ์ USB host แบบมีเงื่อนไข",
+      "category": "ส่วนขยายที่ต้องยืนยันเพิ่ม และชุดรวม",
+      "state": "HOLD",
+      "state_label": "รอหลักฐานก่อนทดสอบฮาร์ดแวร์ตามขอบเขตนี้",
+      "contracts": [
+        "extensions"
+      ],
+      "prerequisites": [
+        "Separate control transport and verified USB/power arrangement, or an exact expansion protocol/power/driver fixture."
+      ],
+      "depends_on": [],
+      "template": null,
+      "correction": "HOLD USB host จนมี control transport สำรองและ power arrangement ที่ยืนยัน",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "ตรวจความเป็นไปได้ของ USB host และความขัดแย้งกับ RNDIS ก่อน ถ้าต้องสลับพอร์ตที่ใช้ IDE ให้หยุดที่แผนต่อสายและขั้นตอนทดสอบแยก ไม่สลับ role อัตโนมัติ ไม่จ่ายไฟย้อน",
+      "expected_when_ready": "มีแผนทดสอบที่แยกช่องทางควบคุมชัด หรือ SKIP เมื่อไม่มี fixture",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "discovery_or_manual_only",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-125",
+      "title": "servo/motor ผ่านบอร์ดขยาย",
+      "category": "ส่วนขยายที่ต้องยืนยันเพิ่ม และชุดรวม",
+      "state": "HOLD",
+      "state_label": "รอหลักฐานก่อนทดสอบฮาร์ดแวร์ตามขอบเขตนี้",
+      "contracts": [
+        "extensions"
+      ],
+      "prerequisites": [
+        "Separate control transport and verified USB/power arrangement, or an exact expansion protocol/power/driver fixture."
+      ],
+      "depends_on": [],
+      "template": null,
+      "correction": "HOLD motor/expansion จน protocol/power/driver/enable fixture ระบุครบ ห้ามขับโหลดตรงจาก GPIO",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "อ่าน protocol กับข้อจำกัดบอร์ดขยายก่อน ทำ dry-run ของคำสั่งบนจอก่อนต่อโหลด จากนั้นให้ผู้ทดสอบเลือก enable ใช้ความเร็ว/มุมต่ำและ stop command ใน finally ห้ามขับ motor จาก GPIO ตรง",
+      "expected_when_ready": "โหลดจริงทำงานหลัง enable และหยุดได้ตามคำสั่งโดยไม่มีการจ่ายไฟผิด",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "discovery_or_manual_only",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-126",
+      "title": "dashboard รวม onboard",
+      "category": "ส่วนขยายที่ต้องยืนยันเพิ่ม และชุดรวม",
+      "state": "NEEDS_SETUP",
+      "state_label": "รออุปกรณ์/ค่าที่วัด/การตั้งค่าที่ระบุ",
+      "contracts": [
+        "display",
+        "touch",
+        "adc",
+        "imu",
+        "camera",
+        "audio"
+      ],
+      "prerequisites": [
+        "Each selected component tested separately; calibration results for buttons."
+      ],
+      "depends_on": [
+        "MP-015",
+        "MP-021",
+        "MP-065",
+        "MP-079",
+        "MP-088"
+      ],
+      "template": null,
+      "correction": "dashboard รวมต้องผ่าน constituent tests ก่อน ไม่ใช้ภาพ mock เป็น sensor จริง",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "สร้าง dashboard มีแท็บจอ touch S1/S2 IMU กล้องและระดับไมค์ เปิดเฉพาะ subsystem ที่หน้าใช้งาน ปิดเมื่อเปลี่ยนหน้า มี self-test checklist ที่รอผู้ทดสอบยืนยันผลภาพ/เสียง",
+      "expected_when_ready": "สลับหน้าได้ไม่เกิด resource busy และไม่รายงาน PASS แทนสายตาผู้ทดสอบ",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "create_reviewed_project",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-127",
+      "title": "ชุดไล่ตรวจ IO ทั้งบอร์ด",
+      "category": "ส่วนขยายที่ต้องยืนยันเพิ่ม และชุดรวม",
+      "state": "HOLD",
+      "state_label": "รอหลักฐานก่อนทดสอบฮาร์ดแวร์ตามขอบเขตนี้",
+      "contracts": [
+        "gpio",
+        "i2c",
+        "uart",
+        "pwm"
+      ],
+      "prerequisites": [
+        "Every connector and subsystem verified separately, including unresolved IO7/P24/PWM; no blanket all-IO actuation."
+      ],
+      "depends_on": [],
+      "template": null,
+      "correction": "HOLD wizard ขับครบทุก IO จนกรณีแยกผ่าน รวม IO7; ทำ subset แล้วห้ามสรุปครบทั้งบอร์ด",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "สร้าง wizard ไล่ IO2–IO8 input/output, external I2C, UART และ IO7 PWM ทีละชุด ให้แสดงผังต่อสายก่อน START บันทึก observed/expected และรอปรับสายเมื่อปิดไฟ ไม่ตั้ง output ชนกันและ SKIP ชุดที่ไม่มี fixture",
+      "expected_when_ready": "รายงานครอบคลุมทุกช่องแยกผล ไม่เหมารวมทั้งบอร์ดจากพอร์ตเดียว",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "discovery_or_manual_only",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    },
+    {
+      "id": "MP-128",
+      "title": "สรุปผลและสร้าง regression suite",
+      "category": "ส่วนขยายที่ต้องยืนยันเพิ่ม และชุดรวม",
+      "state": "DRAFT_REFERENCE",
+      "state_label": "มี API อ้างอิง; ต้องสร้างและตรวจโค้ดตามงาน",
+      "contracts": [
+        "files",
+        "lifecycle"
+      ],
+      "prerequisites": [],
+      "depends_on": [],
+      "template": null,
+      "correction": "วิเคราะห์ผลที่ผู้ใช้ส่งหรืออนุญาตให้อ่านเท่านั้น ไม่สร้าง PASS ให้แถวที่ยัง NOT_RUN และไม่ต้องสร้างโครง display project",
+      "programming_guide": "kidbright_uai_plus_test_contracts.md",
+      "task": "รวบรวม test ID, version, pin mapping, fixture, expected, observed, status และ log ที่ผู้ทดสอบให้ แยก PASS/FAIL/SKIP/NOT_RUN/WAIT_USER/INCONCLUSIVE สร้างรายการทดสอบซ้ำที่สั้นลงจากเคสผ่านแล้ว ห้ามเติมผลจากการคอมไพล์หรือ upload สำเร็จ",
+      "expected_when_ready": "ทุก PASS ย้อนกลับไปดูหลักฐานได้และเคสที่ยังไม่ทำคง NOT_RUN",
+      "expected_failure": false,
+      "desktop_only": false,
+      "action": "analyze_results",
+      "generated_code_verified": false,
+      "physical_result": "NOT_RUN"
+    }
+  ],
+  "templates": {
+    "capabilities": {
+      "main": "samples/kidbright-uai-plus/capabilities.py",
+      "sha256": "e364243d2ecabcda76e277d9594f31930ec7c7616f87766678d96a0528670c06",
+      "helper_source": "src-tauri/src/uai_plus_probe.py",
+      "helper_sha256": "2716dc6c7ec922ee7c3b254c86a03b144c9d2db11fe07b4a7e0bb92e8f240a36",
+      "validation": "local fixture tests only; not a device pass"
+    },
+    "touchscreen": {
+      "main": "samples/kidbright-uai-plus/touchscreen.py",
+      "sha256": "91e29064de544dc2816e6ced48da7dfa7f04456c9c28f22cf38a497bf63fd78a",
+      "validation": "local fixture tests only; not a device pass"
+    },
+    "adc_buttons": {
+      "main": "samples/kidbright-uai-plus/adc_buttons.py",
+      "sha256": "c2056e69c00ffac4ffb9ca92b7036aaf6291b0415ba21c64d44e320fc64dc2af",
+      "validation": "local fixture tests only; not a device pass"
+    }
+  }
+}

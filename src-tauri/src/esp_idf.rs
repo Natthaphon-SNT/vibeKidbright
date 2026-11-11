@@ -10,6 +10,9 @@ use std::sync::{Arc, Mutex, OnceLock};
 use std::time::Duration;
 use tauri::{AppHandle, Emitter, Manager};
 
+#[path = "esp_idf_environment.rs"]
+mod environment;
+
 /// Windows: ซ่อน console window ที่โผล่ขึ้นมาระหว่าง idf.py/cmake/ninja
 const CREATE_NO_WINDOW: u32 = 0x0800_0000;
 
@@ -78,7 +81,6 @@ async fn stream_command_with_lease(command:Command,app_handle:AppHandle,lease:Ar
 }
 
 const DEFAULT_ESP_IDF_VERSION: &str = "v5.5.1";
-const ESP_IDF_REPO_URL: &str = "https://github.com/espressif/esp-idf.git";
 
 // ── Persistent Config for custom paths ───────────────────────────────
 // Stored in: %APPDATA%/vibeKidbright/config.json
@@ -140,7 +142,7 @@ fn runtime_default_paths(app_handle: &AppHandle) -> Result<(PathBuf, PathBuf), S
 
 fn maybe_find_runtime_idf(app_handle: &AppHandle) -> Result<Option<PathBuf>, String> {
     let root = runtime_root_dir(app_handle)?;
-    if !root.exists() {
+    if !root.is_dir() {
         return Ok(None);
     }
 
@@ -206,6 +208,7 @@ fn venv_bin_dir(venv_path: &Path) -> PathBuf {
     }
 }
 
+#[cfg(test)]
 fn venv_python_candidates(venv_path: &Path) -> Vec<PathBuf> {
     let bin_dir = venv_bin_dir(venv_path);
     if cfg!(target_os = "windows") {
@@ -215,34 +218,18 @@ fn venv_python_candidates(venv_path: &Path) -> Vec<PathBuf> {
     }
 }
 
-fn detect_host_python() -> Result<String, String> {
-    for cmd in ["python3", "python"] {
-        let Ok(status) = Command::new(cmd).arg("--version").status() else {
-            continue;
-        };
-        if status.success() {
-            return Ok(cmd.to_string());
-        }
-    }
-
-    Err("Python was not found in PATH. Install Python 3 first.".to_string())
-}
-
 /// Resolve the ESP-IDF and tools paths (runtime, bundled, or dev fallback).
 /// Priority: env override > user config > Happy Meal toolchain > runtime > bundled.
 pub(crate) fn resolve_idf_paths(app_handle: &AppHandle) -> Result<(PathBuf, PathBuf), String> {
+    let mut candidates = Vec::new();
     // 1. Environment variable override
     if let Some((idf_path, tools_path)) = resolve_env_override() {
-        if let Ok(paths) = canonical_idf_pair(&idf_path, &tools_path) {
-            return Ok(paths);
-        }
+        return environment::choose(&[(idf_path, tools_path)], std::env::consts::OS, std::env::consts::ARCH);
     }
 
     // 2. User-configured paths from GUI settings (highest user priority)
     if let Some((idf_path, tools_path)) = resolve_custom_config_paths() {
-        if let Ok(paths) = canonical_idf_pair(&idf_path, &tools_path) {
-            return Ok(paths);
-        }
+        return environment::choose(&[(idf_path, tools_path)], std::env::consts::OS, std::env::consts::ARCH);
     }
 
     // 3. Happy Meal toolchain (ดาวน์โหลดจาก GitHub Release)
@@ -266,11 +253,7 @@ pub(crate) fn resolve_idf_paths(app_handle: &AppHandle) -> Result<(PathBuf, Path
                     })
                     .collect();
                 idf_dirs.sort();
-                if let Some(idf_dir) = idf_dirs.pop() {
-                    if let Ok(paths) = canonical_idf_pair(&idf_dir, &tools_dir) {
-                        return Ok(paths);
-                    }
-                }
+                candidates.extend(idf_dirs.into_iter().rev().map(|idf| (idf, tools_dir.clone())));
             }
         }
     }
@@ -278,15 +261,16 @@ pub(crate) fn resolve_idf_paths(app_handle: &AppHandle) -> Result<(PathBuf, Path
     // 4. Runtime ESP-IDF (ติดตั้งผ่าน setup_esp_idf command)
     if let Some(runtime_idf) = maybe_find_runtime_idf(app_handle)? {
         let tools = runtime_root_dir(app_handle)?.join(".espressif");
-        if let Ok(paths) = canonical_idf_pair(&runtime_idf, &tools) {
-            return Ok(paths);
-        }
+        candidates.push((runtime_idf, tools));
     }
 
     if let Ok((default_runtime_idf, default_runtime_tools)) = runtime_default_paths(app_handle) {
-        if let Ok(paths) = canonical_idf_pair(&default_runtime_idf, &default_runtime_tools) {
-            return Ok(paths);
-        }
+        candidates.push((default_runtime_idf, default_runtime_tools));
+    }
+
+    #[cfg(target_os = "macos")]
+    if let Some(home) = directories::BaseDirs::new() {
+        candidates.extend(environment::mac_candidates(home.home_dir()));
     }
 
     let resource_path = app_handle
@@ -297,71 +281,85 @@ pub(crate) fn resolve_idf_paths(app_handle: &AppHandle) -> Result<(PathBuf, Path
     let idf_path = resource_path.join("esp-idf");
     let tools_path = resource_path.join(".espressif");
 
-    if let Ok(paths) = canonical_idf_pair(&idf_path, &tools_path) {
-        Ok(paths)
-    } else {
+    candidates.push((idf_path, tools_path));
+    #[cfg(debug_assertions)] {
         let dev_idf = PathBuf::from("../resources/esp-idf");
         let dev_tools = PathBuf::from("../resources/.espressif");
-        if let Ok(paths) = canonical_idf_pair(&dev_idf, &dev_tools) {
-            Ok(paths)
-        } else {
-            Err(
-                "ESP-IDF not found. Run setup_esp_idf() on first launch to install platform-specific tools."
-                    .to_string(),
-            )
-        }
+        candidates.push((dev_idf, dev_tools));
     }
-}
-
-/// Find the Python binary and venv path inside the ESP-IDF virtual environment.
-/// Returns (python_binary_path, venv_directory_path).
-fn find_idf_python(tools_path: &Path) -> Result<(PathBuf, PathBuf), String> {
-    let python_env_dir = tools_path.join("python_env");
-    if !python_env_dir.exists() {
-        return Err(format!(
-            "ESP-IDF python_env not found at {}",
-            python_env_dir.display()
-        ));
-    }
-
-    // Look for any idf*_py*_env directory
-    let entries = std::fs::read_dir(&python_env_dir)
-        .map_err(|e| format!("Cannot read python_env dir: {}", e))?;
-
-    for entry in entries.flatten() {
-        let name = entry.file_name().to_string_lossy().to_string();
-        if name.starts_with("idf") && name.contains("_py") && name.ends_with("_env") {
-            let venv_path = entry.path();
-            for python_bin in venv_python_candidates(&venv_path) {
-                if python_bin.exists() {
-                    return Ok((python_bin, venv_path));
-                }
-            }
-        }
-    }
-
-    Err(format!(
-        "No ESP-IDF Python venv found in {}",
-        python_env_dir.display()
-    ))
+    environment::choose(&candidates, std::env::consts::OS, std::env::consts::ARCH)
 }
 
 /// Read the ESP-IDF version from version.txt to avoid git lookups.
 fn read_idf_version(idf_path: &Path) -> String {
-    let version_file = idf_path.join("version.txt");
-    std::fs::read_to_string(&version_file)
-        .unwrap_or_default()
-        .trim()
-        .to_string()
+    environment::version(idf_path)
 }
 
 /// Read-only readiness for a configured/external SDK. A managed-install marker
 /// is not required when the same resolver used by build found an existing SDK.
 pub(crate) fn installed_sdk_status(idf: &Path, tools: &Path) -> Result<serde_json::Value,String> {
     let (idf,tools)=canonical_idf_pair(idf,tools)?;
-    find_idf_python(&tools)?;
+    let (python, venv) = environment::validate(&idf, &tools, std::env::consts::OS, std::env::consts::ARCH)?;
     let version=read_idf_version(&idf);
-    Ok(serde_json::json!({"status":"ready","version":if version.is_empty(){None}else{Some(version.trim_start_matches('v').to_owned())},"path":idf,"tools_path":tools,"source":"configured-sdk"}))
+    Ok(serde_json::json!({"status":"ready","integrity":"existing_installation_not_reverified","version":if version.is_empty(){None}else{Some(version.trim_start_matches('v').to_owned())},"path":idf,"tools_path":tools,"python_bin":python,"python_venv":venv,"source":"configured-sdk","platform":std::env::consts::OS}))
+}
+
+/// Shared by readiness, the actual build and the packaged native build probe.
+/// An unrelated shell Python/venv must never override the selected SDK.
+fn sdk_command(idf: &Path, tools: &Path, args: &[String], cwd: &Path) -> Result<Command, String> {
+    let (python, venv) = environment::validate(idf, tools, std::env::consts::OS, std::env::consts::ARCH)?;
+    let mut paths = vec![venv_bin_dir(&venv)];
+    paths.extend(environment::exported_paths(idf, tools, std::env::consts::OS, std::env::consts::ARCH));
+    paths.extend(std::env::split_paths(&build_idf_path(tools)));
+    let mut command = Command::new(python);
+    command.arg(idf.join("tools/idf.py")).args(args).current_dir(cwd)
+        .env("IDF_PATH", idf).env("IDF_TOOLS_PATH", tools).env("IDF_PYTHON_ENV_PATH", &venv)
+        .env("VIRTUAL_ENV", venv).env("ESP_IDF_VERSION", read_idf_version(idf))
+        .env("PATH", std::env::join_paths(paths).map_err(|error| error.to_string())?)
+        .env("IDF_TARGET", "esp32").env("PYTHONUTF8", "1").env("PYTHONIOENCODING", "utf-8")
+        .env("PYTHONLEGACYWINDOWSSTDIO", "0").env_remove("PYTHONHOME").env_remove("PYTHONPATH");
+    if let Some(rom) = find_esp_rom_elf_dir(tools) { command.env("ESP_ROM_ELF_DIR", rom); }
+    Ok(command)
+}
+
+pub(crate) async fn checked_sdk_status(idf: PathBuf, tools: PathBuf) -> Result<serde_json::Value, String> {
+    tokio::task::spawn_blocking(move || {
+        let mut status = installed_sdk_status(&idf, &tools)?;
+        let command = sdk_command(&idf, &tools, &["--version".into()], &idf)?;
+        let result = crate::sdk_process::execute(command, Arc::new(|_, _| {}), Arc::new(AtomicBool::new(false)), Duration::from_secs(20))?;
+        if !result.success {
+            return Err(format!("ESP-IDF Python environment cannot run on this machine. Open Setup / Repair ESP-IDF and repair its native dependencies.\n{}{}", result.stdout, result.stderr));
+        }
+        #[cfg(target_os = "macos")]
+        for tool in environment::native_tools(&idf, &tools, "macos", std::env::consts::ARCH)? {
+            let mut command = Command::new(&tool);
+            command.arg("--version").env("PATH", build_idf_path(&tools));
+            let result = crate::sdk_process::execute(command, Arc::new(|_, _| {}), Arc::new(AtomicBool::new(false)), Duration::from_secs(10))?;
+            if !result.success { return Err(format!("Native SDK tool {} cannot run:\n{}{}", tool.display(),result.stdout,result.stderr)); }
+        }
+        status["python_execution_checked"] = serde_json::json!(true);
+        Ok(status)
+    }).await.map_err(|error| format!("SDK readiness worker failed: {error}"))?
+}
+
+pub(crate) fn sdk_build_self_check(idf: &Path, tools: &Path, scratch: &Path) -> Result<serde_json::Value, String> {
+    let (idf, tools) = canonical_idf_pair(idf, tools)?;
+    installed_sdk_status(&idf, &tools)?;
+    std::fs::create_dir(scratch).map_err(|error| format!("SDK build check requires a new scratch directory: {error}"))?;
+    let main = scratch.join("main");
+    std::fs::create_dir(&main).map_err(|error| error.to_string())?;
+    std::fs::write(scratch.join("CMakeLists.txt"), "cmake_minimum_required(VERSION 3.16)\ninclude($ENV{IDF_PATH}/tools/cmake/project.cmake)\nproject(macos_sdk_check)\n").map_err(|error| error.to_string())?;
+    std::fs::write(main.join("CMakeLists.txt"), "idf_component_register(SRCS \"main.c\" INCLUDE_DIRS \".\")\n").map_err(|error| error.to_string())?;
+    std::fs::write(main.join("main.c"), "#include <stdio.h>\nvoid app_main(void) { printf(\"vibeKidbright native ESP32 build check\\n\"); }\n").map_err(|error| error.to_string())?;
+    let command = sdk_command(&idf, &tools, &["build".into()], scratch)?;
+    let result = crate::sdk_process::execute(command, Arc::new(|line, _| eprintln!("{line}")), Arc::new(AtomicBool::new(false)), Duration::from_secs(600))?;
+    if !result.success { return Err(format!("Native ESP32 build check failed:\n{}{}", result.stdout, result.stderr)); }
+    let firmware = scratch.join("build/macos_sdk_check.bin");
+    let size = std::fs::metadata(&firmware).map_err(|error| format!("No firmware was produced: {error}"))?.len();
+    if size == 0 { return Err("SDK produced empty firmware.".into()); }
+    Ok(serde_json::json!({"version":env!("CARGO_PKG_VERSION"),"platform":std::env::consts::OS,
+        "architecture":std::env::consts::ARCH,"sdk_version":read_idf_version(&idf),"target":"esp32",
+        "firmware_bytes":size,"native_sdk_build":true,"hardware_flashed":false}))
 }
 
 /// Scan an ESP-IDF tools directory and add all executable directories to `paths`.
@@ -484,6 +482,11 @@ fn build_idf_path(tools_path: &Path) -> OsString {
         }
     }
 
+    // Finder does not inherit Homebrew's shell profile. Keep these behind the
+    // selected SDK tools so an unrelated global compiler cannot override it.
+    #[cfg(target_os = "macos")]
+    paths.extend([PathBuf::from("/opt/homebrew/bin"), PathBuf::from("/usr/local/bin"), PathBuf::from("/usr/bin"), PathBuf::from("/bin")]);
+
     // 4. System PATH (fallback)
     if let Some(system_path) = std::env::var_os("PATH") {
         paths.extend(std::env::split_paths(&system_path));
@@ -534,7 +537,8 @@ pub fn find_esp_rom_elf_dir(tools_path: &Path) -> Option<String> {
 
 #[tauri::command]
 pub async fn check_esp_idf(app_handle: AppHandle) -> Result<String, String> {
-    let (actual_idf_path, _) = resolve_idf_paths(&app_handle)?;
+    let (actual_idf_path, tools) = resolve_idf_paths(&app_handle)?;
+    checked_sdk_status(actual_idf_path.clone(), tools).await?;
     Ok(format!(
         "Ready: ESP-IDF found at {}",
         actual_idf_path.display()
@@ -567,6 +571,8 @@ pub async fn set_idf_custom_paths(idf_path: String, tools_path: String) -> Resul
     if !tools_path.is_empty() && !tools.exists() {
         return Err(format!("Tools path does not exist: '{}'", tools_path));
     }
+    // Saving a directory that merely exists must not turn the status green.
+    checked_sdk_status(idf, tools).await?;
 
     crate::ai::config::update_config(|config| {
         config["custom_idf_path"] = serde_json::json!(idf_path);
@@ -587,140 +593,35 @@ pub async fn clear_idf_custom_paths() -> Result<(), String> {
 }
 
 #[tauri::command]
+pub async fn select_native_macos_sdk() -> Result<serde_json::Value, String> {
+    #[cfg(target_os = "macos")]
+    {
+        let home = directories::BaseDirs::new().ok_or("Cannot locate the user's home directory")?;
+        let (idf, tools) = environment::choose(&environment::mac_candidates(home.home_dir()), "macos", std::env::consts::ARCH)?;
+        let status = checked_sdk_status(idf.clone(), tools.clone()).await?;
+        // User explicitly chose the native SDK. Save only after its Python
+        // actually runs; retain previous settings if discovery/probing fails.
+        crate::ai::config::update_config(|config| {
+            config["custom_idf_path"] = serde_json::json!(idf);
+            config["custom_tools_path"] = serde_json::json!(tools);
+        })?;
+        Ok(status)
+    }
+    #[cfg(not(target_os = "macos"))]
+    Err("Native macOS SDK selection is only available on a Mac.".into())
+}
+
+#[tauri::command]
 pub async fn setup_esp_idf(
     app_handle: AppHandle,
     version: Option<String>,
     targets: Option<Vec<String>>,
 ) -> Result<String, String> {
-    let mut requested_version = version
-        .unwrap_or_else(|| DEFAULT_ESP_IDF_VERSION.to_string())
-        .trim()
-        .to_string();
-    if requested_version.is_empty() {
-        requested_version = DEFAULT_ESP_IDF_VERSION.to_string();
-    }
-    if !requested_version.starts_with('v') {
-        requested_version = format!("v{}", requested_version);
-    }
-
-    let target_list = targets
-        .unwrap_or_else(|| vec!["all".to_string()])
-        .into_iter()
-        .filter(|t| !t.trim().is_empty())
-        .collect::<Vec<_>>();
-    let targets_arg = if target_list.is_empty() {
-        "all".to_string()
-    } else {
-        target_list.join(",")
-    };
-
-    let runtime_root = runtime_root_dir(&app_handle)?;
-    std::fs::create_dir_all(&runtime_root)
-        .map_err(|e| format!("Failed to create runtime directory: {}", e))?;
-
-    let idf_path = runtime_root.join(format!("esp-idf-{}", requested_version));
-    let tools_path = runtime_root.join(".espressif");
-
-    if let Ok((idf_abs, tools_abs)) = canonical_idf_pair(&idf_path, &tools_path) {
-        if find_idf_python(&tools_abs).is_ok() {
-            return Ok(format!(
-                "ESP-IDF already installed at {}",
-                idf_abs.display()
-            ));
-        }
-    }
-
-    if !idf_path.exists() {
-        let req_ver = requested_version.clone();
-        let idf_p = idf_path.clone();
-        let clone_output = tokio::task::spawn_blocking(move || {
-            Command::new("git")
-                .arg("clone")
-                .arg("--depth")
-                .arg("1")
-                .arg("--branch")
-                .arg(&req_ver)
-                .arg(ESP_IDF_REPO_URL)
-                .arg(&idf_p)
-                .output()
-                .map_err(|e| format!("Failed to run git clone: {}", e))
-        })
-        .await
-        .map_err(|e| format!("Task panicked: {}", e))??;
-
-        if !clone_output.status.success() {
-            return Err(format!(
-                "Failed to clone ESP-IDF {}: {}",
-                requested_version,
-                String::from_utf8_lossy(&clone_output.stderr)
-            ));
-        }
-    }
-
-    let python_cmd = detect_host_python()?;
-    let idf_tools_py = idf_path.join("tools/idf_tools.py");
-    if !idf_tools_py.exists() {
-        return Err(format!(
-            "Invalid ESP-IDF checkout at {} (missing tools/idf_tools.py)",
-            idf_path.display()
-        ));
-    }
-
-    let py_cmd = python_cmd.clone();
-    let tools_py = idf_tools_py.clone();
-    let targets = targets_arg.clone();
-    let idf_p = idf_path.clone();
-    let tools_p = tools_path.clone();
-
-    let install_status = tokio::task::spawn_blocking(move || {
-        Command::new(&py_cmd)
-            .arg(&tools_py)
-            .arg("install")
-            .arg("--targets")
-            .arg(&targets)
-            .env("IDF_PATH", &idf_p)
-            .env("IDF_TOOLS_PATH", &tools_p)
-            .status()
-            .map_err(|e| format!("Failed to run idf_tools.py install: {}", e))
-    })
-    .await
-    .map_err(|e| format!("Task panicked: {}", e))??;
-    if !install_status.success() {
-        return Err(
-            "idf_tools.py install failed. Check network/proxy and rerun setup_esp_idf()."
-                .to_string(),
-        );
-    }
-
-    let py_cmd = python_cmd.clone();
-    let tools_py = idf_tools_py.clone();
-    let idf_p = idf_path.clone();
-    let tools_p = tools_path.clone();
-
-    let pyenv_status = tokio::task::spawn_blocking(move || {
-        Command::new(&py_cmd)
-            .arg(&tools_py)
-            .arg("install-python-env")
-            .env("IDF_PATH", &idf_p)
-            .env("IDF_TOOLS_PATH", &tools_p)
-            .status()
-            .map_err(|e| format!("Failed to run idf_tools.py install-python-env: {}", e))
-    })
-    .await
-    .map_err(|e| format!("Task panicked: {}", e))??;
-    if !pyenv_status.success() {
-        return Err("idf_tools.py install-python-env failed. Check Python/pip access and rerun setup_esp_idf().".to_string());
-    }
-
-    let (idf_abs, tools_abs) = canonical_idf_pair(&idf_path, &tools_path)?;
-    let _ = find_idf_python(&tools_abs)?;
-
-    Ok(format!(
-        "ESP-IDF {} installed at {} with targets {}",
-        requested_version,
-        idf_abs.display(),
-        targets_arg
-    ))
+    let _ = (app_handle, version, targets); // Preserve the existing IPC argument names.
+    // Gate before directory creation, cache probing, git or Python execution.
+    // idf_tools.py's own hashes cannot establish trust in the mutable checkout,
+    // nor cover the complete Python dependency installation chain.
+    crate::toolchain_integrity::legacy_setup_policy()
 }
 
 /// Resolve every explicit IDF project directory against the process working
@@ -761,112 +662,22 @@ pub async fn run_idf_command(
     for project in idf_project_directories(&idf_args, &working_dir) {
         ensure_project_reviewed(&project)?;
     }
+    #[cfg(target_os = "macos")]
+    if working_dir.to_string_lossy().chars().any(char::is_whitespace) {
+        return Err("ESP-IDF on macOS cannot build projects in a path with spaces. Save the project in a folder without spaces, then build again.".into());
+    }
     let (actual_idf_path, actual_tools_path) = resolve_idf_paths(&app_handle)?;
-    let (python_bin, python_env_path) = find_idf_python(&actual_tools_path)?;
-    let path_env = build_idf_path(&actual_tools_path);
-    let idf_version = read_idf_version(&actual_idf_path);
 
     prepare_idf_build(&idf_args, &working_dir, &actual_idf_path, &actual_tools_path, &app_handle,lease.clone()).await?;
 
-    let mut cmd = Command::new(&python_bin);
-    cmd.arg(actual_idf_path.join("tools/idf.py"))
-        .arg(&command)
-        .args(&args)
-        .current_dir(&working_dir)
-        .env("IDF_PATH", &actual_idf_path)
-        .env("IDF_TOOLS_PATH", &actual_tools_path)
-        .env("IDF_PYTHON_ENV_PATH", &python_env_path)
-        .env("ESP_IDF_VERSION", &idf_version)
-        .env("PATH", &path_env)
-        // Always set IDF_TARGET so cmake never has to guess from sdkconfig
-        .env("IDF_TARGET", "esp32")
-        // Force Python to use UTF-8 regardless of Windows system locale (cp874, cp932, etc.)
-        // This fixes kconfgen UnicodeDecodeError on non-English Windows machines.
-        .env("PYTHONUTF8", "1")
-        .env("PYTHONIOENCODING", "utf-8")
-        .env("PYTHONLEGACYWINDOWSSTDIO", "0");
-    if let Some(rom_elf_dir) = find_esp_rom_elf_dir(&actual_tools_path) {
-        cmd.env("ESP_ROM_ELF_DIR", rom_elf_dir);
-    }
+    let cmd = sdk_command(&actual_idf_path, &actual_tools_path, &idf_args, &working_dir)?;
     Ok(stream_command_with_lease(cmd, app_handle,lease).await?.stdout)
 }
 
 #[tauri::command]
-pub async fn create_idf_project(
-    _app_handle: AppHandle,
-    path: String,
-    name: String,
-) -> Result<String, String> {
-    let project_path = PathBuf::from(&path).join(&name);
-    println!(
-        "DEBUG: Creating project at path: {}",
-        project_path.display()
-    );
-
-    // Create project directory and main subdirectory
-    std::fs::create_dir_all(project_path.join("main")).map_err(|e| {
-        let err = format!("Failed to create project directory: {}", e);
-        println!("DEBUG ERROR: {}", err);
-        err
-    })?;
-
-    // 1. Root CMakeLists.txt
-    let root_cmake = format!(
-        "cmake_minimum_required(VERSION 3.16)
-
-include($ENV{{IDF_PATH}}/tools/cmake/project.cmake)
-project({})
-",
-        name
-    );
-    std::fs::write(project_path.join("CMakeLists.txt"), root_cmake).map_err(|e| {
-        let err = format!("Failed to write Root CMakeLists.txt: {}", e);
-        println!("DEBUG ERROR: {}", err);
-        err
-    })?;
-
-    // 2. main/CMakeLists.txt
-    let main_cmake = r#"idf_component_register(
-    SRCS
-    # VIBEKIDBRIGHT_MANAGED_SOURCES_BEGIN
-    "main.c"
-    # VIBEKIDBRIGHT_MANAGED_SOURCES_END
-    INCLUDE_DIRS ".")
-"#;
-    std::fs::write(project_path.join("main/CMakeLists.txt"), main_cmake).map_err(|e| {
-        let err = format!("Failed to write main/CMakeLists.txt: {}", e);
-        println!("DEBUG ERROR: {}", err);
-        err
-    })?;
-
-    // 3. main/main.c
-    let main_c = r#"#include <stdio.h>
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-
-void app_main(void) {
-    printf("Hello from vibeKidbright!\n");
-    while (1) {
-        printf("Heartbeat...\n");
-        vTaskDelay(pdMS_TO_TICKS(1000));
-    }
-}
-"#;
-    std::fs::write(project_path.join("main/main.c"), main_c).map_err(|e| {
-        let err = format!("Failed to write main/main.c: {}", e);
-        println!("DEBUG ERROR: {}", err);
-        err
-    })?;
-
-    println!(
-        "DEBUG: Project created successfully at {}",
-        project_path.display()
-    );
-    Ok(format!(
-        "Project '{}' created successfully at {}",
-        name,
-        project_path.display()
-    ))
+pub async fn create_idf_project(_app_handle: AppHandle, path: String, name: String) -> Result<String, String> {
+    let root = crate::ai::tools::initialize_project_workspace(Path::new(&path), &name)?;
+    Ok(root.to_string_lossy().into_owned())
 }
 
 #[derive(serde::Serialize)]
@@ -880,8 +691,8 @@ pub struct FileEntry {
 #[tauri::command]
 pub async fn list_project_files(path: String) -> Result<Vec<FileEntry>, String> {
     let root = PathBuf::from(&path);
-    if !root.exists() {
-        return Err(format!("Path does not exist: {}", path));
+    if !root.is_dir() {
+        return Err(format!("Project directory does not exist: {}", path));
     }
 
     fn read_dir_recursive(dir: &Path, depth: usize) -> Result<Vec<FileEntry>, String> {
@@ -889,9 +700,12 @@ pub async fn list_project_files(path: String) -> Result<Vec<FileEntry>, String> 
             return Ok(vec![]);
         }
         let mut entries = Vec::new();
-        if let Ok(read_entries) = std::fs::read_dir(dir) {
-            for entry in read_entries.flatten() {
+        {
+            let read_entries = std::fs::read_dir(dir).map_err(|error| format!("Cannot read project directory {}: {error}", dir.display()))?;
+            for entry in read_entries {
+                let entry = entry.map_err(|error| format!("Cannot read project entry in {}: {error}", dir.display()))?;
                 let path = entry.path();
+                if crate::project_workspace::reject_link(&path).is_err() {continue;}
                 let name = path
                     .file_name()
                     .unwrap_or_default()
@@ -947,13 +761,15 @@ pub async fn list_project_files(path: String) -> Result<Vec<FileEntry>, String> 
 }
 
 #[tauri::command]
-pub async fn read_project_file(path: String) -> Result<String, String> {
+pub async fn read_project_file(path: String, project_dir: Option<String>) -> Result<String, String> {
+    let path = crate::project_workspace::scoped_file(project_dir.as_deref(), &path)?;
     std::fs::read_to_string(path).map_err(|e| format!("Failed to read file: {}", e))
 }
 
 #[tauri::command]
-pub async fn write_project_file(path: String, content: String) -> Result<(), String> {
-    let parent=Path::new(&path).parent().ok_or("File parent unavailable.")?;
+pub async fn write_project_file(path: String, content: String, project_dir: Option<String>) -> Result<(), String> {
+    let path = crate::project_workspace::scoped_file(project_dir.as_deref(), &path)?;
+    let parent=path.parent().ok_or("File parent unavailable.")?;
     let _lease=crate::sdk_process::lease(parent,false)?;
     std::fs::write(path, content).map_err(|e| format!("Failed to write file: {}", e))
 }
@@ -1145,11 +961,30 @@ fn reject_link(path: &Path) -> Result<(), String> {
 
 fn checked_program_root(project_root: &Path) -> Result<PathBuf, String> {
     let root = dunce::canonicalize(project_root).map_err(|error| format!("Invalid project directory: {}", error))?;
-    if !root.join("CMakeLists.txt").is_file() || !root.join("main").is_dir() {
-        return Err("Choose an ESP-IDF project containing CMakeLists.txt and main.".into());
+    if (!root.join("CMakeLists.txt").is_file() && !crate::ai::uai_plus::is_project(&root)) || !root.join("main").is_dir() {
+        return Err("Choose an ESP-IDF project or a KidBright uAI Plus Python project containing main.".into());
     }
     reject_link(&root.join("main"))?;
     Ok(root)
+}
+
+#[cfg(test)]
+mod plus_program_tests {
+    use super::*;
+
+    #[test]
+    fn python_helpers_support_sidebar_operations_without_cmake_and_keep_entrypoint() {
+        let base = tempfile::tempdir().unwrap();
+        let root = crate::ai::uai_plus::initialize(base.path(), "plus_sidebar", &serde_json::json!({"project_type":"kidbright_uai_plus"})).unwrap();
+        create_program_file_inner(&root, Path::new("main/helper.py")).unwrap();
+        rename_program_item_inner(&root, Path::new("main/helper.py"), Path::new("main/drawing.py")).unwrap();
+        delete_program_item_inner(&root, Path::new("main/drawing.py")).unwrap();
+        assert!(!root.join("main/drawing.py").exists());
+        assert!(delete_program_item_inner(&root, Path::new("main/main.py")).is_err());
+        assert!(rename_program_item_inner(&root, Path::new("main/main.py"), Path::new("main/other.py")).is_err());
+        assert!(root.join("main/main.py").exists());
+        assert!(!root.join("main/CMakeLists.txt").exists());
+    }
 }
 
 fn has_project_pending_diff(root: &Path, paths: impl IntoIterator<Item = PathBuf>) -> bool {
@@ -1186,6 +1021,9 @@ fn checked_program_item(root: &Path, supplied: &Path, must_exist: bool) -> Resul
     let parent = dunce::canonicalize(parent).map_err(|error| format!("Program parent directory does not exist: {}", error))?;
     let path = parent.join(raw.file_name().ok_or("Missing program filename.")?);
     let relative = path.strip_prefix(root).map_err(|_| "Program path is outside the project.")?.to_path_buf();
+    if must_exist && crate::ai::uai_plus::is_project(root) && relative == Path::new("main/main.py") {
+        return Err("Keep the Python entrypoint main/main.py. Edit its content or add helper modules instead of renaming or deleting it.".into());
+    }
     let source = safe_relative_program_path(&relative)?;
     if source.eq_ignore_ascii_case("CMakeLists.txt") || source.eq_ignore_ascii_case("kb_board.h") {
         return Err("This file is managed by the IDE. Choose a program file.".into());
@@ -1253,7 +1091,7 @@ fn create_program_file_inner(project_root: &Path, supplied: &Path) -> Result<(),
     let root = checked_program_root(project_root)?;
     let (path, relative) = checked_program_item(&root, supplied, false)?;
     if path.exists() { return Err("A file or folder with this name already exists; it was kept.".into()); }
-    let plan = source_list_plan(&root, &[relative], &[])?;
+    let plan = if crate::ai::uai_plus::is_project(&root) { None } else { source_list_plan(&root, &[relative], &[])? };
     apply_program_operation(plan, || std::fs::OpenOptions::new().write(true).create_new(true).open(path).map(drop))
 }
 
@@ -1291,7 +1129,7 @@ fn rename_program_item_inner(project_root: &Path, old_path: &Path, new_path: &Pa
     if new.exists() { return Err("The destination already exists; both items were kept.".into()); }
     let mut sources = Vec::new();
     collect_program_sources(&old, &root, &mut sources)?;
-    let plan = if old.is_file() && !is_program_source(&old) && is_program_source(&new) {
+    let plan = if crate::ai::uai_plus::is_project(&root) { None } else if old.is_file() && !is_program_source(&old) && is_program_source(&new) {
         source_list_plan(&root, &[new_relative], &[])?
     } else if !sources.is_empty() {
         let registered = registered_sources_for_rename(&root)?;
@@ -1308,7 +1146,7 @@ fn delete_program_item_inner(project_root: &Path, supplied: &Path) -> Result<(),
     let (path, relative) = checked_program_item(&root, supplied, true)?;
     let mut sources = Vec::new();
     collect_program_sources(&path, &root, &mut sources)?;
-    let plan = if !sources.is_empty() { source_list_plan(&root, &[], &[relative])? } else { None };
+    let plan = if !crate::ai::uai_plus::is_project(&root) && !sources.is_empty() { source_list_plan(&root, &[], &[relative])? } else { None };
     // The resolved target was verified below canonical root/main above. Rejecting
     // links throughout the tree also protects recursive directory deletion.
     apply_program_operation(plan, || {
@@ -1361,14 +1199,15 @@ fn emit_managed_cmake_changed(app: &AppHandle, root: &Path) {
 }
 
 #[tauri::command]
-pub async fn safe_write_project_file(path: String, content: String) -> Result<(), String> {
-    let _lease=crate::sdk_process::lease(Path::new(&path).parent().ok_or("Missing file parent.")?,false)?;
-    let path_buf = PathBuf::from(&path);
+pub async fn safe_write_project_file(path: String, content: String, project_dir: Option<String>) -> Result<(), String> {
+    let path = crate::project_workspace::scoped_file(project_dir.as_deref(), &path)?;
+    let _lease=crate::sdk_process::lease(path.parent().ok_or("Missing file parent.")?,false)?;
+    let path_buf = path.clone();
     if !path_buf.exists() {
-        return Err(format!("File does not exist: {}", path));
+        return Err(format!("File does not exist: {}", path.display()));
     }
     if !path_buf.is_file() {
-        return Err(format!("Path is not a file: {}", path));
+        return Err(format!("Path is not a file: {}", path.display()));
     }
 
     std::fs::write(path, content).map_err(|e| format!("Failed to write file safely: {}", e))
@@ -1564,8 +1403,11 @@ pub async fn run_shell_command(
         }
     }
     let (actual_idf_path, actual_tools_path) = resolve_idf_paths(&app_handle)?;
-    let (python_bin, python_env_path) = find_idf_python(&actual_tools_path)?;
-    let path_env = build_idf_path(&actual_tools_path);
+    let (python_bin, python_env_path) = environment::validate(&actual_idf_path, &actual_tools_path, std::env::consts::OS, std::env::consts::ARCH)?;
+    let mut sdk_paths = vec![venv_bin_dir(&python_env_path)];
+    sdk_paths.extend(environment::exported_paths(&actual_idf_path, &actual_tools_path, std::env::consts::OS, std::env::consts::ARCH));
+    sdk_paths.extend(std::env::split_paths(&build_idf_path(&actual_tools_path)));
+    let path_env = std::env::join_paths(sdk_paths).map_err(|error| error.to_string())?;
     let idf_version = read_idf_version(&actual_idf_path);
 
     if cmd == "idf.py" {
@@ -1595,6 +1437,8 @@ pub async fn run_shell_command(
         .env("IDF_PATH", &actual_idf_path)
         .env("IDF_TOOLS_PATH", &actual_tools_path)
         .env("IDF_PYTHON_ENV_PATH", &python_env_path)
+        .env("VIRTUAL_ENV", &python_env_path)
+        .env_remove("PYTHONHOME").env_remove("PYTHONPATH")
         .env("ESP_IDF_VERSION", &idf_version)
         .env("PATH", &path_env)
         // Always set IDF_TARGET so cmake never has to guess from sdkconfig
@@ -1622,97 +1466,17 @@ pub async fn pick_directory() -> Result<String, String> {
 }
 
 #[tauri::command]
-pub async fn save_project_as(source_dir: String) -> Result<String, String> {
-    use rfd::FileDialog;
-
-    let source = PathBuf::from(&source_dir);
-    if !source.exists() || !source.is_dir() {
-        return Err(format!(
-            "Source project directory does not exist: {}",
-            source_dir
-        ));
-    }
-
-    // Open folder picker for the destination parent directory
-    let dest_parent = FileDialog::new()
-        .set_title("Save Project As — Choose Destination Folder")
-        .pick_folder()
-        .ok_or("No destination directory selected")?;
-
-    // Use the same project folder name at the destination
-    let project_name = source
-        .file_name()
-        .map(|n| n.to_string_lossy().to_string())
-        .unwrap_or_else(|| "project_copy".to_string());
-
-    let dest = dest_parent.join(&project_name);
-
-    if dest.exists() {
-        return Err(format!(
-            "A folder named '{}' already exists at '{}'. Please choose a different location or rename it first.",
-            project_name,
-            dest_parent.display()
-        ));
-    }
-
-    // Recursively copy the project directory, skipping build artifacts
-    fn copy_dir_recursive(src: &Path, dst: &Path) -> Result<u64, String> {
-        std::fs::create_dir_all(dst)
-            .map_err(|e| format!("Failed to create directory {}: {}", dst.display(), e))?;
-
-        let mut file_count: u64 = 0;
-
-        let entries = std::fs::read_dir(src)
-            .map_err(|e| format!("Failed to read directory {}: {}", src.display(), e))?;
-
-        for entry in entries {
-            let entry = entry.map_err(|e| format!("Failed to read entry: {}", e))?;
-            let src_path = entry.path();
-            let name = src_path
-                .file_name()
-                .unwrap_or_default()
-                .to_string_lossy()
-                .to_string();
-
-            // Skip build artifacts and hidden directories
-            if name == "build"
-                || name == "target"
-                || name == "node_modules"
-                || name == ".git"
-                || name == "__pycache__"
-            {
-                continue;
-            }
-
-            let dst_path = dst.join(&name);
-
-            if src_path.is_dir() {
-                file_count += copy_dir_recursive(&src_path, &dst_path)?;
-            } else {
-                std::fs::copy(&src_path, &dst_path).map_err(|e| {
-                    format!(
-                        "Failed to copy {} -> {}: {}",
-                        src_path.display(),
-                        dst_path.display(),
-                        e
-                    )
-                })?;
-                file_count += 1;
-            }
-        }
-
-        Ok(file_count)
-    }
-
-    let src = source.clone();
-    let dst = dest.clone();
-    let file_count = tokio::task::spawn_blocking(move || copy_dir_recursive(&src, &dst))
-        .await
-        .map_err(|e| format!("Copy task panicked: {}", e))??;
-
-    crate::ai::compatibility::hide_internal_metadata(&dest)
-        .map_err(|error| format!("Project files were copied, but private metadata could not be hidden: {}", error))?;
-    Ok(format!("{}|{}", dest.to_string_lossy(), file_count))
+pub async fn save_project_as(source_dir: String) -> Result<crate::project_workspace::ProjectCopy, String> {
+    let source = PathBuf::from(crate::ai_chat::normalize_project_dir(&source_dir));
+    ensure_project_reviewed(&source)?;
+    let destination = rfd::FileDialog::new()
+        .set_title("Save Project As - Choose Destination Folder")
+        .pick_folder().ok_or("No destination directory selected")?;
+    let result = tokio::task::spawn_blocking(move || {
+        let _lease = crate::sdk_process::lease(&source, false)?;
+        crate::project_workspace::copy_project(&source, &destination)
+    }).await.map_err(|error| error.to_string())??;
+    Ok(result)
 }
 
 struct SerialMonitorState {
@@ -1735,12 +1499,17 @@ fn stop_serial_monitor_internal() {
     }
 }
 
+fn board_serial_port(port: &str, os: &str) -> bool {
+    os != "macos" || (port.starts_with("/dev/cu.") && !port.contains("debug-console") && !port.contains("Bluetooth-Incoming-Port"))
+}
+
 #[tauri::command]
 pub async fn list_serial_ports() -> Result<Vec<String>, String> {
     let ports = serialport::available_ports()
         .map_err(|e| format!("Failed to list serial ports: {}", e))?
         .into_iter()
         .map(|p| p.port_name)
+        .filter(|port| board_serial_port(port, std::env::consts::OS))
         .collect();
     Ok(ports)
 }
@@ -2172,6 +1941,15 @@ mod tests {
         std::fs::create_dir_all(idf.join("tools")).unwrap();std::fs::write(idf.join("tools/idf.py"),"# fixture").unwrap();std::fs::write(idf.join("version.txt"),"v5.5.4\n").unwrap();
         let venv=tools.join("python_env/idf5.5_py3.11_env");let python=super::venv_python_candidates(&venv)[0].clone();
         std::fs::create_dir_all(python.parent().unwrap()).unwrap();std::fs::write(&python,"fixture, never executed").unwrap();
+        #[cfg(target_os = "macos")] {
+            use std::os::unix::fs::PermissionsExt;
+            let cpu: u32 = if cfg!(target_arch = "aarch64") { 0x0100000c } else { 0x01000007 };
+            let mut bytes=vec![0xcf,0xfa,0xed,0xfe];bytes.extend(cpu.to_le_bytes());
+            for path in [&python, &tools.join("tools/native/1/bin/cmake"), &tools.join("tools/native/1/bin/ninja"), &tools.join("tools/native/1/bin/xtensa-esp-elf-gcc")] {
+                std::fs::create_dir_all(path.parent().unwrap()).unwrap(); std::fs::write(path,&bytes).unwrap();
+                std::fs::set_permissions(path,std::fs::Permissions::from_mode(0o755)).unwrap();
+            }
+        }
         let status=super::installed_sdk_status(&idf,&tools).unwrap();assert_eq!(status["status"],"ready");assert_eq!(status["version"],"5.5.4");assert_eq!(status["source"],"configured-sdk");
         assert!(!scratch.path().join(".toolchain_ready").exists());
         std::fs::remove_file(python).unwrap();assert!(super::installed_sdk_status(&idf,&tools).is_err());
@@ -2179,6 +1957,18 @@ mod tests {
     use super::*;
     use std::fs;
     use std::process::Command;
+
+    #[test]
+    fn mac_serial_ports_exclude_system_console_and_duplicate_tty_devices() {
+        for port in ["/dev/cu.debug-console", "/dev/tty.usbserial-123", "/dev/cu.Bluetooth-Incoming-Port"] {
+            assert!(!board_serial_port(port,"macos"));
+        }
+        for port in ["/dev/cu.usbserial-123", "/dev/cu.SLAB_USBtoUART", "/dev/cu.usbmodem123"] {
+            assert!(board_serial_port(port,"macos"));
+        }
+        assert!(board_serial_port("COM7","windows"));
+        assert!(board_serial_port("/dev/ttyUSB0","linux"));
+    }
 
     fn managed_test_project(cmake: &str) -> tempfile::TempDir {
         let directory = tempfile::tempdir().unwrap();
@@ -2421,6 +2211,14 @@ mod tests {
             }
         }
         paths
+    }
+
+    #[tokio::test]
+    async fn project_tree_reports_missing_roots_and_files_instead_of_empty_success() {
+        let root=tempfile::tempdir().unwrap();
+        assert!(list_project_files(root.path().join("missing").to_string_lossy().into_owned()).await.is_err());
+        let file=root.path().join("not_a_directory");fs::write(&file,"user code").unwrap();
+        assert!(list_project_files(file.to_string_lossy().into_owned()).await.is_err());
     }
 
     #[tokio::test]

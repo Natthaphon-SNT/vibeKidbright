@@ -10,7 +10,11 @@ permissions:
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: macos-15
+    timeout-minutes: 90
+    outputs:
+      version: ${{ steps.get_version.outputs.VERSION }}
+      tag: ${{ steps.get_version.outputs.TAG }}
     env:
       NODE_OPTIONS: --max-old-space-size=4096
       HAS_APPLE_CERT: ${{ secrets.APPLE_CERTIFICATE != '' && secrets.APPLE_CERTIFICATE_PASSWORD != '' && secrets.KEYCHAIN_PASSWORD != '' }}
@@ -32,6 +36,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: aarch64-apple-darwin,x86_64-apple-darwin
+          components: clippy
 
       - name: Cache Rust build artifacts
         uses: Swatinem/rust-cache@v2
@@ -41,6 +46,10 @@ jobs:
       - name: Install Frontend Dependencies
         working-directory: main_repo
         run: npm ci
+
+      - name: Test installer verification helpers
+        working-directory: main_repo
+        run: python3 -m unittest discover -s scripts/tests -p 'test_macos_installer.py' -v
 
       - name: Check repository public readiness
         working-directory: main_repo
@@ -102,9 +111,13 @@ jobs:
         run: npm test
 
       # ─── Run Rust Unit Tests ──────────────────────────────────────────────────
-      - name: Run Rust unit tests
+      - name: Run Rust tests (library, binaries and examples on runner host)
         working-directory: main_repo/src-tauri
-        run: cargo test --lib -- --nocapture
+        run: cargo test --all-targets --locked -- --nocapture
+
+      - name: Check Rust targets with Clippy on runner host
+        working-directory: main_repo/src-tauri
+        run: cargo clippy --all-targets --locked
 
       - name: Configure available Apple signing credentials
         env:
@@ -136,11 +149,15 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           projectPath: main_repo
-          args: --target universal-apple-darwin
+          args: --target universal-apple-darwin --bundles dmg -- --locked
 
       # ─── Notarize ไฟล์ DMG (ต้องการ Apple ID secrets) ───────────────────────
       - name: Notarize DMG with Apple Notary Service
         if: ${{ env.HAS_APPLE_CERT == 'true' && env.HAS_APPLE_NOTARY_CREDENTIALS == 'true' }}
+        env:
+          NOTARY_APPLE_ID: ${{ secrets.APPLE_ID }}
+          NOTARY_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+          NOTARY_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
           DMG=$(find main_repo/src-tauri/target/universal-apple-darwin/release/bundle/dmg -name "*.dmg" | head -1)
           if [ -z "$DMG" ]; then
@@ -149,24 +166,143 @@ jobs:
           fi
           echo "📦 Notarizing: $DMG"
           xcrun notarytool submit "$DMG" \
-            --apple-id "${{ secrets.APPLE_ID }}" \
-            --password "${{ secrets.APPLE_ID_PASSWORD }}" \
-            --team-id "${{ secrets.APPLE_TEAM_ID }}" \
+            --apple-id "$NOTARY_APPLE_ID" \
+            --password "$NOTARY_PASSWORD" \
+            --team-id "$NOTARY_TEAM_ID" \
             --wait \
             --timeout 30m
           xcrun stapler staple "$DMG"
+          xcrun stapler validate "$DMG"
           echo "✅ Notarization complete"
 
-      # ─── Release ─────────────────────────────────────────────────────────────
+      - name: Checksum the final installer
+        working-directory: main_repo/src-tauri/target/universal-apple-darwin/release/bundle/dmg
+        env:
+          APP_VERSION: ${{ steps.get_version.outputs.VERSION }}
+        run: |
+          python3 - <<'PY'
+          import hashlib, os
+          from pathlib import Path
+          images = list(Path('.').glob('*.dmg'))
+          if len(images) != 1:
+              raise SystemExit('Expected exactly one final DMG')
+          # GitHub release assets normalize spaces; use the same name everywhere.
+          target = Path(f"VibeKidbright-IDE_{os.environ['APP_VERSION']}_universal.dmg")
+          if images[0] != target:
+              images[0].rename(target)
+          with target.open('rb') as stream:
+              digest = hashlib.file_digest(stream, 'sha256').hexdigest()
+          Path('SHA256SUMS-macos.txt').write_text(f'{digest}  {target.name}\n', encoding='utf-8')
+          PY
+
+      # Make the DMG downloadable even while the GitHub release is still a draft.
+      - name: Upload macOS installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: vibeKidbright-macOS-${{ steps.get_version.outputs.VERSION }}-universal
+          path: |
+            main_repo/src-tauri/target/universal-apple-darwin/release/bundle/dmg/*.dmg
+            main_repo/src-tauri/target/universal-apple-darwin/release/bundle/dmg/SHA256SUMS-macos.txt
+          if-no-files-found: error
+          retention-days: 30
+          compression-level: 0
+
+      - name: Remove temporary Apple signing keychain
+        if: ${{ always() && env.HAS_APPLE_CERT == 'true' }}
+        run: |
+          if [ -f "$RUNNER_TEMP/build.keychain" ]; then
+            security delete-keychain "$RUNNER_TEMP/build.keychain"
+          fi
+          rm -f "$RUNNER_TEMP/cert.p12"
+
+  verify-installation:
+    name: Install and launch (${{ matrix.arch }})
+    needs: build
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-15
+            arch: aarch64
+          - runner: macos-15-intel
+            arch: x86_64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 35
+    steps:
+      - name: Checkout verification scripts
+        uses: actions/checkout@v4
+
+      - name: Download the universal installer
+        uses: actions/download-artifact@v4
+        with:
+          name: vibeKidbright-macOS-${{ needs.build.outputs.version }}-universal
+          path: installer
+
+      - name: Install native ESP-IDF using the in-app macOS setup instructions
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          source = Path('src/MacosSdkSetup.tsx').read_text(encoding='utf-8')
+          commands = re.search(r'export const MACOS_SDK_SETUP = `(.*?)`;', source, re.DOTALL).group(1)
+          Path('macos-sdk-setup.sh').write_text(commands + '\n', encoding='utf-8')
+          PY
+          /bin/bash macos-sdk-setup.sh
+
+      - name: Verify copied installation without developer tools
+        run: >-
+          python3 scripts/test-macos-installer.py
+          --installer-directory installer
+          --report verification/macos-installation-check-${{ matrix.arch }}.json
+          --expected-version '${{ needs.build.outputs.version }}'
+          --expected-arch '${{ matrix.arch }}'
+          --sdk-idf "$HOME/esp/esp-idf-v5.5.1"
+          --sdk-tools "$HOME/.vibekidbright/.espressif"
+
+      - name: Upload installation verification and startup logs
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: macOS-installation-check-${{ matrix.arch }}
+          path: verification/
+          if-no-files-found: error
+          retention-days: 30
+
+  release:
+    needs: [build, verify-installation]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Download verified installer
+        uses: actions/download-artifact@v4
+        with:
+          name: vibeKidbright-macOS-${{ needs.build.outputs.version }}-universal
+          path: installer
+
+      - name: Download installation reports
+        uses: actions/download-artifact@v4
+        with:
+          pattern: macOS-installation-check-*
+          path: verification
+          merge-multiple: true
+
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.get_version.outputs.TAG }}
+          tag_name: ${{ needs.build.outputs.tag }}
           target_commitish: ${{ github.sha }}
-          name: 'vibeKidbright ${{ steps.get_version.outputs.TAG }} (macOS)'
-          body: 'ดาวน์โหลดไฟล์ .dmg ด้านล่างเพื่อติดตั้งบน macOS (รองรับทั้ง Apple Silicon และ Intel)'
+          name: 'vibeKidbright ${{ needs.build.outputs.tag }}'
+          body: |
+            macOS: ดาวน์โหลด Universal .dmg แล้วลาก VibeKidbright IDE ไปไว้ใน Applications (Apple Silicon และ Intel)
+            ตรวจ SHA-256 ด้วย SHA256SUMS-macos.txt; แนบผล self-check และ startup ของทั้งสองสถาปัตยกรรม
+            ถ้ายังไม่ได้ notarize ให้ทำตาม docs/macos-installer-setup.md เพื่ออนุญาตแอปใน Privacy & Security
+          append_body: true
           draft: true
           prerelease: false
           fail_on_unmatched_files: true
           files: |
-            main_repo/src-tauri/target/universal-apple-darwin/release/bundle/dmg/*.dmg
+            installer/*.dmg
+            installer/SHA256SUMS-macos.txt
+            verification/*.json
