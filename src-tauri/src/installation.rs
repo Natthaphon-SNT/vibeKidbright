@@ -7,6 +7,31 @@ pub fn sdk_self_check(idf: &Path, tools: &Path, scratch: &Path) -> Result<Value,
     crate::esp_idf::sdk_build_self_check(idf, tools, scratch)
 }
 
+fn review_restart_probe(data: &Path) -> Result<(), String> {
+    let workspace = data.join("review-probe");
+    std::fs::create_dir(&workspace).map_err(|error| error.to_string())?;
+    let file = workspace.join("main.c");
+    std::fs::write(&file, "original").map_err(|error| error.to_string())?;
+    let journal_path = data.join("installation-review-probe.json");
+    let mut journal = crate::ai::change_journal::Journal::open(journal_path.clone())?;
+    let proposal = journal.propose(&workspace, &file, "installation-probe", "reviewed")?;
+    if std::fs::read_to_string(&file).map_err(|error| error.to_string())? != "original" {
+        return Err("Proposal unexpectedly changed source".into());
+    }
+    drop(journal);
+    let mut journal = crate::ai::change_journal::Journal::open(journal_path.clone())?;
+    // Journal proposals bind the canonical path. On macOS, /var and
+    // /private/var may name the same file but are different journal keys.
+    journal.apply(&[(proposal.path, proposal.revision)])?;
+    drop(journal);
+    let mut journal = crate::ai::change_journal::Journal::open(journal_path)?;
+    journal.undo_message("installation-probe")?;
+    if std::fs::read_to_string(&file).map_err(|error| error.to_string())? != "original" {
+        return Err("Packaged restart/Undo probe failed".into());
+    }
+    Ok(())
+}
+
 pub fn self_check(resources: &Path, data: &Path) -> Result<Value, String> {
     let knowledge = data.join("knowledge_base");
     let copied = crate::ai_chat::copy_bundled_knowledge(&resources.join("knowledge_base"), &knowledge)?;
@@ -39,17 +64,7 @@ pub fn self_check(resources: &Path, data: &Path) -> Result<Value, String> {
     crate::ai::change_journal::initialize(data)?;
     crate::ai::project_review::initialize(data)?;
     crate::ai::repair::initialize(data)?;
-    let workspace=data.join("review-probe");std::fs::create_dir(&workspace).map_err(|e|e.to_string())?;
-    let file=workspace.join("main.c");std::fs::write(&file,"original").map_err(|e|e.to_string())?;
-    let journal_path=data.join("installation-review-probe.json");
-    let mut journal=crate::ai::change_journal::Journal::open(journal_path.clone())?;
-    let proposal=journal.propose(&workspace,&file,"installation-probe","reviewed")?;
-    if std::fs::read_to_string(&file).map_err(|e|e.to_string())?!="original"{return Err("Proposal unexpectedly changed source".into());}
-    drop(journal);
-    let mut journal=crate::ai::change_journal::Journal::open(journal_path.clone())?;
-    journal.apply(&[(file.clone(),proposal.revision)])?;drop(journal);
-    let mut journal=crate::ai::change_journal::Journal::open(journal_path)?;journal.undo_message("installation-probe")?;
-    if std::fs::read_to_string(&file).map_err(|e|e.to_string())?!="original"{return Err("Packaged restart/Undo probe failed".into());}
+    review_restart_probe(data)?;
     let credential_service = format!("vibekidbright-installation-check-{}", std::process::id());
     let credential = keyring::Entry::new(&credential_service, "installation-check").map_err(|error| error.to_string())?;
     credential.set_password("temporary-installation-probe").map_err(|error| format!("Credential store write failed: {error}"))?;
@@ -63,4 +78,23 @@ pub fn self_check(resources: &Path, data: &Path) -> Result<Value, String> {
         "tree_sitter_c":"0.24.2", "lexical_intelligence_search":true,"indexed_chunks":index.chunks,
         "durable_review_restart_and_undo":true,"startup_recovery_journals":true,
         "runtime_downloads_required": false, "toolchain_required_for_self_check": false, "hardware_flashed": false }))
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn copied_installation_review_survives_restart_and_undo() {
+        let data = tempfile::tempdir().unwrap();
+        super::review_restart_probe(data.path()).unwrap();
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn copied_installation_review_accepts_macos_style_directory_alias() {
+        let data = tempfile::tempdir().unwrap();
+        let aliases = tempfile::tempdir().unwrap();
+        let alias = aliases.path().join("user-data");
+        std::os::unix::fs::symlink(data.path(), &alias).unwrap();
+        super::review_restart_probe(&alias).unwrap();
+    }
 }
