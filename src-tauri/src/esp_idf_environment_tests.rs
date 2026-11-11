@@ -172,7 +172,8 @@ fn copied_or_traversing_clean_install_pointer_cannot_select_another_home() {
     let home = temporary.path();
     let root = home.join(".vibekidbright/macos-sdk");
     std::fs::create_dir_all(&root).unwrap();
-    for directory in ["/Users/other/.vibekidbright/macos-sdk/install-old", "install-../../other", "../install-old"] {
+    let copied = temporary.path().join("other-user/.vibekidbright/macos-sdk/install-old").to_string_lossy().into_owned();
+    for directory in [copied.as_str(), "install-../../other", "../install-old"] {
         std::fs::write(root.join("current.json"), serde_json::to_vec(&serde_json::json!({"directory":directory})).unwrap()).unwrap();
         assert!(!mac_candidates(home).iter().any(|(idf,_)| idf.starts_with(&root)));
     }
