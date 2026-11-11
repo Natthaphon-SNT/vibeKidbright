@@ -1,0 +1,111 @@
+{
+  "date": "2026-10-28",
+  "timezone": "Asia/Bangkok",
+  "scope": "Offline routing, driver/adapter contract tests, SDK compilation and regression checks; no physical board I/O or live AI-provider evaluation.",
+  "physical_board_tested": false,
+  "flashed": false,
+  "live_ai_provider_tested": false,
+  "firmware_builds": [
+    {
+      "family": "master",
+      "sdk": "5.5.4",
+      "exit_code": 0,
+      "firmware_created": true,
+      "physical_tested": false,
+      "flashed": false,
+      "log": "master.log",
+      "source_sha256": {
+        "ikb1z.c": "eb0241e7085661e190c0605bd490c3e03d24523d74d0a65506a192ddef7c6765",
+        "ikb1z.h": "efd801e81d828dd31fcc3e8e22c8fe4a963eff8689e7c17a036c1beb5ac2c583",
+        "ikb1z_esp_idf.c": "8c45e58427f63109deb6860422ae0d153bf509a55e17e045c2a77ca39b4174d2",
+        "ikb1z_esp_idf.h": "4fd9ed2644022fff6c6a4e4ef8ae85b0b79320592b172c7a7b2779b8818ce880"
+      }
+    },
+    {
+      "family": "legacy",
+      "sdk": "5.5.4",
+      "exit_code": 0,
+      "firmware_created": true,
+      "physical_tested": false,
+      "flashed": false,
+      "log": "legacy.log",
+      "source_sha256": {
+        "ikb1z.c": "eb0241e7085661e190c0605bd490c3e03d24523d74d0a65506a192ddef7c6765",
+        "ikb1z.h": "efd801e81d828dd31fcc3e8e22c8fe4a963eff8689e7c17a036c1beb5ac2c583",
+        "ikb1z_esp_idf.c": "8c45e58427f63109deb6860422ae0d153bf509a55e17e045c2a77ca39b4174d2",
+        "ikb1z_esp_idf.h": "4fd9ed2644022fff6c6a4e4ef8ae85b0b79320592b172c7a7b2779b8818ce880"
+      }
+    }
+  ],
+  "tests": [
+    {
+      "command": "cargo test --lib --offline",
+      "passed": 259,
+      "failed": 0
+    },
+    {
+      "command": "npm test -- --reporter=dot",
+      "passed": 225,
+      "files": 22,
+      "failed": 0
+    },
+    {
+      "command": "python -m unittest discover -s scripts/tests -p test_*.py",
+      "passed": 89,
+      "skipped": 2,
+      "failed": 0,
+      "skip_note": "Native parity requires IKB1Z_TEST_LIBRARY; both cases separately passed via npm run test:ikb."
+    },
+    {
+      "command": "npm run test:ikb",
+      "python_tests_passed": 12,
+      "skipped": 0,
+      "c_suites_passed": [
+        "portable protocol",
+        "IDF master contract",
+        "IDF legacy contract"
+      ],
+      "failed": 0
+    },
+    {
+      "command": "npm run test:compat",
+      "checks_passed": 490,
+      "failed": 0
+    },
+    {
+      "command": "npm run build",
+      "exit_code": 0
+    }
+  ],
+  "protocol_exhaustive_cases": {
+    "io": 48,
+    "motor": 3015,
+    "servo": 12663,
+    "adc10_words": 65536
+  },
+  "unsupported_actuation": [
+    "UART operations",
+    "servo free",
+    "external M3/M4"
+  ],
+  "source_sha256": {
+    "knowledge_base/drivers/ikb1z.c": "eb0241e7085661e190c0605bd490c3e03d24523d74d0a65506a192ddef7c6765",
+    "knowledge_base/drivers/ikb1z.h": "efd801e81d828dd31fcc3e8e22c8fe4a963eff8689e7c17a036c1beb5ac2c583",
+    "knowledge_base/drivers/ikb1z.py": "64c854f61c9c09f7dc09a9d45a5e0f8e1a0912ea8aa2782b3325fd6c3a4ca4fc",
+    "knowledge_base/drivers/ikb1z_esp_idf.c": "8c45e58427f63109deb6860422ae0d153bf509a55e17e045c2a77ca39b4174d2",
+    "knowledge_base/drivers/ikb1z_esp_idf.h": "4fd9ed2644022fff6c6a4e4ef8ae85b0b79320592b172c7a7b2779b8818ce880",
+    "knowledge_base/drivers/README.md": "7284c0a46d9863ae716c9f7510488e80b20a6d4d6705d2a7a052df338185248b",
+    "src/AiChat.tsx": "5a510f532267413f90d7a1edc32e2aca13ef95b868f1346a54b2afbe55ac1f35",
+    "src-tauri/src/ai/compatibility.rs": "2fae0df71ca5489f19194c20125374f6b0d6046b1d48d1a927d885e265c4f017",
+    "src-tauri/src/ai/expansions.rs": "99cab502847365628a3ac9748bf85db95bd176669ea370100efbbe7458f16820",
+    "src-tauri/src/ai/language.rs": "aeabde6ec220a4d89c3ea1badc61c1eda300f9e8ecd17df864f678460ebc4a14",
+    "src-tauri/src/ai/prompts/classic_esp32.md": "97b3483ff10475e49ba1d486d2df4f2428a12a641240477eeb29009f240d0e1b",
+    "src-tauri/src/ai/prompts/ikb_1z.md": "fad1c85ce8a41bb033fcb7a7c146f4ea6faa6503234fbc49b8d059e8c59a3908",
+    "src-tauri/src/ai/prompts/mai_plus.md": "644a63d96a019d7171c60d6a28e535bf4835855d2c7c4c982a9171daaac62e01",
+    "src-tauri/src/ai/prompts.rs": "56c83d67820fd6530765ea94194c847f94403b16ca620b5551973ab308fc231a",
+    "src-tauri/src/ai/providers.rs": "2e64d44dcc49c9c6c506c4c864c0a7ef437d0610101cb49457edd266fb0e8d37",
+    "src-tauri/src/ai/system_prompt.txt": "e8ec532b2d5cc0f516ed5636b231ebcd01363193e0abfa958f80d5b55fc5ce0b",
+    "src-tauri/src/ai/tools.rs": "6f33326a2c31c000616ce55190dfa96159e9df7366b6090f9ff8f4a7883a67a6",
+    "src-tauri/src/ai_chat.rs": "02ce7ba3daba4e6599689102106599bfd1cd5225978c80848fb9bfacb69edf34"
+  }
+}

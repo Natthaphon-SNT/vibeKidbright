@@ -10,11 +10,11 @@
 
 พัฒนาด้วย **Tauri v2, React 19, TypeScript และ Rust** รวมตัวแก้ไขโค้ด Vibe Coder, Wiki, ฐานความรู้ภายในเครื่อง และเครื่องมือ Build & Flash ไว้ในโปรแกรมเดียว เป้าหมายคือรองรับ KidBright32 หลายรุ่น และต่อยอดไปยัง KidBright μAI / μAI Plus หลังงาน KidBright32 สมบูรณ์
 
-**สถานะ ณ 18 ตุลาคม 2026:** เหมาะสำหรับตรวจทานและทดสอบแบบ Draft/Beta ยังไม่รับรองว่าแทน KidBright IDE ต้นฉบับได้ครบทุกบอร์ด ทุกบล็อก หรือทุกฟังก์ชัน ตัวติดตั้ง Windows x64 ที่สร้างและตรวจล่าสุดคือ **3.7.3** ตรวจไฟล์ภายในและรัน binary ด้วย AppData ใหม่โดยตัด path เครื่องพัฒนาแล้ว ยังไม่ได้ทดสอบ GUI บน clean VM ดู [ผลตรวจชุดติดตั้ง](docs/ai-engineering/installer-validation-3.7.3.json)
+**สถานะ ณ 21 ตุลาคม 2026:** เหมาะสำหรับตรวจทานและทดสอบแบบ Draft/Beta ยังไม่รับรองว่าแทน KidBright IDE ต้นฉบับได้ครบทุกบอร์ด ทุกบล็อก หรือทุกฟังก์ชัน รุ่น **3.7.4** แก้การติดตั้ง toolchain บน Windows ที่ล้มเหลวเมื่อ path ยาวเกิน 260 ตัวอักษร ดู [รายละเอียดรุ่น 3.7.4](docs/releases/3.7.4.md) ผลตรวจไฟล์ภายในและการรันด้วย AppData ใหม่ของรุ่น 3.7.3 เป็น [หลักฐานย้อนหลัง](docs/ai-engineering/installer-validation-3.7.3.json) ยังไม่ได้ทดสอบ GUI บน clean VM
 
-อัปเดต 18 ตุลาคม 2026: จัดเวอร์ชัน Tauri, npm, Cargo และ lockfile ให้ตรงกันที่ **3.7.3** แล้ว ผลทดสอบตัวติดตั้ง 3.7.2 เป็นหลักฐานย้อนหลัง ดูผลสร้างและตรวจรุ่นใหม่ใน [verification.json](docs/ai-engineering/verification.json)
+อัปเดต 21 ตุลาคม 2026: จัดเวอร์ชัน Tauri, npm, Cargo และ lockfile ให้ตรงกันที่ **3.7.4** พร้อมแก้ path ยาวของไฟล์ชั่วคราว ตั้งค่า Python หลังย้าย toolchain ไปโฟลเดอร์ปลายทาง และแสดงข้อความผิดพลาดเต็มในหน้าติดตั้ง
 
-ซอร์สที่พัฒนาต่อจาก NSIS 3.7.3 มี optional clangd สำหรับค้นหา definition/references ด้วย compile_commands ของ ESP-IDF และข้อความที่ยังไม่ Save, Block-to-C เพิ่มเป็น 9 ID และ tests ด้านการกู้คืน/ข้อมูลแทรกคำสั่ง งานใหม่นี้ **ยังไม่อยู่ใน installer เดิม** และยังไม่ publish ดู [รายงานรอบพัฒนาล่าสุด](docs/ai-engineering/14-continuation-report.md) โมเดลค้นหาเริ่มต้นยังเป็นตัวเดิม
+รุ่น 3.7.4 รวมซอร์สที่พัฒนาต่อจาก NSIS 3.7.3 ซึ่งมี optional clangd สำหรับค้นหา definition/references ด้วย compile_commands ของ ESP-IDF และข้อความที่ยังไม่ Save, Block-to-C เพิ่มเป็น 9 ID และ tests ด้านการกู้คืน/ข้อมูลแทรกคำสั่ง ดู [รายงานรอบพัฒนาก่อนหน้า](docs/ai-engineering/14-continuation-report.md) โมเดลค้นหาเริ่มต้นยังเป็นตัวเดิม รุ่น 3.7.4 ยังไม่ได้ publish
 
 ## ความสามารถปัจจุบัน
 
@@ -37,7 +37,7 @@
 | `kidbright32_v13` | มีโปรไฟล์และตัวอย่าง `button_buzzer`, `temperature_serial`, `music_scale`, `matrix_counter` ผ่านการ build ตามหลักฐาน ยังไม่มีผลเทียบ peripheral กับ IDE ต้นฉบับบนบอร์ดจริงครบ |
 | `kidbright32_rev31` | มีโปรไฟล์และตัวอย่างเสียง/อุณหภูมิ/เพลง ยังไม่เปิด `matrix_counter` เพราะหลักฐาน revision และขาจอยังต้องยืนยัน |
 | KidBright32 รุ่นอื่น รวม iA / iP | มีตารางเปรียบเทียบและข้อมูลอ้างอิง รวม 16 รายการใน catalog ไม่ใช่ 16 บอร์ดที่ใช้งานได้ครบ ผู้ใช้รายงาน Hello/Heartbeat บน iA ผ่านแล้ว แต่ยังไม่ยืนยันจอ ปุ่ม เสียง และเซนเซอร์ |
-| KidBright μAI / μAI Plus | มีหน้าพื้นที่เรียนรู้แบบ preview สำหรับจัดตัวอย่างและป้ายกำกับ ดูความพร้อมข้อมูลและตัวอย่างโค้ด ยังฝึกโมเดลหรือ deploy ลงบอร์ดจากแอปไม่ได้ งานเชื่อมต่อจริงอยู่ในแผนอนาคต |
+| KidBright uAI Plus SG2002 | Development: Vibe Coder creates reviewed MaixPy 4 Python projects with display/camera samples; user-operated USB RNDIS Connect / Run / Stop. Local tests do not certify physical output or training. Original uAI V831 remains separate. |
 | ESP32-S2 / S3 / C3 / C6 | ยังไม่มีเส้นทางเลือก target และ Build & Flash ที่รองรับครบใน UI |
 | Blockly / Simulator | มีข้อมูลต้นแบบและ inventory บล็อก ยังไม่มีตัวนำเข้า/แปลงโปรเจกต์ Blockly หรือ simulator ที่ทำงานเทียบเท่าต้นฉบับครบ |
 
@@ -45,7 +45,9 @@
 
 ## ติดตั้งและเริ่มใช้งาน
 
-ชุดติดตั้ง Windows x64 ที่สร้างล่าสุดชื่อ `VibeKidbright IDE_3.7.3_x64-setup.exe` สามารถคัดลอกผ่าน USB หรือช่องทางแจกจ่ายของโรงเรียนไปทดสอบติดตั้งได้ ผู้ใช้ปลายทางไม่ต้อง clone repository หรือติดต่อเครื่องผู้พัฒนา รุ่นนี้ยังไม่ได้ publish
+ชุดติดตั้ง Windows x64 รุ่น 3.7.4 ชื่อ `VibeKidbright IDE_3.7.4_x64-setup.exe` สามารถคัดลอกผ่าน USB หรือช่องทางแจกจ่ายของโรงเรียนไปทดสอบติดตั้งได้ ผู้ใช้ปลายทางไม่ต้อง clone repository หรือติดต่อเครื่องผู้พัฒนา รุ่นนี้ยังไม่ได้ publish
+
+สำหรับ **macOS (Apple Silicon และ Intel)** มีเส้นทางสร้าง Universal `.dmg` พร้อม checksum และตรวจการติดตั้งบน runner ทั้งสองสถาปัตยกรรม ดาวน์โหลดจาก Actions artifact หลัง installation jobs ผ่าน หรือจาก Release เมื่อผู้ดูแล publish แล้ว ดู [คู่มือติดตั้ง macOS และตั้งค่า ESP-IDF](docs/macos-installer-setup.md) บนเครื่อง Mac ของผู้พัฒนาสร้างได้ด้วย `npm run build:macos` การแก้ไขรอบนี้ยังต้องรัน workflow บน macOS ก่อนยืนยัน DMG ของซอร์สล่าสุด
 
 1. เปิดไฟล์ติดตั้ง แล้วเปิด vibeKidbright จาก shortcut
 2. ใช้ตัวแก้ไขโค้ด อ่าน Wiki หรือทดลองพื้นที่เรียนรู้ได้ทันที
@@ -65,7 +67,7 @@
 
 Settings และฐานข้อมูลใช้ AppData ของผู้ใช้ บน Windows อยู่ใต้ `%APPDATA%\th.nectec.vibekidbright` ไม่รวมโปรเจกต์ บทสนทนา หรือ API key ของเครื่องพัฒนาไว้ในตัวติดตั้ง
 
-ดู [คู่มือติดตั้งบนเครื่องอื่น](docs/STANDALONE_INSTALLATION_2026-10-17.md) ตัวติดตั้งล่าสุดยังไม่ได้ทดสอบติดตั้ง/ถอนการติดตั้งบน clean VM หรือเครื่องผู้ใช้ใหม่จริง ส่วน macOS มี workflow สำหรับ Universal build แต่ยังไม่มีผลทดสอบรุ่นล่าสุดในรอบนี้
+ดู [คู่มือติดตั้งบนเครื่องอื่น](docs/STANDALONE_INSTALLATION_2026-10-17.md) ตัวติดตั้งล่าสุดยังไม่ได้ทดสอบติดตั้ง/ถอนการติดตั้งบน clean VM หรือเครื่องผู้ใช้ใหม่จริง ส่วน macOS มี Universal build และ installation checks บน Apple Silicon/Intel ใน workflow แต่ยังไม่มีผลรันของการแก้ไขล่าสุดในรอบนี้
 
 ตรวจรุ่นที่เผยแพร่ได้ที่ [GitHub Releases](https://github.com/Natthaphon-SNT/vibeKidbright/releases) การสร้างไฟล์ติดตั้งสำเร็จในเครื่องพัฒนาไม่ได้หมายความว่ารุ่นนั้นเผยแพร่แล้ว
 

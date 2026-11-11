@@ -3,6 +3,10 @@
 use std::path::Path;
 use serde_json::{json, Value};
 
+pub fn sdk_self_check(idf: &Path, tools: &Path, scratch: &Path) -> Result<Value, String> {
+    crate::esp_idf::sdk_build_self_check(idf, tools, scratch)
+}
+
 pub fn self_check(resources: &Path, data: &Path) -> Result<Value, String> {
     let knowledge = data.join("knowledge_base");
     let copied = crate::ai_chat::copy_bundled_knowledge(&resources.join("knowledge_base"), &knowledge)?;

@@ -4,8 +4,9 @@
  * Run: npm test
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
+import { listen } from "@tauri-apps/api/event";
 import type { EditorProps, OnMount } from "@monaco-editor/react";
 import CodeEditor from "../CodeEditor";
 
@@ -33,6 +34,61 @@ vi.mock("@monaco-editor/react", () => ({
 describe("CodeEditor diff flow", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        vi.mocked(listen).mockReset().mockResolvedValue(() => {});
+    });
+
+    afterEach(() => vi.restoreAllMocks());
+
+    it("ignores a diff event for the same basename in another project", async () => {
+        invokeMock.mockResolvedValue(null);
+        render(<CodeEditor value="# current" onChange={() => {}} filePath="/current/main/main.py" />);
+        await waitFor(() => expect(listen).toHaveBeenCalledWith("ai-diff-pending", expect.any(Function)));
+        const before=invokeMock.mock.calls.length;
+        await act(async () => {
+            const handler=vi.mocked(listen).mock.calls.find(([name])=>name==="ai-diff-pending")![1];
+            handler({event:"ai-diff-pending",id:1,payload:JSON.stringify({fullPath:"/other/main/main.py"})});
+        });
+        expect(invokeMock.mock.calls.length).toBe(before);
+        expect(screen.getByTestId("mock-editor")).toHaveAttribute("data-value","# current");
+    });
+
+    it("gives same-named files in different projects separate Monaco model identities", async () => {
+        invokeMock.mockResolvedValue(null);
+        const { rerender } = render(<CodeEditor value="# MP-021" onChange={() => {}} filePath={"D:\\projects\\mai_test_021\\main\\main.py"} />);
+        await screen.findByTestId("mock-editor");
+        expect(editorPropsMock.mock.calls[editorPropsMock.mock.calls.length - 1]?.[0].path).toBe("D:/projects/mai_test_021/main/main.py");
+        rerender(<CodeEditor value="# MP-022" onChange={() => {}} filePath={"D:\\projects\\mai_test_022\\main\\main.py"} />);
+        await waitFor(() => expect(editorPropsMock.mock.calls[editorPropsMock.mock.calls.length - 1]?.[0].path).toBe("D:/projects/mai_test_022/main/main.py"));
+        expect(screen.getByTestId("mock-editor")).toHaveAttribute("data-value", "# MP-022");
+    });
+
+    it("preserves the latest review when an earlier diff request fails", async () => {
+        const errSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+        let rejectInitial!: (reason?: unknown) => void;
+        invokeMock.mockImplementationOnce(() => new Promise((_resolve, reject) => {
+            rejectInitial = reject;
+        })).mockResolvedValue({ revision: "r2", before: "old", proposed: "latest patch", status: "pending" });
+        const path = "/proj/main/main.c";
+        render(<CodeEditor value="old" onChange={() => {}} filePath={path} />);
+        await waitFor(() => expect(listen).toHaveBeenCalledWith("ai-diff-pending", expect.any(Function)));
+        await act(async () => {
+            vi.mocked(listen).mock.calls[0][1]({ event: "ai-diff-pending", id: 1, payload: { fullPath: path } });
+        });
+        await screen.findByText("latest patch");
+        await act(async () => rejectInitial(new Error("stale request failed")));
+        expect(screen.getByText("latest patch")).toBeInTheDocument();
+        expect(screen.getByText("Review AI Changes")).toBeInTheDocument();
+        expect(errSpy).not.toHaveBeenCalled();
+    });
+
+    it("handles a failed diff event subscription without discarding the initial review", async () => {
+        const errSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+        vi.mocked(listen).mockRejectedValueOnce(new Error("event subscription unavailable"));
+        invokeMock.mockResolvedValue({ revision: "r1", before: "old", proposed: "pending patch", status: "pending" });
+        render(<CodeEditor value="old" onChange={() => {}} filePath="/proj/main/main.c" />);
+        await screen.findByText("pending patch");
+        await waitFor(() => expect(errSpy).toHaveBeenCalledWith("Failed to listen for pending AI changes:", expect.any(Error)));
+        expect(screen.getByText("Review AI Changes")).toBeInTheDocument();
     });
 
     it("shows the Review AI Changes banner when a pending diff exists", async () => {

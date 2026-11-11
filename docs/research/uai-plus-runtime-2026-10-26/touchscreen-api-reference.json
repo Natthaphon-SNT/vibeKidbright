@@ -1,0 +1,18 @@
+{
+  "date": "2026-10-26",
+  "source": "Read-only inspection of the user-supplied kidbright-mAi-plus-2026-05-02-v4.12.5B1.img",
+  "path": "/usr/lib/python3.11/site-packages/maix/_maix/touchscreen.pyi",
+  "bytes": 1288,
+  "sha256": "df4b18db74f1a8ccdaccf21e3da89fabe98fa00c2701462a20c65dcf800c72da",
+  "module": "maix.touchscreen",
+  "class": "TouchScreen",
+  "constructor": "TouchScreen(device: str = '', open: bool = True)",
+  "methods": {
+    "read": "Returns a list containing x, y and pressed state",
+    "available": "timeout=0: nonblocking event availability",
+    "is_opened": "Whether the touchscreen device is open",
+    "close": "Release the touchscreen device"
+  },
+  "public_documentation": "https://wiki.sipeed.com/maixpy/doc/en/vision/touchscreen.html",
+  "physical_touch_validation": "Not yet confirmed; the prior Run/Stop pass did not exercise touchscreen input"
+}

@@ -34,7 +34,7 @@ fn dependency_proposal(root:&Path,component:&str)->Result<(PathBuf,String),Strin
 
 /// File tools accept paths relative to their workspace, including not-yet-created files.
 /// Resolve the nearest existing ancestor so links cannot redirect access outside it.
-fn workspace_file_path(root: &Path, relative: &str) -> Result<PathBuf, String> {
+pub(crate) fn workspace_file_path(root: &Path, relative: &str) -> Result<PathBuf, String> {
     let relative = Path::new(relative);
     if relative.components().any(|part| !matches!(part, Component::Normal(_) | Component::CurDir)) {
         return Err("File tool paths must stay relative to the selected workspace.".into());
@@ -124,20 +124,26 @@ fn private_context_guard(name: &str, allowed: bool) -> Option<Value> {
 }
 
 /// Initialize a fresh directory without overwriting an existing project.
-fn initialize_project_workspace(base_dir: &Path, project_name: &str) -> Result<PathBuf, String> {
+pub(crate) fn initialize_project_workspace(base_dir: &Path, project_name: &str) -> Result<PathBuf, String> {
+    initialize_workspace_files(base_dir, project_name, &starter_files(project_name))
+}
+
+pub(crate) fn initialize_workspace_files(base_dir: &Path, project_name: &str, files: &[(String, String)]) -> Result<PathBuf, String> {
     if project_name.is_empty()
         || !project_name.chars().all(|c| c.is_ascii_alphanumeric() || c == '_' || c == '-')
     {
         return Err("Invalid project_name. Use only ASCII letters, digits, underscores or hyphens.".to_string());
     }
+    let base_dir = dunce::canonicalize(base_dir).map_err(|error| format!("Cannot resolve the selected project parent: {error}"))?;
     let new_proj_path = base_dir.join(project_name);
     std::fs::create_dir(&new_proj_path).map_err(|e| {
         format!("Cannot create new project '{}': {}. Choose a different name or base directory; do not write the new project into the previous workspace.", new_proj_path.display(), e)
     })?;
     let result = (|| -> std::io::Result<()> {
-        std::fs::create_dir(new_proj_path.join("main"))?;
-        for (relative, content) in starter_files(project_name) {
-            std::fs::write(new_proj_path.join(relative), content)?;
+        for (relative, content) in files {
+            let path = new_proj_path.join(relative);
+            std::fs::create_dir_all(path.parent().unwrap())?;
+            std::fs::write(path, content)?;
         }
         Ok(())
     })();
@@ -155,7 +161,14 @@ pub(crate) async fn execute_tool(
     no_workspace: &mut bool,
     private_context_allowed: bool,
 ) -> Value {
+    #[cfg(debug_assertions)]
+    if super::config::evaluation_isolated() {
+        return json!({"error":"Isolated pilot tools require the native public-provenance route; production tool dispatch is blocked."});
+    }
     if let Some(result) = private_context_guard(name, private_context_allowed) { return result; }
+    if super::uai_plus::is_project(project_path) && matches!(name, "esp_idf_info" | "install_idf_library" | "compiler_diagnostics" | "kidbright_block_to_c" | "run_command") {
+        return json!({"error":"This is a KidBright uAI Plus MaixPy Python project. Use main/main.py and kidbright_uai_plus_python.md; classic ESP-IDF, C compiler repair and idf.py tools do not apply. Board Run/Stop is user-operated in the UI."});
+    }
     if *no_workspace && matches!(name, "write_file" | "run_command" | "read_file" | "list_files" | "get_file_tree" | "search_in_files" | "project_search" | "diff_file") {
         return json!({
             "error": "BLOCKED: No project workspace is open. You MUST call 'create_project_workspace' FIRST."
@@ -185,6 +198,7 @@ pub(crate) async fn execute_tool(
             }
         }
         "kidbright_reference" => crate::ai::compatibility::reference(input),
+        "uai_plus_test_reference" => super::uai_plus::test_reference(input),
         // ── read_file ──────────────────────────────────────────────────────────
         "read_file" => {
             let rel_path = input["path"].as_str().unwrap_or("");
@@ -193,7 +207,7 @@ pub(crate) async fn execute_tool(
                 Err(error) => return json!({ "error": error }),
             };
             match std::fs::read_to_string(&full_path) {
-                Ok(c) => json!({ "result": c }),
+                Ok(c) => super::context::file_page(&c,input,rel_path),
                 Err(e) => json!({ "error": format!("Error reading file: {}", e) }),
             }
         }
@@ -224,7 +238,7 @@ pub(crate) async fn execute_tool(
             // Plan registration before touching a new source. Preserve dependencies
             // already proposed by this turn; accepting the CMake diff remains a
             // separate reviewed action rather than a silent configuration write.
-            let source_plan = if !full_path.exists() && relative.starts_with("main") {
+            let source_plan = if !super::uai_plus::is_project(project_path) && !full_path.exists() && relative.starts_with("main") {
                 let cmake = project_path.join("main/CMakeLists.txt");
                 let canonical = dunce::canonicalize(&cmake).unwrap_or(cmake);
                 let pending_map = match super::change_journal::with(|journal|Ok(journal.pending_map())) {
@@ -258,7 +272,7 @@ pub(crate) async fn execute_tool(
                 let _=app_handle.emit("ai-diff-pending",json!({"fullPath":change.path,"relPath":change.path.strip_prefix(&change.root).unwrap_or(&change.path),"revision":change.revision}).to_string());
             }
             if let Err(error)=super::project_review::emit_pending(app_handle,project_path) {return json!({"error":error});}
-            json!({"result":"Changes saved for review, including new files and any CMake update. No source was written. The user must Keep each current revision or Keep the project before building."})
+            json!({"result":"Changes saved for review, including new files and any required configuration update. No source was written. The user must Keep each current revision or Keep the project before building or running on the board."})
         }
         // ── list_files ─────────────────────────────────────────────────────────
         "list_files" => {
@@ -363,7 +377,7 @@ pub(crate) async fn execute_tool(
                 Err(error) => return json!({ "error": error }),
             };
             match std::fs::read_to_string(&full_path) {
-                Ok(content) if private_context_allowed || super::privacy::bundled_source(file_name,content.as_bytes()) => json!({ "result": content }),
+                Ok(content) if private_context_allowed || super::privacy::bundled_source(file_name,content.as_bytes()) => super::context::file_page(&content,input,file_name),
                 Ok(_) => json!({"error":super::privacy::REQUIRED}),
                 Err(e) => json!({ 
                     "error": format!("Cannot read '{}' from knowledge_base: {}", file_name, e) 
@@ -374,20 +388,29 @@ pub(crate) async fn execute_tool(
         // ── create_project_workspace ───────────────────────────────────────────
         "create_project_workspace" => {
             let project_name = input["project_name"].as_str().unwrap_or("my_esp_project");
-            let reference_files = match crate::ai::compatibility::requested_files(input) {
+            let plus = match super::uai_plus::requested(input) {
+                Ok(plus) => plus, Err(error) => return json!({"error":error}),
+            };
+            let mut reference_files = match crate::ai::compatibility::requested_files(input) {
                 Ok(files) => files,
                 Err(error) => return json!({ "error": error }),
             };
             // Preserve the generated text in memory. Never export a later disk
             // read: it might include a user's concurrent edits or private paths.
-            let generated_files = if reference_files.is_empty() {
-                Some(starter_files(project_name).into_iter().map(|(path, text)| (path, json!(text))).collect::<serde_json::Map<String, Value>>())
+            let mut initial_files = if plus { match super::uai_plus::files(input) {
+                Ok(files) => files, Err(error) => return json!({"error":error}),
+            }} else { starter_files(project_name) };
+            if let Err(error) = super::expansions::add(input, plus, &mut initial_files, &mut reference_files) {
+                return json!({"error":error});
+            }
+            let generated_files = if reference_files.is_empty() || input.get("expansion_boards").is_some() {
+                Some(initial_files.iter().chain(reference_files.iter()).filter(|(path,_)| !crate::ai::compatibility::is_internal_project_file(Path::new(path))).cloned().map(|(path, text)| (path, json!(text))).collect::<serde_json::Map<String, Value>>())
             } else { None };
             if let Some(picked_dir) = rfd::FileDialog::new()
                 .set_title("Select a Base Directory for Your New Project")
                 .pick_folder()
             {
-                let new_proj_path = match initialize_project_workspace(&picked_dir, project_name) {
+                let new_proj_path = match initialize_workspace_files(&picked_dir, project_name, &initial_files) {
                     Ok(path) => path,
                     Err(error) => return json!({ "error": error }),
                 };
@@ -403,6 +426,7 @@ pub(crate) async fn execute_tool(
                     return json!({ "error": format!("Could not finish private project metadata: {}. Workspace was not switched.", error) });
                 }
                 let previous = if *no_workspace { None } else { Some(project_path.clone()) };
+                let source_project = previous.as_ref().map(|path|path.to_string_lossy().into_owned()).unwrap_or_else(||".".into());
                 let review = match crate::ai::project_review::register_created_project(&new_proj_path, previous, message_id) {
                     Ok(review) => review,
                     Err(error) => return json!({ "error": format!("Could not register project review: {}. Workspace was not switched. Do not write into the previous workspace.", error) }),
@@ -410,16 +434,20 @@ pub(crate) async fn execute_tool(
                 // Switch only after the files and their Undo snapshot are ready.
                 *project_path = new_proj_path.clone();
                 *no_workspace = false;
-                let _ = app_handle.emit("force-project-dir", new_proj_path.to_string_lossy().to_string());
+                let _ = app_handle.emit("force-project-dir", json!({"projectPath":new_proj_path.to_string_lossy(),"sourceProjectPath":source_project,"action":"create"}).to_string());
                 let _ = app_handle.emit("ai-project-review-pending", serde_json::to_string(&review).unwrap());
                 let reported_workspace=if private_context_allowed{new_proj_path.to_string_lossy().into_owned()}else{".".into()};
                 json!({
                     "result": format!(
-                        "Created project workspace for review: {}. Reference files (when selected) and boilerplate are ready. For initial custom proposals use the literal generated_files returned here; reference recipes are available via kidbright_reference. These are creation-time contents, not a read of current private files. Preserve the confirmed board and timing. The user must choose Keep or Undo in the project review card. Do not run commands, build or flash while this review is pending.",
+                        "Created project workspace for review: {}. The generated_files below are the creation-time contents, not a read of current private files. Finish the entire requested draft now BEFORE asking for Keep; write_file proposals are allowed during creation review and Keep applies them together. Keep is not permission to begin implementing the request. Preserve the confirmed board and timing. Do not run commands, build or flash while this review is pending.",
                         reported_workspace
                     ),
+                    "project_type": if plus {super::uai_plus::PROJECT_TYPE} else {"esp_idf"},
+                    "expansion_boards": input.get("expansion_boards").cloned().unwrap_or_else(||json!([])),
+                    "entrypoint": if plus {"main/main.py"} else {"main/main.c"},
                     "workspace_path": reported_workspace,
                     "generated_files": generated_files,
+                    "plus_test_reference": if plus && input.get("test_id").is_some() {super::uai_plus::test_reference(input)} else {Value::Null},
                     "review_pending": true
                 })
             } else {

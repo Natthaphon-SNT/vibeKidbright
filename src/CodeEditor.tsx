@@ -2,8 +2,10 @@ import { useRef, useEffect, useCallback } from "react";
 import Editor, { OnMount, BeforeMount } from "@monaco-editor/react";
 import type { editor } from "monaco-editor";
 import type * as MonacoNS from "monaco-editor";
+import { listen } from "@tauri-apps/api/event";
 import { lintCCode, isCFamilyFile } from "./syntaxLinter";
 import type { ParsedBuildError } from "./errorHints";
+import { normPath } from "./utils";
 
 // ── Language detection from file extension ──────────────────────────────────
 function getLanguageFromPath(filePath: string): string {
@@ -321,10 +323,11 @@ export default function CodeEditor({
         if (!model) return;
 
         // Only show build errors that belong to the currently-open file
-        const normCurrent = filePath.replace(/\\/g, "/").toLowerCase();
+        const normCurrent = normPath(filePath);
         const relevantErrors = buildErrors.filter((err) => {
             if (!err.file || !err.line) return false;
-            const normErr = err.file.replace(/\\/g, "/").toLowerCase();
+            const normErr = normPath(err.file);
+            if (/^(?:[a-z]:\/|\/)/i.test(normErr)) return normCurrent === normErr;
             // Match by full path, tail of path, or just basename
             return (
                 normCurrent.endsWith(normErr) ||
@@ -369,9 +372,10 @@ export default function CodeEditor({
                     setPendingContent(res?.proposed ?? null);
                 })
                 .catch(err => {
+                    if (!isMounted || current !== request) return;
                     console.error("Failed to check pending diff:", err);
                     toast("Could not check for pending AI changes.", "error");
-                    if (isMounted) setPendingContent(null);
+                    setPendingContent(null);
                 });
         };
         refreshDiffRef.current = checkDiff;
@@ -380,34 +384,28 @@ export default function CodeEditor({
 
         let unlisten: (() => void) | null = null;
         
-        import("@tauri-apps/api/event").then(({ listen }) => {
+        void listen("ai-diff-pending", (event) => {
             if (!isMounted) return;
-            listen("ai-diff-pending", (event) => {
-                if (!isMounted) return;
-                try {
-                    const data = typeof event.payload === 'string' ? JSON.parse(event.payload) : event.payload as any;
-                    const eventPath = String(data.fullPath || "");
-                    const currentPath = String(filePath || "");
-                    
-                    if (eventPath && currentPath) {
-                        const normalize = (p: string) => p.replace(/\\/g, '/').toLowerCase().replace(/\/+/g, '/');
-                        const normEvent = normalize(eventPath);
-                        const normCurrent = normalize(currentPath);
-                        // Also match by last 2 path segments (e.g. "main/main.c")
-                        const tailSegments = (p: string) => p.split('/').slice(-2).join('/');
-                        if (normEvent === normCurrent || 
-                            normCurrent.endsWith(normEvent) ||
-                            normEvent.endsWith(normCurrent) ||
-                            tailSegments(normEvent) === tailSegments(normCurrent)) {
-                            checkDiff();
-                        }
+            try {
+                const data = typeof event.payload === 'string' ? JSON.parse(event.payload) : event.payload as any;
+                const eventPath = String(data.fullPath || "");
+                const currentPath = String(filePath || "");
+
+                if (eventPath && currentPath) {
+                    if (normPath(eventPath) === normPath(currentPath)) {
+                        checkDiff();
                     }
-                } catch (e) {
-                    console.error("Error handling ai-diff-pending:", e);
-                }            }).then(fn => {
-                if (!isMounted) fn();
-                else unlisten = fn;
-            });
+                }
+            } catch (e) {
+                console.error("Error handling ai-diff-pending:", e);
+            }
+        }).then(fn => {
+            if (!isMounted) fn();
+            else unlisten = fn;
+        }).catch(err => {
+            if (!isMounted) return;
+            console.error("Failed to listen for pending AI changes:", err);
+            toast("Could not subscribe to AI changes. Reopen the file to refresh its review.", "error");
         });
 
         return () => { 
@@ -549,6 +547,7 @@ export default function CodeEditor({
             ) : (
                 <Editor
                     height="100%"
+                    path={filePath.replace(/\\/g, "/")}
                     language={language}
                     value={value}
                     theme={monacoTheme}

@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "recorded_date": "2026-10-26",
+  "source": "User-pasted device log and explicit user confirmation in the conversation",
+  "board": "KidBright mAi Plus",
+  "transport": "USB RNDIS / WebSocket",
+  "runtime_info": {
+    "schema": 1,
+    "python": "3.11.6",
+    "maixpy": "4.12.5",
+    "runtime": "1.24.0",
+    "api_checked": true,
+    "missing_apis": []
+  },
+  "run_id": "1792985291124572100",
+  "program": "main.py",
+  "timeline": [
+    { "local_time": "10:28:09", "event": "Connected over USB RNDIS / WebSocket" },
+    { "local_time": "10:28:11", "event": "Python uploaded; execution requested" },
+    { "event": "Released launcher_daemon PID 296, then launcher PID 297" },
+    { "event": "Detected installed versions, imported native MaixPy and passed required API checks" },
+    { "event": "Started main.py; multimedia initialized and display channel started" },
+    { "local_time": "10:28:34", "event": "Stop requested for the owned Python process" },
+    { "event": "Multimedia driver and communication protocol released; Launcher processes restored" },
+    { "local_time": "10:28:39", "event": "Python exit status received", "exit_code": 0 }
+  ],
+  "user_confirmation": {
+    "quote": "ได้แล้ว พอ stop ก็กลับไปหน้าเดิมให้ แจ๋วสุดๆ พร้อมทำต่อละ",
+    "run_works": true,
+    "stop_returns_display_to_original_board_menu": true
+  },
+  "scope": {
+    "successful_cycles": 1,
+    "directly_observed_by_agent": false,
+    "repeated_run_after_stop_confirmed": false,
+    "newer_installed_versions_tested": false,
+    "installer_or_binary_identity_verified": false,
+    "duplicate_exit_markers_are_one_run": true
+  }
+}

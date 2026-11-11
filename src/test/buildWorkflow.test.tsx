@@ -60,7 +60,7 @@ describe("Build and flash from the learner editor", () => {
       if (command === "list_project_files") return [{ name: "main", path: `${projectDir}\\main`, is_dir: true, children: [
         { name: "main.c", path: mainFile, is_dir: false },
       ] }];
-      if (command === "validate_idf_project") return true;
+      if (command === "get_project_kind") return "esp_idf";
       if (command === "check_toolchain") return { status: "ready", version: "test" };
       if (command === "get_idf_custom_paths") return { idf_path: "C:\\Toolchains & SDKs\\ESP IDF", tools_path: "C:\\SDK tools" };
       if (command === "list_serial_ports") return ["COM7", "COM8"];
@@ -79,7 +79,7 @@ describe("Build and flash from the learner editor", () => {
     await waitFor(() => expect(invokeMock).toHaveBeenCalledWith("run_idf_command", {
       command: "-p", args: ["COM8", "build", "flash"], projectDir,
     }));
-    expect(invokeMock).toHaveBeenCalledWith("write_project_file", { path: mainFile, content: "latest program" });
+    expect(invokeMock).toHaveBeenCalledWith("write_project_file", { path: mainFile, content: "latest program", projectDir });
     const commands = invokeMock.mock.calls.map(([command]) => command);
     expect(commands.indexOf("write_project_file")).toBeLessThan(commands.indexOf("run_idf_command"));
     expect(commands).not.toContain("run_shell_command");
@@ -120,7 +120,7 @@ describe("Build and flash from the learner editor", () => {
       fireEvent.keyDown(window, { key: "B", ctrlKey: true, shiftKey: true });
       fireEvent.keyDown(window, { key: "b", ctrlKey: true, shiftKey: true });
     });
-    expect(invokeMock.mock.calls.filter(([command]) => command === "write_project_file")).toHaveLength(1);
+    await waitFor(() => expect(invokeMock.mock.calls.filter(([command]) => command === "write_project_file")).toHaveLength(1));
     expect(invokeMock).not.toHaveBeenCalledWith("run_idf_command", expect.anything());
     expect(screen.getByRole("button", { name: "Building..." })).toBeDisabled();
     await act(async () => { save.resolve(); });
@@ -140,7 +140,7 @@ describe("Build and flash from the learner editor", () => {
     fireEvent.click(build);
     await waitFor(() => expect(invokeMock).toHaveBeenCalledWith("run_idf_command", expect.anything()));
     expect(invokeMock.mock.calls.filter(([command]) => command === "write_project_file")).toEqual([
-      ["write_project_file", { path: mainFile, content: "latest program" }],
+      ["write_project_file", { path: mainFile, content: "latest program", projectDir }],
     ]);
   });
 
@@ -153,7 +153,7 @@ describe("Build and flash from the learner editor", () => {
     fireEvent.click(build);
     fireEvent.change(editor, { target: { value: "newer edit during save" } });
     await act(async () => { save.resolve(); });
-    expect(invokeMock).toHaveBeenCalledWith("write_project_file", { path: mainFile, content: "program at build click" });
+    expect(invokeMock).toHaveBeenCalledWith("write_project_file", { path: mainFile, content: "program at build click", projectDir });
     expect(screen.getByTestId("unsaved-program-state")).toHaveTextContent("true");
     expect(editor).toHaveValue("newer edit during save");
   });
@@ -186,6 +186,41 @@ describe("Build and flash from the learner editor", () => {
     expect(invokeMock).not.toHaveBeenCalledWith("cancel_sdk_command",expect.anything());
   });
 
+  it("does not launch a stale build after changing projects and returning during Save",async()=>{
+    const save=deferred();const original=invokeMock.getMockImplementation()!;
+    invokeMock.mockImplementation((command:string,args:unknown)=>command==="write_project_file"?save.promise:original(command,args));
+    const build=await readyApp();await editMain();fireEvent.click(build);
+    await waitFor(()=>expect(invokeMock).toHaveBeenCalledWith("write_project_file",expect.anything()));
+    await act(async()=>{await handlers.get("force-project-dir")?.({payload:"D:/projects/other"});});
+    await act(async()=>{await handlers.get("force-project-dir")?.({payload:projectDir});});
+    await act(async()=>save.resolve());
+    expect(invokeMock).not.toHaveBeenCalledWith("run_idf_command",expect.anything());
+    expect((await screen.findAllByText(/Project changed while preparing/)).length).toBeGreaterThan(0);
+  });
+
+  it("keeps compiler errors from an active old build out of the newly selected project", async () => {
+    const run = deferred(); const original = invokeMock.getMockImplementation()!;
+    invokeMock.mockImplementation((command: string, args: unknown) => command === "run_idf_command" ? run.promise : original(command, args));
+    fireEvent.click(await readyApp());
+    await waitFor(() => expect(invokeMock).toHaveBeenCalledWith("run_idf_command", expect.anything()));
+    await act(async () => { await handlers.get("force-project-dir")?.({ payload: "D:/projects/other" }); });
+    await act(async () => { await handlers.get("terminal-output")?.({ payload: "main/main.c:7:3: error: old project compilation failure" }); });
+    await act(async () => { await handlers.get("terminal-output")?.({ payload: "ninja failed with exit code 1" }); });
+    expect(screen.queryByText(/Ask Vibe Coder to Fix/)).not.toBeInTheDocument();
+    await act(async () => run.resolve());
+  });
+
+  it("opens a relative compiler source path with the current project's full file identity", async () => {
+    const original = invokeMock.getMockImplementation()!;
+    invokeMock.mockImplementation((command: string, args: unknown) => command === "run_idf_command" ? Promise.reject(new Error("compiler failed")) : original(command, args));
+    fireEvent.click(await readyApp());
+    await screen.findByText(/Build stopped:.*compiler failed/);
+    await act(async () => { await handlers.get("terminal-output")?.({ payload: "main/main.c:7:3: error: sample error" }); });
+    fireEvent.click(await screen.findByTitle("Click to jump to this line"));
+    await waitFor(() => expect(invokeMock).toHaveBeenCalledWith("read_project_file", { path: `${projectDir}/main/main.c`, projectDir }));
+    expect(invokeMock).not.toHaveBeenCalledWith("read_project_file", { path: "main/main.c", projectDir });
+  });
+
   it("preserves a backend Keep requirement without retrying through a shell", async () => {
     const original = invokeMock.getMockImplementation()!;
     invokeMock.mockImplementation((command: string, args: unknown) => command === "run_idf_command"
@@ -196,16 +231,20 @@ describe("Build and flash from the learner editor", () => {
     expect(invokeMock).not.toHaveBeenCalledWith("run_shell_command", expect.anything());
   });
 
-  it("keeps μAI deployment unavailable in both the button and shortcut", async () => {
+  it("offers Plus Python controls without routing the shortcut to ESP-IDF or ADB", async () => {
     localStorage.setItem("vibe-selected-board", "miuaiplus");
-    const build = await readyApp();
-    expect(build).toBeDisabled();
-    expect(build).toHaveAttribute("title", MIUAI_DEPLOYMENT_UNAVAILABLE);
-    expect(MIUAI_DEPLOYMENT_UNAVAILABLE).toContain("after KidBright support is complete");
+    render(<App />);
+    await screen.findByRole("button", { name: "main.c" });
+    fireEvent.click(screen.getByRole("button", { name: "\u0e40\u0e02\u0e35\u0e22\u0e19\u0e42\u0e1b\u0e23\u0e41\u0e01\u0e23\u0e21" }));
+    expect(await screen.findByRole("button", { name: "Connect Plus" })).toBeEnabled();
+    expect(screen.queryByRole("button", { name: /Build & Flash/ })).not.toBeInTheDocument();
     fireEvent.keyDown(window, { key: "b", ctrlKey: true, shiftKey: true });
-    expect(invokeMock).not.toHaveBeenCalledWith("run_idf_command", expect.anything());
-    expect(invokeMock).not.toHaveBeenCalledWith("run_shell_command", expect.anything());
+    expect(MIUAI_DEPLOYMENT_UNAVAILABLE).toContain("Run Python");
+    for (const name of ["run_idf_command", "run_shell_command", "list_adb_devices", "start_adb_monitor", "probe_uai_plus", "run_uai_plus_project"]) {
+      expect(invokeMock.mock.calls.some(([command]) => command === name)).toBe(false);
+    }
   });
+
 
   it("routes typed idf.py commands through backend argv without an export.bat shell string", async () => {
     await readyApp();

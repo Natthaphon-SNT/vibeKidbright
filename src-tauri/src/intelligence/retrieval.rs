@@ -320,7 +320,7 @@ impl Engine {
             if metadata.title.is_empty() {
                 metadata.title = name.clone();
             }
-            if !declarations.contains_key(name) && (name.ends_with(".c") || name.ends_with(".h")) {
+            if !declarations.contains_key(name) && (name.ends_with(".c") || name.ends_with(".h") || name.ends_with(".py")) {
                 metadata.category = "code".into();
             }
             let public_source = !self.project_scope && crate::ai::privacy::bundled_source(name, &bytes);
@@ -707,7 +707,7 @@ fn discover(
         } else if kind.is_file()
             && (matches!(
                 path.extension().and_then(|s| s.to_str()),
-                Some("md" | "txt" | "c" | "h" | "cmake")
+                Some("md" | "txt" | "c" | "h" | "py" | "cmake")
             ) || name == "CMakeLists.txt")
         {
             out.push((
@@ -743,6 +743,18 @@ mod tests {
     }
     fn search(engine: &Engine, q: &str) -> Vec<SearchHit> {
         engine.search(q, None, &SearchFilter::default()).unwrap()
+    }
+    #[test]
+    fn bundled_python_expansion_is_discovered_and_retrieved_without_private_consent() {
+        let root = tempfile::tempdir().unwrap();
+        std::fs::create_dir(root.path().join("drivers")).unwrap();
+        std::fs::write(root.path().join("drivers/ikb1z.py"), include_bytes!("../../../knowledge_base/drivers/ikb1z.py")).unwrap();
+        assert!(crate::ai::kb::collect_kb_files(root.path()).iter().any(|(_,name)|name=="drivers/ikb1z.py"));
+        let engine=Engine::open(root.path(),lexical()).unwrap();
+        assert_eq!(index(&engine,root.path()).files_updated,1);
+        let hits=engine.search("MaixI2CTransport",None,&SearchFilter{bundled_only:true,include_unknown:true,..Default::default()}).unwrap();
+        assert!(!hits.is_empty());
+        assert!(hits.iter().all(|hit|hit.file=="drivers/ikb1z.py"));
     }
     #[test]
     fn exact_api_is_not_a_like_wildcard_and_thai_substring_is_searchable() {

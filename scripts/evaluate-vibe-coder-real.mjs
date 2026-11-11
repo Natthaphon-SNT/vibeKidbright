@@ -14,7 +14,7 @@ const flagOptions=new Set(['--run','--preflight','--authorize-local-inference'])
 const options=new Map();
 for(let i=0;i<args.length;i++) {
     const name=args[i];
-    if(!valueOptions.has(name)&&!flagOptions.has(name))throw new Error(`Unknown evaluation option: ${name}. No provider request budget is implemented; do not assume an unsupported limit is enforced.`);
+    if(!valueOptions.has(name)&&!flagOptions.has(name))throw new Error(`Unknown evaluation option: ${name}. Actual-run prerequisites cannot be relaxed by CLI budget flags.`);
     if(options.has(name))throw new Error(`Duplicate evaluation option: ${name}`);
     if(flagOptions.has(name)){options.set(name,true);continue;}
     const value=args[++i];
@@ -47,10 +47,10 @@ if(run) {
     const target=await realpath(resolve(root,'src-tauri/target'));
     if(!resolvedParent.startsWith(target+sep)&&resolvedParent!==target)throw new Error('Raw model evidence must stay under ignored src-tauri/target');
     // A UI-turn count cannot enforce the user's HTTP/retry or USD ceiling.
-    // Until the isolated native transport has verified accounting and a cost
-    // bound, fail before CDP, /models, settings writes or inference. There is
-    // deliberately no CLI/environment bypass for this incomplete safeguard.
-    throw new Error('Inference blocked: native HTTP-request/retry and USD budget enforcement is not implemented. No desktop connection or model discovery was attempted. Endpoint/model authorization alone cannot enforce these limits.');
+    // Native reservation/provenance/capture has synthetic regression coverage.
+    // There is still no verified actual-provider cost proof or authorized target.
+    // Keep --run closed before CDP, metadata, settings or credentials; no bypass.
+    throw new Error('Inference blocked: native pilot safeguards require a verified provider/model cost bound and explicitly authorized target. No desktop connection or model discovery was attempted. Synthetic pricing cannot authorize an actual run.');
 }
 
 async function connectIsolated() {
@@ -123,9 +123,9 @@ try {
     }else if(!run) {
         report.reason='Prepared only. Run requires explicitly authorized loopback model and isolated desktop. No capability level is certified by preparation.';
     }else {
-        const response=await fetch(new URL(endpoint.replace(/\/$/,'')+'/models'),{redirect:'error',signal:AbortSignal.timeout(3000)});
-        const available=await response.json();
-        if(!response.ok||!available.data?.some(item=>item.id===model))throw new Error('Selected local model is not available');
+        // Metadata is a metered native attempt too. This unreachable legacy
+        // collection branch must not regain a direct provider fetch when enabled.
+        throw new Error('Actual collection remains disabled until a verified native session is provisioned, including metadata discovery.');
         const project=await page.evaluate(()=>localStorage.getItem('vibe-project-dir'));
         const allowed=await Promise.all(['repeat_delay','forever_delay'].map(async name=>{
             const path=resolve(root,'src-tauri/target/block-c-evaluation-20261018',name);

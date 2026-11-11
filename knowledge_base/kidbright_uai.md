@@ -1,6 +1,22 @@
 # KidBright uAI และ KidBright uAI Plus
 
-> **สถานะ: เอกสารอ้างอิงสำหรับอนาคต** ผู้ใช้กำหนดให้ทำ KidBright แบบ ESP32 ให้สมบูรณ์ก่อน แล้วจึงพัฒนา μAI/Plus ไม่มีการเปิด Build & Flash หรือเพิ่ม runtime/deployment ในรอบนี้
+> Current scope update (2026-10-27): Plus SG2002 Python project generation is
+> now active by explicit user request. Read `kidbright_uai_plus_python.md` for
+> actual MaixPy 4 display/camera/touch and ADC0 button APIs, latest English training slide evidence,
+> and project creation. Older deferred-phase statements below describe the
+> previous research phase; they do not prohibit current Plus coding. Original
+> V831 and physical validation remain separate.
+
+For confirmed **mAi Plus / μAI Plus SG2002 MP-021 (ADC0, S1, S2)** read
+`kidbright_uai_plus_python.md`, section "ADC0, S1 and S2". The Plus button source
+uses `from maix import adc`, `adc.ADC(0, adc.RES_BIT_12)` and `read()` for these
+buttons; `python_example="adc_buttons"` supplies the complete measurement test.
+Do not treat the variant-identification rules below as absence of this API.
+Measure released/S1/S2 bands before choosing thresholds; never import the
+generator's old fixed thresholds as calibration for the user's board.
+
+
+> **Historical research scope:** The old classic-first deferral below is superseded for Plus Python projects by the current update above. ESP-IDF Build & Flash still does not apply to Plus.
 >
 > ปรับข้อมูล 17 ตุลาคม 2026: **μAI รุ่น Allwinner V831** จากข้อมูล/ภาพผู้ใช้ เทียบ [ผลิตภัณฑ์ INEX](https://inex.co.th/home/product/kidbright-%CE%BCai/) และ [คู่มือแนะนำ](https://inex.co.th/store/manual/KBmAI_Leaflet240518-opt.pdf); **Plus รุ่น SG2002** จากไฟล์/ภาพใหม่ของผู้ใช้ เทียบ [INEX Plus](https://inex.co.th/home/product/kidbright-microai-plus/) และ static source ของ [μAI IDE](https://kidbright-mai.web.app/) คำแนะนำ training จากคู่มือเดิมยังต้องเทียบเวอร์ชันก่อนใช้
 

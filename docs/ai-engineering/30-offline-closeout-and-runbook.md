@@ -1,4 +1,96 @@
-# ปิดงานเตรียม offline และรายการรันทดสอบภายหลัง — 2026-10-19
+# ปิดงานเตรียม offline และรายการรันทดสอบภายหลัง — อัปเดต 2026-10-21
+
+## Native safeguards รอบ 21 ตุลาคม 2026
+
+รอบนี้ implement แล้ว ไม่ใช่การสร้าง preparation/evaluation drafts ซ้ำ:
+`src-tauri/src/ai/pilot.rs` และ `ai/pilot/tests.rs` เพิ่ม native session ledger,
+transport boundary, public provenance และ serialized-request capture แยกจาก production
+provider policy; isolated `send_ai_message` เชื่อมเข้า native pilot route ก่อนอ่าน config/keys
+ส่วน production OpenAI/Google/Wiki/tools ถูกกันไม่ให้ใช้เป็นทางอ้อมใน isolated evaluation
+
+- เพดาน 10 attempts ใช้ mutex transaction เดียวทั้ง session: metadata, inference,
+  tool loop, retries, case/turn และ HTTP connections จองและ fsync ก่อนเรียก transport
+  error/timeout/usage=0 ไม่คืนสิทธิ์หรือ budget; attempt 11 ถูกบล็อกก่อนส่ง
+- HTTP client ของ pilot ปิด redirects, automatic retries และ proxy inheritance
+  redirect response ใช้หนึ่งสิทธิ์แล้วหยุด ไม่ส่งต่อไป Location หรือปลายทางที่มี URL keys
+- ledger หาย ถูกแก้ หรือตัด suffix ทำให้ session หยุด การ restart/recovery ถูกปฏิเสธ
+  เพราะ hash chain บนดิสก์อย่างเดียวพิสูจน์ไม่ได้ว่าไม่ถูก truncate ห้ามเริ่มจากศูนย์
+  authorization ID/ที่เก็บซ้ำถูกปฏิเสธใน process; ยังไม่มี cross-process reauthorization
+- fixture ต้องตรง deterministic generator `repeat_delay`/`forever_delay` และ canonical root;
+  KB ใช้ pinned bundled-source manifest ตรวจ bytes/revision ก่อนส่งทุกครั้ง
+  ไม่อ่าน AppData KB หรือ SDK source ของผู้ใช้ ไม่มีการเปลี่ยน MiniLM/ranking
+- หลัง serialize ตรวจ byte-for-byte กับ request ที่ประกอบจาก authorized case prompts,
+  native-verified public tool fragments และ response ที่ session นี้ได้รับจริง
+  private/unprovenanced history, traversal, symlinks/junctions และปลอม tool result ถูกปฏิเสธ
+  การสแกนข้อความเป็นเพียงส่วนเสริม ไม่รับรองว่าค้นหา secrets ได้ครบด้วย regex
+- capture ผูก session/case/turn/attempt, compiled source revision, payload SHA256,
+  redacted serialized request, reservation และ transport outcome ลง ledger
+  `reserved_before_send` ไม่ใช่หลักฐานว่า server ได้รับแล้ว หาก crash จะถือว่าสิทธิ์ใช้ไป
+  `blocked_before_send` แยกชัดจาก `transport_attempted`/HTTP response
+- ไม่เก็บ Authorization headers, endpoints/URL keys หรือ credentials ใน evidence
+  response เก็บ SHA256/จำนวน bytes/status และ numeric usage ที่มีจริง โดยตัด untrusted
+  response text/keys ทั้งหมดออก จึงไม่อ้างว่าเป็น transcript ที่ใช้ตัดสินคุณภาพคำตอบได้
+
+### Cost gate และสิ่งที่ยังปิดอยู่
+
+Synthetic pricing fixtures ใช้ integer nano-USD และ reserve upper bound ก่อนส่ง
+ครอบคลุม input upper bound, output limit, metadata และ other charges ทดสอบ overflow,
+missing bounds และ no-refund แล้ว **ไม่ใช่ราคาของ provider จริง** ไม่ถือ localhost ฟรี
+ไม่มี verified-provider pricing authority/constructor ที่รับคำยืนยันจาก CLI/environment
+หรือ JSON ว่าเป็นหลักฐานจริง ดังนั้น actual preflight ยังคงปฏิเสธ actual run ทุกครั้ง
+ก่อน credentials/metadata/inference ไม่อ้างว่ารับประกัน 1 USD กับ provider ใดได้แล้ว
+
+Native route/state เป็นของ isolated debug IPC ไม่มีคำสั่ง IPC หรือ env ที่ติดตั้ง
+synthetic grant ให้เป็น actual authority และไม่มี actual session provisioner ที่เปิดใช้อยู่
+read-only public file tool loop เป็นเส้นทางที่ทดสอบในรอบนี้ การต่อ retrieval results
+และ reviewed mutation/repair stages เข้ากับ provenance ของ live pilot ยังต้องยืนยัน
+เมื่อมี concrete provider/model, verified bounds และ revision approvals จริง
+ไม่ใช้ source edits หรือการอนุมัติครั้งใหม่เป็นข้ออ้างรีเซ็ต session budget
+
+ผลรันจริงและ hash แยกไว้ใน [native safeguards verification](native-pilot-safeguards-verification-20261021.json)
+กับ [รายการเปลี่ยนแปลงรอบนี้](native-pilot-safeguards-changes-20261021.json)
+ผลเหล่านี้เป็น mechanical safeguards เท่านั้น ไม่ใช่ actual-model/AI-quality evidence
+ไม่สร้าง installer, ไม่ Flash, ไม่ commit/push/publish/deploy และไม่เปิด `--run`
+
+ผลปัจจุบัน: native safeguards 17 tests ผ่าน; Rust library 218 tests, Python 25 tests,
+Node 12 tests และ native library/examples check ผ่าน มีการตรวจ harness อีก 9 tests
+หลังปรับข้อความ gate รอบ capture ที่ผ่านสุดท้ายใช้ fake transport 38 calls กับ
+owned loopback HTTP 1 request; รวมรอบพัฒนา/ทดสอบทั้งหมด 228 fake calls กับ
+owned loopback HTTP 7 requests ไม่ใช่ provider requests ซึ่งยัง **0**
+ledger ตัวอย่างที่เก็บอยู่ใน ignored target มีป้าย synthetic ทุก record
+ไม่มีการสร้าง actual-model output, evaluation draft ใหม่ หรือ independent judgments
+
+### ตรวจซ้ำเฉพาะส่วนที่เกี่ยวข้อง
+
+คำสั่งนี้ไม่ถาม API ไม่อ่าน credential store และไม่ติดต่อ provider จริง
+Rust tests มี fake transport กับ loopback HTTP server ที่ tests เปิดและปิดเอง
+ให้แยก counts ของ fake calls/local test HTTP ออกจาก provider requests ซึ่งยังเป็นศูนย์
+ผลของการรันเดิมไม่ใช่ผลอัตโนมัติของการคัดลอกคำสั่งนี้
+
+```powershell
+cargo test --manifest-path src-tauri/Cargo.toml --lib ai::pilot::tests --offline --locked -- --nocapture
+python -X utf8 -m unittest discover -s scripts/tests -v
+node --test scripts/tests/*.test.mjs
+cargo check --manifest-path src-tauri/Cargo.toml --lib --examples --offline --locked
+npm run check:standalone
+npm run check:public
+npm run check:rules
+git -c core.whitespace=cr-at-eol diff --check
+```
+
+AI-quality ทั้ง 16 เกณฑ์ยัง **NOT_EXECUTED**, independent judgments **null**,
+release **NOT_READY**, ข้อกำหนดเดิมทั้งแปด **PARTIAL** การผ่าน synthetic tests
+ไม่เปิดสิทธิ์ให้รัน actual model หรือรับรอง live tool/mutation workflow
+
+## ประวัติ offline closeout วันที่ 19 ตุลาคม 2026
+
+ส่วนด้านล่างเป็นบันทึกรอบก่อนหน้า คำว่า “รอบนี้/ปัจจุบัน” ในส่วนประวัติหมายถึง
+19 ตุลาคม ไม่ใช่ผลตรวจ native safeguards รอบ 21 ตุลาคม ห้ามรัน preparation/draft
+ซ้ำเพื่อทดแทน implementation หรือใช้ manifest เก่าเป็นหลักฐานว่า dirty tree ปัจจุบันตรงกัน
+ก่อนเริ่มรอบ 21 ตุลาคม `verification.json` มี 330 hashes และไม่ตรงกับ source 15 ไฟล์
+ซึ่งถูกบันทึกเป็น starting-state mismatches โดยไม่แก้ประวัติให้ดูว่าผ่าน
+ไฟล์ installer 3.7.3 ที่มีอยู่ก็ไม่ตรง historical SHA256 เดิมตั้งแต่ก่อนรอบนี้
+รอบนี้รักษา bytes ที่พบ ไม่ได้สร้างคืนหรือรับรอง baseline เก่านั้นใหม่
 
 ผู้ใช้ยืนยันว่ายังไม่มี endpoint/model และ credentials สำหรับรอบนี้ ให้ทำส่วน
 offline และไม่ถาม API ซ้ำ จึงไม่มีการ probe, inference, เปิด credential store,

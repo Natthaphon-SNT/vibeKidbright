@@ -1,0 +1,1084 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-27",
+  "board": "kidbright_uai_plus",
+  "kit": "IPST MicroBOX 4.0",
+  "total": 64,
+  "hardware_present": "User confirmed the kit inventory; exact model markings, wiring and runtime backend still need their per-case checks.",
+  "live_model_generation_tested": false,
+  "physical_tested": false,
+  "tests": [
+    {
+      "id": "SA-001",
+      "project": "mai_sa_001",
+      "category": "เตรียมชุดและเส้นทาง I2C",
+      "title": "ทะเบียนอุปกรณ์และผังไฟ",
+      "equipment": "mAi Plus + IPST MicroBOX 4.0",
+      "pdf_pages": [
+        59,
+        60,
+        73,
+        74
+      ],
+      "depends_on": [],
+      "task": "จัดหน้า inventory ของอุปกรณ์จริงที่ผู้ใช้มีแล้ว อ่านรุ่น iKB-1/iKB-1Z, ZX-Sonar/SONAR1M และข้อความบนชิปอุณหภูมิจากข้อมูลผู้ทดสอบ จัดผัง S/V/G และแหล่งจ่ายก่อนเปิดโหลด แยกบอร์ด IPST-WiFi ซึ่งเป็นอุปกรณ์เสริม ไม่เปลี่ยนเป้าหมายหลักจาก mAi Plus ไม่อนุมานว่ามอเตอร์ 2 Output หมายถึงมีมอเตอร์สองตัว",
+      "expected": "ได้ CONFIG และผังต่อสายที่ไม่มีพอร์ตหรือแหล่งจ่ายชนกัน; ยังไม่ขับโหลด",
+      "gate": "PLANNING",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-002",
+      "project": "mai_sa_002",
+      "category": "เตรียมชุดและเส้นทาง I2C",
+      "title": "สำรวจ runtime และ external I2C",
+      "equipment": "mAi Plus + iKB-1",
+      "pdf_pages": [
+        65,
+        72,
+        73
+      ],
+      "depends_on": [
+        "SA-001"
+      ],
+      "task": "อ่าน metadata, i2c.list_devices และ /dev/i2c-* พร้อม pinmap แบบไม่เปลี่ยนค่า หาหลักฐานว่า bus ใดออก connector ที่ต่อ iKB จริง bus 5/A28/A29 เป็นเพียงค่าจากซอร์ส Plus ถ้า node ไม่มีให้รายงาน NEEDS_BACKEND พร้อมรายการที่ตรวจ ไม่ import iKB1 ที่รัน insmod เอง ไม่ scan บัสกล้อง/IMU",
+      "expected": "รู้ bus/backend ที่มีจริง หรือทราบจุดตั้งค่าที่ขาดโดยไม่ตีความว่าบอร์ดเสีย",
+      "gate": "DISCOVERY",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-003",
+      "project": "mai_sa_003",
+      "category": "เตรียมชุดและเส้นทาง I2C",
+      "title": "อ่าน ADC0 ของ iKB เพื่อยืนยันเส้นทาง",
+      "equipment": "iKB-1 + ZX-POTV ช่อง 0",
+      "pdf_pages": [
+        72,
+        73,
+        76
+      ],
+      "depends_on": [
+        "SA-002"
+      ],
+      "task": "สร้าง ikb_adapter.py แบบไม่มี side effect ตอน import รับ bus/address ชัดเจน เลือก address 0x48 หรือ 0x49 ตาม jumper และหลักฐานรุ่น ต่อเฉพาะ iKB กับ ZX-POTV อ่าน ADC ช่อง 0 สิบรอบตาม contract ก่อนเปิดโหลด ตรวจ write count, None, short read, ช่วง 10-bit และเวลาแต่ละ transaction อย่าอ้างว่า address 0x48 เพียงอย่างเดียวพิสูจน์ว่าเป็น iKB",
+      "expected": "ค่าตามการหมุนจริงพร้อม raw/เวลา หรือ error ที่ระบุ operation ไม่ใช้ข้อมูลจำลอง",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-004",
+      "project": "mai_sa_004",
+      "category": "เตรียมชุดและเส้นทาง I2C",
+      "title": "หน้า START/STOP และ dry-run",
+      "equipment": "mAi Plus + จอทัช",
+      "pdf_pages": [
+        60,
+        79
+      ],
+      "depends_on": [
+        "SA-001"
+      ],
+      "task": "สร้างหน้าตรวจสายและ START/STOP โดยแสดงคำสั่งที่จะส่งใน DRY_RUN=True; ARMED=False เป็นค่าเริ่มต้น ใช้ touchscreen.TouchScreen/read ตาม API จริง กดค้างไม่ส่ง START ซ้ำ ยังไม่สร้าง Motor/Servo ที่ constructor อาจสั่งงาน แสดงว่าหยุดโปรแกรมไม่ได้เท่ากับตัดไฟโหลดภายนอก",
+      "expected": "สถานะ idle/armed/stop ชัดเจน; dry-run ไม่มี I2C write สั่ง actuator",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-005",
+      "project": "mai_sa_005",
+      "category": "Accelerometer",
+      "title": "ค่าดิบ accelerometer และ gyro",
+      "equipment": "IMU บน mAi Plus",
+      "pdf_pages": [
+        61,
+        62,
+        63,
+        64
+      ],
+      "depends_on": [
+        "SA-002"
+      ],
+      "task": "สร้าง IMU ที่ยืนยันเป็น QMI8658 ครั้งเดียว อ่านชุดข้อมูลหนึ่งครั้งต่อรอบ ตรวจ len ก่อนแยก acc/gyro หกแกน ใช้หน่วยตาม driver ไม่คูณสิบหรือ index อุณหภูมิ [6] จากตัวอย่างเดิม แสดง raw และ error แยกกัน",
+      "expected": "ค่าปรับตามการเคลื่อนไหวจริง; ไม่อ้างว่าข้อมูลอุณหภูมิเป็น ambient",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-006",
+      "project": "mai_sa_006",
+      "category": "Accelerometer",
+      "title": "หกท่าวางบอร์ด",
+      "equipment": "IMU บน mAi Plus",
+      "pdf_pages": [
+        61,
+        62,
+        63,
+        64
+      ],
+      "depends_on": [
+        "SA-005"
+      ],
+      "task": "ให้ผู้ทดสอบวางหงาย คว่ำ ซ้าย ขวา หน้า หลัง เก็บ min/max/median ท่าละสามวินาที ระบุทิศแกนตามข้อมูลก่อน remap ไม่เขียน calibration ถาวร",
+      "expected": "มีข้อมูลหกท่าและทิศแรงโน้มถ่วงสอดคล้อง",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-007",
+      "project": "mai_sa_007",
+      "category": "Accelerometer",
+      "title": "ลูกบอลและ low-pass filter",
+      "equipment": "IMU + จอ mAi Plus",
+      "pdf_pages": [
+        63,
+        64
+      ],
+      "depends_on": [
+        "SA-006"
+      ],
+      "task": "แสดงลูกบอล raw เทียบ filtered ปรับ alpha ได้ จำกัดพิกัดตามจอจริง วัดเวลารอบและแสดงข้อมูล stale เมื่ออ่านผิด ไม่ให้การอ่านล้มกลายเป็น acc=0 ปกติ",
+      "expected": "ทิศลูกบอลตรงกับการเอียงและกลับนิ่งเมื่อวาง",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-008",
+      "project": "mai_sa_008",
+      "category": "ZX-Switch01",
+      "title": "วัด polarity ของสวิตช์",
+      "equipment": "ZX-Switch01 ที่ iKB ช่อง 1",
+      "pdf_pages": [
+        66,
+        67
+      ],
+      "depends_on": [
+        "SA-003"
+      ],
+      "task": "อ่าน digital ช่อง 1 เก็บช่วงปล่อย/กด/ปล่อยอย่างละสามวินาที แสดง raw และให้ยืนยัน physical state ก่อนกำหนด active level ห้ามถือว่า 1=กดเพราะหน้า 67 กล่าวเช่นนั้น; บาง ZX-Switch01 เป็น active-low",
+      "expected": "ได้ระดับกด/ปล่อยจากอุปกรณ์จริง หรือ INCONCLUSIVE ถ้าแยกไม่ได้",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-009",
+      "project": "mai_sa_009",
+      "category": "ZX-Switch01",
+      "title": "debounce และนับ 20 ครั้ง",
+      "equipment": "ZX-Switch01 ที่ iKB ช่อง 1",
+      "pdf_pages": [
+        67
+      ],
+      "depends_on": [
+        "SA-008"
+      ],
+      "task": "นับขอบกดหลังปล่อยที่เสถียร ใช้ monotonic debounce และวัด sample interval จริง ให้กด 20 ครั้งและกดค้าง นอกข้อมูลที่ยืนยันไม่นับเป็น release ปลอม",
+      "expected": "จำนวนตรงกับการกดจริง; กดค้างไม่เพิ่มซ้ำ",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-010",
+      "project": "mai_sa_010",
+      "category": "ZX-Switch01",
+      "title": "กดสั้น/กดค้าง",
+      "equipment": "ZX-Switch01",
+      "pdf_pages": [
+        67,
+        70
+      ],
+      "depends_on": [
+        "SA-009"
+      ],
+      "task": "แสดง DOWN/UP/LONG_PRESS พร้อมเวลา ตั้ง long press สองวินาทีและเกิดหนึ่งครั้งต่อรอบ เก็บประวัติ 20 event ไม่สร้าง timer จากจำนวนเฟรม",
+      "expected": "กดสั้นและค้างให้ event ตามเวลาจริง",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-011",
+      "project": "mai_sa_011",
+      "category": "ZX-LED",
+      "title": "ไฟติดและดับตามคำสั่ง",
+      "equipment": "ZX-LED ที่ iKB ช่อง 2",
+      "pdf_pages": [
+        66,
+        69
+      ],
+      "depends_on": [
+        "SA-003",
+        "SA-004"
+      ],
+      "task": "ตรวจว่าช่อง 2 ต่อเฉพาะ ZX-LED ไม่ใช่เซนเซอร์ เริ่ม LOW หลัง START ทดสอบ LOW/HIGH โดยรอผู้ทดสอบยืนยันสถานะ ใช้ digital write ไม่ใช้ analog ADC เป็น output",
+      "expected": "LED ที่ต่อจริงติดดับตามลอจิกและจบด้วย OFF",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-012",
+      "project": "mai_sa_012",
+      "category": "ZX-LED",
+      "title": "กระพริบสิบรอบ",
+      "equipment": "ZX-LED",
+      "pdf_pages": [
+        69
+      ],
+      "depends_on": [
+        "SA-011"
+      ],
+      "task": "กระพริบติด/ดับอย่างละหนึ่งวินาทีสิบรอบด้วย exit-aware timing แสดงจำนวนรอบที่สั่งและรอผู้ทดสอบยืนยันจำนวนจริง จบด้วย OFF ใน cleanup",
+      "expected": "เห็นครบสิบรอบ; Stop ระหว่างรอบทำงานตามขั้นตอนที่บันทึก",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-013",
+      "project": "mai_sa_013",
+      "category": "ZX-LED",
+      "title": "สวิตช์สั่ง LED ตามบทเรียน",
+      "equipment": "ZX-Switch01 + ZX-LED",
+      "pdf_pages": [
+        70
+      ],
+      "depends_on": [
+        "SA-008",
+        "SA-011"
+      ],
+      "task": "อ่าน switch ช่อง 1 และสั่ง LED ช่อง 2 หลังใช้ polarity ที่วัดจริง แสดง raw/debounced/output แยกกัน บันทึกเฉพาะเมื่อสถานะเปลี่ยน input error ให้ LED OFF",
+      "expected": "กดแล้วไฟติด ปล่อยแล้วดับตามสถานะที่ยืนยัน",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-014",
+      "project": "mai_sa_014",
+      "category": "ZX-POTV",
+      "title": "คาลิเบรตต่ำ/กลาง/สูง",
+      "equipment": "ZX-POTV ที่ iKB ADC ช่อง 0",
+      "pdf_pages": [
+        71,
+        72,
+        76
+      ],
+      "depends_on": [
+        "SA-003"
+      ],
+      "task": "ให้หมุนต่ำ กลาง สูงค้างจุดละสามวินาที แสดง min/max/median ก่อนคำนวณสเกล ใช้ 10-bit ตาม protocol ที่ยืนยัน ไม่เอา ADC0 ของปุ่มบน mAi Plus มาอ่านแทน และไม่บังคับว่าปลายต้องได้ 0/1023 เป๊ะ",
+      "expected": "ค่าแยกสามตำแหน่งได้พร้อมช่วงจริงและทิศการหมุน",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-015",
+      "project": "mai_sa_015",
+      "category": "ZX-POTV",
+      "title": "เปอร์เซ็นต์จากช่วงที่วัด",
+      "equipment": "ZX-POTV",
+      "pdf_pages": [
+        76
+      ],
+      "depends_on": [
+        "SA-014"
+      ],
+      "task": "ใช้ endpoint จาก SA-014 แปลงเป็นเปอร์เซ็นต์พร้อม clamp และแจ้ง out-of-calibration ห้ามหารศูนย์เมื่อช่วงเท่ากัน แสดง raw ควบคู่เสมอ ไม่อ้างแรงดันถ้าไม่รู้ Vref",
+      "expected": "หมุนแล้วเปอร์เซ็นต์ต่อเนื่องตามช่วงที่คาลิเบรต",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-016",
+      "project": "mai_sa_016",
+      "category": "ZX-POTV",
+      "title": "หมุนปรับความเร็วไฟกระพริบ",
+      "equipment": "ZX-POTV + ZX-LED",
+      "pdf_pages": [
+        79
+      ],
+      "depends_on": [
+        "SA-015",
+        "SA-011"
+      ],
+      "task": "อ่าน POT ช่อง 0 ปรับคาบกระพริบ LED ช่อง 2 ภายในช่วงที่ผู้ทดสอบกำหนด ใช้ deadline ไม่ sleep ยาวจน Stop ไม่ตอบสนอง แสดงคาบจริง",
+      "expected": "หมุนแล้วคาบเปลี่ยนและหยุดได้ระหว่างการกระพริบ",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-017",
+      "project": "mai_sa_017",
+      "category": "ZX-03 อินฟราเรดสะท้อน",
+      "title": "เก็บค่าดำ/ขาว/ไม่มีพื้นผิว",
+      "equipment": "ZX-03 ที่ iKB ADC ช่อง 0",
+      "pdf_pages": [
+        66,
+        68
+      ],
+      "depends_on": [
+        "SA-003"
+      ],
+      "task": "ตรวจ ZX-03 เป็นสัญญาณแอนะล็อกตามรุ่นจริง วางดำ ขาว และไม่มีเป้าตามระยะติดตั้ง เก็บช่วงละสามวินาที raw/min/max/median ห้ามใช้ gpio.value หรือ boolean(raw) เป็นผลตรวจเส้น และไม่บังคับ active level จากชื่อ IR",
+      "expected": "ได้ช่วงสะท้อนจริงพร้อมข้อมูลแสงและระยะ fixture",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-018",
+      "project": "mai_sa_018",
+      "category": "ZX-03 อินฟราเรดสะท้อน",
+      "title": "threshold และ hysteresis",
+      "equipment": "ZX-03",
+      "pdf_pages": [
+        68,
+        79
+      ],
+      "depends_on": [
+        "SA-017"
+      ],
+      "task": "เสนอ threshold จากช่วงที่วัด มี hysteresis และ AMBIGUOUS เมื่อแยกไม่ได้ แสดงสีจอจากสถานะที่ยืนยัน ไม่แปลง raw ที่ไม่เป็นศูนย์ทุกค่าเป็น TRUE",
+      "expected": "เลื่อนผ่านขอบดำขาวแล้วสถานะไม่แกว่งผิดจาก fixture",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-019",
+      "project": "mai_sa_019",
+      "category": "ZX-03 อินฟราเรดสะท้อน",
+      "title": "ผลของพื้นผิวและความสูง",
+      "equipment": "ZX-03 + พื้นดำ/ขาว + ไม้บรรทัด",
+      "pdf_pages": [
+        68
+      ],
+      "depends_on": [
+        "SA-017"
+      ],
+      "task": "ทดสอบหลายระดับความสูงในช่วงที่คู่มือรุ่นอนุญาตและอย่างน้อยสองพื้นผิว เก็บ raw เทียบสภาพแวดล้อม ไม่เรียก IR reflectance ว่าเครื่องวัดระยะเป็นเซนติเมตร",
+      "expected": "เห็นขอบเขตการใช้งานของ threshold เดิมและจุดที่ต้องคาลิเบรตใหม่",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-020",
+      "project": "mai_sa_020",
+      "category": "ZX-02F แสง",
+      "title": "มืด/ห้อง/ส่องไฟ",
+      "equipment": "ZX-02F ที่ iKB ADC ช่อง 0",
+      "pdf_pages": [],
+      "depends_on": [
+        "SA-003"
+      ],
+      "task": "เก็บค่าบังแสง แสงห้อง และส่องไฟอย่างละสามวินาที แสดง raw และช่วงจริง ใช้คำว่า relative light ไม่แปลงเป็น lux โดยไม่มีสมการสอบเทียบรุ่นนี้",
+      "expected": "ค่าตอบสนองต่อแสงและทราบทิศการเปลี่ยน",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-021",
+      "project": "mai_sa_021",
+      "category": "ZX-02F แสง",
+      "title": "เปิด LED เมื่อมืด",
+      "equipment": "ZX-02F + ZX-LED",
+      "pdf_pages": [],
+      "depends_on": [
+        "SA-020",
+        "SA-011"
+      ],
+      "task": "เลือก threshold จาก dark/bright bands จริง พร้อม hysteresis อ่านแสงช่อง 0 และ LED ช่อง 2 ให้ error/stale ไม่สร้างผลแสงจำลอง",
+      "expected": "บังและเปิดแสงแล้ว LED เปลี่ยนตามกติกาที่วัด",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-022",
+      "project": "mai_sa_022",
+      "category": "ZX-02F แสง",
+      "title": "ความนิ่งหนึ่งนาที",
+      "equipment": "ZX-02F",
+      "pdf_pages": [],
+      "depends_on": [
+        "SA-020"
+      ],
+      "task": "เก็บข้อมูลแสงห้องหนึ่งนาทีแบบ bounded sample/log แสดง min/max/median, sample interval และจำนวน read error แยกความแกว่งของไฟห้องออกจากบอร์ดเสีย",
+      "expected": "มีสถิติจริงครบช่วง ไม่มี buffer โตไม่จำกัด",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-023",
+      "project": "mai_sa_023",
+      "category": "ZX-SOUND V2",
+      "title": "ระดับเงียบ/เสียงต่อเนื่อง",
+      "equipment": "ZX-SOUND V2 ที่ iKB ADC ช่อง 0",
+      "pdf_pages": [],
+      "depends_on": [
+        "SA-003"
+      ],
+      "task": "ตรวจว่า signal ที่อ่านเป็น analog level ตามโมดูล เก็บเงียบ พูดต่อเนื่อง และเสียงทดสอบที่ระบุ แสดง raw/peak/min/max และ sample rate จริง ห้ามสวมเป็น maix.audio.Recorder หรืออ้างว่าเป็น PCM 48kHz/dB SPL",
+      "expected": "ค่าตอบสนองเสียงจริงและบอกข้อจำกัดความเร็ว I2C",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-024",
+      "project": "mai_sa_024",
+      "category": "ZX-SOUND V2",
+      "title": "ตรวจเสียงด้วยช่วงที่วัด",
+      "equipment": "ZX-SOUND V2 + ZX-LED",
+      "pdf_pages": [],
+      "depends_on": [
+        "SA-023",
+        "SA-011"
+      ],
+      "task": "ใช้ baseline จาก SA-023 ทำ detector สำหรับเสียงค้างที่ยาวพอให้ sampling ตรวจได้ พร้อม cooldown และ hysteresis ให้ผู้ทดสอบนับ event แยก ไม่สัญญาว่าจับการตบมือสั้นทุกครั้งได้",
+      "expected": "มี event ตรงช่วงเสียงตามอัตราอ่านจริงและไม่มีค่าปลอมเมื่อ read ล้ม",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-025",
+      "project": "mai_sa_025",
+      "category": "ZX-SOUND V2",
+      "title": "วัดผลของ sample interval",
+      "equipment": "ZX-SOUND V2",
+      "pdf_pages": [],
+      "depends_on": [
+        "SA-023"
+      ],
+      "task": "เปรียบเทียบการอ่านอย่างน้อยสองคาบที่ backend ทำได้จริง เก็บ effective rate/jitter/peak ที่พบ ไม่เพิ่มความถี่ด้วยการละทิ้งเวลารอ ADC ตาม protocol และไม่ตีความว่า peak ที่พลาดเป็นไมค์เสีย",
+      "expected": "รายงานอัตราอ่านจริงและข้อจำกัดของ transient detection",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-026",
+      "project": "mai_sa_026",
+      "category": "ZX-Soil",
+      "title": "คาลิเบรตความชื้น",
+      "equipment": "ZX-Soil + ดินแห้ง/ชื้น",
+      "pdf_pages": [],
+      "depends_on": [
+        "SA-003"
+      ],
+      "task": "เก็บอากาศ/ดินแห้ง/ดินชื้นตามวิธีที่โมดูลอนุญาต เฉพาะส่วน probe สัมผัสดิน ไม่จุ่ม PCB เก็บช่วง raw และทิศการเปลี่ยน ไม่ใช้ 0/1023 เป็นร้อยละความชื้นจริงโดยอัตโนมัติ",
+      "expected": "ได้ช่วงเปรียบเทียบจริงและไม่อ้าง volumetric moisture โดยไม่มีสอบเทียบ",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-027",
+      "project": "mai_sa_027",
+      "category": "ZX-Soil",
+      "title": "เตือนดินแห้งด้วย LED",
+      "equipment": "ZX-Soil + ZX-LED",
+      "pdf_pages": [],
+      "depends_on": [
+        "SA-026",
+        "SA-011"
+      ],
+      "task": "กำหนด dry/wet threshold จากชุดดินที่วัด ทำ hysteresis และเวลาค้างเพื่อไม่เตือนทุกเฟรม แสดง sensor stale/read error ชัดเจน",
+      "expected": "เปลี่ยนดินแล้วสถานะเตือนสอดคล้องกับ fixture",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-028",
+      "project": "mai_sa_028",
+      "category": "ZX-Soil",
+      "title": "อ่านซ้ำและข้อมูลขาด",
+      "equipment": "ZX-Soil",
+      "pdf_pages": [],
+      "depends_on": [
+        "SA-026"
+      ],
+      "task": "อ่านซ้ำ 30 ครั้งในดินเดียวกันและรายงานความกระจาย ทดสอบข้อมูลขาดด้วย fixture บนคอมพิวเตอร์ก่อน ไม่แนะนำ hot-unplug ระหว่างจ่ายไฟ ไม่ใช้ raw=0 แทน error",
+      "expected": "แยกค่าชื้นสุด/แห้งสุดออกจากข้อมูลอ่านไม่ได้",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-029",
+      "project": "mai_sa_029",
+      "category": "ZX-Sonar แอนะล็อก",
+      "title": "อ่าน raw และระบุรุ่น",
+      "equipment": "ZX-Sonar ที่ iKB ADC ช่อง 0",
+      "pdf_pages": [],
+      "depends_on": [
+        "SA-003"
+      ],
+      "task": "อ่านฉลาก ZX-Sonar/ZX-SONAR1M จริงก่อนเลือก conversion อ่านผ่าน ADC ของ iKB เป็น raw แอนะล็อก ไม่ใช้ TRIG/ECHO หรือสูตร HC-SR04 ไม่เหมารุ่นเก่ากับ 1M ว่าช่วงวัดเท่ากัน",
+      "expected": "ได้ raw เปลี่ยนตามระยะและบันทึกรุ่นที่ใช้",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-030",
+      "project": "mai_sa_030",
+      "category": "ZX-Sonar แอนะล็อก",
+      "title": "เทียบไม้บรรทัดสามระยะ",
+      "equipment": "ZX-Sonar + เป้าเรียบ + ไม้บรรทัด",
+      "pdf_pages": [],
+      "depends_on": [
+        "SA-029"
+      ],
+      "task": "เลือกสามระยะภายในสเปกของรุ่นจริง เก็บ min/max/median และระยะอ้างอิง ก่อนเสนอสมการแปลง ถ้าเป็น SONAR1M ให้ตรวจคู่มือรุ่นเดียวกันและ full-scale ADC=1023 ของ iKB ไม่ยืม 4095 ของ ESP32",
+      "expected": "มี raw/ระยะจริง/ค่าคลาดเคลื่อน ไม่คำนวณ cm จากรุ่นที่ยังไม่ยืนยัน",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-031",
+      "project": "mai_sa_031",
+      "category": "ZX-Sonar แอนะล็อก",
+      "title": "filter และเป้าที่อ่านยาก",
+      "equipment": "ZX-Sonar + เป้าเรียบ/เอียง",
+      "pdf_pages": [],
+      "depends_on": [
+        "SA-030"
+      ],
+      "task": "เปรียบเทียบ raw กับ median filter และเป้าเอียงภายในช่วงปลอดภัย ระบุข้อมูล out-of-range ตามเอกสารรุ่น อย่าเปลี่ยนค่าที่อ่านผิดเป็นระยะศูนย์หรือระยะปลอดภัย",
+      "expected": "เห็นผลของมุมเป้าและ latency ของ filter จากข้อมูลจริง",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-032",
+      "project": "mai_sa_032",
+      "category": "ZX-Sonar แอนะล็อก",
+      "title": "จำลองเขตหยุดบนจอ",
+      "equipment": "ZX-Sonar + จอ/ZX-LED",
+      "pdf_pages": [],
+      "depends_on": [
+        "SA-030",
+        "SA-011"
+      ],
+      "task": "สร้างโหมด STOP_ZONE บนจอและ LED ก่อนต่อมอเตอร์ ตั้งระยะเข้า/ออกจากค่าที่ตรวจแล้ว เมื่อ error หรือ stale ให้สถานะ STOP_REQUIRED ไม่บอกว่าเส้นทางว่าง",
+      "expected": "เตือนตามระยะอ้างอิงก่อนนำ logic ไปคุมโหลด",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-033",
+      "project": "mai_sa_033",
+      "category": "อุณหภูมิ MCP97xx",
+      "title": "ตรวจรหัสชิปและ raw",
+      "equipment": "ชิปที่ชุดระบุ MCP9731 ที่ iKB ADC ช่อง 0",
+      "pdf_pages": [],
+      "depends_on": [
+        "SA-003"
+      ],
+      "task": "แสดงรหัสชิปตามผู้ทดสอบอ่านจริง Catalog ระบุ MCP9731 แต่ห้ามแก้เป็น MCP9701/MCP9700/LM35 ด้วยการเดา อ่าน raw และบันทึก Vref ที่ยืนยัน ถ้ารหัสยังไม่ชัดให้ยังไม่แสดงองศาเซลเซียส",
+      "expected": "อ่านสัญญาณได้และแยก MODEL_UNCONFIRMED จาก ADC error",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-034",
+      "project": "mai_sa_034",
+      "category": "อุณหภูมิ MCP97xx",
+      "title": "แปลงองศาตาม datasheet รุ่นจริง",
+      "equipment": "ชิปอุณหภูมิ + เอกสารรุ่นตรงกัน",
+      "pdf_pages": [],
+      "depends_on": [
+        "SA-033"
+      ],
+      "task": "ใช้ offset voltage และ slope ของ datasheet ที่ตรงรหัสบนตัวชิป ระบุ Vref/ความละเอียด/สูตรในหน้าผล ถ้ายังไม่มีสูตรที่ตรวจได้ให้แสดง raw และ NEEDS_MODEL_DATA ไม่แต่งค่าคงที่",
+      "expected": "สูตรตรวจย้อนกลับได้และไม่มีตัวเลขอุณหภูมิจากสมมติฐานผิดรุ่น",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-035",
+      "project": "mai_sa_035",
+      "category": "อุณหภูมิ MCP97xx",
+      "title": "เทียบเทอร์โมมิเตอร์",
+      "equipment": "ชิปอุณหภูมิ + เทอร์โมมิเตอร์อ้างอิง",
+      "pdf_pages": [],
+      "depends_on": [
+        "SA-034"
+      ],
+      "task": "เก็บค่าอุณหภูมิห้องสองสภาวะที่อยู่ในสเปกพร้อมเวลาและค่าอ้างอิง ให้รออุณหภูมิเสถียร คำนวณ offset/error โดยไม่เขียน calibration ถาวร ไม่ใช้ไฟหรือน้ำเดือดเพื่อเร่งเทส",
+      "expected": "ผลคลาดเคลื่อนมาจากค่าอ้างอิงจริง",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-036",
+      "project": "mai_sa_036",
+      "category": "มอเตอร์ BO1",
+      "title": "หมุนหนึ่งช่องช่วงสั้น",
+      "equipment": "มอเตอร์ BO1 + iKB M1",
+      "pdf_pages": [
+        71,
+        77
+      ],
+      "depends_on": [
+        "SA-003",
+        "SA-004"
+      ],
+      "task": "ลอยล้อหรือถอดโหลดทางกล ยืนยันแผนไฟและ M1 ก่อน START เริ่ม duty ต่ำในช่วงที่มอเตอร์จริงทำงานตามผู้ทดสอบกำหนด หมุนสั้นแล้วส่ง stop=0 บันทึกคำสั่งแยกจาก observed ไม่ใช้ raw GPIO ขับมอเตอร์",
+      "expected": "หมุนช่องที่ต่อจริงและผู้ทดสอบยืนยันว่าหยุดหลังคำสั่ง",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-037",
+      "project": "mai_sa_037",
+      "category": "มอเตอร์ BO1",
+      "title": "ทิศทางและผ่านศูนย์ก่อนกลับ",
+      "equipment": "มอเตอร์ BO1 + iKB M1",
+      "pdf_pages": [
+        77
+      ],
+      "depends_on": [
+        "SA-036"
+      ],
+      "task": "ทดสอบ forward → stop → รอหยุดจริง → reverse → stop ห้ามกลับขั้วขณะกำลังหมุนและไม่กลับทิศพัดลมหรือปั๊มโดยใช้เทสนี้ ใช้ signed percent encoding ตาม protocol ที่ยืนยัน ไม่ให้ reverse speed=0 สร้าง byte 256",
+      "expected": "สองทิศตรงกับที่ระบุและทุกช่วง stop สังเกตได้จริง",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-038",
+      "project": "mai_sa_038",
+      "category": "มอเตอร์ BO1",
+      "title": "duty กับการหมุนจริง",
+      "equipment": "มอเตอร์ BO1",
+      "pdf_pages": [
+        77
+      ],
+      "depends_on": [
+        "SA-036"
+      ],
+      "task": "วัดสาม duty ภายในขอบเขตที่เลือกพร้อมช่วง stop ระหว่างระดับ แยก duty percent ออกจาก RPM; ถ้าไม่มี encoder ให้ observed เป็นหมุน/ไม่หมุนและผู้ทดสอบบันทึก ห้ามสมมติ duty50=ความเร็วเชิงกล50%",
+      "expected": "มีผลแต่ละระดับโดยไม่สร้าง RPM ปลอม",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-039",
+      "project": "mai_sa_039",
+      "category": "มอเตอร์ BO1",
+      "title": "สองช่องแยกกันเมื่อมีสองตัว",
+      "equipment": "มอเตอร์สองตัวจริง + iKB M1/M2",
+      "pdf_pages": [
+        77
+      ],
+      "depends_on": [
+        "SA-036"
+      ],
+      "task": "ตรวจจำนวนมอเตอร์จริงก่อน: 2 Output อาจหมายถึงเพลาสองด้านของมอเตอร์เดียว ถ้ามีสองตัวต่อ M1/M2 จึงทดสอบทีละช่อง อีกช่องต้องหยุด ไม่ใช้ output3/4 ที่ไม่มีวงจรขับบนบอร์ด",
+      "expected": "ยืนยันช่องอิสระจริง หรือระบุจำนวนอุปกรณ์ที่มีโดยไม่ถือเป็นฮาร์ดแวร์เสีย",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-040",
+      "project": "mai_sa_040",
+      "category": "SG92R เซอร์โว",
+      "title": "ตำแหน่งกลาง",
+      "equipment": "SG92R + iKB servo ช่อง 1",
+      "pdf_pages": [
+        71,
+        78
+      ],
+      "depends_on": [
+        "SA-003",
+        "SA-004"
+      ],
+      "task": "ใช้ช่อง servo1 ของ iKB ซึ่ง silk อาจระบุ10 ไม่ใช่ Plus IO7 ยืนยัน G/V/S และถอดโหลดก่อน START สั่งตำแหน่งกลางที่ตรวจสเปกแล้ว ห้าม constructor ขยับไป0ทันที ไม่เรียก angle0 ว่าปิด PWM",
+      "expected": "เซอร์โวเข้าตำแหน่งกลางโดยไม่ชนกลไก",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-041",
+      "project": "mai_sa_041",
+      "category": "SG92R เซอร์โว",
+      "title": "ขยับช่วงแคบห้ารอบ",
+      "equipment": "SG92R",
+      "pdf_pages": [
+        78
+      ],
+      "depends_on": [
+        "SA-040"
+      ],
+      "task": "เลือกขอบต่ำ/สูงแคบรอบกลางตามกลไกจริง ขยับเป็นขั้นช้าๆห้ารอบ ไม่คัดการเริ่ม0และวิ่งสุดช่วงจากตัวอย่างPDF ใช้ค่าที่ส่งจริงและให้ผู้ทดสอบยืนยันตำแหน่ง ไม่อ้างว่ามีfeedbackมุม",
+      "expected": "ขยับตามขั้นโดยไม่กระชากหรือค้างชน",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-042",
+      "project": "mai_sa_042",
+      "category": "SG92R เซอร์โว",
+      "title": "POT คุมตำแหน่ง",
+      "equipment": "ZX-POTV + SG92R",
+      "pdf_pages": [
+        76,
+        78,
+        79
+      ],
+      "depends_on": [
+        "SA-015",
+        "SA-041"
+      ],
+      "task": "map ช่วงPOTที่วัดสู่ช่วงมุมแคบที่ยืนยัน มี rate limit และ clamp ถ้าอ่านผิดให้หยุดเปลี่ยน target พร้อมแจ้งerror ไม่เรียกการคง target ว่าตัดกำลังเซอร์โว",
+      "expected": "มุมสัมพันธ์กับPOTและไม่กระชากเมื่อค่าขาด",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-043",
+      "project": "mai_sa_043",
+      "category": "SG92R เซอร์โว",
+      "title": "เอียงบอร์ดคุมเซอร์โว",
+      "equipment": "IMU + SG92R",
+      "pdf_pages": [
+        79
+      ],
+      "depends_on": [
+        "SA-006",
+        "SA-041"
+      ],
+      "task": "ทำ Workshop1 ใช้แกนและทิศที่วัดจริงคุมมุมภายในขอบเขต มี deadband/filter/rate limit ปุ่มยุติไม่ส่งมุม0โดยอ้างว่าปิด servo ถ้าไม่มีdisable protocol ให้ระบุการคงแรงบิดและขั้นตอนตัดกำลังที่ถูกต้อง",
+      "expected": "เอียงแล้วเคลื่อนในทิศกำหนดและขอบเขตไม่หลุด",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-044",
+      "project": "mai_sa_044",
+      "category": "ZX-SPEAKER เปียโซ",
+      "title": "สำรวจ backend สร้าง tone",
+      "equipment": "ZX-SPEAKER",
+      "pdf_pages": [],
+      "depends_on": [
+        "SA-002"
+      ],
+      "task": "ตรวจขาที่ต่อและ native PWM/tone backend ที่สร้างความถี่ได้จริง ไม่ใช้ audio.Player เป็นGPIOtone และไม่แต่ง iKB1.tone จากdigitalwrite ถ้ายังไม่มี backend ให้สร้างหน้า dry-run รายงานสิ่งที่ขาด โดยไม่ขับขาหรือยึดPWM10/backlight",
+      "expected": "ระบุ backend/pin/frequency contract จริง หรือ NEEDS_TIMING_BACKEND",
+      "gate": "BACKEND_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-045",
+      "project": "mai_sa_045",
+      "category": "ZX-SPEAKER เปียโซ",
+      "title": "สามความถี่ช่วงสั้น",
+      "equipment": "ZX-SPEAKER + backend ที่ยืนยัน",
+      "pdf_pages": [],
+      "depends_on": [
+        "SA-044"
+      ],
+      "task": "ใช้ backend จากSA044 เล่นความถี่สามค่าที่เลือกในช่วงโมดูลรองรับครั้งละสั้น มีช่วงเงียบและระดับเริ่มต่ำ ปิดด้วยAPIจริงไม่แต่งstop/close ตรวจค่าที่สั่งแยกจากเสียงที่ผู้ทดสอบได้ยิน",
+      "expected": "ผู้ทดสอบแยกสามเสียงและยืนยันการเงียบหลังจบ",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-046",
+      "project": "mai_sa_046",
+      "category": "ZX-SPEAKER เปียโซ",
+      "title": "แพตเทิร์นไม่บล็อกปุ่ม/Stop",
+      "equipment": "ZX-SPEAKER + ZX-Switch01",
+      "pdf_pages": [],
+      "depends_on": [
+        "SA-045",
+        "SA-009"
+      ],
+      "task": "ให้ขอบกดเริ่มแพตเทิร์นสั้นครั้งเดียว ใช้deadlineไม่delayยาว กดค้างไม่เริ่มซ้อน ทดสอบStopกลางเสียงและตรวจคืนbackend โดยไม่อ้างfinallyทำงานหลังforcedkill",
+      "expected": "ไม่เกิดเสียงซ้อนและหยุดตามผลที่ตรวจจริง",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-047",
+      "project": "mai_sa_047",
+      "category": "ZX-RGB12R",
+      "title": "สำรวจ WS2812 backend",
+      "equipment": "ZX-RGB12R 12ดวง",
+      "pdf_pages": [],
+      "depends_on": [
+        "SA-002"
+      ],
+      "task": "ยืนยันรุ่นWS2812และDIN/GND/ไฟเลี้ยง ตรวจ driver ส่ง waveform ที่ทำงานบน SG2002 จริง หรืออะแดปเตอร์ที่มีprotocolยืนยัน ไม่import neopixel/machine.Pin ของMicroPythonบนMaixPyLinux ไม่ใช้I2C digitalwrite bitbang800kHz หากใช้IPST-WiFiเป็นตัวช่วยให้เสนอแผนเฉพาะ ไม่flashหรือสลับบอร์ดเอง",
+      "expected": "มีbackendพร้อมข้อกำหนดหรือ NEEDS_TIMING_BACKEND โดยไม่แต่งAPI",
+      "gate": "BACKEND_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-048",
+      "project": "mai_sa_048",
+      "category": "ZX-RGB12R",
+      "title": "ทดสอบสีหนึ่งดวง",
+      "equipment": "ZX-RGB12R + backend ที่ยืนยัน",
+      "pdf_pages": [],
+      "depends_on": [
+        "SA-047"
+      ],
+      "task": "เริ่มall-offและbrightnessต่ำ เปิดเพียงดวงแรกแดงเขียวน้ำเงินทีละสีเพื่อตรวจRGB/GRB orderจริง ไม่มีจังหวะwhiteเต็มกำลัง ปิดทุกดวงผ่านAPIจริงก่อนจบ",
+      "expected": "ดวงแรกและสีตรงที่ผู้ทดสอบเห็น",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-049",
+      "project": "mai_sa_049",
+      "category": "ZX-RGB12R",
+      "title": "walking pixelครบ12ดวง",
+      "equipment": "ZX-RGB12R",
+      "pdf_pages": [],
+      "depends_on": [
+        "SA-048"
+      ],
+      "task": "เลื่อนแสงหนึ่งดวงครบindex0..11 เก็บmaskในbuffer12ดวงเท่านั้น แสดงindexที่ส่งและให้ผู้ทดสอบตรวจตำแหน่งจริง จบall-off",
+      "expected": "ครบ12ตำแหน่ง ไม่มีindexตกหรือแสดงเกินวง",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-050",
+      "project": "mai_sa_050",
+      "category": "ZX-RGB12R",
+      "title": "POTและสวิตช์คุมวงแหวน",
+      "equipment": "ZX-POTV + ZX-Switch01 + ZX-RGB12R",
+      "pdf_pages": [],
+      "depends_on": [
+        "SA-015",
+        "SA-009",
+        "SA-049"
+      ],
+      "task": "ใช้POTปรับbrightnessภายในเพดานต่ำที่กำหนด สวิตช์เปลี่ยนสีครั้งละขอบ มีall-offเมื่อinputerror/Stop ไม่อ้างว่าiKBมีNeoPixelAPIเพียงเพราะมีdigitalIO",
+      "expected": "ปรับและเปลี่ยนโหมดตรง input ที่วัดจริง",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-051",
+      "project": "mai_sa_051",
+      "category": "รวมเซนเซอร์",
+      "title": "schedulerอ่านหลายช่อง",
+      "equipment": "เซนเซอร์แอนะล็อกในชุด + iKB",
+      "pdf_pages": [],
+      "depends_on": [
+        "SA-014",
+        "SA-017",
+        "SA-020",
+        "SA-023",
+        "SA-026",
+        "SA-029",
+        "SA-033"
+      ],
+      "task": "จัดผังรวมใหม่ไม่ใช้ผังเดี่ยวซ้ำ เสนอADC0POT,1ZX03,2แสง,3เสียง,4ดิน,5Sonar,6อุณหภูมิ และD7switch โดยไม่มีLEDบนช่อง2ในผังนี้ ใช้bushandleเดียวอ่านสลับ แสดงeffective rateและtimestampต่อเซนเซอร์ ไม่สัญญาว่าทั้งเจ็ดช่อง10Hzพร้อมกัน",
+      "expected": "ทุกช่องผูกกับอุปกรณ์ถูกและข้อมูลstaleแยกต่อช่อง",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-052",
+      "project": "mai_sa_052",
+      "category": "รวมเซนเซอร์",
+      "title": "IR/Sonar สั่งหยุดมอเตอร์",
+      "equipment": "ZX-03 หรือ ZX-Sonar + BO1",
+      "pdf_pages": [
+        79
+      ],
+      "depends_on": [
+        "SA-018",
+        "SA-032",
+        "SA-036"
+      ],
+      "task": "ทำWorkshop2 หลังเทสstop-on-screenผ่าน ใช้เฉพาะเซนเซอร์ที่คาลิเบรตจริง error/stale/obstacleต้องส่งmotor0 ลอยล้อก่อนทดลองและต้องre-armหลังเหตุหยุด ไม่ restartมอเตอร์เองเมื่อค่าอ่านกลับมาปกติ บันทึกstop-commandกับหยุดเชิงกลแยกกัน",
+      "expected": "ตรวจสิ่งกีดขวางแล้วมอเตอร์หยุดตามผู้ทดสอบ; ไม่ถือเป็นระบบนิรภัยที่รับรอง",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-053",
+      "project": "mai_sa_053",
+      "category": "รวมเซนเซอร์",
+      "title": "CSV พร้อมสถานะและหน่วย",
+      "equipment": "อุปกรณ์ที่ผ่านแยกแล้ว",
+      "pdf_pages": [],
+      "depends_on": [
+        "SA-051"
+      ],
+      "task": "บันทึกtestID,รุ่น,channel,monotonic time,raw,หน่วยที่ยืนยัน,statusและerrorลงCSVแบบboundedในtestdirectory อ่านกลับนับแถว ไม่ใส่เลข0แทนค่าที่อ่านไม่ได้",
+      "expected": "ข้อมูลย้อนกลับถึงเซนเซอร์และเวลาได้โดยไม่มีผลPASSปลอม",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-054",
+      "project": "mai_sa_054",
+      "category": "รวมเซนเซอร์",
+      "title": "dashboard checklist",
+      "equipment": "อุปกรณ์ที่ผ่านแยกแล้ว",
+      "pdf_pages": [],
+      "depends_on": [
+        "SA-051"
+      ],
+      "task": "ทำแท็บsensor/output เปิดเฉพาะชุดที่เลือก แสดงtimestamp/sampleageและสถานะล่าสุด เกณฑ์ภาพ/เสียง/การเคลื่อนที่รอผู้ทดสอบยืนยัน ไม่ปั้นภาพจำลองแทนค่าจริงและไม่เปิดactuatorจากการสลับแท็บ",
+      "expected": "หน้าจอคงตอบสนองและผลแต่ละตัวไม่ถูกเหมารวม",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-055",
+      "project": "mai_sa_055",
+      "category": "iRover",
+      "title": "ลอยล้อและยืนยันทิศขับ",
+      "equipment": "ชุดโครงสร้าง + มอเตอร์ที่ต่อจริง",
+      "pdf_pages": [],
+      "depends_on": [
+        "SA-039"
+      ],
+      "task": "ตรวจการประกอบล้อ/ฐาน/เพลาก่อน ทดสอบลอยล้อทีละตัวระบุleft/rightตามทิศติดตั้ง ปรับinvertเฉพาะจากผลจริง จำนวนมอเตอร์ไม่พอให้ทำรายงานส่วนที่มี ไม่อนุมานจากจำนวนล้อ",
+      "expected": "ระบุทิศหมุนและข้างได้จริงก่อนวางลงสนาม",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-056",
+      "project": "mai_sa_056",
+      "category": "iRover",
+      "title": "เคลื่อนตรงช่วงสั้น",
+      "equipment": "iRover ที่ผ่านทดสอบลอยล้อ",
+      "pdf_pages": [],
+      "depends_on": [
+        "SA-055"
+      ],
+      "task": "ทำรอบSTARTเคลื่อนช้าในพื้นที่โล่งตามเวลาสั้นที่ผู้ทดสอบเลือกแล้วSTOP แสดงขีดจำกัดเวลาที่ตั้งก่อนเริ่ม มีผู้ทดสอบเข้าถึงสวิตช์ตัดกำลัง ไม่อ้างระยะทางจากเวลาเมื่อไม่มีencoder",
+      "expected": "หยุดในพื้นที่ทดสอบและรายงาน observed ระยะจริงเมื่อมีการวัด",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-057",
+      "project": "mai_sa_057",
+      "category": "iRover",
+      "title": "ติดตามเส้นบนสนาม",
+      "equipment": "iRover + ZX-03 + สนามกระดาษ",
+      "pdf_pages": [],
+      "depends_on": [
+        "SA-018",
+        "SA-056"
+      ],
+      "task": "เริ่มแสดงการตัดสินใจบนจอขณะลอยล้อ แล้วจึงใช้ความเร็วต่ำ ใช้จำนวนZX03ที่มีจริง ไม่แต่งเซนเซอร์ซ้ายขวาถ้ามีตัวเดียว หยุดเมื่อข้อมูลstaleหรือหาขอบเส้นไม่พบภายในเวลาที่กำหนด",
+      "expected": "พฤติกรรมตรงกับแบบ1หรือ2เซนเซอร์ที่ต่อจริง; ไม่อ้างภารกิจสำเร็จจากdry-run",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-058",
+      "project": "mai_sa_058",
+      "category": "iRover",
+      "title": "หยุดก่อนสิ่งกีดขวาง",
+      "equipment": "iRover + ZX-Sonar",
+      "pdf_pages": [],
+      "depends_on": [
+        "SA-030",
+        "SA-052",
+        "SA-056"
+      ],
+      "task": "ตรวจระยะหยุดด้วยความเร็วต่ำและthresholdที่วัดก่อน ใช้เป้าเรียบในช่วงสเปก errorให้STOPและต้องre-arm ไม่สั่งถอยอัตโนมัติเมื่อยังไม่ตรวจพื้นที่หลังรถ",
+      "expected": "หยุดตามระยะที่ผู้ทดสอบวัดและรายงานข้อจำกัดเซนเซอร์",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-059",
+      "project": "mai_sa_059",
+      "category": "Run/Stop และสรุปผล",
+      "title": "Stop ปกติของ output",
+      "equipment": "ZX-LED ก่อน; มอเตอร์/servo เฉพาะที่ผ่านแยกแล้ว",
+      "pdf_pages": [],
+      "depends_on": [
+        "SA-012"
+      ],
+      "task": "ทดสอบStopจากIDEขณะoutputทำงาน ปิดLEDและส่งmotor0ในcleanupตามAPIจริง Servoระบุชัดว่าไม่มีdisableที่ยืนยันจึงอาจคงแรงบิด บันทึกprocess exit,คำสั่งcleanup,ผลโหลดและเมนูกลับแยกกัน ห้ามอนุมานว่าปิดprocessแล้วiKBซึ่งเป็นMCUอีกตัวดับoutputเอง",
+      "expected": "หลักฐานครบแต่ละขั้น; outputที่ไม่มีfeedbackไม่ถูกบันทึกว่าOFFเอง",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-060",
+      "project": "mai_sa_060",
+      "category": "Run/Stop และสรุปผล",
+      "title": "exception พร้อม cleanup",
+      "equipment": "ZX-LED เป็นโหลดเริ่มต้น",
+      "pdf_pages": [],
+      "depends_on": [
+        "SA-059"
+      ],
+      "task": "ใช้โปรเจกต์แยกthrow RuntimeError หลังLEDทำงานสั้นๆ ตรวจtracebackและnonzeroexitพร้อมcleanup ไม่ใช้motorเป็นโหลดทดสอบforcedkillและไม่สั่งถอดสายI2Cขณะโหลดหมุน",
+      "expected": "เห็นerrorที่ตั้งใจและสถานะoutput/เมนูจริง ไม่ตีความnonzeroว่าโปรแกรมสำเร็จ",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-061",
+      "project": "mai_sa_061",
+      "category": "Run/Stop และสรุปผล",
+      "title": "Run/Stop ซ้ำ",
+      "equipment": "เซนเซอร์/LEDที่ผ่านแล้ว",
+      "pdf_pages": [],
+      "depends_on": [
+        "SA-059"
+      ],
+      "task": "ให้ผู้ทดสอบRun/Stopสิบรอบ เริ่มแต่ละรอบด้วยไฟOFFและARMED=False เก็บresource busy,readerrors,เวลาจบและเมนูกลับ ห้ามauto-runบอร์ดหรือคุมLauncherในmain.py",
+      "expected": "รอบใหม่เริ่มจากสถานะที่ระบุและมีบันทึกครบสิบรอบ",
+      "gate": "SETUP_REVIEW",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-062",
+      "project": "mai_sa_062",
+      "category": "Run/Stop และสรุปผล",
+      "title": "รายงาน regression ทั้งชุด",
+      "equipment": "ผลที่ผู้ทดสอบส่ง",
+      "pdf_pages": [],
+      "depends_on": [
+        "SA-001"
+      ],
+      "task": "รวบรวมผลSA001เป็นต้นไป แยกPASS/FAIL/SKIP/NOT_RUN/WAIT_USER/INCONCLUSIVE/NEEDS_BACKEND พร้อมconfigและหลักฐาน คงNOT_RUNให้เทสที่ยังไม่ทำ แยกคำสั่งส่งได้จากภาพเสียงโหลดจริง ไม่สร้างdisplayprojectใหม่เพื่อทำรายงาน",
+      "expected": "ผลทุกPASSมีหลักฐานและไม่มีการเหมารวมทั้งกล่อง",
+      "gate": "ANALYSIS",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-063",
+      "project": "mai_sa_063",
+      "category": "ภาคเสริมจาก PDF",
+      "title": "พัดลม DC เมื่อมีเพิ่ม",
+      "equipment": "พัดลม DC ตรงรุ่นที่ผู้ทดสอบมี",
+      "pdf_pages": [
+        71,
+        77
+      ],
+      "depends_on": [
+        "SA-036"
+      ],
+      "task": "ใช้เฉพาะเมื่อมีพัดลมแยกจริง รายการMicroBOXที่ส่งไม่ได้ยืนยันว่ามี ต่อผ่านiKBmotorchannelที่ว่างตามแรงดัน/กระแสพัดลม หมุนทิศเดียวช่วงสั้นแล้วstop ไม่ให้กลับทิศจากเทสมอเตอร์BO1และไม่ขับจากGPIO",
+      "expected": "ผู้ทดสอบเห็นการทำงานและหยุดจริง; ไม่มีอุปกรณ์เป็นNOT_APPLICABLE",
+      "gate": "OPTIONAL_HARDWARE",
+      "hardware_result": "NOT_RUN"
+    },
+    {
+      "id": "SA-064",
+      "project": "mai_sa_064",
+      "category": "ภาคเสริมจาก PDF",
+      "title": "ปั๊ม DC เมื่อมีเพิ่ม",
+      "equipment": "ปั๊ม DC + ระบบน้ำตามคู่มือรุ่น",
+      "pdf_pages": [
+        71,
+        77
+      ],
+      "depends_on": [
+        "SA-036"
+      ],
+      "task": "ใช้เฉพาะเมื่อมีปั๊มแยกจริง ตรวจรุ่น/แรงดัน/วิธีล่อน้ำตามคู่มือ ป้องกันน้ำถึงPCB ไม่เดินปั๊มแห้งถ้าผู้ผลิตห้าม ต่อผ่านdriverที่ยืนยันเท่านั้นทดสอบช่วงสั้นพร้อมstop ห้ามใช้โปรแกรมรดน้ำอัตโนมัติแทนการเทสนี้",
+      "expected": "ปั๊มทำงานและหยุดตามการยืนยันจริง; ไม่มีอุปกรณ์เป็นNOT_APPLICABLE",
+      "gate": "OPTIONAL_HARDWARE",
+      "hardware_result": "NOT_RUN"
+    }
+  ]
+}
+

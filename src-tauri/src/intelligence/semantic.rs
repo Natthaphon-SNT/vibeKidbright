@@ -252,6 +252,7 @@ fn compile_context(
     let mut selected_found = false;
     let mut driver = None;
     let mut responses = BTreeMap::new();
+    let response_pattern = regex::Regex::new(r#"@(?:"([^"]+)"|(\S+))"#).unwrap();
     for entry in entries {
         let directory = PathBuf::from(
             entry["directory"]
@@ -296,8 +297,7 @@ fn compile_context(
         }
         // ESP-IDF's generated GCC toolchain cflags response file is part of the
         // actual compilation context. Permit only that bounded, checked file.
-        let pattern = regex::Regex::new(r#"@(?:"([^"]+)"|(\S+))"#).unwrap();
-        for item in pattern.captures_iter(&command) {
+        for item in response_pattern.captures_iter(&command) {
             let response = PathBuf::from(item.get(1).or_else(|| item.get(2)).unwrap().as_str());
             let response = if response.is_absolute() {
                 response

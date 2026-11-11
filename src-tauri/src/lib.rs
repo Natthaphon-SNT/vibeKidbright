@@ -1,9 +1,13 @@
 pub mod installation;
+pub mod reference_export;
 mod esp_idf;
+mod project_workspace;
+mod uai_plus_device;
 mod sdk_process;
 mod archive;
 mod ai_chat;
 mod toolchain;
+mod toolchain_integrity;
 mod kb_store;   // SQLite vector store for RAG
 pub mod intelligence; // Local, versioned ingestion and hybrid retrieval
 mod kb_embed;   // Local ONNX embedding (fastembed, offline)
@@ -26,6 +30,11 @@ fn run_context(context: tauri::Context<tauri::Wry>) {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .setup(|app| {
+            #[cfg(debug_assertions)]
+            if app.config().identifier == "th.nectec.vibekidbright.desktop-evaluation" {
+                app.manage(ai::pilot::PilotState::closed());
+            }
+            app.manage(uai_plus_device::PlusDeviceState::default());
             app.manage(ai_chat::AiAbortState(std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false))));
             app.manage(ai_chat::AiGenerationState::default());
             // Sanitize config.json on startup (moves legacy plaintext keys to OS Keychain)
@@ -89,6 +98,14 @@ fn run_context(context: tauri::Context<tauri::Wry>) {
             esp_idf::delete_program_item,
             esp_idf::safe_write_project_file,
             esp_idf::validate_idf_project,
+            ai::uai_plus::get_project_kind,
+            uai_plus_device::probe_uai_plus,
+            uai_plus_device::get_uai_plus_status,
+            uai_plus_device::connect_uai_plus,
+            uai_plus_device::disconnect_uai_plus,
+            uai_plus_device::run_uai_plus_project,
+            uai_plus_device::stop_uai_plus,
+            ai::uai_plus::create_uai_plus_project,
             esp_idf::list_serial_ports,
             esp_idf::start_serial_monitor,
             esp_idf::send_serial_input,
@@ -100,6 +117,7 @@ fn run_context(context: tauri::Context<tauri::Wry>) {
             esp_idf::get_idf_custom_paths,
             esp_idf::set_idf_custom_paths,
             esp_idf::clear_idf_custom_paths,
+            esp_idf::select_native_macos_sdk,
             ai::config::get_api_key,
             ai::wiki::wiki_ai_request,
             ai::config::set_api_key,

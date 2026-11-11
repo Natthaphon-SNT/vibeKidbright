@@ -1,0 +1,61 @@
+{
+  "kind": "production UI with native IPC fixtures",
+  "physical_board": false,
+  "live_model": false,
+  "page_errors": [],
+  "external_requests": [],
+  "viewport_checks": [
+    {
+      "width": 1536,
+      "controls_visible": true,
+      "vibe_coder_open": true
+    },
+    {
+      "width": 1280,
+      "controls_visible": true,
+      "vibe_coder_open": true
+    }
+  ],
+  "checks": [
+    "Python restore",
+    "offline Monaco editing",
+    "certificate trust before connect",
+    "Connect without runtime metadata",
+    "detected versions after Run",
+    "save before run",
+    "Run and Stop states",
+    "fresh Python project",
+    "no ADB or ESP-IDF route"
+  ],
+  "commands": [
+    "plugin:event|listen",
+    "get_uai_plus_status",
+    "get_compiler_repair",
+    "get_api_key",
+    "get_model",
+    "get_base_url",
+    "get_provider",
+    "get_private_context_consent",
+    "get_openrouter_api_key",
+    "get_openrouter_model",
+    "get_google_api_key",
+    "get_google_model",
+    "get_knowledge_base_files",
+    "get_idf_custom_paths",
+    "check_esp_idf",
+    "list_project_files",
+    "get_project_kind",
+    "check_toolchain",
+    "get_pending_project_reviews",
+    "plugin:event|unlisten",
+    "read_project_file",
+    "check_pending_diff",
+    "probe_uai_plus",
+    "connect_uai_plus",
+    "write_project_file",
+    "run_uai_plus_project",
+    "stop_uai_plus",
+    "pick_directory",
+    "create_uai_plus_project"
+  ]
+}

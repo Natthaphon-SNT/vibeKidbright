@@ -115,11 +115,22 @@ pub(crate) fn reference(input: &Value) -> Value {
         Ok(files) => files,
         Err(error) => return json!({ "error": error }),
     };
+    let catalog=serde_json::from_str::<Value>(include_str!("../../../knowledge_base/compatibility/board_catalog.json")).expect("validated bundled board catalog");
+    let catalog_view=if let Some(id)=input.get("catalog_board") {
+        let Some(id)=id.as_str() else{return json!({"error":"catalog_board must be an exact catalog ID."});};
+        let Some(board)=catalog["boards"].as_array().unwrap().iter().find(|b|b["id"]==id) else{return json!({"error":"Unknown catalog_board; request the compact index first. No fallback selected."});};
+        json!({"schema_version":1,"boards":[board],"sources":catalog["sources"].as_array().unwrap().iter().filter(|source|board["source_ids"].as_array().is_some_and(|ids|ids.contains(&source["id"]))).collect::<Vec<_>>()})
+    }else{
+        json!({"schema_version":1,"as_of":catalog["as_of"],"scope":catalog["scope"],
+            "detail_required":true,"hint":"Index only; use catalog_board with an exact id for pins/conflicts/evidence. No executable support is inferred.",
+            "boards":catalog["boards"].as_array().unwrap().iter().map(|b|json!({"id":b["id"],"label":b["label"],"target":b["target"],"status":b["status"],"reference_profile_id":b["reference_profile_id"]})).collect::<Vec<_>>()})
+    };
     json!({
-        "rules": RULES,
-        "support_scope": SUPPORT_SCOPE,
-        "board_catalog": serde_json::from_str::<Value>(include_str!("../../../knowledge_base/compatibility/board_catalog.json")).expect("validated bundled board catalog"),
-        "development_scope": "Complete classic KidBright support first. KidBright muAI and muAI Plus are future work, excluded from active implementation and deployment. A catalog entry is not an executable or physically verified board profile.",
+        "rules": "Use exact scoped profiles/recipes only; no board substitution, physical certification or arbitrary block equivalence. Detailed rules: read_knowledge_file compatibility/README.md with relevant start_line/max_lines.",
+        "support_scope": "Classic ESP32 and Plus SG2002 Python are separate active targets; original muAI V831 remains deferred. Full source: support_scope.md; retrieve relevant pages only.",
+        "board_catalog": catalog_view,
+        "reference_hashes":{"rules":crate::intelligence::digest(RULES.as_bytes()),"support_scope":crate::intelligence::digest(SUPPORT_SCOPE.as_bytes())},
+        "development_scope": "Classic ESP32 recipes and Plus Python projects are separate targets. Plus generation is active through project_type=kidbright_uai_plus; original muAI V831 remains future work. A catalog entry is not a physically verified board profile.",
         "board_profiles": [profile("kidbright32_v13").unwrap(), profile("kidbright32_rev31").unwrap()],
         "examples": [
             { "id": "button_buzzer", "behavior": "wait S1 pressed -> A4 440 Hz quarter note 500 ms -> wait released" },
@@ -142,6 +153,9 @@ pub(crate) fn with_project_context(base_prompt: &str, path: &Path, private_allow
 /// Enforce classic-ESP32 scope before configuring or flashing. Generic legacy
 /// projects remain usable without adding private metadata files.
 pub(crate) fn validate_build_profile(path: &Path) -> Result<(), String> {
+    if super::uai_plus::is_project(path) {
+        return Err("KidBright uAI Plus runs MaixPy Python; ESP-IDF build/flash is not valid for this project.".into());
+    }
     if project_context(path).contains("[PROJECT PROFILE ERROR]") {
         return Err("The KidBright project profile is invalid, unknown or inconsistent with its recipe. Confirm the board before build; no fallback profile was selected.".into());
     }
@@ -157,7 +171,7 @@ pub(crate) fn validate_build_profile(path: &Path) -> Result<(), String> {
         )
         .map_err(|error| error.to_string())?;
         if value.get("target").is_some_and(|target| target != "esp32") {
-            return Err("This KidBright build path currently supports classic ESP32 profiles only. muAI and muAI Plus remain future work.".into());
+            return Err("This build path supports classic ESP32 only. Plus projects use MaixPy Python; original muAI V831 remains future work.".into());
         }
     }
     for name in ["sdkconfig", "sdkconfig.defaults"] {
@@ -282,6 +296,17 @@ pub(crate) fn project_context(path: &Path) -> String {
     let Some(value) = value else {
         return PROFILE_ERROR.into();
     };
+    let expansion = if value["expansion_boards"] == json!(["ikb_1z"]) {
+        "\n[CURRENT PROJECT EXPANSION: IKB-1Z] Use the host-specific bundled driver; no wiring or physical validation implied.\n"
+    } else { "" };
+    if super::uai_plus::is_manifest(&value) {
+        return format!("\n[PROJECT TARGET] KidBright uAI Plus SG2002; MaixPy 4 Python; entrypoint main/main.py. Not an ESP32 profile. Read kidbright_uai_plus_python.md; never use idf.py for this project.\n{expansion}");
+    }
+    if value["schema_version"] == 1 && value["project_type"] == "esp_idf" &&
+        value["target"] == "esp32" && value["entrypoint"] == "main/main.c" &&
+        value.get("board_profile").is_none() && value.get("reference_example").is_none() {
+        return format!("\n[CURRENT KIDBRIGHT PROJECT]\nCustom ESP32 ESP-IDF C draft, entrypoint main/main.c. No executable board profile, pins or physical certification are implied. Retain the user's confirmed exact model; do not inherit another board's wiring.\n{expansion}");
+    }
     let board = value["board_profile"].as_str().unwrap_or_default();
     let example = value["reference_example"].as_str().unwrap_or_default();
     let valid_example = if example=="typed_block_pilot" {value["block_mapping_schema"]==1&&profile(board).is_ok()}else{files(board,example).is_ok()};
@@ -294,7 +319,7 @@ pub(crate) fn project_context(path: &Path) -> String {
         .unwrap()
         .to_string_lossy()
         .replace('\\', "/");
-    format!("\n[CURRENT KIDBRIGHT PROJECT]\nBoard profile: {}. Initial reference example: {}. Read {} and main/kb_board.h before edits; keep the confirmed pins. Private metadata is not a learner-editable source file; do not copy reference Markdown into the project. Read shared rules with kidbright_reference. No Formula Kid or minibike motor wiring is implied by this profile. Protocol changes require an explicit matching sender/receiver contract.\n", board, example, manifest_name)
+    format!("\n[CURRENT KIDBRIGHT PROJECT]\nBoard profile: {}. Initial reference example: {}. Read {} and main/kb_board.h before edits; keep the confirmed pins. Private metadata is not a learner-editable source file; do not copy reference Markdown into the project. Read shared rules with kidbright_reference. No Formula Kid or minibike motor wiring is implied by this profile. Protocol changes require an explicit matching sender/receiver contract.\n{}", board, example, manifest_name, expansion)
 }
 
 #[cfg(test)]
@@ -390,6 +415,12 @@ mod tests {
             .contains("future work"));
         assert!(files("kidbright32_v16", "music_scale").is_err());
         assert!(files("kidbright_uai", "music_scale").is_err());
+        assert!(result.to_string().len()<12*1024,"A narrow reference call must not dump the full catalog/guides");
+        assert_eq!(catalog["detail_required"],true);
+        let selected=reference(&json!({"catalog_board":"kidbright32_v13"}));
+        assert_eq!(selected["board_catalog"]["boards"].as_array().unwrap().len(),1);
+        assert!(selected["board_catalog"]["boards"][0]["pins"].is_array());
+        assert!(reference(&json!({"catalog_board":"unknown"})).get("error").is_some());
     }
 
     #[test]

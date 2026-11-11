@@ -1,0 +1,13 @@
+{
+  "date": "2026-10-27",
+  "cases": 64,
+  "core_kit_cases": 62,
+  "optional_pdf_fan_pump_cases": 2,
+  "unique_ids_and_project_names": true,
+  "acyclic_ordered_dependencies": true,
+  "all_prompts_have_equipment_task_and_expected": true,
+  "csv_matches_all_ids": true,
+  "physical_tests_run": 0,
+  "live_model_generated_programs": 0,
+  "method": "Static reference/procedure review and cross-file data checks; not generation or hardware certification"
+}

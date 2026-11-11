@@ -521,7 +521,7 @@ Recipe `button_buzzer` ใช้ S1 GPIO16 active-low และ buzzer GPIO13 �
 | Block ID | K def/gen | W def/gen | Toolbox | Sample | KB candidate | Host subset | Recipe subset | แหล่งอ้างอิงแรก |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | `call_function` | 1/1 | 1/1 | มี | — | — | — | — | K:kbide/app/public/blockly/kidbright/blocks-function.js:25 |
-| `function` | 1/1 | 1/1 | มี | — | 22 จุด | — | — | K:kbide/app/public/blockly/kidbright/blocks-function.js:13 |
+| `function` | 1/1 | 1/1 | มี | — | 25 จุด | — | — | K:kbide/app/public/blockly/kidbright/blocks-function.js:13 |
 | `procedures_callnoreturn` | 1/1 | 1/1 | — | — | — | — | — | K:kbide/app/public/blockly/blocks_compressed.js:108 |
 | `procedures_callreturn` | 1/1 | 1/1 | — | — | — | — | — | K:kbide/app/public/blockly/blocks_compressed.js:117 |
 | `procedures_defnoreturn` | 1/1 | 1/1 | — | — | — | — | — | K:kbide/app/public/blockly/blocks_compressed.js:89 |
@@ -636,7 +636,7 @@ Recipe `button_buzzer` ใช้ S1 GPIO16 active-low และ buzzer GPIO13 �
 | `music_get_volume` | 1/1 | 1/1 | มี | — | — | — | — | K:kbide/app/public/blockly/kidbright/blocks.js:1193 |
 | `music_note` | 1/1 | 1/1 | มี | มี | — | — | button_buzzer | K:kbide/app/public/blockly/kidbright/blocks.js:463 |
 | `music_rest` | 1/1 | 1/1 | มี | — | — | — | — | K:kbide/app/public/blockly/kidbright/blocks.js:522 |
-| `music_scale` | 1/1 | 1/1 | มี | — | 4 จุด | — | — | K:kbide/app/public/blockly/kidbright/blocks.js:1111 |
+| `music_scale` | 1/1 | 1/1 | มี | — | 5 จุด | — | — | K:kbide/app/public/blockly/kidbright/blocks.js:1111 |
 | `music_set_tempo` | 0/1 | 0/1 | — | — | — | — | — | K:kbide/app/public/blockly/kidbright/generators.js:350 |
 | `music_set_volume` | 1/1 | 1/1 | มี | — | — | — | — | K:kbide/app/public/blockly/kidbright/blocks.js:1177 |
 
@@ -787,7 +787,7 @@ Recipe `button_buzzer` ใช้ S1 GPIO16 active-low และ buzzer GPIO13 �
 | `string_length` | 1/1 | 1/1 | มี | — | — | — | — | K:kbide/app/public/blockly/kidbright/blocks-string.js:24 |
 | `string_substring` | 1/1 | 1/1 | มี | — | — | — | — | K:kbide/app/public/blockly/kidbright/blocks-string.js:172 |
 | `string_with_number` | 1/1 | 1/1 | มี | — | — | — | — | K:kbide/app/public/blockly/kidbright/blocks-string.js:202 |
-| `text` | 1/1 | 1/1 | — | — | 31 จุด | — | — | K:kbide/app/public/blockly/blocks_compressed.js:123 |
+| `text` | 1/1 | 1/1 | — | — | 41 จุด | — | — | K:kbide/app/public/blockly/blocks_compressed.js:123 |
 | `text_append` | 1/1 | 1/1 | — | — | — | — | — | K:kbide/app/public/blockly/blocks_compressed.js:124 |
 | `text_changeCase` | 1/1 | 1/1 | — | — | — | — | — | K:kbide/app/public/blockly/blocks_compressed.js:132 |
 | `text_charAt` | 1/1 | 1/1 | — | — | — | — | — | K:kbide/app/public/blockly/blocks_compressed.js:127 |
@@ -841,6 +841,10 @@ Recipe `button_buzzer` ใช้ S1 GPIO16 active-low และ buzzer GPIO13 �
 | `knowledge_base/compatibility/matrix_counter.c` | `app_main`:11 | ไม่พบ | recorded-source-and-dependency-hash-matched |
 | `knowledge_base/compatibility/music_scale.c` | `app_main`:11 | ไม่พบ | recorded-source-and-dependency-hash-matched |
 | `knowledge_base/compatibility/temperature_serial.c` | `app_main`:13 | ไม่พบ | recorded-source-and-dependency-hash-matched |
+| `knowledge_base/drivers/ikb1z.c` | `valid_mask`:3, `ikb1z_init`:8, `ikb1z_encode_io`:20, `ikb1z_encode_motor`:28, `ikb1z_encode_servo`:38, `ikb1z_decode_adc10`:48, `exchange`:59, `ikb1z_output`:69, `read_byte`:76, `ikb1z_input`:91, `ikb1z_adc8`:93, `ikb1z_adc_percent`:95, `ikb1z_adc10`:98, `ikb1z_motor`:108, `ikb1z_stop`:117, `ikb1z_servo`:119, `ikb1z_reset`:126, `ikb1z_servo_free`:132, `ikb1z_uart_read`:138 | ไม่พบ | no-current-hash-matched-build-evidence |
+| `knowledge_base/drivers/ikb1z.h` | — | ไม่พบ | no-current-hash-matched-build-evidence |
+| `knowledge_base/drivers/ikb1z_esp_idf.c` | `mapped`:5, `budget_ticks`:11, `remaining`:17, `valid_config`:24, `idf_exchange`:30, `ikb1z_esp_idf_init_legacy`:74, `ikb1z_esp_idf_attach`:86, `ikb1z_esp_idf_detach`:109 | ไม่พบ | no-current-hash-matched-build-evidence |
+| `knowledge_base/drivers/ikb1z_esp_idf.h` | — | ไม่พบ | no-current-hash-matched-build-evidence |
 | `knowledge_base/sensor_examples/accel_kxtj3.c` | `kxtj3_write_reg`:60, `kxtj3_read_reg`:72, `kxtj3_init`:89, `kxtj3_read`:121, `kxtj3_is_shaking`:150, `kxtj3_get_tilt`:161, `accel_task`:169, `standalone`:186 | ไม่พบ | no-current-hash-matched-build-evidence |
 | `knowledge_base/sensor_examples/accel_mc3479.c` | `i2c_master_init`:35, `mc3479_init`:48, `app_main`:59 | ไม่พบ | no-current-hash-matched-build-evidence |
 | `knowledge_base/sensor_examples/adc_ldr_external.c` | `adc_calibration_init`:41, `adc_init_all`:83, `adc_read_raw`:109, `adc_read_mv`:135, `ldr_get_raw`:149, `ldr_get_brightness_percent`:155, `ldr_classify`:162, `adc_demo_task`:176, `adc_deinit`:204, `app_main`:234 | ไม่พบ | no-current-hash-matched-build-evidence |

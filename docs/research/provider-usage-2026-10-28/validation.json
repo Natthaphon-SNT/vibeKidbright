@@ -1,0 +1,30 @@
+{
+  "date": "2026-10-28",
+  "scope": "Provider-neutral usage normalization and existing application transports; deterministic fixtures, no live keys or generation calls.",
+  "live_api_tested": false,
+  "api_credentials_logged": false,
+  "tests": {
+    "native_passed": 276,
+    "ui_passed": 232,
+    "ui_files": 23
+  },
+  "routes": [
+    "OpenAI-compatible including custom/cloud/local",
+    "OpenRouter",
+    "Google native"
+  ],
+  "states": [
+    "reported",
+    "partial",
+    "unavailable",
+    "interrupted"
+  ],
+  "source_sha256": {
+    "src-tauri/src/ai/usage.rs": "a72222d1a749e3624c3c2024469de3e1206362715f57efdea75545a262c5a673",
+    "src-tauri/src/ai/providers.rs": "9d3df86219fc5ae09494fd767f8dac2224ce4c3de1ca2c6fedb775ceee37cc18",
+    "src/AiChat.tsx": "aab63879a490564e34c64b17050a68757ecc01e457d38fedef108febd004a25d",
+    "src/aiUsage.ts": "9e3669140825b1ed369e139b136402bd1ceec0934ee4a2e1640225d5902b7165",
+    "src/test/aiUsage.test.ts": "309918b5ced7b701d614e07512271f01ef7791de430bdda48370081fd3664326",
+    "src/test/aiChatHistory.test.tsx": "b58b4bf91a6795f54d004930db2716320133eb175333e07d5924f84cc54e83dc"
+  }
+}

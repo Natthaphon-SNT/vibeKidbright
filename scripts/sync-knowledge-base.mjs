@@ -4,12 +4,14 @@ import { dirname, extname, join, relative } from "node:path";
 const source = "knowledge_base";
 const destination = "resources/knowledge_base";
 const write = process.argv.includes("--write");
-const allowed = new Set([".c", ".h", ".md", ".txt", ".pdf", ".png", ".jpg", ".jpeg", ".webp"]);
-function files(directory) {
+const allowed = new Set([".c", ".h", ".py", ".md", ".txt", ".pdf", ".png", ".jpg", ".jpeg", ".webp"]);
+const structuredReferences = new Set(["compatibility/uai_plus_test_contracts.json"]);
+function files(directory, root = directory) {
   return readdirSync(directory, { withFileTypes: true }).flatMap(entry => {
     if (entry.name.startsWith(".")) return [];
     const path = join(directory, entry.name);
-    return entry.isDirectory() ? files(path) : allowed.has(extname(path).toLowerCase()) ? [path] : [];
+    return entry.isDirectory() ? files(path, root) : allowed.has(extname(path).toLowerCase())
+      || structuredReferences.has(relative(root, path).replaceAll("\\", "/")) ? [path] : [];
   });
 }
 const expected = new Set();

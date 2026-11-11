@@ -1,9 +1,9 @@
 // Production React smoke with an explicit in-memory native/provider fixture.
 // This verifies UI/CSP wiring; it is NOT a live-provider or native-IPC quality eval.
 import {createServer} from 'node:http';
-import {readFile,writeFile,mkdir} from 'node:fs/promises';
+import {readFile,writeFile,mkdir,mkdtemp} from 'node:fs/promises';
 import {existsSync} from 'node:fs';
-import {resolve,extname,sep,dirname} from 'node:path';
+import {resolve,extname,sep,dirname,relative} from 'node:path';
 import {createHash} from 'node:crypto';
 import {createRequire} from 'node:module';
 import {probeBoardGuide} from './probe-board-guide.mjs';
@@ -11,8 +11,13 @@ import {probePromptExamples} from './probe-prompt-examples.mjs';
 const root=process.cwd();
 const args=process.argv.slice(2);
 if(args.length && (args.length!==2||args[0]!=='--report'))throw new Error('Usage: check-production-workflows.mjs [--report <workspace-path.json>]');
-const reportPath=resolve(root,args[1]??'docs/ai-engineering/production-workflow-probe.json');
+// Keep every run's report, debug output and screenshots separate from prior evidence.
+const runs=resolve(root,'src-tauri/target/production-workflows');
+await mkdir(runs,{recursive:true});
+const artifactRoot=await mkdtemp(resolve(runs,'run-'));
+const reportPath=resolve(root,args[1]??resolve(artifactRoot,'report.json'));
 if(!reportPath.startsWith(root+sep))throw new Error('Report must stay inside the workspace');
+if(existsSync(reportPath))throw new Error('Report already exists; choose a new evidence path');
 const require=createRequire(resolve(root,'src-tauri/target/learning-ui-tools/package.json'));
 const {chromium}=require('playwright-core');
 const executable=['C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe','C:/Program Files/Microsoft/Edge/Application/msedge.exe','C:/Program Files/Google/Chrome/Application/chrome.exe'].find(existsSync);
@@ -37,9 +42,9 @@ try{
     await page.addInitScript(()=>{
         const project='D:\\fixture';const path=project+'\\main\\main.c';
         const old='void app_main(void) { int revision = 0; }\n';const proposed='void app_main(void) { int revision = 1; }\n';
-        let source=old,pending=null,next=1;const callbacks=new Map(),listeners=new Map(),commands=[];
+        let source=old,pending=null,next=1;const callbacks=new Map(),listeners=new Map(),commands=[],unexpectedCommands=[];
         const emit=(name,payload)=>{for(const id of listeners.get(name)??[])callbacks.get(id)?.({event:name,id,payload});};
-        window.__workflowProbe={commands,state:()=>({source,pending}),emit};
+        window.__workflowProbe={commands,unexpectedCommands,state:()=>({source,pending}),emit};
         window.__TAURI_EVENT_PLUGIN_INTERNALS__={unregisterListener:()=>{}};
         localStorage.clear();localStorage.setItem('vibe-project-dir',project);
         window.__TAURI_INTERNALS__={metadata:{currentWindow:{label:'main'},currentWebview:{label:'main'}},
@@ -51,7 +56,9 @@ try{
                 if(cmd==='plugin:event|unlisten'){listeners.get(args.event)?.delete(args.eventId);return;}
                 if(cmd==='check_toolchain')return {status:'ready',version:'fixture'};
                 if(cmd==='get_idf_custom_paths')return {idf_path:'C:\\fixture-sdk',tools_path:'C:\\fixture-tools'};
+                if(cmd==='get_project_kind')return args.path===project?'esp_idf':null;
                 if(cmd==='validate_idf_project')return true;
+                if(cmd==='check_esp_idf')return 'Fixture ESP-IDF ready';
                 if(cmd==='list_project_files')return [{name:'main',path:project+'\\main',is_dir:true,children:[{name:'main.c',path,is_dir:false}]}];
                 if(cmd==='read_project_file')return source;
                 if(cmd==='check_pending_diff')return pending;
@@ -75,12 +82,14 @@ try{
                     if(args.expectedRevision!==pending?.revision)throw new Error('Stale fixture revision');source=pending.proposed;pending=null;
                     emit('file-modified',JSON.stringify({path}));return 'Reviewed';
                 }
-                if(cmd.startsWith('get_'))return '';
-                return 'Ready';
+                if(['get_api_key','get_search_api_key','get_openrouter_api_key','get_google_api_key'].includes(cmd))return '';
+                unexpectedCommands.push(cmd);
+                throw new Error('Unexpected fixture IPC command: '+cmd);
             }};
     });
     await page.goto(address);
     await page.getByRole('button',{name:'main.c',exact:true}).waitFor({timeout:10000});
+    if(!await page.evaluate(()=>window.__workflowProbe.commands.some(({cmd,args})=>cmd==='get_project_kind'&&args.path==='D:\\fixture')))throw new Error('Restored project kind was not checked');
     await page.locator('nav[aria-label="Workspace views"] button').nth(1).click();
     const input=page.getByPlaceholder('Ask about your code...');await input.waitFor();
     await input.fill('Explain delay');await input.press('Enter');
@@ -98,21 +107,24 @@ try{
     const sent=calls.filter(c=>c.cmd==='send_ai_message');
     if(sent[0]?.args.messages.at(-1)?.content!=='Explain delay')throw new Error('Synthetic context was inserted into the user text');
     if(accepts.length!==1||accepts[0].args.expectedRevision!=='fixture-r1')throw new Error('Approval did not bind the pending revision');
-    const boardGuide=await probeBoardGuide(page,root);
-    const promptExamples=await probePromptExamples(page,root);
-    if(errors.length||external.length)throw new Error(JSON.stringify({errors,external}));
+    const boardGuide=await probeBoardGuide(page,artifactRoot);
+    const promptExamples=await probePromptExamples(page,artifactRoot);
+    const unexpected=await page.evaluate(()=>window.__workflowProbe.unexpectedCommands);
+    if(errors.length||external.length||unexpected.length)throw new Error(JSON.stringify({errors,external,unexpected}));
     const result={production_dist:true,strict_production_csp:true,native_backend_stubbed:true,model_response_fixture:true,live_provider:false,
         knowledge_citation_rendered:true,code_edit_reviewed:true,source_unchanged_before_keep:true,revision_bound_keep:true,
         automatic_project_path_export:false,
+        restored_project_kind_checked:true,unexpected_ipc_commands:unexpected,
+        artifacts_directory:relative(root,artifactRoot),
         board_preparation_guide:boardGuide,
         prompt_examples:promptExamples,
         external_requests_attempted:external,page_errors:errors,scope:'Actual compiled React UI with in-memory event/native fixture; actual native Engine/journal and installer probes are separate evidence'};
     result.production_index_sha256=createHash('sha256').update(await readFile(resolve(dist,'index.html'))).digest('hex');
     result.scope+='; current development dist, not a replacement NSIS qualification';
-    await mkdir(dirname(reportPath),{recursive:true});await writeFile(reportPath,JSON.stringify(result,null,2)+'\n');
+    await mkdir(dirname(reportPath),{recursive:true});await writeFile(reportPath,JSON.stringify(result,null,2)+'\n',{flag:'wx'});
     console.log(JSON.stringify(result));
 }catch(error){
     const debug=await page.evaluate(()=>({body:document.body.innerText,commands:window.__workflowProbe?.commands}));
-    await writeFile('src-tauri/target/production-workflow-debug.json',JSON.stringify({errors,external,...debug},null,2));
+    await writeFile(resolve(artifactRoot,'debug.json'),JSON.stringify({errors,external,...debug},null,2),{flag:'wx'});
     console.error(JSON.stringify({errors,external,body:debug.body.slice(0,800),commands:debug.commands?.slice(0,12)}));throw error;
 }finally{await browser.close();await new Promise(resolve=>server.close(resolve));}

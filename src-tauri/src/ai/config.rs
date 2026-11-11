@@ -14,6 +14,10 @@ static EVALUATION_NO_CREDENTIALS: std::sync::atomic::AtomicBool = std::sync::ato
 pub(crate) fn isolate_evaluation_credentials() {
     EVALUATION_NO_CREDENTIALS.store(true,std::sync::atomic::Ordering::SeqCst);
 }
+#[cfg(debug_assertions)]
+pub(crate) fn evaluation_isolated() -> bool {
+    EVALUATION_NO_CREDENTIALS.load(std::sync::atomic::Ordering::SeqCst)
+}
 const CREDENTIALS: &[(&str, &str)] = &[
     ("vibekidbright-openai", "api_key"), ("vibekidbright-openrouter", "openrouter_api_key"),
     ("vibekidbright-google", "google_api_key"), ("vibekidbright-search", "search_api_key"),

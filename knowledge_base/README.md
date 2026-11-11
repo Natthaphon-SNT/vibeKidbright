@@ -1,290 +1,43 @@
-# KidBright32 iA — Sensor Code Examples (ESP-IDF v5.x)
-
-> **สถานะ:** ฐานข้อมูลอ้างอิงประกอบด้วย ESP-IDF C, Arduino ต้นฉบับ และเอกสารประวัติ ไม่ใช่โค้ดที่รับรองว่า build ได้ทุกไฟล์
-> อ่าน [support_scope.md](support_scope.md) ก่อนเลือกบอร์ดหรือใช้ snippet และใช้ API ที่ตรงกับ SDK ปัจจุบัน
->
-> **รุ่นที่กล่าวถึงในเอกสาร:** V1.5 Rev 3.1 · Rev 3.1G · V1.5 iA · V1.6 — ไม่ใช่รายการ runtime profiles ที่ทดสอบครบ
->
-> ใช้ [ตารางรุ่นที่มีแหล่งอ้างอิง](compatibility/board_catalog.json) และตรวจ PCB silkscreen ก่อนกำหนดขา
-> ตารางประวัติด้านล่างยังมีข้อมูลต่าง revision; ไม่ใช้เป็นหลักฐานขยายโปรไฟล์โดยอัตโนมัติ
-> μAI และ μAI Plus เป็นแผนอนาคต หลังพัฒนา KidBright เสร็จตามคำขอของผู้ใช้
-
----
-
-## ไฟล์ในโฟลเดอร์นี้
-
-| ไฟล์ | เซ็นเซอร์ | อธิบาย |
-|------|----------|--------|
-| `adc_ldr_external.c` | LDR, IN1, IN2 | ADC oneshot + calibration สำหรับ LDR (GPIO36) และพอร์ต JST |
-| `temp_lm73.c` | LM73 (I2C) | อ่านอุณหภูมิจาก LM73 บน I2C_NUM_1 |
-| `accel_kxtj3.c` | KXTJ3-1057 (I2C) | อ่านความเร่งจาก KXTJ3 บน I2C_NUM_0 |
-| `all_sensors_demo.c` | ทุกเซ็นเซอร์ | Demo รวมทุกเซ็นเซอร์ใน task เดียว |
-| `all_models.md` | — | รายการรุ่นและตารางประวัติที่ยังมีความขัดแย้ง ต้องตรวจ PCB |
-| `inex_ia_ip.md` | LDR/โฟโต้ทรานซิสเตอร์, MC3479 | ข้อมูล INEX iA/iP แยกรุ่นและขอบเขตผลทดสอบผู้ใช้ |
-| `kidbright_uai.md` | กล้อง/เสียง/accelerometer ของ μAI V831 | เอกสารอนาคตสำหรับ Linux/Allwinner; μAI และ Plus ยังไม่เปิด deployment |
-
----
-
-## กฎที่ต้องรู้ก่อน (Vaccine)
-
-### ❌ Framework ที่ห้ามใช้
-
-```c
-// ❌ BANNED: Arduino Framework — ห้ามใช้โดยเด็ดขาด
-#include <Wire.h>          // ❌
-#include <Arduino.h>       // ❌
-void setup() { }           // ❌
-void loop()  { }           // ❌
-digitalWrite(...)          // ❌
-analogRead(...)            // ❌
-```
-
-> **กฎสำหรับ firmware ที่สร้างใหม่:** ใช้ ESP-IDF C และ SDK ที่เลือก ส่วน `balanced_robot.c` เป็น Arduino reference ต้องพอร์ตก่อน build ไม่ใช่ตัวอย่างที่ผ่าน ESP-IDF แล้ว
-
----
-
-### ADC Legacy — ห้ามสรุปว่า API ถูกลบเหมือนกันทุก SDK
-
-```c
-// Historical API names; availability/deprecation depends on the installed SDK.
-#include "driver/adc.h"           // ❌ BANNED
-#include "esp_adc_cal.h"          // ❌ BANNED
-adc1_config_width(...)            // inspect SDK headers before porting
-adc1_config_channel_atten(...)    // prefer supported oneshot API for new code
-adc1_get_raw(...)                 // preserve source mapping during migration
-esp_adc_cal_characterize(...)     // calibration API is SDK-specific
-ADC_ATTEN_DB_11                   // ❌ Deprecated → ใช้ ADC_ATTEN_DB_12 แทน
-```
-
-### ✅ ADC Oneshot API ที่ถูกต้อง (ESP-IDF v5.x)
-
-```c
-#include "esp_adc/adc_oneshot.h"     // ✅
-#include "esp_adc/adc_cali.h"        // ✅
-#include "esp_adc/adc_cali_scheme.h" // ✅
-
-// ขั้นตอน 4 ขั้น:
-adc_oneshot_new_unit(...)            // 1. Create unit
-adc_oneshot_config_channel(...)      // 2. Config channel (ใช้ ADC_ATTEN_DB_12)
-adc_oneshot_read(...)                // 3. Read raw
-adc_cali_raw_to_voltage(...)         // 4. Convert to mV (optional calibration)
-```
-
----
-
-### ❌ I2C Golden Rule — `i2c_driver_install()` เรียกได้แค่ครั้งเดียวต่อ port
-
-```c
-// ❌ ห้ามเรียก i2c_driver_install() ซ้ำบน port เดิม
-// จะเกิด ESP_ERR_INVALID_STATE
-
-// ✅ เรียกครั้งเดียว แล้วแชร์ bus ให้ทุก device บน port นั้น
-i2c_driver_install(I2C_NUM_0, I2C_MODE_MASTER, 0, 0, 0);  // ครั้งเดียวเท่านั้น
-// จากนั้น HT16K33 (0x70) และ KXTJ3 (0x0E) ใช้ I2C_NUM_0 ร่วมกันได้เลย
-```
-
----
-
-### ⚠️ Hardware Quirk — LED Matrix Y-axis Inversion
-
-```c
-// ❌ ผิด — จะแสดงผลกลับหัว
-out_cols[col] |= (1 << row);
-
-// ✅ ถูก — ต้อง invert Y-axis เสมอ (hardware wired upside-down)
-out_cols[col] |= (1 << (7 - row));
-```
-
----
-
-## Sensor Map สรุป
-
-### On-board Sensors — V1.5 Rev 3.1 (NECTEC Standard)
-
-> ⚠️ **ไม่มี Accelerometer** · **ไม่รองรับ ADC บน IN1–IN4** · **SW2 = GPIO14**
-
-| Sensor | Protocol | Bus/Pin | Address |
-|--------|----------|---------|---------|
-| LDR (Light) | ADC | GPIO36 / ADC1_CH0 | — |
-| LM73 (Temp) | I2C | I2C_NUM_1, SDA=GPIO4, SCL=GPIO5 | 0x4D |
-| RTC MCP794xx | I2C | I2C_NUM_1, SDA=GPIO4, SCL=GPIO5 | 0x6F |
-| HT16K33 (Matrix) | I2C | I2C_NUM_0, SDA=GPIO21, SCL=GPIO22 | 0x70 |
-| Passive Buzzer | GPIO/PWM | GPIO13 (LEDC) | — |
-| SW1 Button | GPIO | GPIO16 | — |
-| **SW2 Button** | GPIO | **GPIO14** | — |
-| USB Host Control | GPIO | GPIO25 (Active LOW) | — |
-
----
-
-### On-board Sensors — V1.5 Rev 3.1G (Gravitech OEM)
-
-> ⚠️ **ไม่มี Accelerometer** · **ไม่รองรับ ADC บน IN1–IN4** · **SW2 = GPIO14** (เหมือน Rev 3.1)
-
-| Sensor | Protocol | Bus/Pin | Address |
-|--------|----------|---------|---------|
-| LDR (Light) | ADC | GPIO36 / ADC1_CH0 | — |
-| LM73 (Temp) | I2C | I2C_NUM_1, SDA=GPIO4, SCL=GPIO5 | 0x4D |
-| RTC MCP794xx | I2C | I2C_NUM_1, SDA=GPIO4, SCL=GPIO5 | 0x6F |
-| HT16K33 (Matrix) | I2C | I2C_NUM_0, SDA=GPIO21, SCL=GPIO22 | 0x70 |
-| Passive Buzzer | GPIO/PWM | GPIO13 (LEDC) | — |
-| SW1 Button | GPIO | GPIO16 | — |
-| **SW2 Button** | GPIO | **GPIO14** | — |
-| USB Host Control | GPIO | GPIO25 (Active LOW) | — |
-
-> 📋 **I2C Scan Result (V1.5 Rev 3.1G — confirmed Apr 17 2026)**
-> I2C_NUM_1: `0x4D` (LM73) + `0x6F` (RTC MCP794xx) · I2C_NUM_0: `0x70` (HT16K33)
-
----
-
-### On-board Sensors — V1.5 iA (INEX)
-
-> ✅ **เพิ่ม KXTJ3 Accelerometer** · **รองรับ ADC บน IN1–IN4** · SW2 = GPIO17
-
-| Sensor | Protocol | Bus/Pin | Address |
-|--------|----------|---------|---------|
-| LDR (Light) | ADC | GPIO36 / ADC1_CH0 | — |
-| LM73 (Temp) | I2C | I2C_NUM_1, SDA=GPIO4, SCL=GPIO5 | 0x4D |
-| RTC MCP794xx | I2C | I2C_NUM_1, SDA=GPIO4, SCL=GPIO5 | 0x6F |
-| **KXTJ3 (Accel)** | I2C | I2C_NUM_0, SDA=GPIO21, SCL=GPIO22 | **0x0E** |
-| HT16K33 (Matrix) | I2C | I2C_NUM_0, SDA=GPIO21, SCL=GPIO22 | 0x70 |
-| Passive Buzzer | GPIO/PWM | GPIO13 (LEDC) | — |
-| SW1 Button | GPIO | GPIO16 | — |
-| SW2 Button | GPIO | GPIO17 | — |
-
----
-
-### External JST Ports (ทุกรุ่น V1.5+)
-
-| Port | GPIO | Mode | หมายเหตุ |
-|------|------|------|---------|
-| IN1 | GPIO32 | Digital / ADC1_CH4 / Touch | ADC รองรับเฉพาะ iA และ V1.6 |
-| IN2 | GPIO33 | Digital / ADC1_CH5 / Touch | ADC รองรับเฉพาะ iA และ V1.6 |
-| IN3 | GPIO34 | Input-only / ADC1_CH6 | ไม่มี pull resistor |
-| IN4 | GPIO35 | Input-only / ADC1_CH7 | ไม่มี pull resistor |
-| OUT1 | GPIO26 | Digital / DAC2 | — |
-| OUT2 | GPIO27 | Digital | — |
-
----
-
-## ⚠️ GPIO Conflict Table
-
-### V1.5 Rev 3.1 (NECTEC Standard)
-
-| GPIO | ใช้ได้เป็น... |
-|------|--------------|
-| GPIO2 | **Wi-Fi LED** — อย่าใช้งานอื่น |
-| GPIO4 | **BT LED** หรือ **LM73 SDA** — เลือกได้แค่อย่างเดียว |
-| GPIO13 | **Passive Buzzer** — ต้องใช้ LEDC/PWM เสมอ |
-| GPIO14 | **SW2 Button** — ห้ามใช้งานอื่น |
-| GPIO16 | **SW1 Button** — ห้ามใช้งานอื่น |
-| GPIO25 | **USB Host (Active LOW)** — อย่าใช้งานอื่น |
-| GPIO36 | **LDR ADC** — Input-only, ไม่มี pull resistor |
-
-### V1.5 Rev 3.1G (Gravitech OEM)
-
-| GPIO | ใช้ได้เป็น... |
-|------|--------------|
-| GPIO2 | **Wi-Fi LED** — อย่าใช้งานอื่น |
-| GPIO4 | **BT LED** หรือ **LM73 SDA** — เลือกได้แค่อย่างเดียว |
-| GPIO13 | **Passive Buzzer** — ต้องใช้ LEDC/PWM เสมอ |
-| GPIO14 | **SW2 Button** — ห้ามใช้งานอื่น (ยืนยัน Apr 17 2026) |
-| GPIO16 | **SW1 Button** — ห้ามใช้งานอื่น |
-| GPIO25 | **USB Host (Active LOW)** — อย่าใช้งานอื่น |
-| GPIO36 | **LDR ADC** — Input-only, ไม่มี pull resistor |
-
-### V1.5 iA (INEX)
-
-| GPIO | ใช้ได้เป็น... |
-|------|--------------|
-| GPIO2 | **Wi-Fi LED** — อย่าใช้งานอื่น |
-| GPIO4 | **BT LED** หรือ **LM73 SDA** — เลือกได้แค่อย่างเดียว |
-| GPIO13 | **Passive Buzzer** — ต้องใช้ LEDC/PWM เสมอ |
-| GPIO16 | **SW1 Button** — ห้ามใช้งานอื่น |
-| GPIO17 | **SW2 Button** — ห้ามใช้งานอื่น |
-| GPIO36 | **LDR ADC** — Input-only, ไม่มี pull resistor |
-
-### V1.6 (Gravitech)
-
-| GPIO | ใช้ได้เป็น... |
-|------|--------------|
-| GPIO2 | **Wi-Fi LED** — อย่าใช้งานอื่น |
-| GPIO4 | **BT LED** หรือ **LM73 SDA** — เลือกได้แค่อย่างเดียว |
-| GPIO13 | **Passive Buzzer** — ต้องใช้ LEDC/PWM เสมอ |
-| GPIO16 | **SW1 Button** หรือ **SERVO1** — เลือกได้แค่อย่างเดียว |
-| GPIO36 | **LDR ADC** — Input-only, ไม่มี pull resistor |
-
----
-
-## ตัวอย่าง: อ่าน LM35 บน IN1 (GPIO32)
-
-```c
-// LM35: 10mV per degree Celsius
-// Connect: VCC→3.3V, GND→GND, OUT→GPIO32 (IN1)
-// รองรับเฉพาะ V1.5 iA และ V1.6 เท่านั้น (Rev 3.1 / 3.1G ไม่รองรับ ADC บน IN1)
-int mv = adc_read_mv(ADC_CHANNEL_4, cali_in1);
-float temp_c = mv / 10.0f;
-ESP_LOGI("SENSOR", "LM35 Temperature: %.2f °C", temp_c);
-```
-
-## ตัวอย่าง: I2C init order ตามรุ่น
-
-### V1.5 Rev 3.1 (NECTEC Standard) — SW2=GPIO14
-
-```
-I2C init order:
-1. i2c_init_bus0() → I2C_NUM_0: LED Matrix (0x70) เท่านั้น (ไม่มี KXTJ3)
-2. i2c_init_bus1() → I2C_NUM_1: LM73 (0x4D) + RTC (0x6F)
-3. adc_init_all()  → ADC1: LDR (GPIO36) เท่านั้น (IN1–IN4 ไม่รองรับ ADC)
-
-Button config:
-- SW1 = GPIO16
-- SW2 = GPIO14
-```
-
-### V1.5 Rev 3.1G (Gravitech OEM) — SW2=GPIO14
-
-```
-I2C init order:
-1. i2c_init_bus0() → I2C_NUM_0: LED Matrix (0x70) เท่านั้น (ไม่มี KXTJ3)
-2. i2c_init_bus1() → I2C_NUM_1: LM73 (0x4D) + RTC (0x6F)
-3. adc_init_all()  → ADC1: LDR (GPIO36) เท่านั้น (IN1–IN4 ไม่รองรับ ADC)
-
-Button config:
-- SW1 = GPIO16
-- SW2 = GPIO14  ← ยืนยัน hardware scan Apr 17 2026 (เหมือน Rev 3.1)
-```
-
-### V1.5 iA (INEX) — ต้องยืนยัน SW2 และรุ่นเซนเซอร์จาก PCB
-
-```
-I2C init order (ต้องทำก่อนเสมอ):
-1. i2c_init_bus0() → I2C_NUM_0: LED Matrix (0x70) + KXTJ3 (0x0E)
-2. i2c_init_bus1() → I2C_NUM_1: LM73 (0x4D) + RTC (0x6F)
-3. adc_init_all()  → ADC1: LDR (GPIO36) + IN1 (CH4) + IN2 (CH5) + IN3 (CH6) + IN4 (CH7)
-
-Button config:
-- SW1 = GPIO16
-- SW2 = ต้องตรวจ schematic ของรุ่นจริง; ตารางเก่าในชุดนี้ขัดกันระหว่าง GPIO14/17
-```
-
-### V1.6 (Gravitech)
-
-```
-I2C init order:
-1. i2c_init_bus0() → I2C_NUM_0: LED Matrix (0x70) + MPU-6050 (0x68) + RGB LED
-2. i2c_init_bus1() → I2C_NUM_1: LM73 (0x4D) + RTC (0x6F)
-3. adc_init_all()  → ADC1: LDR (GPIO36) + IN1–IN4
-
-Button config:
-- SW1 = GPIO16 (shared with SERVO1 — เลือกใช้อย่างใดอย่างหนึ่ง)
-```
-
-> **กฎทอง:** `i2c_driver_install()` เรียกได้แค่ครั้งเดียวต่อ port number
-> หากเรียก 2 ครั้งจะเกิด error `ESP_ERR_INVALID_STATE`
-
----
-
-## อ้างอิงเพิ่มเติม
-
-- `kidbright32iA.md` — Full developer reference: MCU specs, HT16K33 register map, code examples, peripheral wiring
-- `all_models.md` — รายการรุ่นหลายยุคพร้อมข้อจำกัด; ไม่ใช่ข้อยืนยันว่าทุก profile มี implementation
+# KidBright — ฐานความรู้ฮาร์ดแวร์และตัวอย่าง ESP-IDF
+
+ปรับข้อมูล V1.3/V1.5 วันที่ 22 ตุลาคม 2026 จากไฟล์อ้างอิงที่ผู้ใช้ส่ง อ่าน [ขอบเขตการรองรับ](support_scope.md) ก่อนเลือกบอร์ด การมีเอกสารหรือไฟล์ C ไม่ได้ยืนยันว่า build หรือผ่านบอร์ดจริงทุกไฟล์
+
+## เลือกเอกสารตามรุ่น
+
+| เอกสาร | ขอบเขต |
+|---|---|
+| [kidbright32_v13.md](kidbright32_v13.md) | V1.3: digital-buffer IN, NTP LED GPIO15, ไม่มีหลักฐานช่อง Servo เฉพาะ |
+| [kidbright32_v15.md](kidbright32_v15.md) | V1.5 ตาม design ที่ส่ง: input bypass/ADC, Servo15/17, endpoint และข้อแตกต่าง revision |
+| [kidbright32_versions.md](kidbright32_versions.md) | ตารางเทียบ V1.3/V1.5 และข้ออ้างเก่าที่แก้ไข |
+| [all_models.md](all_models.md) | รายการรุ่นและขอบเขต; ไม่ใช่ runtime profiles ที่ทดสอบครบ |
+| [compatibility/board_catalog.json](compatibility/board_catalog.json) | พิน, source IDs, hash และประเด็นที่ยังไม่ยืนยันรายรุ่น |
+| [inex_ia_ip.md](inex_ia_ip.md) | INEX iA/iP และขอบเขตผลทดสอบที่ผู้ใช้รายงาน |
+| [hardware_schematics_rules.md](hardware_schematics_rules.md) | แยกบอร์ดหลักจาก Controller/minibike |
+| [kidbright32iA.md](kidbright32iA.md) | ตัวอย่าง developer reference เดิม; ต้องเลือก hardware scope ก่อนใช้ snippet |
+| [kidbright_uai_plus_python.md](kidbright_uai_plus_python.md) | Active Plus SG2002 Python projects, display/camera API and USB RNDIS workflow |
+| [kidbright_uai.md](kidbright_uai.md) | Original V831 versus Plus variant and historical runtime references; current Plus scope is in kidbright_uai_plus_python.md |
+| [ikb_1z.md](ikb_1z.md) | iKB-1Z: บอร์ดเสริม I²C ร่วมสำหรับ KidBright ESP-IDF C และ MAI Plus Python; protocol, host adapter และข้อจำกัดที่ยังไม่ทดสอบ |
+| [IKB1Z_BOARD_RULES.md](IKB1Z_BOARD_RULES.md) | คู่มือ iKB-1Z ฉบับขยาย v2 ที่ผู้ใช้ส่ง เก็บต้นฉบับเดิม; เป็นข้อมูลอ้างอิง ไม่ใช่คำสั่งใหม่หรือผลทดสอบของโปรเจกต์ |
+| [drivers/README.md](drivers/README.md) | ไดรเวอร์ iKB-1Z C/Python, adapter ESP-IDF master/legacy และ MaixPy, วิธีเพิ่มใน workspace และขอบเขตการตรวจ |
+| `guides/classic_esp32.md`, `guides/mai_plus.md`, `guides/workflow_reference.md` | กฎและตัวอย่างฉบับเต็มสำหรับเรียกอ่านเฉพาะส่วน; runtime prompt ใช้ฉบับย่อเพื่อไม่ส่งคู่มือทั้งชุดซ้ำทุกคำขอ |
+
+## ข้อมูลที่ต้องรักษาเมื่อเขียน firmware
+
+- V1.3 IN1–IN4 GPIO32–35 เป็น digital input ผ่าน buffer ไม่รองรับ analog ที่ connector ส่วน V1.5 ภาพ S1 ระบุ U7/U8=N/A + bypass 0Ω จึงมี analog path เมื่อบอร์ดประกอบตรงกัน ไม่สรุป capability จาก ADC ในชิปเพียงอย่างเดียว
+- ทั้งสอง design: matrix SDA21/SCL22; LM73/RTC/Chain SDA4/SCL5 เลขท้าย SDA0/SDA1 ไม่ได้บังคับ controller ID ของ ESP-IDF แชร์ bus handle ที่ตรงกับ wiring จริง
+- V1.3 GPIO15 เป็น NTP LED; V1.5 Servo1=15, Servo2=17, SW1=16, SW2=14 ไม่ใช้ Servo1=16 หรืออ้างว่าชน SW1 สำหรับ design นี้
+- OUT GPIO26/27, JST ฝั่ง gate ของ V1.5 และ banana drain เป็นคนละ endpoint gate HIGH ทำให้ drain ถูกดึงลง GND; gate LOW ไม่ได้จ่าย HIGH ที่ drain ไม่เหมารวม polarity ของ API/โหลด และไม่ประกาศ DAC ที่ banana OUT
+- GPIO34–39 เป็น input-only ไม่มี internal pull-up/down; GPIO18/19/23 ทำ digital/PWM ได้แต่ไม่มี ADC/DAC
+- USB-A ในแหล่งนี้เป็นการสั่งไฟโหลด ไม่ใช่หลักฐาน USB host data; แยก Servo +5VExt จาก USB +5V
+- I2C addresses ใน recipe เดิมเป็นหลักฐานจากซอฟต์แวร์แยกจากรายงานฮาร์ดแวร์ใหม่ ต้องตรวจ part/address/SDK ที่ตรงงานก่อนเพิ่ม driver
+- V1.5 มีข้อขัดแย้ง designator J2 ระหว่าง Chain กับ boot ใน Markdown ที่ส่ง ดูรายละเอียดในเอกสาร V1.5 ก่อนระบุตำแหน่งเสียบ
+
+## ตัวอย่างและ SDK
+
+ตัวอย่าง sensor ใน `sensor_examples/` มีทั้ง ESP-IDF และ Arduino ต้นฉบับ เช่น `balanced_robot.c` ต้องพอร์ตก่อนใช้กับ ESP-IDF การสร้าง firmware ใหม่ใช้ ESP-IDF C และ API ของ SDK ที่ resolve จริง ไม่ตัดสินว่า API legacy ถูกลบเหมือนกันทุก SDK
+
+ตัวอย่าง ADC ให้แยก onboard LDR GPIO36 จาก external IN ตาม capability ของรุ่น ใช้ oneshot/calibration API ที่ SDK รองรับ ไม่เรียก raw ADC ว่า lux และไม่รับรองเปอร์เซ็นต์หรือแรงดันที่ยังไม่สอบเทียบ
+
+Matrix orientation/RAM mapping ต้องตรงกับบอร์ดและ source ของงานนั้น ไม่ใช้คำว่า invert Y “เสมอ” ข้ามรุ่น อ่าน [กฎ mapping จอ](led_16x8_matrix_mapping.md) และ source ที่ผู้ใช้ทดสอบไว้
+
+Deterministic recipes ยังคง `kidbright32_v13` และ `kidbright32_rev31` ในขอบเขตเดิม ส่วน `matrix_counter` จำกัด V1.3 เอกสารใหม่ไม่ได้เพิ่ม firmware support หรือ inheritance ของ V1.6/INEX/บอร์ดอื่นโดยอัตโนมัติ

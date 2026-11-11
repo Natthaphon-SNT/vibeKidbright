@@ -63,9 +63,15 @@ fn get_local_client() -> &'static Client {
 const MAX_TOOL_TURNS: u32 = 20;
 
 // ── Conversation loop ─────────────────────────────────────────────────────────
-// D2: SYSTEM_PROMPT is now stored in ai/system_prompt.txt and loaded at compile
-// time via include_str!. This makes the prompt editable independently of the
-// Rust source, and reduces this file by ~812 lines.
+fn track_usage(app:&AppHandle,provider:&str,model:&str,message_id:&str)->crate::ai::usage::RequestUsage {
+    let app=app.clone();
+    crate::ai::usage::RequestUsage::new(provider,model,message_id,move|report| {
+        let _=app.emit("ai-token-usage",serde_json::to_string(&report).unwrap());
+    })
+}
+
+// Common rules only. ai::prompts adds the selected host and requested expansion
+// on every provider iteration, including after workspace creation.
 pub(crate) const SYSTEM_PROMPT: &str = include_str!("system_prompt.txt");
 
 
@@ -79,7 +85,7 @@ fn get_tools() -> Value {
                 "description": "Read file content. Always use this before editing a file.",
                 "parameters": {
                     "type": "object",
-                    "properties": {
+                    "properties": { "start_line": {"type":"integer","description":"1-based first line; follow next_start_line for later pages."}, "max_lines": {"type":"integer","description":"1..500 lines, default 200; 16 KiB page cap. Partial pages are not complete files."},
                         "path": { "type": "string", "description": "Path relative to project root" }
                     },
                     "required": ["path"]
@@ -263,10 +269,10 @@ fn get_tools() -> Value {
             "type": "function",
             "function": {
                 "name": "read_knowledge_file",
-                "description": "Read the FULL content of a file from the knowledge_base folder. Use this when knowledge_search returns partial/truncated results or says the KB is not loaded.",
+                "description": "Read a bounded knowledge source page (default 200 lines, maximum 16 KiB). Use start_line/max_lines and next_start_line; partial pages are not a complete source file.",
                 "parameters": {
                     "type": "object",
-                    "properties": {
+                    "properties": { "start_line": {"type":"integer","description":"1-based first line; follow next_start_line for later pages."}, "max_lines": {"type":"integer","description":"1..500 lines, default 200; 16 KiB page cap. Partial pages are not complete files."},
                         "file_name": {
                             "type": "string",
                             "description": "File name relative to knowledge_base/, e.g. 'formula_kid_controller.md'"
@@ -282,7 +288,7 @@ fn get_tools() -> Value {
                 "name": "kidbright_reference",
                 "description": "Read the versioned KidBright compatibility rules, supported board profiles and deterministic ESP-IDF C pilot examples. Call for behavior matching KidBright. Omit arguments to list recipes; provide both board_profile and reference_example to read complete files. Never guess a board.",
                 "parameters": {
-                    "type": "object", "properties": {
+                    "type": "object", "properties": { "catalog_board": {"type":"string","description":"Optional exact catalog id for detailed pins/conflicts/sources; omit for a compact index."},
                         "board_profile": { "type": "string", "enum": ["kidbright32_v13", "kidbright32_rev31"] },
                         "reference_example": { "type": "string", "enum": crate::ai::compatibility::EXAMPLE_IDS }
                     }
@@ -292,11 +298,25 @@ fn get_tools() -> Value {
         {
             "type": "function",
             "function": {
+                "name": "uai_plus_test_reference",
+                "description": "Read the reviewed public API contracts, blockers, prerequisites and matching template for Plus MP-001 through MP-128. Call before creating a named Plus test. HOLD is discovery/manual planning only; no hardware pass is implied. No private files or board execution.",
+                "parameters": {"type":"object","properties":{"test_id":{"type":"string","description":"Exact test ID, for example MP-021. Omit to list the audit states."}}}
+            }
+        },
+        {
+            "type": "function",
+            "function": {
                 "name": "create_project_workspace",
-                "description": "Create a fresh project whenever the user asks to create a project, program or firmware from scratch, even with a workspace open. Prompts for a base folder and creates project_name there. For custom boards such as iP omit board_profile and reference_example; lack of a preset does not prohibit custom code. Returns literal generated_files for the initial custom proposal without private reads. Keep/Undo review remains mandatory. Do not use for edits to an existing project.",
+                "description": "Create a fresh project whenever the user asks to create a project, program or firmware from scratch, even with a workspace open. Prompts for a base folder and creates project_name there. For Plus use project_type=kidbright_uai_plus and optional python_example; creates main/main.py, no ESP-IDF files. For custom classic boards such as iP omit board_profile and reference_example; lack of a preset does not prohibit custom code. Returns literal generated_files for the initial custom proposal without private reads. Keep/Undo review remains mandatory. Do not use for edits to an existing project.",
                 "parameters": {
                     "type": "object",
                     "properties": {
+                        "project_type": { "type": "string", "enum": ["esp_idf", "kidbright_uai_plus"], "description": "Use kidbright_uai_plus for SG2002 MaixPy 4 Python; defaults to classic esp_idf only when no Plus is confirmed." },
+                        "expansion_boards": {"type":"array","items":{"type":"string","enum":["ikb_1z"]},"description":"Optional explicitly requested expansion. Adds the host-specific iKB-1Z driver files without changing the host or configuring/actuating hardware."},
+                        "ikb_i2c_driver": {"type":"string","enum":["master","legacy"],"description":"Required only for classic iKB-1Z: match the whole app's ESP-IDF I2C driver family. Bundled recipes use master. Omit for Plus Python."},
+                        "test_id": {"type":"string","description":"Reviewed Plus test ID such as MP-021. Read uai_plus_test_reference first. Selects a matching complete template when available; other seeds still need custom implementation."},
+                        "main_python": {"type":"string","description":"Complete main/main.py for a custom Plus draft. Required when test_id has no complete matching template, e.g. MP-022. Supply the actual requested program in this creation call before asking for Keep; do not create an unfinished calibration/circle seed."},
+                        "python_example": { "type": "string", "enum": crate::ai::uai_plus::EXAMPLES, "description": "Plus only: capabilities (MP-001..005), touchscreen (MP-015), adc_buttons (MP-021), or display/camera seeds. A seed is not a completed arbitrary MP test." },
                         "project_name": { "type": "string", "description": "A fresh folder name using ASCII letters, digits, underscores or hyphens (e.g. my_esp_project). Existing directories will not be overwritten." },
                         "board_profile": { "type": "string", "enum": ["kidbright32_v13", "kidbright32_rev31"], "description": "Confirmed pilot board. Supply together with reference_example to install deterministic reference firmware." },
                         "reference_example": { "type": "string", "enum": crate::ai::compatibility::EXAMPLE_IDS, "description": "Optional tested reference recipe; requires board_profile. Read kidbright_reference first." }
@@ -323,6 +343,8 @@ pub(crate) async fn run_conversation_loop(
     no_workspace: &mut bool,
     system_prompt: &str,
 ) -> Result<(), String> {
+    #[cfg(debug_assertions)]
+    if super::config::evaluation_isolated() { return super::pilot::actual_preflight(); }
     // Detect local/LAN server early — affects client config, timeout, and encoding headers.
     // Covers: localhost, 127.x.x.x, 10.x.x.x, 172.16-31.x.x, 192.168.x.x, bare IP URLs.
     let is_local_url = {
@@ -389,11 +411,19 @@ pub(crate) async fn run_conversation_loop(
     // Guard against infinite tool-call loops.
     let mut tool_turns: u32 = 0;
 
+    let initial_history_len = messages.len();
+    let mut private_context_used = crate::ai::privacy::permitted(base_url);
+    let mut routed_system_prompt = system_prompt.to_owned();
+    let mut usage_options = crate::ai::usage::StreamUsageOptions::new(base_url, model, api_key);
+
     loop {
-        let mut request_prompt = crate::ai::compatibility::with_project_context(system_prompt, project_path, crate::ai::privacy::permitted(base_url));
+        let allow_private = crate::ai::privacy::permitted(base_url);
+        private_context_used |= allow_private;
+        let mut request_prompt = crate::ai::prompts::with_context(&routed_system_prompt, &messages, project_path, allow_private);
         request_prompt.push_str(if *no_workspace {"\n[WORKSPACE STATE] No workspace is open; create_project_workspace is required before file tools.\n"}else{"\n[WORKSPACE STATE] A workspace is selected. Creation requests require a new workspace; file tools remain scoped to the selected workspace.\n"});
-        let request_prompt = crate::ai::language::with_latest_user_language(&request_prompt, &messages);
-        let api_messages = build_api_messages(&request_prompt, &messages, model);
+        let prepared = crate::ai::context::prepare(&messages)?;
+        let request_prompt = crate::ai::language::with_latest_user_language(&request_prompt, &prepared.messages);
+        let api_messages = build_api_messages(&request_prompt, &prepared.messages, model);
         let mut body = json!({
             "model": model,
             "messages": api_messages,
@@ -454,7 +484,12 @@ pub(crate) async fn run_conversation_loop(
             std::time::Duration::from_secs(180)
         };
 
-        let send_future = request.body(body.to_string()).send();
+        if usage_options.enabled() {
+            body["stream_options"] = json!({"include_usage":true});
+        }
+        let serialized = crate::ai::context::serialize_request(&body)?;
+        let _=app_handle.emit("ai-context-report",json!({"message_id":message_id.as_ref(),"model":model,"request_bytes":serialized.len(),"request_limit_bytes":crate::ai::context::REQUEST_BYTES,"history":prepared.report}).to_string());
+        let send_future = request.body(serialized).send();
         let response_result = if is_local_url || is_openrouter {
             match tokio::time::timeout(current_timeout, send_future).await {
                 Ok(Ok(res)) => Ok(res),
@@ -494,6 +529,10 @@ pub(crate) async fn run_conversation_loop(
         if !response.status().is_success() {
             let status = response.status();
             let body_text = response.text().await.unwrap_or_default();
+            if usage_options.accept_rejection(status.as_u16(), &body_text) {
+                let _=app_handle.emit("terminal-output","[AI] Endpoint rejected stream usage options; retrying once without that optional field.");
+                continue;
+            }
             let provider_name = if base_url.contains("googleapis") {
                 "Google AI"
             } else if is_openrouter {
@@ -557,6 +596,9 @@ pub(crate) async fn run_conversation_loop(
         // in this conversation doesn't bleed into subsequent tool-call turns.
         retry_count = 0;
 
+        let mut request_usage = track_usage(app_handle,
+            crate::ai::usage::provider_label(base_url,is_openrouter,is_local_url),
+            model, &message_id);
         let mut stream = response.bytes_stream();
         let mut accumulated_text = String::new(); // Final answer (outside <think>)
         let mut think_text = String::new();       // Thinking content (inside <think>)
@@ -602,6 +644,7 @@ pub(crate) async fn run_conversation_loop(
                     // treat this as a natural end-of-stream instead of an error.
                     let err_str = e.to_string();
                     if is_local_url && !accumulated_text.is_empty() {
+                        request_usage.interrupt();
                         let _ = app_handle.emit(
                             "terminal-output",
                             format!("[AI] Local stream ended early (ignored): {}", err_str),
@@ -619,13 +662,13 @@ pub(crate) async fn run_conversation_loop(
             while let Some(newline_pos) = buffer.find('\n') {
                 let line = buffer[..newline_pos].trim().to_string();
                 buffer = buffer[newline_pos + 1..].to_string();
-                if !line.starts_with("data: ") { continue; }
-                let data = &line[6..];
+                let Some(data) = line.strip_prefix("data:").map(str::trim) else { continue; };
                 if data == "[DONE]" { continue; }
                 let event: Value = match serde_json::from_str(data) {
                     Ok(v) => v,
                     Err(_) => continue,
                 };
+                request_usage.observe(&event);
                 let choice = &event["choices"][0];
                 let delta = &choice["delta"];
                 if let Some(raw_content) = delta["content"].as_str() {
@@ -722,6 +765,9 @@ pub(crate) async fn run_conversation_loop(
             }
         }
 
+        request_usage.observe_tail(&buffer);
+        request_usage.finish(!stream_failed_or_timed_out);
+
         if stream_failed_or_timed_out {
             if (is_local_url || is_openrouter) && accumulated_text.is_empty() && think_text.is_empty() {
                 let is_timeout = stream_error_msg == "timeout" || stream_error_msg.to_lowercase().contains("timeout") || stream_error_msg.to_lowercase().contains("timed out");
@@ -787,7 +833,12 @@ pub(crate) async fn run_conversation_loop(
                     }
                 };
                 // FIX: pass &message_id — Arc<str> derefs to &str cleanly.
-                let result = execute_tool(app_handle, &tc.name, &input, project_path, &message_id, no_workspace, crate::ai::privacy::permitted(base_url)).await;
+                let allow_private = crate::ai::privacy::permitted(base_url);
+                private_context_used |= allow_private;
+                let result = execute_tool(app_handle, &tc.name, &input, project_path, &message_id, no_workspace, allow_private).await;
+                if tc.name == "create_project_workspace" {
+                    crate::ai::prompts::record_creation(&mut routed_system_prompt, &result);
+                }
                 let _ = app_handle.emit(
                     "ai-chat-tool-result",
                     json!({ "name": tc.name, "id": tc.id, "result": &result }).to_string(),
@@ -821,6 +872,7 @@ pub(crate) async fn run_conversation_loop(
                     content: json!(accumulated_text),
                 });
             }
+            crate::ai::privacy::remember_public_turn(&messages[initial_history_len..], private_context_used);
             let _ = app_handle.emit("ai-chat-done", json!({
                 "text": &accumulated_text,
                 "history": &messages
@@ -911,7 +963,7 @@ fn build_google_contents(messages: &[ChatMessage]) -> Vec<Value> {
 fn get_google_tools() -> Value {
     json!([{
         "functionDeclarations": [
-            { "name": "read_file", "description": "Read file content. Always use this before editing a file.", "parameters": { "type": "OBJECT", "properties": { "path": { "type": "STRING", "description": "Path relative to project root" } }, "required": ["path"] } },
+            { "name": "read_file", "description": "Read file content. Always use this before editing a file.", "parameters": { "type": "OBJECT", "properties": { "start_line": {"type":"INTEGER","description":"1-based first line; follow next_start_line for later pages."}, "max_lines": {"type":"INTEGER","description":"1..500 lines, default 200; 16 KiB page cap. Partial pages are not complete files."}, "path": { "type": "STRING", "description": "Path relative to project root" } }, "required": ["path"] } },
             { "name": "write_file", "description": "CRITICAL: You MUST use this tool to write or modify any code. DO NOT put code blocks in your chat response. Persists a revision-bound proposal. No source is applied until explicit user Keep/repair approval.", "parameters": { "type": "OBJECT", "properties": { "path": { "type": "STRING", "description": "Path relative to project root" }, "content": { "type": "STRING", "description": "The FULL complete new file content. DO NOT truncate or omit code." } }, "required": ["path", "content"] } },
             { "name": "list_files", "description": "List files in a directory.", "parameters": { "type": "OBJECT", "properties": { "path": { "type": "STRING" } }, "required": ["path"] } },
             { "name": "get_file_tree", "description": "Recursively list all files in the project as an indented tree.", "parameters": { "type": "OBJECT", "properties": { "max_depth": { "type": "INTEGER", "description": "Max depth (default 4)" } } } },
@@ -926,9 +978,10 @@ fn get_google_tools() -> Value {
             { "name": "install_idf_library", "description": "Propose a review-gated component manifest. No immediate process or install. User must Keep the manifest and build; existing YAML requires a full write_file edit.", "parameters": { "type": "OBJECT", "properties": { "component": { "type": "STRING", "description": "Component identifier, e.g. espressif/led_strip or espressif/led_strip^2.5.3" } }, "required": ["component"] } },
             { "name": "web_search", "description": "Search the internet for technical docs.", "parameters": { "type": "OBJECT", "properties": { "query": { "type": "STRING" } }, "required": ["query"] } },
             { "name": "knowledge_search", "description": "Local BM25+dense rank fusion with source citations. Unknown metadata is not proof of compatibility.", "parameters": { "type": "OBJECT", "properties": { "query": { "type": "STRING" }, "filter": { "type": "OBJECT", "properties": { "board": { "type": "STRING" }, "target": { "type": "STRING" }, "sdk_version": { "type": "STRING" }, "include_unknown": { "type": "BOOLEAN" } } } }, "required": ["query"] } },
-            { "name": "read_knowledge_file", "description": "Read the FULL content of a file from the knowledge_base folder. Use this when knowledge_search returns partial/truncated results or says the KB is not loaded.", "parameters": { "type": "OBJECT", "properties": { "file_name": { "type": "STRING", "description": "File name relative to knowledge_base/, e.g. 'formula_kid_controller.md'" } }, "required": ["file_name"] } },
-            { "name": "kidbright_reference", "description": "Read KidBright compatibility rules and supported profiles. Omit arguments for the catalog, or provide both board_profile and reference_example for full deterministic C files. Never guess a board.", "parameters": { "type": "OBJECT", "properties": { "board_profile": { "type": "STRING", "enum": ["kidbright32_v13", "kidbright32_rev31"] }, "reference_example": { "type": "STRING", "enum": crate::ai::compatibility::EXAMPLE_IDS } } } },
-            { "name": "create_project_workspace", "description": "Create a fresh project for creation requests even with a workspace open. Call before writing files. For a custom board such as iP omit board_profile and reference_example; no preset does not prohibit custom code. Returns literal generated_files for the initial proposal without private reads. For supported reference recipes provide both optional parameters after reading kidbright_reference. Keep/Undo review remains mandatory. Do not use for edits.", "parameters": { "type": "OBJECT", "properties": { "project_name": { "type": "STRING", "description": "A fresh folder name using ASCII letters, digits, underscores or hyphens. Existing directories will not be overwritten." }, "board_profile": { "type": "STRING", "enum": ["kidbright32_v13", "kidbright32_rev31"] }, "reference_example": { "type": "STRING", "enum": crate::ai::compatibility::EXAMPLE_IDS } }, "required": ["project_name"] } }
+            { "name": "read_knowledge_file", "description": "Read a bounded knowledge source page (default 200 lines, maximum 16 KiB). Use start_line/max_lines and next_start_line; partial pages are not a complete source file.", "parameters": { "type": "OBJECT", "properties": { "start_line": {"type":"INTEGER","description":"1-based first line; follow next_start_line for later pages."}, "max_lines": {"type":"INTEGER","description":"1..500 lines, default 200; 16 KiB page cap. Partial pages are not complete files."}, "file_name": { "type": "STRING", "description": "File name relative to knowledge_base/, e.g. 'formula_kid_controller.md'" } }, "required": ["file_name"] } },
+            { "name": "kidbright_reference", "description": "Read KidBright compatibility rules and supported profiles. Omit arguments for the catalog, or provide both board_profile and reference_example for full deterministic C files. Never guess a board.", "parameters": { "type": "OBJECT", "properties": { "catalog_board": {"type":"STRING","description":"Optional exact catalog id for detailed pins/conflicts/sources; omit for a compact index."}, "board_profile": { "type": "STRING", "enum": ["kidbright32_v13", "kidbright32_rev31"] }, "reference_example": { "type": "STRING", "enum": crate::ai::compatibility::EXAMPLE_IDS } } } },
+            { "name": "uai_plus_test_reference", "description": "Read reviewed public API contracts, blockers, prerequisites and the matching template for MP-001 through MP-128 before creating a Plus test. HOLD permits discovery/manual planning only. No private files or board execution.", "parameters": {"type":"OBJECT","properties":{"test_id":{"type":"STRING","description":"Exact test ID such as MP-021. Omit for the audit summary."}}} },
+            { "name": "create_project_workspace", "description": "Create a fresh project for creation requests even with a workspace open. Call before writing files. For Plus use project_type=kidbright_uai_plus and optional python_example; creates main/main.py, no ESP-IDF files. For a custom classic board such as iP omit board_profile and reference_example; no preset does not prohibit custom code. Returns literal generated_files for the initial proposal without private reads. For supported reference recipes provide both optional parameters after reading kidbright_reference. Keep/Undo review remains mandatory. Do not use for edits.", "parameters": { "type": "OBJECT", "properties": { "expansion_boards": {"type":"ARRAY","items":{"type":"STRING","enum":["ikb_1z"]},"description":"Explicit expansion selection; installs matching host driver without configuring hardware."}, "ikb_i2c_driver": {"type":"STRING","enum":["master","legacy"],"description":"Classic iKB only; match the whole app driver family. Omit for Plus."}, "project_type": { "type": "STRING", "enum": ["esp_idf", "kidbright_uai_plus"] }, "test_id": {"type":"STRING","description":"Reviewed Plus test ID; read uai_plus_test_reference first. Matching templates are selected automatically."}, "main_python": {"type":"STRING","description":"Complete main/main.py for a custom Plus draft; required for named tests without a complete template, e.g. MP-022. Finish the requested code in this call before Keep."}, "python_example": { "type": "STRING", "enum": crate::ai::uai_plus::EXAMPLES }, "project_name": { "type": "STRING", "description": "A fresh folder name using ASCII letters, digits, underscores or hyphens. Existing directories will not be overwritten." }, "board_profile": { "type": "STRING", "enum": ["kidbright32_v13", "kidbright32_rev31"] }, "reference_example": { "type": "STRING", "enum": crate::ai::compatibility::EXAMPLE_IDS } }, "required": ["project_name"] } }
         ]
     }])
 }
@@ -989,6 +1042,8 @@ pub(crate) async fn run_google_conversation_loop(
     no_workspace: &mut bool,
     system_prompt: &str,
 ) -> Result<(), String> {
+    #[cfg(debug_assertions)]
+    if super::config::evaluation_isolated() { return super::pilot::actual_preflight(); }
     // FIX H5: Use shared static HTTP client (get_cloud_client) instead of creating
     // a new Client per invocation. Creating a new Client per request causes socket
     // accumulation and progressively slower responses (same issue fixed in OpenAI loop).
@@ -1012,11 +1067,21 @@ pub(crate) async fn run_google_conversation_loop(
     // FIX: Guard against infinite tool-call loops.
     let mut tool_turns: u32 = 0;
 
+    let initial_history_len = messages.len();
+    let mut private_context_used = crate::ai::privacy::consent();
+    let mut routed_system_prompt = effective_prompt.to_owned();
+
     loop {
-        let contents = build_google_contents(&messages);
-        let mut request_prompt = crate::ai::compatibility::with_project_context(effective_prompt, project_path, crate::ai::privacy::consent());
+        let prepared = crate::ai::context::prepare(&messages)?;
+        let contents = build_google_contents(&prepared.messages);
+        let allow_private = crate::ai::privacy::consent();
+        private_context_used |= allow_private;
+        let mut request_prompt = crate::ai::prompts::with_context(&routed_system_prompt, &messages, project_path, allow_private);
+        if model.starts_with("gemini-3") {
+            request_prompt = compact_prompt_for_thinking_model(&request_prompt);
+        }
         request_prompt.push_str(if *no_workspace {"\n[WORKSPACE STATE] No workspace is open; create_project_workspace is required before file tools.\n"}else{"\n[WORKSPACE STATE] A workspace is selected. Creation requests require a new workspace; file tools remain scoped to the selected workspace.\n"});
-        let request_prompt = crate::ai::language::with_latest_user_language(&request_prompt, &messages);
+        let request_prompt = crate::ai::language::with_latest_user_language(&request_prompt, &prepared.messages);
 
         // Set thinkingBudget for Gemini 3.x thinking models.
         // Gemini 3.x always thinks internally — unlimited budget burns quota fast.
@@ -1043,9 +1108,11 @@ pub(crate) async fn run_google_conversation_loop(
             model, api_key
         );
 
+        let serialized = crate::ai::context::serialize_request(&body)?;
+        let _=app_handle.emit("ai-context-report",json!({"message_id":message_id.as_ref(),"model":model,"request_bytes":serialized.len(),"request_limit_bytes":crate::ai::context::REQUEST_BYTES,"history":prepared.report}).to_string());
         let response = client.post(&url)
             .header("Content-Type", "application/json")
-            .body(body.to_string())
+            .body(serialized)
             .send()
             .await
             .map_err(|e| format!("Connection to Google AI failed: {}", e))?;
@@ -1080,6 +1147,7 @@ pub(crate) async fn run_google_conversation_loop(
         // Reset retry counter on a successful response (same logic as OpenAI loop).
         retry_count = 0;
 
+        let mut request_usage = track_usage(app_handle, "Google", model, &message_id);
         let mut stream = response.bytes_stream();
         let mut accumulated_text = String::new();
         let mut buffer = String::new();
@@ -1105,13 +1173,13 @@ pub(crate) async fn run_google_conversation_loop(
             while let Some(newline_pos) = buffer.find('\n') {
                 let line = buffer[..newline_pos].trim().to_string();
                 buffer = buffer[newline_pos + 1..].to_string();
-                if !line.starts_with("data: ") { continue; }
-                let data = &line[6..];
+                let Some(data) = line.strip_prefix("data:").map(str::trim) else { continue; };
                 if data == "[DONE]" { continue; }
                 let event: Value = match serde_json::from_str(data) {
                     Ok(v) => v,
                     Err(_) => continue,
                 };
+                request_usage.observe(&event);
                 if let Some(candidates) = event["candidates"].as_array() {
                     for candidate in candidates {
                         if let Some(parts) = candidate["content"]["parts"].as_array() {
@@ -1146,6 +1214,9 @@ pub(crate) async fn run_google_conversation_loop(
                 }
             }
         }
+
+        request_usage.observe_tail(&buffer);
+        request_usage.finish(true);
 
         if !pending_tool_calls.is_empty() {
             // FIX: Max tool-turn guard.
@@ -1188,7 +1259,12 @@ pub(crate) async fn run_google_conversation_loop(
                     }
                 };
                 // FIX: &message_id derefs Arc<str> to &str cleanly.
-                let result = execute_tool(app_handle, &tc.name, &input, project_path, &message_id, no_workspace, crate::ai::privacy::consent()).await;
+                let allow_private = crate::ai::privacy::consent();
+                private_context_used |= allow_private;
+                let result = execute_tool(app_handle, &tc.name, &input, project_path, &message_id, no_workspace, allow_private).await;
+                if tc.name == "create_project_workspace" {
+                    crate::ai::prompts::record_creation(&mut routed_system_prompt, &result);
+                }
                 let _ = app_handle.emit(
                     "ai-chat-tool-result",
                     json!({ "name": tc.name, "id": tc.id, "result": &result }).to_string(),
@@ -1216,6 +1292,7 @@ pub(crate) async fn run_google_conversation_loop(
                     content: json!(accumulated_text),
                 });
             }
+            crate::ai::privacy::remember_public_turn(&messages[initial_history_len..], private_context_used);
             let _ = app_handle.emit("ai-chat-done", json!({
                 "text": &accumulated_text,
                 "history": &messages
@@ -1229,7 +1306,7 @@ pub(crate) async fn run_google_conversation_loop(
 
 // ── API message builder ────────────────────────────────────────────────────────
 
-fn build_api_messages(system_prompt: &str, messages: &[ChatMessage], model: &str) -> Vec<Value> {
+pub(super) fn build_api_messages(system_prompt: &str, messages: &[ChatMessage], model: &str) -> Vec<Value> {
     let mut api_msgs: Vec<Value> = Vec::new();
     let messages = crate::ai::language::with_user_language_evidence(messages);
     let unsupported_system_role =
@@ -1402,6 +1479,47 @@ mod compatibility_schema_tests {
     use super::*;
 
     #[test]
+    fn bounded_context_keeps_both_provider_tool_protocols_and_thought_signatures_valid() {
+        let mut history=vec![ChatMessage{role:"user".into(),content:json!("Use MAI Plus with IKB-1Z; motor -50 then stop.")}];
+        for i in 0..40 {history.push(ChatMessage{role:"assistant".into(),content:json!("old code ".repeat(3000))});history.push(ChatMessage{role:"user".into(),content:json!(format!("continue step {i}"))});}
+        history.push(ChatMessage{role:"assistant".into(),content:json!({"__tool_calls__":[{"id":"current","function":{"name":"read_file","arguments":"{\"path\":\"main/main.py\"}","thought_signature":"actual-signature"}}]})});
+        history.push(ChatMessage{role:"tool".into(),content:json!({"__tool_response__":true,"tool_call_id":"current","__func_name__":"read_file","content":"{\"result\":\"current code\"}"})});
+        let prepared=crate::ai::context::prepare(&history).unwrap();
+        let openai=build_api_messages("base",&prepared.messages,"gpt-test");
+        assert_eq!(openai.last().unwrap()["tool_call_id"],"current");
+        assert_eq!(openai[openai.len()-2]["tool_calls"][0]["id"],"current");
+        let google=build_google_contents(&prepared.messages);
+        assert_eq!(google[google.len()-2]["parts"][0]["thoughtSignature"],"actual-signature");
+        assert_eq!(google.last().unwrap()["parts"][0]["functionResponse"]["name"],"read_file");
+        assert!(crate::ai::context::serialize_request(&json!({"messages":openai,"tools":get_tools()})).is_ok());
+        assert!(crate::ai::context::serialize_request(&json!({"contents":google,"tools":get_google_tools()})).is_ok());
+        for name in ["read_file","read_knowledge_file"] {
+            let tools=get_tools();let tool=tools.as_array().unwrap().iter().find(|t|t["function"]["name"]==name).unwrap();
+            assert!(tool["function"]["parameters"]["properties"].get("start_line").is_some());
+        }
+    }
+
+    #[test]
+    fn both_providers_expose_the_public_plus_test_reference_and_test_identity() {
+        let openai=get_tools(); let google=get_google_tools();
+        let a=openai.as_array().unwrap().iter().find(|t|t["function"]["name"]=="uai_plus_test_reference").unwrap();
+        let g=google[0]["functionDeclarations"].as_array().unwrap().iter().find(|t|t["name"]=="uai_plus_test_reference").unwrap();
+        assert_eq!(a["function"]["parameters"]["properties"]["test_id"]["type"],"string");
+        assert_eq!(g["parameters"]["properties"]["test_id"]["type"],"STRING");
+        for name in ["create_project_workspace"] {
+            let a=openai.as_array().unwrap().iter().find(|t|t["function"]["name"]==name).unwrap();
+            let g=google[0]["functionDeclarations"].as_array().unwrap().iter().find(|t|t["name"]==name).unwrap();
+            assert!(a["function"]["parameters"]["properties"].get("test_id").is_some());
+            assert!(a["function"]["parameters"]["properties"].get("expansion_boards").is_some());
+            assert!(g["parameters"]["properties"].get("expansion_boards").is_some());
+            assert!(g["parameters"]["properties"].get("ikb_i2c_driver").is_some());
+            assert!(a["function"]["parameters"]["properties"].get("main_python").is_some());
+            assert!(g["parameters"]["properties"].get("test_id").is_some());
+            assert!(g["parameters"]["properties"].get("main_python").is_some());
+        }
+    }
+
+    #[test]
     fn both_providers_allow_custom_creation_without_private_sdk_introspection() {
         let openai = get_tools();
         let google = get_google_tools();
@@ -1409,6 +1527,8 @@ mod compatibility_schema_tests {
         let g = google[0]["functionDeclarations"].as_array().unwrap().iter().find(|t| t["name"] == "create_project_workspace").unwrap();
         for params in [&a["function"]["parameters"], &g["parameters"]] {
             assert_eq!(params["required"], serde_json::json!(["project_name"]));
+            assert_eq!(params["properties"]["project_type"]["enum"], serde_json::json!(["esp_idf","kidbright_uai_plus"]));
+            assert_eq!(params["properties"]["python_example"]["enum"], serde_json::json!(crate::ai::uai_plus::EXAMPLES));
             assert_eq!(params["properties"]["board_profile"]["enum"], serde_json::json!(["kidbright32_v13", "kidbright32_rev31"]));
         }
         // Provider-visible descriptions do not present private SDK paths as the

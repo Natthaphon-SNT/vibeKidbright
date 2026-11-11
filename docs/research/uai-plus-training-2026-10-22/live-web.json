@@ -1,0 +1,25 @@
+{
+  "url": "https://kidbright-mai.web.app/",
+  "final_url": "https://kidbright-mai.web.app/",
+  "last_modified": "Wed, 07 Oct 2026 16:41:45 GMT",
+  "sha256": "08841388779e7157e238c2b1a7bded06703178ac0a7ecaee2f9c4131b11b89d3",
+  "bytes": 1297,
+  "assets": [
+    {
+      "url": "https://kidbright-mai.web.app/assets/index.428a4c98.js",
+      "filename": "index.428a4c98.js",
+      "bytes": 5056447,
+      "sha256": "df41393716382457b9fd3d2e459235a7947653b24fcbadce913cdde5f5f41efa",
+      "same_as_previous_cache": true
+    }
+  ],
+  "as_of": "2026-10-22",
+  "website_identity": "confirmed by user as actual website",
+  "method": "read-only HTTP download and byte comparison; reference JavaScript was not executed",
+  "plus_config": {
+    "id": "kidbright-mai-plus",
+    "protocol": "websocket-shell",
+    "wsShell": "wss://10.155.55.1:5050"
+  },
+  "physical_board_test": false
+}

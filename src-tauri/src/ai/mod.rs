@@ -50,7 +50,15 @@ pub(crate) mod repair;
 pub mod kb;
 pub(crate) mod language;
 pub(crate) mod orchestration;
+pub(crate) mod prompts;
+pub(crate) mod context;
+pub(crate) mod usage;
+pub(crate) mod expansions;
 pub(crate) mod privacy;
 pub(crate) mod evidence;
 pub mod providers;
 pub mod tools;
+pub(crate) mod uai_plus;
+// Evaluation-only transport; never changes production provider policy.
+#[cfg(debug_assertions)]
+pub(crate) mod pilot;

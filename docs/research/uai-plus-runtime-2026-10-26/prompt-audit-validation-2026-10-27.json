@@ -1,0 +1,160 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-27",
+  "scope": "Audit all 128 authored prompts against version-specific declarations, public references, project creation and locally tested matching templates. No board execution by this audit.",
+  "board": "KidBright mAi Plus / SG2002",
+  "maixpy_reference": "4.12.5",
+  "runtime_user_reported": "1.24.0",
+  "image_sha256": "287883ec84279574ecb70eb3856d956b23e1a9840a6ad4e946e74054deb7b422",
+  "api_module_count": 20,
+  "api_symbol_count": 1090,
+  "audit_summary": {
+    "TEMPLATE_CHECKED": 7,
+    "DRAFT_REFERENCE": 43,
+    "NEEDS_SETUP": 60,
+    "HOLD": 18
+  },
+  "checks": [
+    {
+      "command": "cargo test --lib --locked --offline --quiet",
+      "cwd": "src-tauri",
+      "result": "passed",
+      "tests": 238
+    },
+    {
+      "command": "python -X utf8 -m unittest discover -s scripts/tests -p 'test_uai_plus*.py'",
+      "result": "passed",
+      "tests": 48,
+      "method": "local standard-library fixtures; no board"
+    },
+    {
+      "command": "node scripts/audit-uai-plus-prompts.mjs --check",
+      "result": "passed",
+      "cases": 128
+    },
+    {
+      "command": "node scripts/sync-knowledge-base.mjs",
+      "result": "passed",
+      "bundled_source_files": 48
+    },
+    {
+      "command": "node scripts/check-public.mjs --bundle",
+      "result": "passed",
+      "bundled_source_files": 48
+    },
+    {
+      "command": "node scripts/check-standalone.mjs",
+      "result": "passed"
+    },
+    {
+      "command": "node scripts/audit-kidbright-coverage.mjs --check",
+      "result": "passed"
+    },
+    {
+      "command": "node scripts/audit-rule-documents.mjs --check",
+      "result": "passed"
+    },
+    {
+      "command": "Python compile(main.py) and compile(plus_metadata.py) in prepared preflight project",
+      "result": "passed"
+    },
+    {
+      "command": "node scripts/check-public.mjs",
+      "result": "passed",
+      "scanned_files": 623
+    }
+  ],
+  "artifact_hashes": {
+    "docs/research/uai-plus-runtime-2026-10-26/api-contracts-2026-10-27.json": "436fb75b46d824a30c0033812338a65005af2b0b77594e83b5cf7cfd188fe076",
+    "knowledge_base/compatibility/uai_plus_test_contracts.json": "64c33a4cea7825a59a01aef4791c82408be0d25d6ddf82eb749ed08a4f98d4f6",
+    "samples/kidbright-uai-plus/capabilities.py": "e364243d2ecabcda76e277d9594f31930ec7c7616f87766678d96a0528670c06",
+    "samples/kidbright-uai-plus/touchscreen.py": "91e29064de544dc2816e6ced48da7dfa7f04456c9c28f22cf38a497bf63fd78a",
+    "samples/kidbright-uai-plus/adc_buttons.py": "c2056e69c00ffac4ffb9ca92b7036aaf6291b0415ba21c64d44e320fc64dc2af",
+    "src-tauri/src/uai_plus_probe.py": "2716dc6c7ec922ee7c3b254c86a03b144c9d2db11fe07b4a7e0bb92e8f240a36",
+    "scripts/audit-uai-plus-prompts.mjs": "f8e8f4adf7543477b67fec98c216134a4f0356d3b9d90af2491f56d8141c087c",
+    "scripts/collect-uai-plus-api.py": "5f88d21a5c1b1173024e432bb44fe6a15bc0b1f21258655d087260935111940f",
+    "docs/KIDBRIGHT_MAI_PLUS_TEST_PROMPTS_TH_2026-10-26.md": "7aa07f1a0aa8010e4bd1af31ee00730eb258620c57b396d6fbd979ca25d65899",
+    "docs/KIDBRIGHT_MAI_PLUS_PROMPT_AUDIT_2026-10-27.csv": "2f45a0a50c9ebaf69390ad532e5bb752f9089bafaf59a90995cf72a7a286a4a0",
+    "docs/KIDBRIGHT_MAI_PLUS_TEST_RESULTS_2026-10-26.csv": "394a83aeb7789faaa31ed24438fd99ec4d6676aee1685a19315ede1b25617522"
+  },
+  "prepared_project": "src-tauri/target/recovery-projects/mai_plus_preflight",
+  "installer_build": {
+    "status": "passed",
+    "command": "npm run tauri -- build --config src-tauri/tauri.windows.conf.json --bundles nsis,msi --ci",
+    "log": "src-tauri/target/plus-prompt-audit-build-2026-10-27.log",
+    "build_application_result": "passed",
+    "production_frontend_build": "passed",
+    "bundle_command": "npm run tauri -- bundle --config src-tauri/tauri.windows.conf.json --bundles nsis,msi --ci",
+    "bundle_log": "src-tauri/target/plus-prompt-audit-bundle-2026-10-27.log",
+    "artifacts": [
+      {
+        "path": "src-tauri/target/release/vibe-kidbright.exe",
+        "bytes": 48664064,
+        "sha256": "7967734d3008f7d96059692c25d8018b8ee3ed6abc06147712eed2cc09dfdcd7"
+      },
+      {
+        "path": "src-tauri/target/release/bundle/nsis/VibeKidbright IDE_3.7.4_x64-setup.exe",
+        "bytes": 318079616,
+        "sha256": "1fccd8dce1a2c24793fc3653edb6868f603b57ddee1210bf6856738e9c90d370"
+      },
+      {
+        "path": "src-tauri/target/release/bundle/msi/VibeKidbright IDE_3.7.4_x64_en-US.msi",
+        "bytes": 325840896,
+        "sha256": "1d9fee563b9454a60ef028be6c88b6d9ba539e510dfa5dfcfb38148f40ca1595"
+      }
+    ],
+    "verification": {
+      "release_binary_contains_exact_audit_registry": true,
+      "public_reference_tool_in_release_binary": true,
+      "nsis_script_includes_reviewed_registry_and_guide": true,
+      "wix_file_entries_include_reviewed_registry_and_guide": true,
+      "source_icon_sha256": "40046e2d8658eefa643fb3b2d4cca465427ca0cf5ca6fa43dde912d2e40e6a39",
+      "msi_readonly_file_table_contains_registry_and_guide": true,
+      "msi_product_icon_name": "ProductIcon",
+      "msi_product_icon_bytes": 57610,
+      "source_icon_bytes": 57610
+    },
+    "notes": [
+      "Initial bundling attempt hit restricted-network socket error 10013; packaging-only retry with network access succeeded.",
+      "Tauri emitted bundle-type marker warnings on packaging retry; no updater plugin is enabled. GUI install/upgrade was not executed."
+    ]
+  },
+  "limitations": [
+    "Live model generation of all 128 test programs was not performed.",
+    "Only MP-001..005, MP-015 and MP-021 have complete matching locally tested templates.",
+    "No hardware run, external bus probing, firmware installation or system configuration changes were performed by this audit.",
+    "API declarations do not prove driver operation, connector wiring or future installed-version compatibility.",
+    "Prior user-confirmed Connect/Run/Stop behavior is separate evidence, not a pass for all 128 cases.",
+    "Original hardware-results CSV was not overwritten or reset.",
+    "Building installers does not install or restart the currently running desktop application."
+  ],
+  "template_checked_ids": [
+    "MP-001",
+    "MP-002",
+    "MP-003",
+    "MP-004",
+    "MP-005",
+    "MP-015",
+    "MP-021"
+  ],
+  "hold_ids": [
+    "MP-020",
+    "MP-037",
+    "MP-038",
+    "MP-041",
+    "MP-042",
+    "MP-043",
+    "MP-050",
+    "MP-051",
+    "MP-052",
+    "MP-053",
+    "MP-054",
+    "MP-072",
+    "MP-120",
+    "MP-121",
+    "MP-122",
+    "MP-124",
+    "MP-125",
+    "MP-127"
+  ]
+}

@@ -7,11 +7,12 @@ import { fileURLToPath } from "node:url";
 const root = fileURLToPath(new URL("../", import.meta.url));
 const catalog = JSON.parse(readFileSync(new URL("../knowledge_base/compatibility/board_catalog.json", import.meta.url), "utf8"));
 assert.equal(catalog.schema_version, 1);
-assert.equal(catalog.as_of, "2026-10-17");
+assert.equal(catalog.as_of, "2026-10-22");
 assert.ok(Array.isArray(catalog.boards) && catalog.boards.length > 0);
 assert.ok(Array.isArray(catalog.sources) && catalog.sources.length > 0);
 assert.ok(catalog.deferred_families.includes("kidbright_uai"));
-assert.ok(catalog.deferred_families.includes("kidbright_uai_plus"));
+assert.ok(!catalog.deferred_families.includes("kidbright_uai_plus"));
+assert.ok(catalog.python_project_types.some(project => project.id === "kidbright_uai_plus" && project.target === "sg2002" && project.runtime === "maixpy4"));
 const sourceIds = new Set(catalog.sources.map(source => source.id));
 assert.equal(sourceIds.size, catalog.sources.length, "Duplicate source identifiers");
 for (const source of catalog.sources) {
@@ -39,6 +40,14 @@ for (const board of catalog.boards) {
     assert.ok(pin.signal && pin.source_ids.length, `Unsourced signal on ${board.id}`);
     assert.ok(Number.isInteger(pin.gpio) && pin.gpio >= 0 && pin.gpio <= (board.target === "esp8266" ? 16 : 39));
   }
+  if (board.hardware_contract) {
+    const hardware = board.hardware_contract;
+    assert.ok(board.hardware_reference && readFileSync(resolve(root, "knowledge_base", board.hardware_reference), "utf8").length);
+    assert.ok(hardware.source_ids.length && hardware.source_ids.every(id => sourceIds.has(id)));
+    assert.equal(hardware.hardware_tested, false, "Document analysis cannot establish a physical pass");
+    assert.ok(hardware.output_endpoints.includes("gpio_gate_control") && hardware.output_endpoints.includes("banana_mosfet_drain"));
+    assert.ok(hardware.input_analog_condition, "Connector capability must state its assembly condition");
+  }
   if (board.reference_profile_id !== null) {
     assert.ok(["kidbright32_v13", "kidbright32_rev31"].includes(board.reference_profile_id));
     assert.equal(board.status, "pilot");
@@ -49,8 +58,21 @@ for (const board of catalog.boards) {
 }
 assert.equal(executable, 2, "Catalog comparison must not silently add executable profiles");
 assert.deepEqual([...executableIds].sort(), ["kidbright32_rev31", "kidbright32_v13"]);
+const v13 = catalog.boards.find(board => board.id === "kidbright32_v13").hardware_contract;
+const v15 = catalog.boards.find(board => board.id === "kidbright32_v15").hardware_contract;
+assert.equal(v13.input_analog_supported, false);
+assert.equal(v15.input_analog_supported, true);
+assert.equal(v13.ntp_led_gpio, 15);
+assert.equal(v15.ntp_led_gpio, null);
+assert.deepEqual(v13.servo_gpios, []);
+assert.deepEqual(v15.servo_gpios, [15, 17]);
+assert.ok(v15.output_endpoints.includes("jst_gate_signal"));
+for (const hardware of [v13, v15]) {
+  assert.deepEqual(hardware.matrix_bus, { sda: 21, scl: 22 });
+  assert.deepEqual(hardware.sensor_chain_bus, { sda: 4, scl: 5 });
+}
 for (const unresolved of catalog.unresolved_labels ?? []) {
   assert.ok(unresolved.label && unresolved.reason && unresolved.candidate_board_ids.length);
   for (const candidate of unresolved.candidate_board_ids) assert.ok(ids.has(candidate), `Unknown alias candidate ${candidate}`);
 }
-console.log(`KidBright catalog checked: ${catalog.boards.length} compared entries, ${executable} scoped profiles; muAI and muAI Plus deferred.`);
+console.log(`KidBright catalog checked: ${catalog.boards.length} compared entries, ${executable} scoped profiles; original muAI deferred; Plus has a separate Python development target.`);

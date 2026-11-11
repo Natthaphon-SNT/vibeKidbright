@@ -1,0 +1,5166 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-27",
+  "maixpy": "4.12.5",
+  "method": "Read-only extfs parsing and AST declarations; no mount, device connection or foreign-code execution.",
+  "physical_runtime_tested": false,
+  "modules": {
+    "display": {
+      "path": "/usr/lib/python3.11/site-packages/maix/_maix/display.pyi",
+      "bytes": 4823,
+      "sha256": "73d475221e96dcd1b3309333e7a1a90413e978d154ec1d37db91daec33b78f4c",
+      "symbols": {
+        "Display": {
+          "kind": "class"
+        },
+        "Display.__init__": {
+          "kind": "function",
+          "signature": "self, width: int=-1, height: int=-1, format: maix._maix.image.Format=..., device: str=None, open: bool=True",
+          "returns": "None"
+        },
+        "Display.add_channel": {
+          "kind": "function",
+          "signature": "self, width: int=-1, height: int=-1, format: maix._maix.image.Format=..., open: bool=True",
+          "returns": "Display"
+        },
+        "Display.close": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "maix._maix.err.Err"
+        },
+        "Display.device": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "str"
+        },
+        "Display.format": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "maix._maix.image.Format"
+        },
+        "Display.get_backlight": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "float"
+        },
+        "Display.height": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Display.is_closed": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "bool"
+        },
+        "Display.is_opened": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "bool"
+        },
+        "Display.open": {
+          "kind": "function",
+          "signature": "self, width: int=-1, height: int=-1, format: maix._maix.image.Format=...",
+          "returns": "maix._maix.err.Err"
+        },
+        "Display.set_backlight": {
+          "kind": "function",
+          "signature": "self, value: float",
+          "returns": "None"
+        },
+        "Display.set_hmirror": {
+          "kind": "function",
+          "signature": "self, en: bool",
+          "returns": "maix._maix.err.Err"
+        },
+        "Display.set_vflip": {
+          "kind": "function",
+          "signature": "self, en: bool",
+          "returns": "maix._maix.err.Err"
+        },
+        "Display.show": {
+          "kind": "function",
+          "signature": "self, img: maix._maix.image.Image, fit: maix._maix.image.Fit=...",
+          "returns": "maix._maix.err.Err"
+        },
+        "Display.size": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "list[int]"
+        },
+        "Display.width": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "send_to_maixvision": {
+          "kind": "function",
+          "signature": "img: maix._maix.image.Image",
+          "returns": "None"
+        }
+      }
+    },
+    "image": {
+      "path": "/usr/lib/python3.11/site-packages/maix/_maix/image.pyi",
+      "bytes": 137710,
+      "sha256": "80b00c6f87dd363ad4b5631f73c2522e298206cf9060e6724460ff8227ad1c27",
+      "symbols": {
+        "AprilTag": {
+          "kind": "class"
+        },
+        "AprilTag.__init__": {
+          "kind": "function",
+          "signature": "self, rect: list[int], corners: list[list[int]], id: int, famliy: int, centroid_x: float, centroid_y: float, rotation: float, decision_margin: float, hamming: int, goodness: float, x_translation: float, y_translation: float, z_translation: float, x_rotation: float, y_rotation: float, z_rotation: float",
+          "returns": "None"
+        },
+        "AprilTag.corners": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "list[list[int]]"
+        },
+        "AprilTag.cx": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "AprilTag.cxf": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "float"
+        },
+        "AprilTag.cy": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "AprilTag.cyf": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "float"
+        },
+        "AprilTag.decision_margin": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "float"
+        },
+        "AprilTag.family": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "AprilTag.goodness": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "float"
+        },
+        "AprilTag.h": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "AprilTag.hamming": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "AprilTag.id": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "AprilTag.rect": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "list[int]"
+        },
+        "AprilTag.rotation": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "float"
+        },
+        "AprilTag.w": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "AprilTag.x": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "AprilTag.x_rotation": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "float"
+        },
+        "AprilTag.x_translation": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "float"
+        },
+        "AprilTag.y": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "AprilTag.y_rotation": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "float"
+        },
+        "AprilTag.y_translation": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "float"
+        },
+        "AprilTag.z_rotation": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "float"
+        },
+        "AprilTag.z_translation": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "float"
+        },
+        "ApriltagFamilies": {
+          "kind": "class"
+        },
+        "ApriltagFamilies.ARTOOLKIT": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[ApriltagFamilies]"
+        },
+        "ApriltagFamilies.TAG16H5": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[ApriltagFamilies]"
+        },
+        "ApriltagFamilies.TAG25H7": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[ApriltagFamilies]"
+        },
+        "ApriltagFamilies.TAG25H9": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[ApriltagFamilies]"
+        },
+        "ApriltagFamilies.TAG36H10": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[ApriltagFamilies]"
+        },
+        "ApriltagFamilies.TAG36H11": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[ApriltagFamilies]"
+        },
+        "ApriltagFamilies.__init__": {
+          "kind": "function",
+          "signature": "self, value: int",
+          "returns": "None"
+        },
+        "ApriltagFamilies.name": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "str"
+        },
+        "ApriltagFamilies.value": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "BarCode": {
+          "kind": "class"
+        },
+        "BarCode.__init__": {
+          "kind": "function",
+          "signature": "self, rect: list[int], corners: list[list[int]], payload: str, type: int, rotation: float, quality: int",
+          "returns": "None"
+        },
+        "BarCode.corners": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "list[list[int]]"
+        },
+        "BarCode.h": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "BarCode.payload": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "str"
+        },
+        "BarCode.quality": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "BarCode.rect": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "list[int]"
+        },
+        "BarCode.rotation": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "float"
+        },
+        "BarCode.type": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "BarCode.w": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "BarCode.x": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "BarCode.y": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Blob": {
+          "kind": "class"
+        },
+        "Blob.__init__": {
+          "kind": "function",
+          "signature": "self, rect: list[int], corners: list[list[int]], mini_corners: list[list[int]], cx: float, cy: float, pixels: int, rotation: float, code: int, count: int, perimeter: int, roundness: float, x_hist_bins: list[int], y_hist_bins: list[int]",
+          "returns": "None"
+        },
+        "Blob.area": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Blob.code": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Blob.compactness": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "float"
+        },
+        "Blob.convexity": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "float"
+        },
+        "Blob.corners": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "list[list[int]]"
+        },
+        "Blob.count": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Blob.cx": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Blob.cxf": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "float"
+        },
+        "Blob.cy": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Blob.cyf": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "float"
+        },
+        "Blob.density": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "float"
+        },
+        "Blob.elongation": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "float"
+        },
+        "Blob.enclosed_ellipse": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "list[int]"
+        },
+        "Blob.enclosing_circle": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "list[int]"
+        },
+        "Blob.extent": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "float"
+        },
+        "Blob.h": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Blob.major_axis_line": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "list[int]"
+        },
+        "Blob.mini_corners": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "list[list[int]]"
+        },
+        "Blob.minor_axis_line": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "list[int]"
+        },
+        "Blob.perimeter": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Blob.pixels": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Blob.rect": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "list[int]"
+        },
+        "Blob.rotation": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "float"
+        },
+        "Blob.rotation_deg": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Blob.rotation_rad": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "float"
+        },
+        "Blob.roundness": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "float"
+        },
+        "Blob.solidity": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "float"
+        },
+        "Blob.w": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Blob.x": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Blob.x_hist_bins": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "list[int]"
+        },
+        "Blob.y": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Blob.y_hist_bins": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "list[int]"
+        },
+        "Circle": {
+          "kind": "class"
+        },
+        "Circle.__init__": {
+          "kind": "function",
+          "signature": "self, x: int, y: int, r: int, magnitude: int",
+          "returns": "None"
+        },
+        "Circle.magnitude": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Circle.r": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Circle.x": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Circle.y": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Color": {
+          "kind": "class"
+        },
+        "Color.alpha": {
+          "kind": "constant",
+          "annotation": "float"
+        },
+        "Color.b": {
+          "kind": "constant",
+          "annotation": "int"
+        },
+        "Color.format": {
+          "kind": "constant",
+          "annotation": "Format"
+        },
+        "Color.g": {
+          "kind": "constant",
+          "annotation": "int"
+        },
+        "Color.gray": {
+          "kind": "constant",
+          "annotation": "int"
+        },
+        "Color.r": {
+          "kind": "constant",
+          "annotation": "int"
+        },
+        "Color.from_bgr": {
+          "kind": "function",
+          "signature": "b: int, g: int, r: int",
+          "returns": "Color"
+        },
+        "Color.from_bgra": {
+          "kind": "function",
+          "signature": "b: int, g: int, r: int, alpha: float",
+          "returns": "Color"
+        },
+        "Color.from_gray": {
+          "kind": "function",
+          "signature": "gray: int",
+          "returns": "Color"
+        },
+        "Color.from_hex": {
+          "kind": "function",
+          "signature": "hex: int, format: Format",
+          "returns": "Color"
+        },
+        "Color.from_rgb": {
+          "kind": "function",
+          "signature": "r: int, g: int, b: int",
+          "returns": "Color"
+        },
+        "Color.from_rgba": {
+          "kind": "function",
+          "signature": "r: int, g: int, b: int, alpha: float",
+          "returns": "Color"
+        },
+        "Color.__init__": {
+          "kind": "function",
+          "signature": "self, ch1: int, ch2: int=0, ch3: int=0, alpha: float=0, format: Format=...",
+          "returns": "None"
+        },
+        "Color.hex": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Color.to_format": {
+          "kind": "function",
+          "signature": "self, format: Format",
+          "returns": "None"
+        },
+        "Color.to_format2": {
+          "kind": "function",
+          "signature": "self, format: Format",
+          "returns": "Color"
+        },
+        "CornerDetector": {
+          "kind": "class"
+        },
+        "CornerDetector.CORNER_AGAST": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[CornerDetector]"
+        },
+        "CornerDetector.CORNER_FAST": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[CornerDetector]"
+        },
+        "CornerDetector.__init__": {
+          "kind": "function",
+          "signature": "self, value: int",
+          "returns": "None"
+        },
+        "CornerDetector.name": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "str"
+        },
+        "CornerDetector.value": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "DataMatrix": {
+          "kind": "class"
+        },
+        "DataMatrix.__init__": {
+          "kind": "function",
+          "signature": "self, rect: list[int], corners: list[list[int]], payload: str, rotation: float, rows: int, columns: int, capacity: int, padding: int",
+          "returns": "None"
+        },
+        "DataMatrix.capacity": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "DataMatrix.columns": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "DataMatrix.corners": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "list[list[int]]"
+        },
+        "DataMatrix.h": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "DataMatrix.padding": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "DataMatrix.payload": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "str"
+        },
+        "DataMatrix.rect": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "list[int]"
+        },
+        "DataMatrix.rotation": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "float"
+        },
+        "DataMatrix.rows": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "DataMatrix.w": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "DataMatrix.x": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "DataMatrix.y": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Displacement": {
+          "kind": "class"
+        },
+        "Displacement.__init__": {
+          "kind": "function",
+          "signature": "self, x_translation: float, y_translation: float, rotation: float, scale: float, response: float",
+          "returns": "None"
+        },
+        "Displacement.response": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "float"
+        },
+        "Displacement.rotation": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "float"
+        },
+        "Displacement.scale": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "float"
+        },
+        "Displacement.x_translation": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "float"
+        },
+        "Displacement.y_translation": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "float"
+        },
+        "EdgeDetector": {
+          "kind": "class"
+        },
+        "EdgeDetector.EDGE_CANNY": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[EdgeDetector]"
+        },
+        "EdgeDetector.EDGE_SIMPLE": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[EdgeDetector]"
+        },
+        "EdgeDetector.__init__": {
+          "kind": "function",
+          "signature": "self, value: int",
+          "returns": "None"
+        },
+        "EdgeDetector.name": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "str"
+        },
+        "EdgeDetector.value": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Fit": {
+          "kind": "class"
+        },
+        "Fit.FIT_CONTAIN": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Fit]"
+        },
+        "Fit.FIT_COVER": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Fit]"
+        },
+        "Fit.FIT_FILL": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Fit]"
+        },
+        "Fit.FIT_MAX": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Fit]"
+        },
+        "Fit.FIT_NONE": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Fit]"
+        },
+        "Fit.__init__": {
+          "kind": "function",
+          "signature": "self, value: int",
+          "returns": "None"
+        },
+        "Fit.name": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "str"
+        },
+        "Fit.value": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Format": {
+          "kind": "class"
+        },
+        "Format.FMT_BGGR10": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Format]"
+        },
+        "Format.FMT_BGGR12": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Format]"
+        },
+        "Format.FMT_BGGR6": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Format]"
+        },
+        "Format.FMT_BGGR8": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Format]"
+        },
+        "Format.FMT_BGR565": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Format]"
+        },
+        "Format.FMT_BGR888": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Format]"
+        },
+        "Format.FMT_BGRA8888": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Format]"
+        },
+        "Format.FMT_COMPRESSED_MAX": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Format]"
+        },
+        "Format.FMT_COMPRESSED_MIN": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Format]"
+        },
+        "Format.FMT_GBRG10": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Format]"
+        },
+        "Format.FMT_GBRG12": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Format]"
+        },
+        "Format.FMT_GBRG6": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Format]"
+        },
+        "Format.FMT_GBRG8": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Format]"
+        },
+        "Format.FMT_GRAYSCALE": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Format]"
+        },
+        "Format.FMT_GRBG10": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Format]"
+        },
+        "Format.FMT_GRBG12": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Format]"
+        },
+        "Format.FMT_GRBG6": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Format]"
+        },
+        "Format.FMT_GRBG8": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Format]"
+        },
+        "Format.FMT_INVALID": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Format]"
+        },
+        "Format.FMT_JPEG": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Format]"
+        },
+        "Format.FMT_PNG": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Format]"
+        },
+        "Format.FMT_RGB565": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Format]"
+        },
+        "Format.FMT_RGB888": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Format]"
+        },
+        "Format.FMT_RGBA8888": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Format]"
+        },
+        "Format.FMT_RGGB10": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Format]"
+        },
+        "Format.FMT_RGGB12": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Format]"
+        },
+        "Format.FMT_RGGB6": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Format]"
+        },
+        "Format.FMT_RGGB8": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Format]"
+        },
+        "Format.FMT_UNCOMPRESSED_MAX": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Format]"
+        },
+        "Format.FMT_YUV420P": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Format]"
+        },
+        "Format.FMT_YUV420SP": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Format]"
+        },
+        "Format.FMT_YUV422P": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Format]"
+        },
+        "Format.FMT_YUV422SP": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Format]"
+        },
+        "Format.FMT_YVU420P": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Format]"
+        },
+        "Format.FMT_YVU420SP": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Format]"
+        },
+        "Format.__init__": {
+          "kind": "function",
+          "signature": "self, value: int",
+          "returns": "None"
+        },
+        "Format.name": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "str"
+        },
+        "Format.value": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "HaarCascade": {
+          "kind": "class"
+        },
+        "HaarCascade.__init__": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "None"
+        },
+        "Histogram": {
+          "kind": "class"
+        },
+        "Histogram.__init__": {
+          "kind": "function",
+          "signature": "self, l_bin: list[float], a_bin: list[float], b_bin: list[float], format: Format=...",
+          "returns": "None"
+        },
+        "Histogram.a_bins": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "list[float]"
+        },
+        "Histogram.b_bins": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "list[float]"
+        },
+        "Histogram.bins": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "list[float]"
+        },
+        "Histogram.get_percentile": {
+          "kind": "function",
+          "signature": "self, percentile: float",
+          "returns": "Percentile"
+        },
+        "Histogram.get_statistics": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "Statistics"
+        },
+        "Histogram.get_threshold": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "Threshold"
+        },
+        "Histogram.l_bins": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "list[float]"
+        },
+        "Image": {
+          "kind": "class"
+        },
+        "Image.to_bytes": {
+          "kind": "function",
+          "signature": "*args, **kwargs",
+          "returns": null
+        },
+        "Image.__init__": {
+          "kind": "function",
+          "signature": "self, width: int, height: int, format: Format=...",
+          "returns": "None"
+        },
+        "Image.add": {
+          "kind": "function",
+          "signature": "self, other: Image, mask: Image=None",
+          "returns": "Image"
+        },
+        "Image.affine": {
+          "kind": "function",
+          "signature": "self, src_points: list[int], dst_points: list[int], width: int=-1, height: int=-1, method: ResizeMethod=...",
+          "returns": "Image"
+        },
+        "Image.awb": {
+          "kind": "function",
+          "signature": "self, max: bool=False",
+          "returns": "Image"
+        },
+        "Image.b_and": {
+          "kind": "function",
+          "signature": "self, other: Image, mask: Image=None",
+          "returns": "Image"
+        },
+        "Image.b_nand": {
+          "kind": "function",
+          "signature": "self, other: Image, mask: Image=None",
+          "returns": "Image"
+        },
+        "Image.b_nor": {
+          "kind": "function",
+          "signature": "self, other: Image, mask: Image=None",
+          "returns": "Image"
+        },
+        "Image.b_or": {
+          "kind": "function",
+          "signature": "self, other: Image, mask: Image=None",
+          "returns": "Image"
+        },
+        "Image.b_xnor": {
+          "kind": "function",
+          "signature": "self, other: Image, mask: Image=None",
+          "returns": "Image"
+        },
+        "Image.b_xor": {
+          "kind": "function",
+          "signature": "self, other: Image, mask: Image=None",
+          "returns": "Image"
+        },
+        "Image.bilateral": {
+          "kind": "function",
+          "signature": "self, size: int, color_sigma: float=0.1, space_sigma: float=1, threshold: bool=False, offset: int=0, invert: bool=False, mask: Image=None",
+          "returns": "Image"
+        },
+        "Image.binary": {
+          "kind": "function",
+          "signature": "self, thresholds: list[list[int]]=[], invert: bool=False, zero: bool=False, mask: Image=None, to_bitmap: bool=False, copy: bool=False",
+          "returns": "Image"
+        },
+        "Image.black_hat": {
+          "kind": "function",
+          "signature": "self, size: int, threshold: int=0, mask: Image=None",
+          "returns": "Image"
+        },
+        "Image.blend": {
+          "kind": "function",
+          "signature": "self, other: Image, alpha: int=128, mask: Image=None",
+          "returns": "Image"
+        },
+        "Image.ccm": {
+          "kind": "function",
+          "signature": "self, matrix: list[float]",
+          "returns": "Image"
+        },
+        "Image.clear": {
+          "kind": "function",
+          "signature": "self, mask: Image=None",
+          "returns": "Image"
+        },
+        "Image.close": {
+          "kind": "function",
+          "signature": "self, size: int, threshold: int=0, mask: Image=None",
+          "returns": "Image"
+        },
+        "Image.compress": {
+          "kind": "function",
+          "signature": "self, quality: int=95",
+          "returns": "Image"
+        },
+        "Image.copy": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "Image"
+        },
+        "Image.crop": {
+          "kind": "function",
+          "signature": "self, x: int, y: int, w: int, h: int",
+          "returns": "Image"
+        },
+        "Image.data": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "capsule"
+        },
+        "Image.data_size": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Image.difference": {
+          "kind": "function",
+          "signature": "self, other: Image, mask: Image=None",
+          "returns": "Image"
+        },
+        "Image.dilate": {
+          "kind": "function",
+          "signature": "self, size: int, threshold: int=0, mask: Image=None",
+          "returns": "Image"
+        },
+        "Image.div": {
+          "kind": "function",
+          "signature": "self, other: Image, invert: bool=False, mod: bool=False, mask: Image=None",
+          "returns": "Image"
+        },
+        "Image.draw_arrow": {
+          "kind": "function",
+          "signature": "self, x0: int, y0: int, x1: int, y1: int, color: Color, thickness: int=1",
+          "returns": "Image"
+        },
+        "Image.draw_circle": {
+          "kind": "function",
+          "signature": "self, x: int, y: int, radius: int, color: Color, thickness: int=1",
+          "returns": "Image"
+        },
+        "Image.draw_cross": {
+          "kind": "function",
+          "signature": "self, x: int, y: int, color: Color, size: int=5, thickness: int=1",
+          "returns": "Image"
+        },
+        "Image.draw_edges": {
+          "kind": "function",
+          "signature": "self, corners: list[list[int]], color: Color, size: int=0, thickness: int=1, fill: bool=False",
+          "returns": "Image"
+        },
+        "Image.draw_ellipse": {
+          "kind": "function",
+          "signature": "self, x: int, y: int, a: int, b: int, angle: float, start_angle: float, end_angle: float, color: Color, thickness: int=1",
+          "returns": "Image"
+        },
+        "Image.draw_image": {
+          "kind": "function",
+          "signature": "self, x: int, y: int, img: Image",
+          "returns": "Image"
+        },
+        "Image.draw_keypoints": {
+          "kind": "function",
+          "signature": "self, keypoints: list[int], color: Color, size: int=4, thickness: int=-1, line_thickness: int=0",
+          "returns": "Image"
+        },
+        "Image.draw_line": {
+          "kind": "function",
+          "signature": "self, x1: int, y1: int, x2: int, y2: int, color: Color, thickness: int=1",
+          "returns": "Image"
+        },
+        "Image.draw_rect": {
+          "kind": "function",
+          "signature": "self, x: int, y: int, w: int, h: int, color: Color, thickness: int=1",
+          "returns": "Image"
+        },
+        "Image.draw_string": {
+          "kind": "function",
+          "signature": "self, x: int, y: int, textstring: str, color: Color=..., scale: float=1, thickness: int=-1, wrap: bool=True, wrap_space: int=4, font: str=''",
+          "returns": "Image"
+        },
+        "Image.erode": {
+          "kind": "function",
+          "signature": "self, size: int, threshold: int=-1, mask: Image=None",
+          "returns": "Image"
+        },
+        "Image.find_apriltags": {
+          "kind": "function",
+          "signature": "self, roi: list[int]=[], families: ApriltagFamilies=..., fx: float=-1, fy: float=-1, cx: int=-1, cy: int=-1",
+          "returns": "list[AprilTag]"
+        },
+        "Image.find_barcodes": {
+          "kind": "function",
+          "signature": "self, roi: list[int]=[]",
+          "returns": "list[BarCode]"
+        },
+        "Image.find_blobs": {
+          "kind": "function",
+          "signature": "self, thresholds: list[list[int]]=[], invert: bool=False, roi: list[int]=[], x_stride: int=2, y_stride: int=1, area_threshold: int=10, pixels_threshold: int=10, merge: bool=False, margin: int=0, x_hist_bins_max: int=0, y_hist_bins_max: int=0",
+          "returns": "list[Blob]"
+        },
+        "Image.find_circles": {
+          "kind": "function",
+          "signature": "self, roi: list[int]=[], x_stride: int=2, y_stride: int=1, threshold: int=2000, x_margin: int=10, y_margin: int=10, r_margin: int=10, r_min: int=2, r_max: int=-1, r_step: int=2",
+          "returns": "list[Circle]"
+        },
+        "Image.find_datamatrices": {
+          "kind": "function",
+          "signature": "self, roi: list[int]=[], effort: int=200",
+          "returns": "list[DataMatrix]"
+        },
+        "Image.find_displacement": {
+          "kind": "function",
+          "signature": "self, template_image: Image, roi: list[int]=[], template_roi: list[int]=[], logpolar: bool=False",
+          "returns": "Displacement"
+        },
+        "Image.find_edges": {
+          "kind": "function",
+          "signature": "self, edge_type: EdgeDetector, roi: list[int]=[], threshold: list[int]=[100, 200]",
+          "returns": "Image"
+        },
+        "Image.find_features": {
+          "kind": "function",
+          "signature": "self, cascade: int, threshold: float=0.5, scale: float=1.5, roi: list[int]=[]",
+          "returns": "list[int]"
+        },
+        "Image.find_hog": {
+          "kind": "function",
+          "signature": "self, roi: list[int]=[], size: int=8",
+          "returns": "Image"
+        },
+        "Image.find_keypoints": {
+          "kind": "function",
+          "signature": "self, roi: list[int]=[], threshold: int=20, normalized: bool=False, scale_factor: float=1.5, max_keypoints: int=100, corner_detector: CornerDetector=...",
+          "returns": "ORBKeyPoint"
+        },
+        "Image.find_lbp": {
+          "kind": "function",
+          "signature": "self, roi: list[int]=[]",
+          "returns": "LBPKeyPoint"
+        },
+        "Image.find_line_segments": {
+          "kind": "function",
+          "signature": "self, roi: list[int]=[], merge_distance: int=0, max_theta_difference: int=15",
+          "returns": "list[Line]"
+        },
+        "Image.find_lines": {
+          "kind": "function",
+          "signature": "self, roi: list[int]=[], x_stride: int=2, y_stride: int=1, threshold: float=1000, theta_margin: float=25, rho_margin: float=25",
+          "returns": "list[Line]"
+        },
+        "Image.find_qrcodes": {
+          "kind": "function",
+          "signature": "self, roi: list[int]=[]",
+          "returns": "list[QRCode]"
+        },
+        "Image.find_rects": {
+          "kind": "function",
+          "signature": "self, roi: list[int]=[], threshold: int=10000",
+          "returns": "list[Rect]"
+        },
+        "Image.find_template": {
+          "kind": "function",
+          "signature": "self, template_image: Image, threshold: float, roi: list[int]=[], step: int=2, search: TemplateMatch=...",
+          "returns": "list[int]"
+        },
+        "Image.flood_fill": {
+          "kind": "function",
+          "signature": "self, x: int, y: int, seed_threshold: float=0.05, floating_threshold: float=0.05, color: Color=..., invert: bool=False, clear_background: bool=False, mask: Image=None",
+          "returns": "Image"
+        },
+        "Image.format": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "Format"
+        },
+        "Image.gamma": {
+          "kind": "function",
+          "signature": "self, gamma: float=1.0, contrast: float=1.0, brightness: float=0.0",
+          "returns": "Image"
+        },
+        "Image.gamma_corr": {
+          "kind": "function",
+          "signature": "self, gamma: float, contrast: float=1.0, brightness: float=0.0",
+          "returns": "Image"
+        },
+        "Image.gaussian": {
+          "kind": "function",
+          "signature": "self, size: int, unsharp: bool=False, mul: float=-1, add: float=0.0, threshold: bool=False, offset: int=0, invert: bool=False, mask: Image=None",
+          "returns": "Image"
+        },
+        "Image.get_histogram": {
+          "kind": "function",
+          "signature": "self, thresholds: list[list[int]]=[], invert: bool=False, roi: list[int]=[], bins: int=-1, l_bins: int=100, a_bins: int=256, b_bins: int=256, difference: Image=None",
+          "returns": "Histogram"
+        },
+        "Image.get_pixel": {
+          "kind": "function",
+          "signature": "self, x: int, y: int, rgbtuple: bool=False",
+          "returns": "list[int]"
+        },
+        "Image.get_regression": {
+          "kind": "function",
+          "signature": "self, thresholds: list[list[int]]=[], invert: bool=False, roi: list[int]=[], x_stride: int=2, y_stride: int=1, area_threshold: int=10, pixels_threshold: int=10, robust: bool=False",
+          "returns": "list[Line]"
+        },
+        "Image.get_statistics": {
+          "kind": "function",
+          "signature": "self, thresholds: list[list[int]]=[], invert: bool=False, roi: list[int]=[], bins: int=-1, l_bins: int=-1, a_bins: int=-1, b_bins: int=-1, difference: Image=None",
+          "returns": "Statistics"
+        },
+        "Image.height": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Image.histeq": {
+          "kind": "function",
+          "signature": "self, adaptive: bool=False, clip_limit: int=-1, mask: Image=None",
+          "returns": "Image"
+        },
+        "Image.invert": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "Image"
+        },
+        "Image.laplacian": {
+          "kind": "function",
+          "signature": "self, size: int, sharpen: bool=False, mul: float=-1, add: float=0.0, threshold: bool=False, offset: int=0, invert: bool=False, mask: Image=None",
+          "returns": "Image"
+        },
+        "Image.lens_corr": {
+          "kind": "function",
+          "signature": "self, strength: float=1.8, zoom: float=1.0, x_corr: float=0.0, y_corr: float=0.0",
+          "returns": "Image"
+        },
+        "Image.linpolar": {
+          "kind": "function",
+          "signature": "self, reverse: bool=False",
+          "returns": "Image"
+        },
+        "Image.logpolar": {
+          "kind": "function",
+          "signature": "self, reverse: bool=False",
+          "returns": "Image"
+        },
+        "Image.mask_circle": {
+          "kind": "function",
+          "signature": "self, x: int=-1, y: int=-1, radius: int=-1",
+          "returns": "Image"
+        },
+        "Image.mask_ellipse": {
+          "kind": "function",
+          "signature": "self, x: int=-1, y: int=-1, radius_x: int=-1, radius_y: int=-1, rotation_angle_in_degrees: float=0",
+          "returns": "Image"
+        },
+        "Image.mask_rectange": {
+          "kind": "function",
+          "signature": "self, x: int=-1, y: int=-1, w: int=-1, h: int=-1",
+          "returns": "Image"
+        },
+        "Image.match_lbp_descriptor": {
+          "kind": "function",
+          "signature": "self, desc1: LBPKeyPoint, desc2: LBPKeyPoint",
+          "returns": "int"
+        },
+        "Image.match_orb_descriptor": {
+          "kind": "function",
+          "signature": "self, desc1: ORBKeyPoint, desc2: ORBKeyPoint, threshold: int=95, filter_outliers: bool=False",
+          "returns": "KPTMatch"
+        },
+        "Image.max": {
+          "kind": "function",
+          "signature": "self, other: Image, mask: Image=None",
+          "returns": "Image"
+        },
+        "Image.mean": {
+          "kind": "function",
+          "signature": "self, size: int, threshold: bool=False, offset: int=0, invert: bool=False, mask: Image=None",
+          "returns": "Image"
+        },
+        "Image.mean_pool": {
+          "kind": "function",
+          "signature": "self, x_div: int, y_div: int, copy: bool=False",
+          "returns": "Image"
+        },
+        "Image.median": {
+          "kind": "function",
+          "signature": "self, size: int, percentile: float=0.5, threshold: bool=False, offset: int=0, invert: bool=False, mask: Image=None",
+          "returns": "Image"
+        },
+        "Image.midpoint": {
+          "kind": "function",
+          "signature": "self, size: int, bias: float=0.5, threshold: bool=False, offset: int=0, invert: bool=False, mask: Image=None",
+          "returns": "Image"
+        },
+        "Image.midpoint_pool": {
+          "kind": "function",
+          "signature": "self, x_div: int, y_div: int, bias: float=0.5, copy: bool=False",
+          "returns": "Image"
+        },
+        "Image.min": {
+          "kind": "function",
+          "signature": "self, other: Image, mask: Image=None",
+          "returns": "Image"
+        },
+        "Image.mode": {
+          "kind": "function",
+          "signature": "self, size: int, threshold: bool=False, offset: int=0, invert: bool=False, mask: Image=None",
+          "returns": "Image"
+        },
+        "Image.morph": {
+          "kind": "function",
+          "signature": "self, size: int, kernel: list[int], mul: float=-1, add: float=0.0, threshold: bool=False, offset: int=0, invert: bool=False, mask: Image=None",
+          "returns": "Image"
+        },
+        "Image.mul": {
+          "kind": "function",
+          "signature": "self, other: Image, invert: bool=False, mask: Image=None",
+          "returns": "Image"
+        },
+        "Image.negate": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "Image"
+        },
+        "Image.open": {
+          "kind": "function",
+          "signature": "self, size: int, threshold: int=0, mask: Image=None",
+          "returns": "Image"
+        },
+        "Image.replace": {
+          "kind": "function",
+          "signature": "self, other: Image=None, hmirror: bool=False, vflip: bool=False, transpose: bool=False, mask: Image=None",
+          "returns": "Image"
+        },
+        "Image.resize": {
+          "kind": "function",
+          "signature": "self, width: int, height: int, object_fit: Fit=..., method: ResizeMethod=...",
+          "returns": "Image"
+        },
+        "Image.rotate": {
+          "kind": "function",
+          "signature": "self, angle: float, width: int=-1, height: int=-1, method: ResizeMethod=...",
+          "returns": "Image"
+        },
+        "Image.rotation_corr": {
+          "kind": "function",
+          "signature": "self, x_rotation: float=0.0, y_rotation: float=0.0, z_rotation: float=0.0, x_translation: float=0.0, y_translation: float=0.0, zoom: float=1.0, fov: float=60.0, corners: list[float]=[]",
+          "returns": "Image"
+        },
+        "Image.save": {
+          "kind": "function",
+          "signature": "self, path: str, quality: int=95",
+          "returns": "maix._maix.err.Err"
+        },
+        "Image.set": {
+          "kind": "function",
+          "signature": "self, other: Image, hmirror: bool=False, vflip: bool=False, transpose: bool=False, mask: Image=None",
+          "returns": "Image"
+        },
+        "Image.set_pixel": {
+          "kind": "function",
+          "signature": "self, x: int, y: int, pixel: list[int]",
+          "returns": "maix._maix.err.Err"
+        },
+        "Image.size": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "Size"
+        },
+        "Image.sub": {
+          "kind": "function",
+          "signature": "self, other: Image, reverse: bool=False, mask: Image=None",
+          "returns": "Image"
+        },
+        "Image.to_format": {
+          "kind": "function",
+          "signature": "self, format: Format",
+          "returns": "Image"
+        },
+        "Image.to_jpeg": {
+          "kind": "function",
+          "signature": "self, quality: int=95",
+          "returns": "Image"
+        },
+        "Image.to_str": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "str"
+        },
+        "Image.to_tensor": {
+          "kind": "function",
+          "signature": "self, chw: bool=False, copy: bool=True",
+          "returns": "maix._maix.tensor.Tensor"
+        },
+        "Image.top_hat": {
+          "kind": "function",
+          "signature": "self, size: int, threshold: int=0, mask: Image=None",
+          "returns": "Image"
+        },
+        "Image.width": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "KPTMatch": {
+          "kind": "class"
+        },
+        "KPTMatch.__init__": {
+          "kind": "function",
+          "signature": "self, cx: int, cy: int, x: int, y: int, w: int, h: int, score: int, theta: int, match: int",
+          "returns": "None"
+        },
+        "KeyPoint": {
+          "kind": "class"
+        },
+        "KeyPoint.__init__": {
+          "kind": "function",
+          "signature": "self, x: int, y: int, score: int, octave: int, angle: int, matched: int, desc: list[int]",
+          "returns": "None"
+        },
+        "LBPKeyPoint": {
+          "kind": "class"
+        },
+        "LBPKeyPoint.__init__": {
+          "kind": "function",
+          "signature": "self, data: list[int]",
+          "returns": "None"
+        },
+        "Line": {
+          "kind": "class"
+        },
+        "Line.__init__": {
+          "kind": "function",
+          "signature": "self, x1: int, y1: int, x2: int, y2: int, magnitude: int=0, theta: int=0, rho: int=0",
+          "returns": "None"
+        },
+        "Line.length": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Line.magnitude": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Line.rho": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Line.theta": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Line.x1": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Line.x2": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Line.y1": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Line.y2": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "ORBKeyPoint": {
+          "kind": "class"
+        },
+        "ORBKeyPoint.__init__": {
+          "kind": "function",
+          "signature": "self, data: list[KeyPoint], threshold: int, normalized: bool",
+          "returns": "None"
+        },
+        "ORBKeyPoint.get_data": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "list[KeyPoint]"
+        },
+        "Percentile": {
+          "kind": "class"
+        },
+        "Percentile.__init__": {
+          "kind": "function",
+          "signature": "self, l_value: int, a_value: int=0, b_value: int=0",
+          "returns": "None"
+        },
+        "Percentile.a_value": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Percentile.b_value": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Percentile.l_value": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Percentile.value": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "QRCode": {
+          "kind": "class"
+        },
+        "QRCode.__init__": {
+          "kind": "function",
+          "signature": "self, rect: list[int], corners: list[list[int]], payload: str, version: int, ecc_level: int, mask: int, data_type: int, eci: int",
+          "returns": "None"
+        },
+        "QRCode.corners": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "list[list[int]]"
+        },
+        "QRCode.data_type": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "QRCode.ecc_level": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "QRCode.eci": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "QRCode.h": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "QRCode.is_alphanumeric": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "bool"
+        },
+        "QRCode.is_binary": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "bool"
+        },
+        "QRCode.is_kanji": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "bool"
+        },
+        "QRCode.is_numeric": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "bool"
+        },
+        "QRCode.mask": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "QRCode.payload": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "str"
+        },
+        "QRCode.rect": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "list[int]"
+        },
+        "QRCode.version": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "QRCode.w": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "QRCode.x": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "QRCode.y": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Rect": {
+          "kind": "class"
+        },
+        "Rect.__init__": {
+          "kind": "function",
+          "signature": "self, corners: list[list[int]], x: int, y: int, w: int, h: int, magnitude: int=0",
+          "returns": "None"
+        },
+        "Rect.corners": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "list[list[int]]"
+        },
+        "Rect.h": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Rect.magnitude": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Rect.rect": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "list[int]"
+        },
+        "Rect.w": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Rect.x": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Rect.y": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "ResizeMethod": {
+          "kind": "class"
+        },
+        "ResizeMethod.AREA": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[ResizeMethod]"
+        },
+        "ResizeMethod.BICUBIC": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[ResizeMethod]"
+        },
+        "ResizeMethod.BILINEAR": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[ResizeMethod]"
+        },
+        "ResizeMethod.HAMMING": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[ResizeMethod]"
+        },
+        "ResizeMethod.LANCZOS": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[ResizeMethod]"
+        },
+        "ResizeMethod.NEAREST": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[ResizeMethod]"
+        },
+        "ResizeMethod.RESIZE_METHOD_MAX": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[ResizeMethod]"
+        },
+        "ResizeMethod.__init__": {
+          "kind": "function",
+          "signature": "self, value: int",
+          "returns": "None"
+        },
+        "ResizeMethod.name": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "str"
+        },
+        "ResizeMethod.value": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Size": {
+          "kind": "class"
+        },
+        "Size.__init__": {
+          "kind": "function",
+          "signature": "self, width: int=0, height: int=0",
+          "returns": "None"
+        },
+        "Size.height": {
+          "kind": "function",
+          "signature": "self, height: int=-1",
+          "returns": "int"
+        },
+        "Size.width": {
+          "kind": "function",
+          "signature": "self, width: int=-1",
+          "returns": "int"
+        },
+        "Statistics": {
+          "kind": "class"
+        },
+        "Statistics.__init__": {
+          "kind": "function",
+          "signature": "self, format: Format, l_statistics: list[int], a_statistics: list[int], b_statistics: list[int]",
+          "returns": "None"
+        },
+        "Statistics.a_lq": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Statistics.a_max": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Statistics.a_mean": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Statistics.a_median": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Statistics.a_min": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Statistics.a_mode": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Statistics.a_std_dev": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Statistics.a_uq": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Statistics.b_lq": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Statistics.b_max": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Statistics.b_mean": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Statistics.b_median": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Statistics.b_min": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Statistics.b_mode": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Statistics.b_std_dev": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Statistics.b_uq": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Statistics.format": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "Format"
+        },
+        "Statistics.l_lq": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Statistics.l_max": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Statistics.l_mean": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Statistics.l_median": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Statistics.l_min": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Statistics.l_mode": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Statistics.l_std_dev": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Statistics.l_uq": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "TemplateMatch": {
+          "kind": "class"
+        },
+        "TemplateMatch.SEARCH_DS": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[TemplateMatch]"
+        },
+        "TemplateMatch.SEARCH_EX": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[TemplateMatch]"
+        },
+        "TemplateMatch.__init__": {
+          "kind": "function",
+          "signature": "self, value: int",
+          "returns": "None"
+        },
+        "TemplateMatch.name": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "str"
+        },
+        "TemplateMatch.value": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Threshold": {
+          "kind": "class"
+        },
+        "Threshold.__init__": {
+          "kind": "function",
+          "signature": "self, l_value: int, a_value: int=0, b_value: int=0",
+          "returns": "None"
+        },
+        "Threshold.a_value": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Threshold.b_value": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Threshold.l_value": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Threshold.value": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "cv2image": {
+          "kind": "function",
+          "signature": "array: numpy.ndarray[numpy.uint8], bgr: bool=True, copy: bool=True",
+          "returns": "Image"
+        },
+        "fonts": {
+          "kind": "function",
+          "signature": "",
+          "returns": "list[str]"
+        },
+        "from_bytes": {
+          "kind": "function",
+          "signature": "width: int, height: int, format: Format, data: maix.Bytes(bytes), copy: bool=True",
+          "returns": "Image"
+        },
+        "image2cv": {
+          "kind": "function",
+          "signature": "img: Image, ensure_bgr: bool=True, copy: bool=True",
+          "returns": "numpy.ndarray[numpy.uint8]"
+        },
+        "load": {
+          "kind": "function",
+          "signature": "path: str, format: Format=...",
+          "returns": "Image"
+        },
+        "load_font": {
+          "kind": "function",
+          "signature": "name: str, path: str, size: int=16",
+          "returns": "maix._maix.err.Err"
+        },
+        "resize_map_pos": {
+          "kind": "function",
+          "signature": "w_in: int, h_in: int, w_out: int, h_out: int, fit: Fit, x: int, y: int, w: int=-1, h: int=-1",
+          "returns": "list[int]"
+        },
+        "resize_map_pos_reverse": {
+          "kind": "function",
+          "signature": "w_in: int, h_in: int, w_out: int, h_out: int, fit: Fit, x: int, y: int, w: int=-1, h: int=-1",
+          "returns": "list[int]"
+        },
+        "set_default_font": {
+          "kind": "function",
+          "signature": "name: str",
+          "returns": "maix._maix.err.Err"
+        },
+        "string_size": {
+          "kind": "function",
+          "signature": "string: str, scale: float=1, thickness: int=1, font: str=''",
+          "returns": "Size"
+        },
+        "COLOR_BLACK": {
+          "kind": "constant",
+          "annotation": "Color"
+        },
+        "COLOR_BLUE": {
+          "kind": "constant",
+          "annotation": "Color"
+        },
+        "COLOR_GRAY": {
+          "kind": "constant",
+          "annotation": "Color"
+        },
+        "COLOR_GREEN": {
+          "kind": "constant",
+          "annotation": "Color"
+        },
+        "COLOR_ORANGE": {
+          "kind": "constant",
+          "annotation": "Color"
+        },
+        "COLOR_PURPLE": {
+          "kind": "constant",
+          "annotation": "Color"
+        },
+        "COLOR_RED": {
+          "kind": "constant",
+          "annotation": "Color"
+        },
+        "COLOR_WHITE": {
+          "kind": "constant",
+          "annotation": "Color"
+        },
+        "COLOR_YELLOW": {
+          "kind": "constant",
+          "annotation": "Color"
+        },
+        "fmt_names": {
+          "kind": "constant",
+          "annotation": "list"
+        },
+        "fmt_size": {
+          "kind": "constant",
+          "annotation": "list"
+        }
+      }
+    },
+    "app": {
+      "path": "/usr/lib/python3.11/site-packages/maix/_maix/app.pyi",
+      "bytes": 7398,
+      "sha256": "eb1dbc0c5b437a575ee5d7f45df3f592da84dc2a3249be7f6cebaeddd8e222cc",
+      "symbols": {
+        "APP_Info": {
+          "kind": "class"
+        },
+        "APP_Info.author": {
+          "kind": "constant",
+          "annotation": "str"
+        },
+        "APP_Info.desc": {
+          "kind": "constant",
+          "annotation": "str"
+        },
+        "APP_Info.descs": {
+          "kind": "constant",
+          "annotation": "dict[str, str]"
+        },
+        "APP_Info.exec": {
+          "kind": "constant",
+          "annotation": "str"
+        },
+        "APP_Info.icon": {
+          "kind": "constant",
+          "annotation": "str"
+        },
+        "APP_Info.id": {
+          "kind": "constant",
+          "annotation": "str"
+        },
+        "APP_Info.name": {
+          "kind": "constant",
+          "annotation": "str"
+        },
+        "APP_Info.names": {
+          "kind": "constant",
+          "annotation": "dict[str, str]"
+        },
+        "APP_Info.version": {
+          "kind": "constant",
+          "annotation": "Version"
+        },
+        "Version": {
+          "kind": "class"
+        },
+        "Version.from_str": {
+          "kind": "function",
+          "signature": "version_str: str",
+          "returns": "Version"
+        },
+        "app_id": {
+          "kind": "function",
+          "signature": "",
+          "returns": "str"
+        },
+        "get_app_config_kv": {
+          "kind": "function",
+          "signature": "item: str, key: str, value: str='', from_cache: bool=True",
+          "returns": "str"
+        },
+        "get_app_config_path": {
+          "kind": "function",
+          "signature": "",
+          "returns": "str"
+        },
+        "get_app_data_path": {
+          "kind": "function",
+          "signature": "",
+          "returns": "str"
+        },
+        "get_app_info": {
+          "kind": "function",
+          "signature": "app_id: str",
+          "returns": "APP_Info"
+        },
+        "get_app_path": {
+          "kind": "function",
+          "signature": "app_id: str=''",
+          "returns": "str"
+        },
+        "get_apps_info": {
+          "kind": "function",
+          "signature": "ignore_launcher: bool=False, ignore_app_store: bool=False",
+          "returns": "list[APP_Info]"
+        },
+        "get_apps_info_path": {
+          "kind": "function",
+          "signature": "",
+          "returns": "str"
+        },
+        "get_exit_msg": {
+          "kind": "function",
+          "signature": "cache: bool=False",
+          "returns": "tuple[str, maix._maix.err.Err, str]"
+        },
+        "get_font_path": {
+          "kind": "function",
+          "signature": "",
+          "returns": "str"
+        },
+        "get_icon_path": {
+          "kind": "function",
+          "signature": "",
+          "returns": "str"
+        },
+        "get_picture_path": {
+          "kind": "function",
+          "signature": "",
+          "returns": "str"
+        },
+        "get_share_path": {
+          "kind": "function",
+          "signature": "",
+          "returns": "str"
+        },
+        "get_start_param": {
+          "kind": "function",
+          "signature": "",
+          "returns": "str"
+        },
+        "get_sys_config_kv": {
+          "kind": "function",
+          "signature": "item: str, key: str, value: str='', from_cache: bool=True",
+          "returns": "str"
+        },
+        "get_tmp_path": {
+          "kind": "function",
+          "signature": "",
+          "returns": "str"
+        },
+        "get_video_path": {
+          "kind": "function",
+          "signature": "",
+          "returns": "str"
+        },
+        "have_exit_msg": {
+          "kind": "function",
+          "signature": "cache: bool=False",
+          "returns": "bool"
+        },
+        "need_exit": {
+          "kind": "function",
+          "signature": "",
+          "returns": "bool"
+        },
+        "running": {
+          "kind": "function",
+          "signature": "",
+          "returns": "bool"
+        },
+        "set_app_config_kv": {
+          "kind": "function",
+          "signature": "item: str, key: str, value: str, write_file: bool=True",
+          "returns": "maix._maix.err.Err"
+        },
+        "set_app_id": {
+          "kind": "function",
+          "signature": "app_id: str",
+          "returns": "str"
+        },
+        "set_exit_flag": {
+          "kind": "function",
+          "signature": "exit: bool",
+          "returns": "None"
+        },
+        "set_exit_msg": {
+          "kind": "function",
+          "signature": "code: maix._maix.err.Err, msg: str",
+          "returns": "maix._maix.err.Err"
+        },
+        "switch_app": {
+          "kind": "function",
+          "signature": "app_id: str, idx: int=-1, start_param: str=''",
+          "returns": "None"
+        }
+      }
+    },
+    "time": {
+      "path": "/usr/lib/python3.11/site-packages/maix/_maix/time.pyi",
+      "bytes": 8821,
+      "sha256": "bb4dc74d2e3ee92b3b65485309ef5da6ce992ae6caabaf9e4c51518c60d5f615",
+      "symbols": {
+        "DateTime": {
+          "kind": "class"
+        },
+        "DateTime.day": {
+          "kind": "constant",
+          "annotation": "int"
+        },
+        "DateTime.hour": {
+          "kind": "constant",
+          "annotation": "int"
+        },
+        "DateTime.microsecond": {
+          "kind": "constant",
+          "annotation": "int"
+        },
+        "DateTime.minute": {
+          "kind": "constant",
+          "annotation": "int"
+        },
+        "DateTime.month": {
+          "kind": "constant",
+          "annotation": "int"
+        },
+        "DateTime.second": {
+          "kind": "constant",
+          "annotation": "int"
+        },
+        "DateTime.weekday": {
+          "kind": "constant",
+          "annotation": "int"
+        },
+        "DateTime.year": {
+          "kind": "constant",
+          "annotation": "int"
+        },
+        "DateTime.yearday": {
+          "kind": "constant",
+          "annotation": "int"
+        },
+        "DateTime.zone": {
+          "kind": "constant",
+          "annotation": "float"
+        },
+        "DateTime.zone_name": {
+          "kind": "constant",
+          "annotation": "str"
+        },
+        "DateTime.__init__": {
+          "kind": "function",
+          "signature": "self, year: int=0, month: int=0, day: int=0, hour: int=0, minute: int=0, second: int=0, microsecond: int=0, yearday: int=0, weekday: int=0, zone: int=0",
+          "returns": "None"
+        },
+        "DateTime.strftime": {
+          "kind": "function",
+          "signature": "self, format: str",
+          "returns": "str"
+        },
+        "DateTime.timestamp": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "float"
+        },
+        "FPS": {
+          "kind": "class"
+        },
+        "FPS.__init__": {
+          "kind": "function",
+          "signature": "self, buff_len: int=20",
+          "returns": "None"
+        },
+        "FPS.fps": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "float"
+        },
+        "FPS.set_buff_len": {
+          "kind": "function",
+          "signature": "self, len: int",
+          "returns": "None"
+        },
+        "FPS.start": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "None"
+        },
+        "fps": {
+          "kind": "function",
+          "signature": "",
+          "returns": "float"
+        },
+        "fps_set_buff_len": {
+          "kind": "function",
+          "signature": "len: int",
+          "returns": "None"
+        },
+        "fps_start": {
+          "kind": "function",
+          "signature": "",
+          "returns": "None"
+        },
+        "gmtime": {
+          "kind": "function",
+          "signature": "timestamp: float",
+          "returns": "DateTime"
+        },
+        "list_timezones": {
+          "kind": "function",
+          "signature": "",
+          "returns": "dict[str, list[str]]"
+        },
+        "localtime": {
+          "kind": "function",
+          "signature": "",
+          "returns": "DateTime"
+        },
+        "now": {
+          "kind": "function",
+          "signature": "",
+          "returns": "DateTime"
+        },
+        "ntp_sync_sys_time": {
+          "kind": "function",
+          "signature": "host: str, port: int=-1, retry: int=3, timeout_ms: int=0",
+          "returns": "list[int]"
+        },
+        "ntp_sync_sys_time_with_config": {
+          "kind": "function",
+          "signature": "path: str",
+          "returns": "list[int]"
+        },
+        "ntp_timetuple": {
+          "kind": "function",
+          "signature": "host: str, port: int=-1, retry: int=3, timeout_ms: int=0",
+          "returns": "list[int]"
+        },
+        "ntp_timetuple_with_config": {
+          "kind": "function",
+          "signature": "path: str",
+          "returns": "list[int]"
+        },
+        "strptime": {
+          "kind": "function",
+          "signature": "str: str, format: str",
+          "returns": "DateTime"
+        },
+        "ticks_diff": {
+          "kind": "function",
+          "signature": "last: float, now: float=-1",
+          "returns": "float"
+        },
+        "ticks_ms": {
+          "kind": "function",
+          "signature": "",
+          "returns": "int"
+        },
+        "ticks_s": {
+          "kind": "function",
+          "signature": "",
+          "returns": "float"
+        },
+        "ticks_us": {
+          "kind": "function",
+          "signature": "",
+          "returns": "int"
+        },
+        "time": {
+          "kind": "function",
+          "signature": "",
+          "returns": "float"
+        },
+        "time_diff": {
+          "kind": "function",
+          "signature": "last: float, now: float=-1",
+          "returns": "float"
+        },
+        "time_ms": {
+          "kind": "function",
+          "signature": "",
+          "returns": "int"
+        },
+        "time_s": {
+          "kind": "function",
+          "signature": "",
+          "returns": "int"
+        },
+        "time_us": {
+          "kind": "function",
+          "signature": "",
+          "returns": "int"
+        },
+        "timezone": {
+          "kind": "function",
+          "signature": "timezone: str=''",
+          "returns": "str"
+        }
+      }
+    },
+    "sys": {
+      "path": "/usr/lib/python3.11/site-packages/maix/_maix/sys.pyi",
+      "bytes": 3920,
+      "sha256": "1af86c9e2d71cf400891f7df39a4b52c4cf64197d40a5feab5455837395e0dac",
+      "symbols": {
+        "bytes_to_human": {
+          "kind": "function",
+          "signature": "bytes: int, precision: int=2, base: int=1024, unit: str='B', sep: str=' '",
+          "returns": "str"
+        },
+        "cpu_freq": {
+          "kind": "function",
+          "signature": "",
+          "returns": "dict[str, int]"
+        },
+        "cpu_temp": {
+          "kind": "function",
+          "signature": "",
+          "returns": "dict[str, float]"
+        },
+        "cpu_usage": {
+          "kind": "function",
+          "signature": "",
+          "returns": "dict[str, float]"
+        },
+        "device_key": {
+          "kind": "function",
+          "signature": "",
+          "returns": "str"
+        },
+        "device_name": {
+          "kind": "function",
+          "signature": "",
+          "returns": "str"
+        },
+        "disk_partitions": {
+          "kind": "function",
+          "signature": "only_disk: bool=True",
+          "returns": "list[dict[str, str]]"
+        },
+        "disk_usage": {
+          "kind": "function",
+          "signature": "path: str='/'",
+          "returns": "dict[str, int]"
+        },
+        "host_domain": {
+          "kind": "function",
+          "signature": "",
+          "returns": "str"
+        },
+        "host_name": {
+          "kind": "function",
+          "signature": "",
+          "returns": "str"
+        },
+        "ip_address": {
+          "kind": "function",
+          "signature": "",
+          "returns": "dict[str, str]"
+        },
+        "mac_address": {
+          "kind": "function",
+          "signature": "",
+          "returns": "dict[str, str]"
+        },
+        "maixpy_version": {
+          "kind": "function",
+          "signature": "",
+          "returns": "str"
+        },
+        "memory_info": {
+          "kind": "function",
+          "signature": "",
+          "returns": "dict[str, int]"
+        },
+        "npu_freq": {
+          "kind": "function",
+          "signature": "",
+          "returns": "dict[str, int]"
+        },
+        "os_version": {
+          "kind": "function",
+          "signature": "",
+          "returns": "str"
+        },
+        "poweroff": {
+          "kind": "function",
+          "signature": "",
+          "returns": "None"
+        },
+        "reboot": {
+          "kind": "function",
+          "signature": "",
+          "returns": "None"
+        },
+        "register_default_signal_handle": {
+          "kind": "function",
+          "signature": "",
+          "returns": "None"
+        }
+      }
+    },
+    "touchscreen": {
+      "path": "/usr/lib/python3.11/site-packages/maix/_maix/touchscreen.pyi",
+      "bytes": 1288,
+      "sha256": "df4b18db74f1a8ccdaccf21e3da89fabe98fa00c2701462a20c65dcf800c72da",
+      "symbols": {
+        "TouchScreen": {
+          "kind": "class"
+        },
+        "TouchScreen.__init__": {
+          "kind": "function",
+          "signature": "self, device: str='', open: bool=True",
+          "returns": "None"
+        },
+        "TouchScreen.available": {
+          "kind": "function",
+          "signature": "self, timeout: int=0",
+          "returns": "bool"
+        },
+        "TouchScreen.close": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "maix._maix.err.Err"
+        },
+        "TouchScreen.is_opened": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "bool"
+        },
+        "TouchScreen.open": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "maix._maix.err.Err"
+        },
+        "TouchScreen.read": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "list[int]"
+        }
+      }
+    },
+    "camera": {
+      "path": "/usr/lib/python3.11/site-packages/maix/_maix/camera.pyi",
+      "bytes": 10797,
+      "sha256": "8d5aae750bd6942429da546322025d1346655de5ba26a560c35076f6af548b6e",
+      "symbols": {
+        "Camera": {
+          "kind": "class"
+        },
+        "Camera.__init__": {
+          "kind": "function",
+          "signature": "self, width: int=-1, height: int=-1, format: maix._maix.image.Format=..., device: str=None, fps: float=-1, buff_num: int=3, open: bool=True, raw: bool=False",
+          "returns": "None"
+        },
+        "Camera.add_channel": {
+          "kind": "function",
+          "signature": "self, width: int=-1, height: int=-1, format: maix._maix.image.Format=..., fps: float=-1, buff_num: int=3, open: bool=True",
+          "returns": "Camera"
+        },
+        "Camera.awb_mode": {
+          "kind": "function",
+          "signature": "self, value: int=-1",
+          "returns": "int"
+        },
+        "Camera.buff_num": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Camera.clear_buff": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "None"
+        },
+        "Camera.close": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "None"
+        },
+        "Camera.constrast": {
+          "kind": "function",
+          "signature": "self, value: int=-1",
+          "returns": "int"
+        },
+        "Camera.device": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "str"
+        },
+        "Camera.exp_mode": {
+          "kind": "function",
+          "signature": "self, value: int=-1",
+          "returns": "int"
+        },
+        "Camera.exposure": {
+          "kind": "function",
+          "signature": "self, value: int=-1",
+          "returns": "int"
+        },
+        "Camera.format": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "maix._maix.image.Format"
+        },
+        "Camera.fps": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "float"
+        },
+        "Camera.gain": {
+          "kind": "function",
+          "signature": "self, value: int=-1",
+          "returns": "int"
+        },
+        "Camera.get_ch_nums": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Camera.get_channel": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Camera.height": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Camera.hmirror": {
+          "kind": "function",
+          "signature": "self, value: int=-1",
+          "returns": "int"
+        },
+        "Camera.is_closed": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "bool"
+        },
+        "Camera.is_opened": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "bool"
+        },
+        "Camera.luma": {
+          "kind": "function",
+          "signature": "self, value: int=-1",
+          "returns": "int"
+        },
+        "Camera.open": {
+          "kind": "function",
+          "signature": "self, width: int=-1, height: int=-1, format: maix._maix.image.Format=..., fps: float=-1, buff_num: int=-1",
+          "returns": "maix._maix.err.Err"
+        },
+        "Camera.read": {
+          "kind": "function",
+          "signature": "self, buff: capsule=None, buff_size: int=0, block: bool=True, block_ms: int=-1",
+          "returns": "maix._maix.image.Image"
+        },
+        "Camera.read_raw": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "maix._maix.image.Image"
+        },
+        "Camera.read_reg": {
+          "kind": "function",
+          "signature": "self, addr: int, bit_width: int=8",
+          "returns": "int"
+        },
+        "Camera.saturation": {
+          "kind": "function",
+          "signature": "self, value: int=-1",
+          "returns": "int"
+        },
+        "Camera.set_awb": {
+          "kind": "function",
+          "signature": "self, mode: int=-1",
+          "returns": "int"
+        },
+        "Camera.set_fps": {
+          "kind": "function",
+          "signature": "self, fps: float",
+          "returns": "maix._maix.err.Err"
+        },
+        "Camera.set_resolution": {
+          "kind": "function",
+          "signature": "self, width: int, height: int",
+          "returns": "maix._maix.err.Err"
+        },
+        "Camera.set_windowing": {
+          "kind": "function",
+          "signature": "self, roi: list[int]",
+          "returns": "maix._maix.err.Err"
+        },
+        "Camera.show_colorbar": {
+          "kind": "function",
+          "signature": "self, enable: bool",
+          "returns": "maix._maix.err.Err"
+        },
+        "Camera.skip_frames": {
+          "kind": "function",
+          "signature": "self, num: int",
+          "returns": "None"
+        },
+        "Camera.vflip": {
+          "kind": "function",
+          "signature": "self, value: int=-1",
+          "returns": "int"
+        },
+        "Camera.width": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Camera.write_reg": {
+          "kind": "function",
+          "signature": "self, addr: int, data: int, bit_width: int=8",
+          "returns": "maix._maix.err.Err"
+        },
+        "list_devices": {
+          "kind": "function",
+          "signature": "",
+          "returns": "list[str]"
+        },
+        "set_regs_enable": {
+          "kind": "function",
+          "signature": "enable: bool=True",
+          "returns": "None"
+        }
+      }
+    },
+    "audio": {
+      "path": "/usr/lib/python3.11/site-packages/maix/_maix/audio.pyi",
+      "bytes": 5474,
+      "sha256": "59d76cf2b62ba283f280b9c0238458b8455f9c69c49329691d22ba6e4be1cd22",
+      "symbols": {
+        "Format": {
+          "kind": "class"
+        },
+        "Format.FMT_NONE": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Format]"
+        },
+        "Format.FMT_S16_BE": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Format]"
+        },
+        "Format.FMT_S16_LE": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Format]"
+        },
+        "Format.FMT_S32_BE": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Format]"
+        },
+        "Format.FMT_S32_LE": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Format]"
+        },
+        "Format.FMT_S8": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Format]"
+        },
+        "Format.FMT_U16_BE": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Format]"
+        },
+        "Format.FMT_U16_LE": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Format]"
+        },
+        "Format.FMT_U32_BE": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Format]"
+        },
+        "Format.FMT_U32_LE": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Format]"
+        },
+        "Format.FMT_U8": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Format]"
+        },
+        "Format.__init__": {
+          "kind": "function",
+          "signature": "self, value: int",
+          "returns": "None"
+        },
+        "Format.name": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "str"
+        },
+        "Format.value": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Player": {
+          "kind": "class"
+        },
+        "Player.__init__": {
+          "kind": "function",
+          "signature": "self, path: str='', sample_rate: int=48000, format: Format=..., channel: int=1",
+          "returns": "None"
+        },
+        "Player.channel": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Player.format": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "Format"
+        },
+        "Player.play": {
+          "kind": "function",
+          "signature": "self, data: maix.Bytes(bytes)=b''",
+          "returns": "maix._maix.err.Err"
+        },
+        "Player.sample_rate": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Player.volume": {
+          "kind": "function",
+          "signature": "self, value: int=-1",
+          "returns": "int"
+        },
+        "Recorder": {
+          "kind": "class"
+        },
+        "Recorder.record": {
+          "kind": "function",
+          "signature": "*args, **kwargs",
+          "returns": null
+        },
+        "Recorder.__init__": {
+          "kind": "function",
+          "signature": "self, path: str='', sample_rate: int=48000, format: Format=..., channel: int=1",
+          "returns": "None"
+        },
+        "Recorder.channel": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Recorder.finish": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "maix._maix.err.Err"
+        },
+        "Recorder.format": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "Format"
+        },
+        "Recorder.mute": {
+          "kind": "function",
+          "signature": "self, data: int=-1",
+          "returns": "bool"
+        },
+        "Recorder.sample_rate": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Recorder.volume": {
+          "kind": "function",
+          "signature": "self, value: int=-1",
+          "returns": "int"
+        }
+      }
+    },
+    "http": {
+      "path": "/usr/lib/python3.11/site-packages/maix/_maix/http.pyi",
+      "bytes": 1313,
+      "sha256": "4bd3e64ed3dfd9a4e2df5c4a316b49341ec7a0733aeaa8f9b95999c87a35a5a3",
+      "symbols": {
+        "JpegStreamer": {
+          "kind": "class"
+        },
+        "JpegStreamer.__init__": {
+          "kind": "function",
+          "signature": "self, host: str='', port: int=8000, client_number: int=16",
+          "returns": "None"
+        },
+        "JpegStreamer.host": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "str"
+        },
+        "JpegStreamer.port": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "JpegStreamer.set_html": {
+          "kind": "function",
+          "signature": "self, data: str",
+          "returns": "maix._maix.err.Err"
+        },
+        "JpegStreamer.start": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "maix._maix.err.Err"
+        },
+        "JpegStreamer.write": {
+          "kind": "function",
+          "signature": "self, img: maix._maix.image.Image",
+          "returns": "maix._maix.err.Err"
+        }
+      }
+    },
+    "peripheral.gpio": {
+      "path": "/usr/lib/python3.11/site-packages/maix/_maix/peripheral/gpio.pyi",
+      "bytes": 3928,
+      "sha256": "5f3008bf029e5efa7aecd500f591bf81154c80faa3d57a39ca61fbe0485a86bd",
+      "symbols": {
+        "GPIO": {
+          "kind": "class"
+        },
+        "GPIO.__init__": {
+          "kind": "function",
+          "signature": "self, pin: str, mode: Mode=..., pull: Pull=...",
+          "returns": "None"
+        },
+        "GPIO.get_mode": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "Mode"
+        },
+        "GPIO.get_pull": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "Pull"
+        },
+        "GPIO.high": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "None"
+        },
+        "GPIO.low": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "None"
+        },
+        "GPIO.reset": {
+          "kind": "function",
+          "signature": "self, mode: Mode, pull: Pull",
+          "returns": "maix._maix.err.Err"
+        },
+        "GPIO.toggle": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "None"
+        },
+        "GPIO.value": {
+          "kind": "function",
+          "signature": "self, value: int=-1",
+          "returns": "int"
+        },
+        "Mode": {
+          "kind": "class"
+        },
+        "Mode.IN": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Mode]"
+        },
+        "Mode.MODE_MAX": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Mode]"
+        },
+        "Mode.OUT": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Mode]"
+        },
+        "Mode.OUT_OD": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Mode]"
+        },
+        "Mode.__init__": {
+          "kind": "function",
+          "signature": "self, value: int",
+          "returns": "None"
+        },
+        "Mode.name": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "str"
+        },
+        "Mode.value": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Pull": {
+          "kind": "class"
+        },
+        "Pull.PULL_DOWN": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Pull]"
+        },
+        "Pull.PULL_MAX": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Pull]"
+        },
+        "Pull.PULL_NONE": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Pull]"
+        },
+        "Pull.PULL_UP": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Pull]"
+        },
+        "Pull.__init__": {
+          "kind": "function",
+          "signature": "self, value: int",
+          "returns": "None"
+        },
+        "Pull.name": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "str"
+        },
+        "Pull.value": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        }
+      }
+    },
+    "peripheral.pinmap": {
+      "path": "/usr/lib/python3.11/site-packages/maix/_maix/peripheral/pinmap.pyi",
+      "bytes": 780,
+      "sha256": "b6dd551c151baa0949ea297599470dd6c25879b2e2c551ab729403c8a61ff22b",
+      "symbols": {
+        "get_pin_functions": {
+          "kind": "function",
+          "signature": "pin: str",
+          "returns": "list[str]"
+        },
+        "get_pins": {
+          "kind": "function",
+          "signature": "",
+          "returns": "list[str]"
+        },
+        "set_pin_function": {
+          "kind": "function",
+          "signature": "pin: str, func: str",
+          "returns": "maix._maix.err.Err"
+        }
+      }
+    },
+    "peripheral.pwm": {
+      "path": "/usr/lib/python3.11/site-packages/maix/_maix/peripheral/pwm.pyi",
+      "bytes": 1877,
+      "sha256": "23cfa8c9be053c9b67dcc99c52fc618c0cbc50b63c4005177bb6d044a2a5339d",
+      "symbols": {
+        "PWM": {
+          "kind": "class"
+        },
+        "PWM.__init__": {
+          "kind": "function",
+          "signature": "self, id: int, freq: int=1000, duty: float=0, enable: bool=True, duty_val: int=-1",
+          "returns": "None"
+        },
+        "PWM.disable": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "maix._maix.err.Err"
+        },
+        "PWM.duty": {
+          "kind": "function",
+          "signature": "self, duty: float=-1",
+          "returns": "float"
+        },
+        "PWM.duty_val": {
+          "kind": "function",
+          "signature": "self, duty_val: int=-1",
+          "returns": "int"
+        },
+        "PWM.enable": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "maix._maix.err.Err"
+        },
+        "PWM.freq": {
+          "kind": "function",
+          "signature": "self, freq: int=-1",
+          "returns": "int"
+        },
+        "PWM.is_enabled": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "bool"
+        }
+      }
+    },
+    "peripheral.i2c": {
+      "path": "/usr/lib/python3.11/site-packages/maix/_maix/peripheral/i2c.pyi",
+      "bytes": 4964,
+      "sha256": "a1264956027de4a3a66ac4c1ed8a6aceadf8ae8b7fed542c33750edbe529caa7",
+      "symbols": {
+        "AddrSize": {
+          "kind": "class"
+        },
+        "AddrSize.SEVEN_BIT": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[AddrSize]"
+        },
+        "AddrSize.TEN_BIT": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[AddrSize]"
+        },
+        "AddrSize.__init__": {
+          "kind": "function",
+          "signature": "self, value: int",
+          "returns": "None"
+        },
+        "AddrSize.name": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "str"
+        },
+        "AddrSize.value": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "I2C": {
+          "kind": "class"
+        },
+        "I2C.readfrom": {
+          "kind": "function",
+          "signature": "*args, **kwargs",
+          "returns": null
+        },
+        "I2C.readfrom_mem": {
+          "kind": "function",
+          "signature": "*args, **kwargs",
+          "returns": null
+        },
+        "I2C.__init__": {
+          "kind": "function",
+          "signature": "self, id: int, mode: Mode, freq: int=100000, addr_size: AddrSize=...",
+          "returns": "None"
+        },
+        "I2C.scan": {
+          "kind": "function",
+          "signature": "self, addr: int=-1",
+          "returns": "list[int]"
+        },
+        "I2C.writeto": {
+          "kind": "function",
+          "signature": "self, addr: int, data: maix.Bytes(bytes)",
+          "returns": "int"
+        },
+        "I2C.writeto_mem": {
+          "kind": "function",
+          "signature": "self, addr: int, mem_addr: int, data: maix.Bytes(bytes), mem_addr_size: int=8, mem_addr_le: bool=False",
+          "returns": "int"
+        },
+        "Mode": {
+          "kind": "class"
+        },
+        "Mode.MASTER": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Mode]"
+        },
+        "Mode.SLAVE": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Mode]"
+        },
+        "Mode.__init__": {
+          "kind": "function",
+          "signature": "self, value: int",
+          "returns": "None"
+        },
+        "Mode.name": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "str"
+        },
+        "Mode.value": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "list_devices": {
+          "kind": "function",
+          "signature": "",
+          "returns": "list[int]"
+        }
+      }
+    },
+    "peripheral.uart": {
+      "path": "/usr/lib/python3.11/site-packages/maix/_maix/peripheral/uart.pyi",
+      "bytes": 9508,
+      "sha256": "4d1fe1e39d82367ab588e5f54cecf7a5a4302558345b8ba85ab243b088532c8f",
+      "symbols": {
+        "BITS": {
+          "kind": "class"
+        },
+        "BITS.BITS_5": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[BITS]"
+        },
+        "BITS.BITS_6": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[BITS]"
+        },
+        "BITS.BITS_7": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[BITS]"
+        },
+        "BITS.BITS_8": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[BITS]"
+        },
+        "BITS.BITS_MAX": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[BITS]"
+        },
+        "BITS.__init__": {
+          "kind": "function",
+          "signature": "self, value: int",
+          "returns": "None"
+        },
+        "BITS.name": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "str"
+        },
+        "BITS.value": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "FLOW_CTRL": {
+          "kind": "class"
+        },
+        "FLOW_CTRL.FLOW_CTRL_HW": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[FLOW_CTRL]"
+        },
+        "FLOW_CTRL.FLOW_CTRL_MAX": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[FLOW_CTRL]"
+        },
+        "FLOW_CTRL.FLOW_CTRL_NONE": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[FLOW_CTRL]"
+        },
+        "FLOW_CTRL.__init__": {
+          "kind": "function",
+          "signature": "self, value: int",
+          "returns": "None"
+        },
+        "FLOW_CTRL.name": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "str"
+        },
+        "FLOW_CTRL.value": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "PARITY": {
+          "kind": "class"
+        },
+        "PARITY.PARITY_EVEN": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[PARITY]"
+        },
+        "PARITY.PARITY_MAX": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[PARITY]"
+        },
+        "PARITY.PARITY_NONE": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[PARITY]"
+        },
+        "PARITY.PARITY_ODD": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[PARITY]"
+        },
+        "PARITY.__init__": {
+          "kind": "function",
+          "signature": "self, value: int",
+          "returns": "None"
+        },
+        "PARITY.name": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "str"
+        },
+        "PARITY.value": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "STOP": {
+          "kind": "class"
+        },
+        "STOP.STOP_1": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[STOP]"
+        },
+        "STOP.STOP_1_5": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[STOP]"
+        },
+        "STOP.STOP_2": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[STOP]"
+        },
+        "STOP.STOP_MAX": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[STOP]"
+        },
+        "STOP.__init__": {
+          "kind": "function",
+          "signature": "self, value: int",
+          "returns": "None"
+        },
+        "STOP.name": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "str"
+        },
+        "STOP.value": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "UART": {
+          "kind": "class"
+        },
+        "UART.read": {
+          "kind": "function",
+          "signature": "*args, **kwargs",
+          "returns": null
+        },
+        "UART.readline": {
+          "kind": "function",
+          "signature": "*args, **kwargs",
+          "returns": null
+        },
+        "UART.__init__": {
+          "kind": "function",
+          "signature": "self, port: str='', baudrate: int=115200, databits: BITS=..., parity: PARITY=..., stopbits: STOP=..., flow_ctrl: FLOW_CTRL=...",
+          "returns": "None"
+        },
+        "UART.available": {
+          "kind": "function",
+          "signature": "self, timeout: int=0",
+          "returns": "int"
+        },
+        "UART.close": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "maix._maix.err.Err"
+        },
+        "UART.get_baudrate": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "UART.get_port": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "str"
+        },
+        "UART.is_open": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "bool"
+        },
+        "UART.open": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "maix._maix.err.Err"
+        },
+        "UART.set_baudrate": {
+          "kind": "function",
+          "signature": "self, baudrate: int",
+          "returns": "maix._maix.err.Err"
+        },
+        "UART.set_port": {
+          "kind": "function",
+          "signature": "self, port: str",
+          "returns": "maix._maix.err.Err"
+        },
+        "UART.set_received_callback": {
+          "kind": "function",
+          "signature": "self, callback: typing.Callable[[UART, maix.Bytes(bytes)], None]",
+          "returns": "None"
+        },
+        "UART.write": {
+          "kind": "function",
+          "signature": "self, data: maix.Bytes(bytes)",
+          "returns": "int"
+        },
+        "UART.write_str": {
+          "kind": "function",
+          "signature": "self, str: str",
+          "returns": "int"
+        },
+        "list_devices": {
+          "kind": "function",
+          "signature": "",
+          "returns": "list[str]"
+        }
+      }
+    },
+    "peripheral.adc": {
+      "path": "/usr/lib/python3.11/site-packages/maix/_maix/peripheral/adc.pyi",
+      "bytes": 862,
+      "sha256": "377be516c93e440d3393d9c51f853f43cfa94d3f8d648a38289bd28ca5854327",
+      "symbols": {
+        "ADC": {
+          "kind": "class"
+        },
+        "ADC.__init__": {
+          "kind": "function",
+          "signature": "self, pin: int, resolution: int, vref: float=-1",
+          "returns": "None"
+        },
+        "ADC.read": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "ADC.read_vol": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "float"
+        },
+        "RES_BIT_10": {
+          "kind": "constant",
+          "annotation": "int"
+        },
+        "RES_BIT_12": {
+          "kind": "constant",
+          "annotation": "int"
+        },
+        "RES_BIT_16": {
+          "kind": "constant",
+          "annotation": "int"
+        },
+        "RES_BIT_8": {
+          "kind": "constant",
+          "annotation": "int"
+        }
+      }
+    },
+    "ext_dev.imu": {
+      "path": "/usr/lib/python3.11/site-packages/maix/_maix/ext_dev/imu.pyi",
+      "bytes": 9855,
+      "sha256": "2e8cdaba1ac2183f8a7b95d3274e6cf27f4df417630b0755e70b91a20f5ccc50",
+      "symbols": {
+        "AccOdr": {
+          "kind": "class"
+        },
+        "AccOdr.ACC_ODR_1000": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[AccOdr]"
+        },
+        "AccOdr.ACC_ODR_11": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[AccOdr]"
+        },
+        "AccOdr.ACC_ODR_125": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[AccOdr]"
+        },
+        "AccOdr.ACC_ODR_128": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[AccOdr]"
+        },
+        "AccOdr.ACC_ODR_2000": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[AccOdr]"
+        },
+        "AccOdr.ACC_ODR_21": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[AccOdr]"
+        },
+        "AccOdr.ACC_ODR_250": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[AccOdr]"
+        },
+        "AccOdr.ACC_ODR_3": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[AccOdr]"
+        },
+        "AccOdr.ACC_ODR_31_25": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[AccOdr]"
+        },
+        "AccOdr.ACC_ODR_4000": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[AccOdr]"
+        },
+        "AccOdr.ACC_ODR_500": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[AccOdr]"
+        },
+        "AccOdr.ACC_ODR_62_5": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[AccOdr]"
+        },
+        "AccOdr.ACC_ODR_8000": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[AccOdr]"
+        },
+        "AccOdr.__init__": {
+          "kind": "function",
+          "signature": "self, value: int",
+          "returns": "None"
+        },
+        "AccOdr.name": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "str"
+        },
+        "AccOdr.value": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "AccScale": {
+          "kind": "class"
+        },
+        "AccScale.ACC_SCALE_16G": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[AccScale]"
+        },
+        "AccScale.ACC_SCALE_2G": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[AccScale]"
+        },
+        "AccScale.ACC_SCALE_4G": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[AccScale]"
+        },
+        "AccScale.ACC_SCALE_8G": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[AccScale]"
+        },
+        "AccScale.__init__": {
+          "kind": "function",
+          "signature": "self, value: int",
+          "returns": "None"
+        },
+        "AccScale.name": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "str"
+        },
+        "AccScale.value": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "GyroOdr": {
+          "kind": "class"
+        },
+        "GyroOdr.GYRO_ODR_1000": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[GyroOdr]"
+        },
+        "GyroOdr.GYRO_ODR_125": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[GyroOdr]"
+        },
+        "GyroOdr.GYRO_ODR_2000": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[GyroOdr]"
+        },
+        "GyroOdr.GYRO_ODR_250": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[GyroOdr]"
+        },
+        "GyroOdr.GYRO_ODR_31_25": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[GyroOdr]"
+        },
+        "GyroOdr.GYRO_ODR_4000": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[GyroOdr]"
+        },
+        "GyroOdr.GYRO_ODR_500": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[GyroOdr]"
+        },
+        "GyroOdr.GYRO_ODR_62_5": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[GyroOdr]"
+        },
+        "GyroOdr.GYRO_ODR_8000": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[GyroOdr]"
+        },
+        "GyroOdr.__init__": {
+          "kind": "function",
+          "signature": "self, value: int",
+          "returns": "None"
+        },
+        "GyroOdr.name": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "str"
+        },
+        "GyroOdr.value": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "GyroScale": {
+          "kind": "class"
+        },
+        "GyroScale.GYRO_SCALE_1024DPS": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[GyroScale]"
+        },
+        "GyroScale.GYRO_SCALE_128DPS": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[GyroScale]"
+        },
+        "GyroScale.GYRO_SCALE_16DPS": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[GyroScale]"
+        },
+        "GyroScale.GYRO_SCALE_2048DPS": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[GyroScale]"
+        },
+        "GyroScale.GYRO_SCALE_256DPS": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[GyroScale]"
+        },
+        "GyroScale.GYRO_SCALE_32DPS": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[GyroScale]"
+        },
+        "GyroScale.GYRO_SCALE_512DPS": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[GyroScale]"
+        },
+        "GyroScale.GYRO_SCALE_64DPS": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[GyroScale]"
+        },
+        "GyroScale.__init__": {
+          "kind": "function",
+          "signature": "self, value: int",
+          "returns": "None"
+        },
+        "GyroScale.name": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "str"
+        },
+        "GyroScale.value": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "IMU": {
+          "kind": "class"
+        },
+        "IMU.__init__": {
+          "kind": "function",
+          "signature": "self, driver: str, i2c_bus: int=-1, addr: int=107, freq: int=400000, mode: Mode=..., acc_scale: AccScale=..., acc_odr: AccOdr=..., gyro_scale: GyroScale=..., gyro_odr: GyroOdr=..., block: bool=True",
+          "returns": "None"
+        },
+        "IMU.read": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "list[float]"
+        },
+        "Mode": {
+          "kind": "class"
+        },
+        "Mode.ACC_ONLY": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Mode]"
+        },
+        "Mode.DUAL": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Mode]"
+        },
+        "Mode.GYRO_ONLY": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[Mode]"
+        },
+        "Mode.__init__": {
+          "kind": "function",
+          "signature": "self, value: int",
+          "returns": "None"
+        },
+        "Mode.name": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "str"
+        },
+        "Mode.value": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        }
+      }
+    },
+    "ext_dev.qmi8658": {
+      "path": "/usr/lib/python3.11/site-packages/maix/_maix/ext_dev/qmi8658.pyi",
+      "bytes": 811,
+      "sha256": "95b660b86cc4c0c76797250405d14e82fe33192fe1b12c45824b26fba689e4d2",
+      "symbols": {
+        "QMI8658": {
+          "kind": "class"
+        },
+        "QMI8658.__init__": {
+          "kind": "function",
+          "signature": "self, i2c_bus: int=-1, addr: int=107, freq: int=400000, mode: maix._maix.ext_dev.imu.Mode=..., acc_scale: maix._maix.ext_dev.imu.AccScale=..., acc_odr: maix._maix.ext_dev.imu.AccOdr=..., gyro_scale: maix._maix.ext_dev.imu.GyroScale=..., gyro_odr: maix._maix.ext_dev.imu.GyroOdr=..., block: bool=True",
+          "returns": "None"
+        },
+        "QMI8658.read": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "list[float]"
+        }
+      }
+    },
+    "ext_dev.bm8563": {
+      "path": "/usr/lib/python3.11/site-packages/maix/_maix/ext_dev/bm8563.pyi",
+      "bytes": 1531,
+      "sha256": "b23edd3f5b7b77bdd113fe56f463ef1242eacbc30a06ad8f7f99ee0314729eb0",
+      "symbols": {
+        "BM8563": {
+          "kind": "class"
+        },
+        "BM8563.__init__": {
+          "kind": "function",
+          "signature": "self, i2c_bus: int=-1",
+          "returns": "None"
+        },
+        "BM8563.datetime": {
+          "kind": "function",
+          "signature": "self, timetuple: list[int]=[]",
+          "returns": "list[int]"
+        },
+        "BM8563.deinit": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "maix._maix.err.Err"
+        },
+        "BM8563.hctosys": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "maix._maix.err.Err"
+        },
+        "BM8563.init": {
+          "kind": "function",
+          "signature": "self, timetuple: list[int]",
+          "returns": "maix._maix.err.Err"
+        },
+        "BM8563.now": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "list[int]"
+        },
+        "BM8563.systohc": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "maix._maix.err.Err"
+        }
+      }
+    },
+    "network.wifi": {
+      "path": "/usr/lib/python3.11/site-packages/maix/_maix/network/wifi.pyi",
+      "bytes": 3962,
+      "sha256": "e8a189615922a3e8a435474e2c15872f8c49e2050d8a926be99763fb3cc2ad17",
+      "symbols": {
+        "AP_Info": {
+          "kind": "class"
+        },
+        "AP_Info.bssid": {
+          "kind": "constant",
+          "annotation": "str"
+        },
+        "AP_Info.channel": {
+          "kind": "constant",
+          "annotation": "int"
+        },
+        "AP_Info.frequency": {
+          "kind": "constant",
+          "annotation": "int"
+        },
+        "AP_Info.rssi": {
+          "kind": "constant",
+          "annotation": "int"
+        },
+        "AP_Info.security": {
+          "kind": "constant",
+          "annotation": "str"
+        },
+        "AP_Info.ssid": {
+          "kind": "constant",
+          "annotation": "list[int]"
+        },
+        "AP_Info.ssid_str": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "str"
+        },
+        "Wifi": {
+          "kind": "class"
+        },
+        "Wifi.__init__": {
+          "kind": "function",
+          "signature": "self, iface: str='wlan0'",
+          "returns": "None"
+        },
+        "Wifi.connect": {
+          "kind": "function",
+          "signature": "self, ssid: str, password: str, wait: bool=True, timeout: int=60",
+          "returns": "maix._maix.err.Err"
+        },
+        "Wifi.disconnect": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "maix._maix.err.Err"
+        },
+        "Wifi.get_gateway": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "str"
+        },
+        "Wifi.get_ip": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "str"
+        },
+        "Wifi.get_mac": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "str"
+        },
+        "Wifi.get_scan_result": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "list[AP_Info]"
+        },
+        "Wifi.get_ssid": {
+          "kind": "function",
+          "signature": "self, from_cache: bool=True",
+          "returns": "str"
+        },
+        "Wifi.is_ap_mode": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "bool"
+        },
+        "Wifi.is_connected": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "bool"
+        },
+        "Wifi.start_ap": {
+          "kind": "function",
+          "signature": "self, ssid: str, password: str, mode: str='g', channel: int=0, ip: str='192.168.66.1', netmask: str='255.255.255.0', hidden: bool=False",
+          "returns": "maix._maix.err.Err"
+        },
+        "Wifi.start_scan": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "maix._maix.err.Err"
+        },
+        "Wifi.stop_ap": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "maix._maix.err.Err"
+        },
+        "Wifi.stop_scan": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "None"
+        },
+        "list_devices": {
+          "kind": "function",
+          "signature": "",
+          "returns": "list[str]"
+        }
+      }
+    },
+    "nn": {
+      "path": "/usr/lib/python3.11/site-packages/maix/_maix/nn/__init__.pyi",
+      "bytes": 44326,
+      "sha256": "83679660baf2c1673d21a2c133a06c0713144bbe55d3c70c880b9419723b785e",
+      "symbols": {
+        "Classifier": {
+          "kind": "class"
+        },
+        "Classifier.label_path": {
+          "kind": "constant",
+          "annotation": "str"
+        },
+        "Classifier.labels": {
+          "kind": "constant",
+          "annotation": "list[str]"
+        },
+        "Classifier.mean": {
+          "kind": "constant",
+          "annotation": "list[float]"
+        },
+        "Classifier.scale": {
+          "kind": "constant",
+          "annotation": "list[float]"
+        },
+        "Classifier.__init__": {
+          "kind": "function",
+          "signature": "self, model: str='', dual_buff: bool=True",
+          "returns": "None"
+        },
+        "Classifier.classify": {
+          "kind": "function",
+          "signature": "self, img: maix._maix.image.Image, softmax: bool=True, fit: maix._maix.image.Fit=...",
+          "returns": "list[tuple[int, float]]"
+        },
+        "Classifier.classify_raw": {
+          "kind": "function",
+          "signature": "self, data: maix._maix.tensor.Tensor, softmax: bool=True",
+          "returns": "list[tuple[int, float]]"
+        },
+        "Classifier.input_format": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "maix._maix.image.Format"
+        },
+        "Classifier.input_height": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Classifier.input_shape": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "list[int]"
+        },
+        "Classifier.input_size": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "maix._maix.image.Size"
+        },
+        "Classifier.input_width": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Classifier.load": {
+          "kind": "function",
+          "signature": "self, model: str",
+          "returns": "maix._maix.err.Err"
+        },
+        "FaceDetector": {
+          "kind": "class"
+        },
+        "FaceDetector.mean": {
+          "kind": "constant",
+          "annotation": "list[float]"
+        },
+        "FaceDetector.scale": {
+          "kind": "constant",
+          "annotation": "list[float]"
+        },
+        "FaceDetector.__init__": {
+          "kind": "function",
+          "signature": "self, model: str='', dual_buff: bool=True",
+          "returns": "None"
+        },
+        "FaceDetector.detect": {
+          "kind": "function",
+          "signature": "self, img: maix._maix.image.Image, conf_th: float=0.5, iou_th: float=0.45, fit: maix._maix.image.Fit=...",
+          "returns": "list[...]"
+        },
+        "FaceDetector.input_format": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "maix._maix.image.Format"
+        },
+        "FaceDetector.input_height": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "FaceDetector.input_size": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "maix._maix.image.Size"
+        },
+        "FaceDetector.input_width": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "FaceDetector.load": {
+          "kind": "function",
+          "signature": "self, model: str",
+          "returns": "maix._maix.err.Err"
+        },
+        "FaceObject": {
+          "kind": "class"
+        },
+        "FaceObject.class_id": {
+          "kind": "constant",
+          "annotation": "int"
+        },
+        "FaceObject.face": {
+          "kind": "constant",
+          "annotation": "maix._maix.image.Image"
+        },
+        "FaceObject.feature": {
+          "kind": "constant",
+          "annotation": "list[float]"
+        },
+        "FaceObject.h": {
+          "kind": "constant",
+          "annotation": "int"
+        },
+        "FaceObject.points": {
+          "kind": "constant",
+          "annotation": "list[int]"
+        },
+        "FaceObject.score": {
+          "kind": "constant",
+          "annotation": "float"
+        },
+        "FaceObject.w": {
+          "kind": "constant",
+          "annotation": "int"
+        },
+        "FaceObject.x": {
+          "kind": "constant",
+          "annotation": "int"
+        },
+        "FaceObject.y": {
+          "kind": "constant",
+          "annotation": "int"
+        },
+        "FaceObject.__init__": {
+          "kind": "function",
+          "signature": "self, x: int=0, y: int=0, w: int=0, h: int=0, class_id: int=0, score: float=0, points: list[int]=[], feature: list[float]=[], face: maix._maix.image.Image=...",
+          "returns": "None"
+        },
+        "FaceRecognizer": {
+          "kind": "class"
+        },
+        "FaceRecognizer.features": {
+          "kind": "constant",
+          "annotation": "list[list[float]]"
+        },
+        "FaceRecognizer.labels": {
+          "kind": "constant",
+          "annotation": "list[str]"
+        },
+        "FaceRecognizer.mean_detector": {
+          "kind": "constant",
+          "annotation": "list[float]"
+        },
+        "FaceRecognizer.mean_feature": {
+          "kind": "constant",
+          "annotation": "list[float]"
+        },
+        "FaceRecognizer.scale_detector": {
+          "kind": "constant",
+          "annotation": "list[float]"
+        },
+        "FaceRecognizer.scale_feature": {
+          "kind": "constant",
+          "annotation": "list[float]"
+        },
+        "FaceRecognizer.__init__": {
+          "kind": "function",
+          "signature": "self, detect_model: str='', feature_model: str='', dual_buff: bool=True",
+          "returns": "None"
+        },
+        "FaceRecognizer.add_face": {
+          "kind": "function",
+          "signature": "self, face: FaceObject, label: str",
+          "returns": "maix._maix.err.Err"
+        },
+        "FaceRecognizer.input_format": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "maix._maix.image.Format"
+        },
+        "FaceRecognizer.input_height": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "FaceRecognizer.input_size": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "maix._maix.image.Size"
+        },
+        "FaceRecognizer.input_width": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "FaceRecognizer.load": {
+          "kind": "function",
+          "signature": "self, detect_model: str, feature_model: str",
+          "returns": "maix._maix.err.Err"
+        },
+        "FaceRecognizer.load_faces": {
+          "kind": "function",
+          "signature": "self, path: str",
+          "returns": "maix._maix.err.Err"
+        },
+        "FaceRecognizer.recognize": {
+          "kind": "function",
+          "signature": "self, img: maix._maix.image.Image, conf_th: float=0.5, iou_th: float=0.45, compare_th: float=0.8, get_feature: bool=False, get_face: bool=False, fit: maix._maix.image.Fit=...",
+          "returns": "list[FaceObject]"
+        },
+        "FaceRecognizer.remove_face": {
+          "kind": "function",
+          "signature": "self, idx: int=-1, label: str=''",
+          "returns": "maix._maix.err.Err"
+        },
+        "FaceRecognizer.save_faces": {
+          "kind": "function",
+          "signature": "self, path: str",
+          "returns": "maix._maix.err.Err"
+        },
+        "LayerInfo": {
+          "kind": "class"
+        },
+        "LayerInfo.dtype": {
+          "kind": "constant",
+          "annotation": "maix._maix.tensor.DType"
+        },
+        "LayerInfo.name": {
+          "kind": "constant",
+          "annotation": "str"
+        },
+        "LayerInfo.shape": {
+          "kind": "constant",
+          "annotation": "list[int]"
+        },
+        "LayerInfo.__init__": {
+          "kind": "function",
+          "signature": "self, name: str='', dtype: maix._maix.tensor.DType=..., shape: list[int]=[]",
+          "returns": "None"
+        },
+        "LayerInfo.shape_int": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "LayerInfo.to_str": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "str"
+        },
+        "MUD": {
+          "kind": "class"
+        },
+        "MUD.items": {
+          "kind": "constant",
+          "annotation": "dict[str, dict[str, str]]"
+        },
+        "MUD.type": {
+          "kind": "constant",
+          "annotation": "str"
+        },
+        "MUD.__init__": {
+          "kind": "function",
+          "signature": "self, model_path: str=None",
+          "returns": "None"
+        },
+        "MUD.load": {
+          "kind": "function",
+          "signature": "self, model_path: str",
+          "returns": "maix._maix.err.Err"
+        },
+        "NN": {
+          "kind": "class"
+        },
+        "NN.__init__": {
+          "kind": "function",
+          "signature": "self, model: str='', dual_buff: bool=True",
+          "returns": "None"
+        },
+        "NN.extra_info": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "dict[str, str]"
+        },
+        "NN.forward": {
+          "kind": "function",
+          "signature": "self, inputs: maix._maix.tensor.Tensors, copy_result: bool=True, dual_buff_wait: bool=False",
+          "returns": "maix._maix.tensor.Tensors"
+        },
+        "NN.forward_image": {
+          "kind": "function",
+          "signature": "self, img: maix._maix.image.Image, mean: list[float]=[], scale: list[float]=[], fit: maix._maix.image.Fit=..., copy_result: bool=True, dual_buff_wait: bool=False",
+          "returns": "maix._maix.tensor.Tensors"
+        },
+        "NN.inputs_info": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "list[LayerInfo]"
+        },
+        "NN.load": {
+          "kind": "function",
+          "signature": "self, model: str",
+          "returns": "maix._maix.err.Err"
+        },
+        "NN.loaded": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "bool"
+        },
+        "NN.outputs_info": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "list[LayerInfo]"
+        },
+        "NN.set_dual_buff": {
+          "kind": "function",
+          "signature": "self, enable: bool",
+          "returns": "None"
+        },
+        "NanoTrack": {
+          "kind": "class"
+        },
+        "NanoTrack.mean": {
+          "kind": "constant",
+          "annotation": "list[float]"
+        },
+        "NanoTrack.scale": {
+          "kind": "constant",
+          "annotation": "list[float]"
+        },
+        "NanoTrack.__init__": {
+          "kind": "function",
+          "signature": "self, model: str=''",
+          "returns": "None"
+        },
+        "NanoTrack.init": {
+          "kind": "function",
+          "signature": "self, img: maix._maix.image.Image, x: int, y: int, w: int, h: int",
+          "returns": "None"
+        },
+        "NanoTrack.input_format": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "maix._maix.image.Format"
+        },
+        "NanoTrack.input_height": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "NanoTrack.input_size": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "maix._maix.image.Size"
+        },
+        "NanoTrack.input_width": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "NanoTrack.load": {
+          "kind": "function",
+          "signature": "self, model: str",
+          "returns": "maix._maix.err.Err"
+        },
+        "NanoTrack.track": {
+          "kind": "function",
+          "signature": "self, img: maix._maix.image.Image, threshold: float=0.9",
+          "returns": "Object"
+        },
+        "OCR_Box": {
+          "kind": "class"
+        },
+        "OCR_Box.x1": {
+          "kind": "constant",
+          "annotation": "int"
+        },
+        "OCR_Box.x2": {
+          "kind": "constant",
+          "annotation": "int"
+        },
+        "OCR_Box.x3": {
+          "kind": "constant",
+          "annotation": "int"
+        },
+        "OCR_Box.x4": {
+          "kind": "constant",
+          "annotation": "int"
+        },
+        "OCR_Box.y1": {
+          "kind": "constant",
+          "annotation": "int"
+        },
+        "OCR_Box.y2": {
+          "kind": "constant",
+          "annotation": "int"
+        },
+        "OCR_Box.y3": {
+          "kind": "constant",
+          "annotation": "int"
+        },
+        "OCR_Box.y4": {
+          "kind": "constant",
+          "annotation": "int"
+        },
+        "OCR_Box.__init__": {
+          "kind": "function",
+          "signature": "self, x1: int=0, y1: int=0, x2: int=0, y2: int=0, x3: int=0, y3: int=0, x4: int=0, y4: int=0",
+          "returns": "None"
+        },
+        "OCR_Box.to_list": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "list[int]"
+        },
+        "OCR_Object": {
+          "kind": "class"
+        },
+        "OCR_Object.box": {
+          "kind": "constant",
+          "annotation": "OCR_Box"
+        },
+        "OCR_Object.char_pos": {
+          "kind": "constant",
+          "annotation": "list[int]"
+        },
+        "OCR_Object.idx_list": {
+          "kind": "constant",
+          "annotation": "list[int]"
+        },
+        "OCR_Object.score": {
+          "kind": "constant",
+          "annotation": "float"
+        },
+        "OCR_Object.__init__": {
+          "kind": "function",
+          "signature": "self, box: OCR_Box, idx_list: list[int], char_list: list[str], score: float=0, char_pos: list[int]=[]",
+          "returns": "None"
+        },
+        "OCR_Object.char_list": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "list[str]"
+        },
+        "OCR_Object.char_str": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "str"
+        },
+        "OCR_Object.update_chars": {
+          "kind": "function",
+          "signature": "self, char_list: list[str]",
+          "returns": "None"
+        },
+        "OCR_Objects": {
+          "kind": "class"
+        },
+        "OCR_Objects.__init__": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "None"
+        },
+        "OCR_Objects.add": {
+          "kind": "function",
+          "signature": "self, box: OCR_Box, idx_list: list[int], char_list: list[str], score: float=0, char_pos: list[int]=[]",
+          "returns": "OCR_Object"
+        },
+        "OCR_Objects.at": {
+          "kind": "function",
+          "signature": "self, idx: int",
+          "returns": "OCR_Object"
+        },
+        "OCR_Objects.remove": {
+          "kind": "function",
+          "signature": "self, idx: int",
+          "returns": "maix._maix.err.Err"
+        },
+        "Object": {
+          "kind": "class"
+        },
+        "Object.class_id": {
+          "kind": "constant",
+          "annotation": "int"
+        },
+        "Object.h": {
+          "kind": "constant",
+          "annotation": "int"
+        },
+        "Object.points": {
+          "kind": "constant",
+          "annotation": "list[int]"
+        },
+        "Object.score": {
+          "kind": "constant",
+          "annotation": "float"
+        },
+        "Object.seg_mask": {
+          "kind": "constant",
+          "annotation": "maix._maix.image.Image"
+        },
+        "Object.w": {
+          "kind": "constant",
+          "annotation": "int"
+        },
+        "Object.x": {
+          "kind": "constant",
+          "annotation": "int"
+        },
+        "Object.y": {
+          "kind": "constant",
+          "annotation": "int"
+        },
+        "Object.__init__": {
+          "kind": "function",
+          "signature": "self, x: int=0, y: int=0, w: int=0, h: int=0, class_id: int=0, score: float=0, points: list[int]=[]",
+          "returns": "None"
+        },
+        "ObjectFloat": {
+          "kind": "class"
+        },
+        "ObjectFloat.class_id": {
+          "kind": "constant",
+          "annotation": "float"
+        },
+        "ObjectFloat.h": {
+          "kind": "constant",
+          "annotation": "float"
+        },
+        "ObjectFloat.points": {
+          "kind": "constant",
+          "annotation": "list[float]"
+        },
+        "ObjectFloat.score": {
+          "kind": "constant",
+          "annotation": "float"
+        },
+        "ObjectFloat.w": {
+          "kind": "constant",
+          "annotation": "float"
+        },
+        "ObjectFloat.x": {
+          "kind": "constant",
+          "annotation": "float"
+        },
+        "ObjectFloat.y": {
+          "kind": "constant",
+          "annotation": "float"
+        },
+        "ObjectFloat.__init__": {
+          "kind": "function",
+          "signature": "self, x: float=0, y: float=0, w: float=0, h: float=0, class_id: float=0, score: float=0, points: list[float]=[]",
+          "returns": "None"
+        },
+        "Objects": {
+          "kind": "class"
+        },
+        "Objects.__init__": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "None"
+        },
+        "Objects.add": {
+          "kind": "function",
+          "signature": "self, x: int=0, y: int=0, w: int=0, h: int=0, class_id: int=0, score: float=0, points: list[int]=[]",
+          "returns": "Object"
+        },
+        "Objects.at": {
+          "kind": "function",
+          "signature": "self, idx: int",
+          "returns": "Object"
+        },
+        "Objects.remove": {
+          "kind": "function",
+          "signature": "self, idx: int",
+          "returns": "maix._maix.err.Err"
+        },
+        "PP_OCR": {
+          "kind": "class"
+        },
+        "PP_OCR.det": {
+          "kind": "constant",
+          "annotation": "bool"
+        },
+        "PP_OCR.labels": {
+          "kind": "constant",
+          "annotation": "list[str]"
+        },
+        "PP_OCR.mean": {
+          "kind": "constant",
+          "annotation": "list[float]"
+        },
+        "PP_OCR.rec": {
+          "kind": "constant",
+          "annotation": "bool"
+        },
+        "PP_OCR.rec_mean": {
+          "kind": "constant",
+          "annotation": "list[float]"
+        },
+        "PP_OCR.rec_scale": {
+          "kind": "constant",
+          "annotation": "list[float]"
+        },
+        "PP_OCR.scale": {
+          "kind": "constant",
+          "annotation": "list[float]"
+        },
+        "PP_OCR.__init__": {
+          "kind": "function",
+          "signature": "self, model: str=''",
+          "returns": "None"
+        },
+        "PP_OCR.detect": {
+          "kind": "function",
+          "signature": "self, img: maix._maix.image.Image, thresh: float=0.3, box_thresh: float=0.6, fit: maix._maix.image.Fit=..., char_box: bool=False",
+          "returns": "..."
+        },
+        "PP_OCR.draw_seg_mask": {
+          "kind": "function",
+          "signature": "self, img: maix._maix.image.Image, x: int, y: int, seg_mask: maix._maix.image.Image, threshold: int=127",
+          "returns": "None"
+        },
+        "PP_OCR.input_format": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "maix._maix.image.Format"
+        },
+        "PP_OCR.input_height": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "PP_OCR.input_size": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "maix._maix.image.Size"
+        },
+        "PP_OCR.input_width": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "PP_OCR.load": {
+          "kind": "function",
+          "signature": "self, model: str",
+          "returns": "maix._maix.err.Err"
+        },
+        "Retinaface": {
+          "kind": "class"
+        },
+        "Retinaface.mean": {
+          "kind": "constant",
+          "annotation": "list[float]"
+        },
+        "Retinaface.scale": {
+          "kind": "constant",
+          "annotation": "list[float]"
+        },
+        "Retinaface.__init__": {
+          "kind": "function",
+          "signature": "self, model: str='', dual_buff: bool=True",
+          "returns": "None"
+        },
+        "Retinaface.detect": {
+          "kind": "function",
+          "signature": "self, img: maix._maix.image.Image, conf_th: float=0.4, iou_th: float=0.45, fit: maix._maix.image.Fit=...",
+          "returns": "list[...]"
+        },
+        "Retinaface.input_format": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "maix._maix.image.Format"
+        },
+        "Retinaface.input_height": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Retinaface.input_size": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "maix._maix.image.Size"
+        },
+        "Retinaface.input_width": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Retinaface.load": {
+          "kind": "function",
+          "signature": "self, model: str",
+          "returns": "maix._maix.err.Err"
+        },
+        "SelfLearnClassifier": {
+          "kind": "class"
+        },
+        "SelfLearnClassifier.label_path": {
+          "kind": "constant",
+          "annotation": "str"
+        },
+        "SelfLearnClassifier.labels": {
+          "kind": "constant",
+          "annotation": "list[str]"
+        },
+        "SelfLearnClassifier.mean": {
+          "kind": "constant",
+          "annotation": "list[float]"
+        },
+        "SelfLearnClassifier.scale": {
+          "kind": "constant",
+          "annotation": "list[float]"
+        },
+        "SelfLearnClassifier.__init__": {
+          "kind": "function",
+          "signature": "self, model: str='', dual_buff: bool=True",
+          "returns": "None"
+        },
+        "SelfLearnClassifier.add_class": {
+          "kind": "function",
+          "signature": "self, img: maix._maix.image.Image, fit: maix._maix.image.Fit=...",
+          "returns": "None"
+        },
+        "SelfLearnClassifier.add_sample": {
+          "kind": "function",
+          "signature": "self, img: maix._maix.image.Image, fit: maix._maix.image.Fit=...",
+          "returns": "None"
+        },
+        "SelfLearnClassifier.class_num": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "SelfLearnClassifier.classify": {
+          "kind": "function",
+          "signature": "self, img: maix._maix.image.Image, fit: maix._maix.image.Fit=...",
+          "returns": "list[tuple[int, float]]"
+        },
+        "SelfLearnClassifier.clear": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "None"
+        },
+        "SelfLearnClassifier.input_format": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "maix._maix.image.Format"
+        },
+        "SelfLearnClassifier.input_height": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "SelfLearnClassifier.input_shape": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "list[int]"
+        },
+        "SelfLearnClassifier.input_size": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "maix._maix.image.Size"
+        },
+        "SelfLearnClassifier.input_width": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "SelfLearnClassifier.learn": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "SelfLearnClassifier.load": {
+          "kind": "function",
+          "signature": "self, path: str",
+          "returns": "list[str]"
+        },
+        "SelfLearnClassifier.load_model": {
+          "kind": "function",
+          "signature": "self, model: str",
+          "returns": "maix._maix.err.Err"
+        },
+        "SelfLearnClassifier.rm_class": {
+          "kind": "function",
+          "signature": "self, idx: int",
+          "returns": "maix._maix.err.Err"
+        },
+        "SelfLearnClassifier.rm_sample": {
+          "kind": "function",
+          "signature": "self, idx: int",
+          "returns": "maix._maix.err.Err"
+        },
+        "SelfLearnClassifier.sample_num": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "SelfLearnClassifier.save": {
+          "kind": "function",
+          "signature": "self, path: str, labels: list[str]=[]",
+          "returns": "maix._maix.err.Err"
+        },
+        "Speech": {
+          "kind": "class"
+        },
+        "Speech.mean": {
+          "kind": "constant",
+          "annotation": "list[float]"
+        },
+        "Speech.scale": {
+          "kind": "constant",
+          "annotation": "list[float]"
+        },
+        "Speech.__init__": {
+          "kind": "function",
+          "signature": "self, model: str=''",
+          "returns": "None"
+        },
+        "Speech.clear": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "None"
+        },
+        "Speech.dec_deinit": {
+          "kind": "function",
+          "signature": "self, decoder: SpeechDecoder",
+          "returns": "None"
+        },
+        "Speech.deinit": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "None"
+        },
+        "Speech.dev_type": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "SpeechDevice"
+        },
+        "Speech.devive": {
+          "kind": "function",
+          "signature": "self, dev_type: SpeechDevice, device_name: str",
+          "returns": "maix._maix.err.Err"
+        },
+        "Speech.digit": {
+          "kind": "function",
+          "signature": "self, blank: int, callback: typing.Callable[[str, int], None]",
+          "returns": "maix._maix.err.Err"
+        },
+        "Speech.frame_time": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "Speech.init": {
+          "kind": "function",
+          "signature": "self, dev_type: SpeechDevice, device_name: str",
+          "returns": "maix._maix.err.Err"
+        },
+        "Speech.kws": {
+          "kind": "function",
+          "signature": "self, kw_tbl: list[str], kw_gate: list[float], callback: typing.Callable[[list[float], int], None], auto_similar: bool=True",
+          "returns": "maix._maix.err.Err"
+        },
+        "Speech.load": {
+          "kind": "function",
+          "signature": "self, model: str",
+          "returns": "maix._maix.err.Err"
+        },
+        "Speech.lvcsr": {
+          "kind": "function",
+          "signature": "self, sfst_name: str, sym_name: str, phones_txt: str, words_txt: str, callback: typing.Callable[[tuple[str, str], int], None], beam: float=8, bg_prob: float=10, scale: float=0.5, mmap: bool=False",
+          "returns": "maix._maix.err.Err"
+        },
+        "Speech.raw": {
+          "kind": "function",
+          "signature": "self, callback: typing.Callable[[list[pnyp_t], int], None]",
+          "returns": "maix._maix.err.Err"
+        },
+        "Speech.run": {
+          "kind": "function",
+          "signature": "self, frame: int",
+          "returns": "int"
+        },
+        "Speech.similar": {
+          "kind": "function",
+          "signature": "self, pny: str, similar_pnys: list[str]",
+          "returns": "maix._maix.err.Err"
+        },
+        "Speech.vocab": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "tuple[str, int]"
+        },
+        "SpeechDecoder": {
+          "kind": "class"
+        },
+        "SpeechDecoder.DECODER_ALL": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[SpeechDecoder]"
+        },
+        "SpeechDecoder.DECODER_DIG": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[SpeechDecoder]"
+        },
+        "SpeechDecoder.DECODER_KWS": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[SpeechDecoder]"
+        },
+        "SpeechDecoder.DECODER_LVCSR": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[SpeechDecoder]"
+        },
+        "SpeechDecoder.DECODER_RAW": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[SpeechDecoder]"
+        },
+        "SpeechDecoder.__init__": {
+          "kind": "function",
+          "signature": "self, value: int",
+          "returns": "None"
+        },
+        "SpeechDecoder.name": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "str"
+        },
+        "SpeechDecoder.value": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "SpeechDevice": {
+          "kind": "class"
+        },
+        "SpeechDevice.DEVICE_MIC": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[SpeechDevice]"
+        },
+        "SpeechDevice.DEVICE_NONE": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[SpeechDevice]"
+        },
+        "SpeechDevice.DEVICE_PCM": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[SpeechDevice]"
+        },
+        "SpeechDevice.DEVICE_WAV": {
+          "kind": "constant",
+          "annotation": "typing.ClassVar[SpeechDevice]"
+        },
+        "SpeechDevice.__init__": {
+          "kind": "function",
+          "signature": "self, value: int",
+          "returns": "None"
+        },
+        "SpeechDevice.name": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "str"
+        },
+        "SpeechDevice.value": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "YOLO11": {
+          "kind": "class"
+        },
+        "YOLO11.label_path": {
+          "kind": "constant",
+          "annotation": "str"
+        },
+        "YOLO11.labels": {
+          "kind": "constant",
+          "annotation": "list[str]"
+        },
+        "YOLO11.mean": {
+          "kind": "constant",
+          "annotation": "list[float]"
+        },
+        "YOLO11.scale": {
+          "kind": "constant",
+          "annotation": "list[float]"
+        },
+        "YOLO11.__init__": {
+          "kind": "function",
+          "signature": "self, model: str='', dual_buff: bool=True",
+          "returns": "None"
+        },
+        "YOLO11.detect": {
+          "kind": "function",
+          "signature": "self, img: maix._maix.image.Image, conf_th: float=0.5, iou_th: float=0.45, fit: maix._maix.image.Fit=..., keypoint_th: float=0.5",
+          "returns": "..."
+        },
+        "YOLO11.draw_pose": {
+          "kind": "function",
+          "signature": "self, img: maix._maix.image.Image, points: list[int], radius: int=4, color: maix._maix.image.Color=..., body: bool=True",
+          "returns": "None"
+        },
+        "YOLO11.draw_seg_mask": {
+          "kind": "function",
+          "signature": "self, img: maix._maix.image.Image, x: int, y: int, seg_mask: maix._maix.image.Image, threshold: int=127",
+          "returns": "None"
+        },
+        "YOLO11.input_format": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "maix._maix.image.Format"
+        },
+        "YOLO11.input_height": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "YOLO11.input_size": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "maix._maix.image.Size"
+        },
+        "YOLO11.input_width": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "YOLO11.load": {
+          "kind": "function",
+          "signature": "self, model: str",
+          "returns": "maix._maix.err.Err"
+        },
+        "YOLOv5": {
+          "kind": "class"
+        },
+        "YOLOv5.anchors": {
+          "kind": "constant",
+          "annotation": "list[float]"
+        },
+        "YOLOv5.label_path": {
+          "kind": "constant",
+          "annotation": "str"
+        },
+        "YOLOv5.labels": {
+          "kind": "constant",
+          "annotation": "list[str]"
+        },
+        "YOLOv5.mean": {
+          "kind": "constant",
+          "annotation": "list[float]"
+        },
+        "YOLOv5.scale": {
+          "kind": "constant",
+          "annotation": "list[float]"
+        },
+        "YOLOv5.__init__": {
+          "kind": "function",
+          "signature": "self, model: str='', dual_buff: bool=True",
+          "returns": "None"
+        },
+        "YOLOv5.detect": {
+          "kind": "function",
+          "signature": "self, img: maix._maix.image.Image, conf_th: float=0.5, iou_th: float=0.45, fit: maix._maix.image.Fit=...",
+          "returns": "list[Object]"
+        },
+        "YOLOv5.input_format": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "maix._maix.image.Format"
+        },
+        "YOLOv5.input_height": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "YOLOv5.input_size": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "maix._maix.image.Size"
+        },
+        "YOLOv5.input_width": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "YOLOv5.load": {
+          "kind": "function",
+          "signature": "self, model: str",
+          "returns": "maix._maix.err.Err"
+        },
+        "YOLOv8": {
+          "kind": "class"
+        },
+        "YOLOv8.label_path": {
+          "kind": "constant",
+          "annotation": "str"
+        },
+        "YOLOv8.labels": {
+          "kind": "constant",
+          "annotation": "list[str]"
+        },
+        "YOLOv8.mean": {
+          "kind": "constant",
+          "annotation": "list[float]"
+        },
+        "YOLOv8.scale": {
+          "kind": "constant",
+          "annotation": "list[float]"
+        },
+        "YOLOv8.__init__": {
+          "kind": "function",
+          "signature": "self, model: str='', dual_buff: bool=True",
+          "returns": "None"
+        },
+        "YOLOv8.detect": {
+          "kind": "function",
+          "signature": "self, img: maix._maix.image.Image, conf_th: float=0.5, iou_th: float=0.45, fit: maix._maix.image.Fit=..., keypoint_th: float=0.5",
+          "returns": "..."
+        },
+        "YOLOv8.draw_pose": {
+          "kind": "function",
+          "signature": "self, img: maix._maix.image.Image, points: list[int], radius: int=4, color: maix._maix.image.Color=..., body: bool=True",
+          "returns": "None"
+        },
+        "YOLOv8.draw_seg_mask": {
+          "kind": "function",
+          "signature": "self, img: maix._maix.image.Image, x: int, y: int, seg_mask: maix._maix.image.Image, threshold: int=127",
+          "returns": "None"
+        },
+        "YOLOv8.input_format": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "maix._maix.image.Format"
+        },
+        "YOLOv8.input_height": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "YOLOv8.input_size": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "maix._maix.image.Size"
+        },
+        "YOLOv8.input_width": {
+          "kind": "function",
+          "signature": "self",
+          "returns": "int"
+        },
+        "YOLOv8.load": {
+          "kind": "function",
+          "signature": "self, model: str",
+          "returns": "maix._maix.err.Err"
+        }
+      }
+    }
+  },
+  "absent_paths": [
+    "/usr/lib/python3.11/site-packages/maix/_maix/ext_dev/rtc.pyi",
+    "/root/servo.py",
+    "/root/scripts/servo.py",
+    "/usr/lib/python3.11/site-packages/servo.py"
+  ],
+  "image": {
+    "filename": "kidbright-mAi-plus-2026-05-02-v4.12.5B1.img",
+    "bytes": 1556086784,
+    "sha256": "287883ec84279574ecb70eb3856d956b23e1a9840a6ad4e946e74054deb7b422"
+  }
+}

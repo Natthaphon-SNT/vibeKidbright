@@ -38,7 +38,9 @@ pub(crate) struct Journal {
 }
 
 pub(crate) fn checked_path(root: &Path, path: &Path) -> Result<PathBuf, String> {
-    let root = dunce::canonicalize(root).map_err(|e| format!("Workspace unavailable: {e}"))?;
+    let canonical_root = std::fs::canonicalize(root)
+        .map_err(|e| format!("Workspace unavailable: {e}"))?;
+    let root = dunce::simplified(&canonical_root).to_path_buf();
     let relative = path
         .strip_prefix(&root)
         .map_err(|_| "Change is outside its recorded workspace.")?;
@@ -78,11 +80,14 @@ pub(crate) fn checked_path(root: &Path, path: &Path) -> Result<PathBuf, String> 
                 if meta.file_type().is_symlink() {
                     return Err("Reviewed paths must not contain links.".into());
                 }
-                let canonical = dunce::canonicalize(&cursor).map_err(|e| e.to_string())?;
-                if !canonical.starts_with(&root) {
-                    return Err("Reviewed path escaped the workspace.".into());
-                }
-                cursor = canonical;
+                // Compare canonical paths in the same format. On Windows,
+                // dunce retains the verbatim prefix only for long paths, so
+                // comparing a long child to a short root can falsely escape.
+                let canonical = std::fs::canonicalize(&cursor).map_err(|e| e.to_string())?;
+                let relative = canonical
+                    .strip_prefix(&canonical_root)
+                    .map_err(|_| "Reviewed path escaped the workspace.")?;
+                cursor = root.join(relative);
             }
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => (),
             Err(e) => return Err(e.to_string()),

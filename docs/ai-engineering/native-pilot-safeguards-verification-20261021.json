@@ -1,0 +1,418 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-21",
+  "scope": "Offline native pilot safeguards; isolated debug route only",
+  "implementation_changed": true,
+  "actual_run_enabled": false,
+  "git_source_commit_at_start": "7d0157a71e380655e8d610dae74d32ef2c97d562",
+  "compiled_native_source_revision": "70360348cf7df7ed1e993f4edaf4f2f423dc12fe2f66e559cfae6f64a2f1d298",
+  "starting_manifest": {
+    "path": "docs/ai-engineering/verification.json",
+    "files": 330,
+    "mismatches_before_work": [
+      {
+        "path": "Readme.md",
+        "recorded": "b9dc7e223a5652b901a657f5fc39f3cd1c3710e609ffc3afafec91a1db316d15",
+        "actual": "24342306fd17158f17b197fc90cd07d79d80ce8512faa6953aa31b3380dbac59"
+      },
+      {
+        "path": "docs/research/rule-documents-2026-10-16.json",
+        "recorded": "5815ef36cda91f883f93d5501112faf936059bafd239fa2d09532636ebed5861",
+        "actual": "34f20f866f12500be39ff2c403edd45212a56585686ee89ca9464eba537efb7f"
+      },
+      {
+        "path": "package-lock.json",
+        "recorded": "26a6de9ec117de7cb2a7b10a19c295a9a85689bfa143f1323ee7b217fc3fe5d6",
+        "actual": "44c1b43265bc50a4cb3b6c4981ffbfa94f96c8ba4a56b335252f249acf58b6a1"
+      },
+      {
+        "path": "package.json",
+        "recorded": "efabda7c4e78f82fef5b4399b9ab56615d87730906abf3899e57ad8b07ba4ffa",
+        "actual": "4efcf3ec1d63d4b80e9ef5a90ac4f8554103064019f53c2def8e457944ee4f89"
+      },
+      {
+        "path": "src-tauri/Cargo.lock",
+        "recorded": "eb87460f9044180f98ac7f761a446bdef2579e1f2be8c6e16f9ba07d04f34a1b",
+        "actual": "459d11366c3077b15ede27650be17406004b2226d52e26500233d86f364eb10c"
+      },
+      {
+        "path": "src-tauri/Cargo.toml",
+        "recorded": "41937edaf3ffadf6298736e7069b64a35a7e0fdd74fef43ddabd30d18514ebea",
+        "actual": "30d4b19e94a5b5fb13d897d2c961831fd7e245c0ebe9b665648e07c379a32363"
+      },
+      {
+        "path": "src-tauri/src/ai/change_journal.rs",
+        "recorded": "849809abf39188f19921f7958d9b56f914401ce04d012837883d5da2d85c9e17",
+        "actual": "83c5fd7845ba8423a86d17672780980e0b16a5ac74e11de1c8aeb819d4d444b3"
+      },
+      {
+        "path": "src-tauri/src/ai/tools.rs",
+        "recorded": "9abf235813aa26deb2f305b4670e9b21c30da4c53d57ff8c0379716531344f8f",
+        "actual": "9f87042c0d8435beaf585c760984f44e471c749a79f1cdb8085d7ce185148b7a"
+      },
+      {
+        "path": "src-tauri/src/archive.rs",
+        "recorded": "375f6b61fe90cbf4dc4637b0431d168b7275878d597c7a1b83d04cd621af9e09",
+        "actual": "e7e7e8e38935de56a6afa8e77ca049d0e8c97470a6c6de7183d145e12b399a27"
+      },
+      {
+        "path": "src-tauri/src/intelligence/semantic.rs",
+        "recorded": "f42cc28ad9197b0617c88e1a53e24d81342025236a6804868a86d675b7afef9b",
+        "actual": "106dca34d404b65e9c532e3b136cda563bbb8e1a3d7a7b3e4baa04658ca720b0"
+      },
+      {
+        "path": "src-tauri/src/lib.rs",
+        "recorded": "1b51d9a3b39e8e15119fffa436731f84e1d05127c4060d8de5f89e05ab412dc8",
+        "actual": "8e15216408d8881377e3e617849326b892b990b8f20f34841d7399e5dd6617f5"
+      },
+      {
+        "path": "src-tauri/src/toolchain.rs",
+        "recorded": "a6e8b8935c774a2b9b274176a3398a807bb8c1be2ff8bc59257377b733325e80",
+        "actual": "7e16418a034a03d653f5d2cb3ade86d7c7dae95f6ee42d3ec6a384f64776380e"
+      },
+      {
+        "path": "src-tauri/tauri.conf.json",
+        "recorded": "1d5278776cd13e1e80439719320f1dc615e9ecd1e07192fb54f7b522d6ba0c96",
+        "actual": "2c27cf75f2eeeb3464bf4644b8420a1186c56a96b6b7ba92cf108375c1916c0a"
+      },
+      {
+        "path": "src/ToolchainSetup.tsx",
+        "recorded": "ad242395c025276bbf9a3fc09d898b659cab8a8753489b2346e4db5539996449",
+        "actual": "ca7aac09aefdbb669e388a35b9302287fb9ee24f937918126a04babc942f0c7f"
+      },
+      {
+        "path": "src/test/toolchainFirstLaunch.test.tsx",
+        "recorded": "354c509affb840c4fc59fa5b0feab9cee5c587075c61145dfca0e559c3ee822a",
+        "actual": "1a52243504ae13b1f4f0b3efbb266292e5ee61b3ac9bfef11c71ec9796e690aa"
+      }
+    ],
+    "silently_rebased": false
+  },
+  "source_sha256": {
+    "src-tauri/src/ai/pilot.rs": "a862d4b4e72e79c4fe5481882adb5d4e63a94922b276d086da164304105efd2b",
+    "src-tauri/src/ai/pilot/tests.rs": "ee8b9bd6e6004beed939769fe2d76ed55dc787d10ca112202fa764b6aed5b0ed",
+    "src-tauri/src/ai/mod.rs": "f2bfc4e82d2a33ccae30abfc137f7b0c1ec9c0b94895ebe33dc4b8b04ae227d0",
+    "src-tauri/src/ai/config.rs": "86e3d17c6c5d5866dc8706b53b60af45fd175009c4e16966487171e5b72eb27c",
+    "src-tauri/src/ai/providers.rs": "8cffd74408f5598fa9d1afa8862207858f4a1300311c1c0fb0ae8861188c792c",
+    "src-tauri/src/ai/tools.rs": "b6a57b158c819bdcb64749b372cb54cbb13287cab29c43b6f583db89b936a9d9",
+    "src-tauri/src/ai/wiki.rs": "15ec8d0bf0e7685c20598011b19739e919c6fdb168c617e79e11b9d1f7d11b48",
+    "src-tauri/src/ai_chat.rs": "000ddc0fd981b29c32a2debfd0e2e64a71f7d5f2d040690da616cbdf2c862793",
+    "src-tauri/src/lib.rs": "cf7e7837387d4c46195660987294a61e0ac842deb91567d2a443db90e0b9c76b",
+    "scripts/evaluate-vibe-coder-real.mjs": "8705b28ad7ec17067ac72ea178301fb5f2fd45d250ec42cbea3871ba8f776da4",
+    "scripts/tests/test_real_vibe_harness.py": "e5aee96513ba9d9796311eb83fe8f8bc21dd1f19841fe5a5522260eaf1d3ce24",
+    "docs/ai-engineering/30-offline-closeout-and-runbook.md": "01e5f529576b0bfb718581838dfa420d1d267d63108f3b64173d6135747e79f3",
+    "docs/research/rule-documents-2026-10-16.json": "045895da9f1e6b5322bc6e04a55dfdd512ccae0f3c44147734f8bf7df66997cf"
+  },
+  "changes_manifest": {
+    "path": "docs/ai-engineering/native-pilot-safeguards-changes-20261021.json",
+    "sha256": "3312be640ff640af0d86de4d64bc50c0981b0e69c1ce55d6870b5f9922e043ec",
+    "bytes": 7832
+  },
+  "tests": {
+    "native_safeguards": {
+      "passed": 17,
+      "failed": 0,
+      "log": {
+        "path": "src-tauri/target/native-pilot-safeguards-20261021/native-tests-captured.log",
+        "sha256": "1268e218e2811ad60234973a99b8b115bc47ed96af0221df80fdbd7b8585f7ce",
+        "bytes": 13890
+      }
+    },
+    "rust_library": {
+      "passed": 218,
+      "failed": 0,
+      "log": {
+        "path": "src-tauri/target/native-pilot-safeguards-20261021/rust-library-final.log",
+        "sha256": "8dde99662e5efb2c2f8cfc21593478d6524c94dbb6da12cc803a1c9958a216d9",
+        "bytes": 51916
+      }
+    },
+    "python": {
+      "passed": 25,
+      "failed": 0,
+      "log": {
+        "path": "src-tauri/target/native-pilot-safeguards-20261021/python.log",
+        "sha256": "20dc2931c7468dcbd40e531b2618b518c77cc891ebde2f202cf723dd5f14c273",
+        "bytes": 9386
+      }
+    },
+    "final_python_harness": {
+      "passed": 9,
+      "failed": 0,
+      "log": {
+        "path": "src-tauri/target/native-pilot-safeguards-20261021/python-harness-final.log",
+        "sha256": "89d03491ed8a6c423b126ccf48f0301ef810e8795793cbdcfd440c80c7469a0e",
+        "bytes": 4168
+      }
+    },
+    "node": {
+      "passed": 12,
+      "failed": 0,
+      "log": {
+        "path": "src-tauri/target/native-pilot-safeguards-20261021/node.log",
+        "sha256": "9055383d3809c3bbcd22caef84d955c340404d55d4867510a2319c664ae28a11",
+        "bytes": 2592
+      }
+    },
+    "native_library_and_examples_check": {
+      "exit_code": 0,
+      "log": {
+        "path": "src-tauri/target/native-pilot-safeguards-20261021/native-check-final.log",
+        "sha256": "d8ef0042a6f0d747963dadce64ff2b24d2eaaee31596dc88e1795f16d58c3948",
+        "bytes": 14226
+      }
+    },
+    "placeholder_path_policy_adjustment": {
+      "passed": 1,
+      "failed": 0,
+      "log": {
+        "path": "src-tauri/target/native-pilot-safeguards-20261021/placeholder-path-test.log",
+        "sha256": "2277e87d8122712adc094c628359476d56788021e5266793aeb9085a263efb09",
+        "bytes": 9242
+      }
+    }
+  },
+  "transport_counts": {
+    "qualified_capture_run": {
+      "fake_transport_calls": 38,
+      "owned_loopback_http_requests": 1,
+      "provider_http_requests": 0
+    },
+    "entire_increment_including_development_iterations": {
+      "fake_transport_calls": 228,
+      "owned_loopback_http_requests": 7,
+      "provider_http_requests": 0
+    },
+    "cli_bypass_test_server_http_requests": 0,
+    "provider_metadata_probes": 0,
+    "provider_inference_requests": 0
+  },
+  "native_captures": [
+    {
+      "path": "src-tauri/target/native-pilot-captures/synthetic-redaction-9GnWb9.jsonl",
+      "sha256": "812818954c31d568d82096c63d160c344341998d759d0d135106efa00d61dda7",
+      "bytes": 94361,
+      "classification": "synthetic native route capture; not actual-model evidence",
+      "session_id": "synthetic-13",
+      "source_revision": "70360348cf7df7ed1e993f4edaf4f2f423dc12fe2f66e559cfae6f64a2f1d298",
+      "hash_chain_verified": true
+    },
+    {
+      "path": "src-tauri/target/native-pilot-captures/synthetic-tool-loop-NgB6bq.jsonl",
+      "sha256": "aa34991dbe6de3f2dfc8a6d831383343b6462c48fbacc689645cca0523f8f3a1",
+      "bytes": 391555,
+      "classification": "synthetic native route capture; not actual-model evidence",
+      "session_id": "synthetic-4",
+      "source_revision": "70360348cf7df7ed1e993f4edaf4f2f423dc12fe2f66e559cfae6f64a2f1d298",
+      "hash_chain_verified": true
+    }
+  ],
+  "development_test_runs": [
+    {
+      "path": "src-tauri/target/native-pilot-safeguards-20261021/native-tests-initial.log",
+      "sha256": "294d6558070fbe47ee68d1a92d6b75ed23d6936a2003fd8e2a15ea9acabea05c",
+      "bytes": 12152,
+      "fake_transport_calls": 0,
+      "owned_loopback_http_requests": 0,
+      "results": [],
+      "qualification": "development iteration, not acceptance or AI-quality evidence"
+    },
+    {
+      "path": "src-tauri/target/native-pilot-safeguards-20261021/native-tests-second.log",
+      "sha256": "a4bfdf477844bdcbdf307c7bcb4dd929c70a5fb77e574d8274ae2963b7673cb7",
+      "bytes": 17706,
+      "fake_transport_calls": 2,
+      "owned_loopback_http_requests": 1,
+      "results": [
+        "test result: FAILED. 5 passed; 8 failed; 0 ignored; 0 measured; 201 filtered out; finished in 0.48s\r"
+      ],
+      "qualification": "development iteration, not acceptance or AI-quality evidence"
+    },
+    {
+      "path": "src-tauri/target/native-pilot-safeguards-20261021/native-tests-third.log",
+      "sha256": "8199363b7dff1fe5b465b3dc070ed44a3c5d71228e39f65f422d1b7e7b9db9df",
+      "bytes": 12554,
+      "fake_transport_calls": 36,
+      "owned_loopback_http_requests": 1,
+      "results": [
+        "test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 201 filtered out; finished in 2.71s\r"
+      ],
+      "qualification": "development iteration, not acceptance or AI-quality evidence"
+    },
+    {
+      "path": "src-tauri/target/native-pilot-safeguards-20261021/rust-library.log",
+      "sha256": "0f78414856a9add12e021a995d4c8488597960682f2192410b42a2552ad40f74",
+      "bytes": 51898,
+      "fake_transport_calls": 38,
+      "owned_loopback_http_requests": 1,
+      "results": [
+        "test result: ok. 217 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.36s\r"
+      ],
+      "qualification": "development iteration, not acceptance or AI-quality evidence"
+    },
+    {
+      "path": "src-tauri/target/native-pilot-safeguards-20261021/native-tests-final.log",
+      "sha256": "dd1153f0ef277dfcee7a352aa9ed288db2c8710b52b78bbaafb820d67f6ff39e",
+      "bytes": 13502,
+      "fake_transport_calls": 38,
+      "owned_loopback_http_requests": 1,
+      "results": [
+        "test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 201 filtered out; finished in 2.99s\r"
+      ],
+      "qualification": "development iteration, not acceptance or AI-quality evidence"
+    },
+    {
+      "path": "src-tauri/target/native-pilot-safeguards-20261021/native-tests-integrated.log",
+      "sha256": "96d3a77b784cefbbf5e77b9bc09ae4e478486ef43f04aebd4bd1daf445b640e3",
+      "bytes": 13500,
+      "fake_transport_calls": 38,
+      "owned_loopback_http_requests": 1,
+      "results": [
+        "test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 201 filtered out; finished in 2.83s\r"
+      ],
+      "qualification": "development iteration, not acceptance or AI-quality evidence"
+    },
+    {
+      "path": "src-tauri/target/native-pilot-safeguards-20261021/rust-library-final.log",
+      "sha256": "8dde99662e5efb2c2f8cfc21593478d6524c94dbb6da12cc803a1c9958a216d9",
+      "bytes": 51916,
+      "fake_transport_calls": 38,
+      "owned_loopback_http_requests": 1,
+      "results": [
+        "test result: ok. 218 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.27s\r"
+      ],
+      "qualification": "final qualified checks"
+    },
+    {
+      "path": "src-tauri/target/native-pilot-safeguards-20261021/native-tests-captured.log",
+      "sha256": "1268e218e2811ad60234973a99b8b115bc47ed96af0221df80fdbd7b8585f7ce",
+      "bytes": 13890,
+      "fake_transport_calls": 38,
+      "owned_loopback_http_requests": 1,
+      "results": [
+        "test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 201 filtered out; finished in 2.85s\r"
+      ],
+      "qualification": "final qualified checks"
+    },
+    {
+      "path": "src-tauri/target/native-pilot-safeguards-20261021/placeholder-path-test.log",
+      "sha256": "2277e87d8122712adc094c628359476d56788021e5266793aeb9085a263efb09",
+      "bytes": 9242,
+      "fake_transport_calls": 0,
+      "owned_loopback_http_requests": 0,
+      "results": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 217 filtered out; finished in 0.04s\r"
+      ],
+      "qualification": "final qualified checks"
+    }
+  ],
+  "cost_gate": {
+    "actual_provider_bound_verified": false,
+    "actual_model_pricing": null,
+    "estimated_actual_cost": null,
+    "one_usd_actual_guarantee_claimed": false,
+    "reservation_tests": "synthetic pricing fixtures only; input/output/other/metadata upper bounds; no post-usage refunds"
+  },
+  "policy_checks": {
+    "public": "passed",
+    "standalone": "passed",
+    "runtime": "passed",
+    "knowledge_base": "passed",
+    "boards": "passed",
+    "coverage": "passed",
+    "rule_inventory": "passed",
+    "git_diff_check_default_exit_code": 2,
+    "git_diff_check_cr_at_eol_exit_code": 0,
+    "diff_check_note": "Preserved CRLF Markdown is -text in .gitattributes; the default check flags CR. cr-at-eol check passes without rewriting pre-existing dirty document bytes."
+  },
+  "preservation": {
+    "untouched_starting_files_verified": 545,
+    "unexpected_changes": [],
+    "lockfiles_sha256": {
+      "package-lock.json": "44c1b43265bc50a4cb3b6c4981ffbfa94f96c8ba4a56b335252f249acf58b6a1",
+      "src-tauri/Cargo.lock": "459d11366c3077b15ede27650be17406004b2226d52e26500233d86f364eb10c"
+    },
+    "lockfiles_match_start": true,
+    "model_files_match_pins": {
+      "resources/embedding/model.onnx": "bbd7b466f6d58e646fdc2bd5fd67b2f5e93c0b687011bd4548c420f7bd46f0c5",
+      "resources/embedding/model-config.json": "1b4d8e2a3988377ed8b519a31d8d31025a25f1c5f8606998e8014111438efcd7",
+      "resources/embedding/tokenizer.json": "851ca67100d372ca3ae031a6abd168f53489eebfd7d89523f35c5c9b4d372c3c",
+      "resources/embedding/special_tokens_map.json": "5d5b662e421ea9fac075174bb0688ee0d9431699900b90662acd44b2a350503a",
+      "resources/embedding/tokenizer_config.json": "abda01c8c14c5151ae498aceb30db406d6b91242c394fd88d3b6fd5a63a101e6"
+    },
+    "sdk_configuration_inspected_or_changed": false,
+    "ranking_frozen_queries_qrels_bundled_corpus_nine_block_ids_schema_unchanged": true,
+    "installer_3_7_3": {
+      "path": "src-tauri/target/release/bundle/nsis/VibeKidbright IDE_3.7.3_x64-setup.exe",
+      "observed_bytes": 316901718,
+      "observed_sha256": "ef5a3f804695cefd0c29470145c9d02ec4d5d89cad12c35fac2b2b49abe10387",
+      "historical_recorded_sha256": "d09d0f9418d94059e801fc43a38241314757c686e5060e26596a806ba56ae7c1",
+      "matches_historical_report": false,
+      "existing_mismatch_before_this_increment": true,
+      "restored_or_rebuilt_in_this_increment": false
+    }
+  },
+  "credential_store_access": false,
+  "api_questions": 0,
+  "provider_probing": false,
+  "installer_created": false,
+  "firmware_build_or_flash": false,
+  "commit_push_publish_deploy": false,
+  "ai_quality": {
+    "retrieval_relevance": "NOT_EXECUTED",
+    "citation_existence": "NOT_EXECUTED",
+    "citation_support": "NOT_EXECUTED",
+    "api_version_correctness": "NOT_EXECUTED",
+    "hardware_metadata": "NOT_EXECUTED",
+    "project_identity": "NOT_EXECUTED",
+    "file_symbol_selection": "NOT_EXECUTED",
+    "dependency_understanding": "NOT_EXECUTED",
+    "patch_scope": "NOT_EXECUTED",
+    "unrelated_code_preserved": "NOT_EXECUTED",
+    "compiler_classification": "NOT_EXECUTED",
+    "focused_repair": "NOT_EXECUTED",
+    "per_attempt_approval": "NOT_EXECUTED",
+    "compilation_success": "NOT_EXECUTED",
+    "rollback_correctness": "NOT_EXECUTED",
+    "bounded_attempts": "NOT_EXECUTED"
+  },
+  "independent_judgments": {
+    "retrieval_relevance": null,
+    "citation_existence": null,
+    "citation_support": null,
+    "api_version_correctness": null,
+    "hardware_metadata": null,
+    "project_identity": null,
+    "file_symbol_selection": null,
+    "dependency_understanding": null,
+    "patch_scope": null,
+    "unrelated_code_preserved": null,
+    "compiler_classification": null,
+    "focused_repair": null,
+    "per_attempt_approval": null,
+    "compilation_success": null,
+    "rollback_correctness": null,
+    "bounded_attempts": null
+  },
+  "independent_reviewer": null,
+  "release": "NOT_READY",
+  "requirements": {
+    "system_architecture": "PARTIAL",
+    "hybrid_rag": "PARTIAL",
+    "knowledge_base_data": "PARTIAL",
+    "code_aware_chunking": "PARTIAL",
+    "compiler_validation_auto_fix": "PARTIAL",
+    "technology_integration": "PARTIAL",
+    "development_phases": "PARTIAL",
+    "evaluation_quality": "PARTIAL"
+  },
+  "remaining_blockers": [
+    "No authorized provider/endpoint/model-version/test credential channel supplied; none requested or searched.",
+    "No provider-specific verified actual-cost authority or actual session provisioner exists; actual preflight stays closed even for localhost/synthetic pricing.",
+    "Only read-only public file tool loop is exercised. Live ranked retrieval and reviewed mutation/repair/revision changes need the same provenance boundary without resetting the session budget.",
+    "Recovery deliberately refuses restart; a trusted independent checkpoint/re-authorization protocol is not implemented.",
+    "Response free text is omitted, not a semantically reviewable actual-model transcript. No AI quality or independent review is established.",
+    "Existing local installer 3.7.3 already differs from its historical report. This increment preserves observed bytes and does not restore/certify that old baseline.",
+    "No actual-model, clean VM, hardware or macOS qualification performed."
+  ]
+}

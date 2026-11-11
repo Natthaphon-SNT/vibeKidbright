@@ -46,12 +46,90 @@ describe("Learner project sidebar", () => {
     localStorage.setItem("vibe-project-dir", root);
     invokeMock.mockImplementation(async (command: string) => {
       if (command === "list_project_files") return tree;
-      if (command === "validate_idf_project") return true;
+      if (command === "get_project_kind") return "esp_idf";
       if (command === "get_idf_custom_paths") return { idf_path: "", tools_path: "" };
       if (command === "list_serial_ports") return [];
       if (command === "read_project_file") return "original";
       return "Ready";
     });
+  });
+
+  it("reloads saved code when reopening the same project instead of retaining an old tab", async () => {
+    const original = invokeMock.getMockImplementation()!;
+    let disk = "first disk version";
+    invokeMock.mockImplementation((command: string, args: unknown) => command === "pick_directory"
+      ? Promise.resolve(root) : command === "read_project_file" ? Promise.resolve(disk) : original(command, args));
+    render(<App />);
+    fireEvent.click(await screen.findByRole("button", { name: "main.c" }));
+    expect(await screen.findByRole("textbox", { name: "Program editor" })).toHaveValue(disk);
+    disk = "updated disk version";
+    fireEvent.click(screen.getByRole("button", { name: "OPEN" }));
+    await waitFor(() => expect(screen.getByRole("textbox", { name: "Program editor" })).toHaveValue(disk));
+    expect(invokeMock).not.toHaveBeenCalledWith("write_project_file", expect.anything());
+  });
+
+  it("preserves unsaved code when the same project is reopened", async () => {
+    const original = invokeMock.getMockImplementation()!;
+    invokeMock.mockImplementation((command: string, args: unknown) => command === "pick_directory"
+      ? Promise.resolve(root) : original(command, args));
+    render(<App />);
+    fireEvent.click(await screen.findByRole("button", { name: "main.c" }));
+    fireEvent.change(await screen.findByRole("textbox", { name: "Program editor" }), { target: { value: "my unsaved draft" } });
+    fireEvent.click(screen.getByRole("button", { name: "OPEN" }));
+    await waitFor(() => expect(screen.getByText(`Project opened: ${root}`, { exact: false })).toBeInTheDocument());
+    expect(screen.getByRole("textbox", { name: "Program editor" })).toHaveValue("my unsaved draft");
+    expect(invokeMock.mock.calls.filter(([command]) => command === "read_project_file")).toHaveLength(1);
+  });
+
+  it("does not report Project opened when reopening fails to reload the saved file", async () => {
+    const original = invokeMock.getMockImplementation()!;
+    let fail = false;
+    invokeMock.mockImplementation((command: string, args: unknown) => command === "pick_directory"
+      ? Promise.resolve(root) : command === "read_project_file" && fail
+        ? Promise.reject("file is no longer readable") : original(command, args));
+    render(<App />);
+    fireEvent.click(await screen.findByRole("button", { name: "main.c" }));
+    await screen.findByRole("textbox", { name: "Program editor" });
+    fail = true;
+    fireEvent.click(screen.getByRole("button", { name: "OPEN" }));
+    expect(await screen.findByText(/Project refresh failed/)).toBeInTheDocument();
+    expect(screen.queryByText(/Project opened:/)).not.toBeInTheDocument();
+  });
+
+  it("opens the chosen project's main.py even when the previous project has the same filename", async () => {
+    const nextRoot = "D:/projects/mai_test_022";
+    const original = invokeMock.getMockImplementation()!;
+    invokeMock.mockImplementation((command: string, args: { path?: string }) => {
+      if (command === "pick_directory") return Promise.resolve(nextRoot);
+      if (command === "get_project_kind") return Promise.resolve("kidbright_uai_plus");
+      if (command === "list_project_files") {
+        const activeRoot = args?.path === nextRoot ? nextRoot : root;
+        return Promise.resolve([{ name: "main", path: `${activeRoot}/main`, is_dir: true, children: [{ name: "main.py", path: `${activeRoot}/main/main.py`, is_dir: false }] }]);
+      }
+      if (command === "read_project_file" && args?.path?.startsWith(nextRoot)) return Promise.resolve("# MP-022 actual S1 counter");
+      return original(command, args);
+    });
+    render(<App />);
+    fireEvent.click(await screen.findByRole("button", { name: "main.py" }));
+    await screen.findByRole("textbox", { name: "Program editor" });
+    fireEvent.click(screen.getByRole("button", { name: "OPEN" }));
+    await waitFor(() => expect(screen.getByRole("textbox", { name: "Program editor" })).toHaveValue("# MP-022 actual S1 counter"));
+    expect(screen.getAllByRole("button", { name: "Close main.py" })).toHaveLength(1);
+    expect(localStorage.getItem("vibe-project-dir")).toBe(nextRoot);
+  });
+
+  it("rejects an old file read after switching away and back to the same project", async () => {
+    const original = invokeMock.getMockImplementation()!;
+    let finish!: (content: string) => void;
+    invokeMock.mockImplementation((command: string, args: unknown) => command === "read_project_file"
+      ? new Promise<string>(resolve => { finish = resolve; }) : original(command, args));
+    render(<App />);
+    fireEvent.click(await screen.findByRole("button", { name: "main.c" }));
+    await waitFor(() => expect(finish).toBeDefined());
+    await act(async () => { handlers.get("force-project-dir")?.({ payload: "D:/projects/other" }); });
+    await act(async () => { handlers.get("force-project-dir")?.({ payload: root }); });
+    await act(async () => { finish("stale data from the previous visit"); });
+    expect(screen.queryByRole("textbox", { name: "Program editor" })).not.toBeInTheDocument();
   });
   afterEach(() => { cleanup(); vi.restoreAllMocks(); });
 
@@ -191,7 +269,7 @@ describe("Learner project sidebar", () => {
   it("does not fall back to overwriting a program when New File finds an existing name", async () => {
     invokeMock.mockImplementation(async (command: string) => {
       if (command === "list_project_files") return tree;
-      if (command === "validate_idf_project") return true;
+      if (command === "get_project_kind") return "esp_idf";
       if (command === "get_idf_custom_paths") return {};
       if (command === "list_serial_ports") return [];
       if (command === "create_program_file") throw new Error("Already exists");
@@ -233,7 +311,7 @@ describe("Learner project sidebar", () => {
     await screen.findByRole("button", { name: "lesson" });
     fireEvent.change(screen.getByRole("textbox", { name: "Program editor" }), { target: { value: "changed after rename" } });
     fireEvent.keyDown(window, { key: "s", ctrlKey: true });
-    await waitFor(() => expect(invokeMock).toHaveBeenCalledWith("write_project_file", { path: `${newPath}\\controller.c`, content: "changed after rename" }));
+    await waitFor(() => expect(invokeMock).toHaveBeenCalledWith("write_project_file", { path: `${newPath}\\controller.c`, content: "changed after rename", projectDir: root }));
     expect(invokeMock).not.toHaveBeenCalledWith("rename_item", expect.anything());
     expect(invokeMock).not.toHaveBeenCalledWith("write_project_file", expect.objectContaining({ path: `${oldPath}\\controller.c` }));
   });
@@ -292,8 +370,8 @@ describe("Learner project sidebar", () => {
     fireEvent.change(supportingEditor, { target: { value: "accidental edit" } });
     expect(supportingEditor).toHaveValue("original");
     fireEvent.keyDown(window, { key: "s", ctrlKey: true });
-    await waitFor(() => expect(invokeMock).toHaveBeenCalledWith("write_project_file", { path: mainFile, content: "new program" }));
+    await waitFor(() => expect(invokeMock).toHaveBeenCalledWith("write_project_file", { path: mainFile, content: "new program", projectDir: root }));
     const writes = invokeMock.mock.calls.filter(([command]) => command === "write_project_file");
-    expect(writes).toEqual([["write_project_file", { path: mainFile, content: "new program" }]]);
+    expect(writes).toEqual([["write_project_file", { path: mainFile, content: "new program", projectDir: root }]]);
   });
 });
