@@ -80,7 +80,9 @@ def verify_app(app, expected_version):
 
 def probe(image, report_path, expected_version, expected_arch, sdk_idf=None, sdk_tools=None):
     with tempfile.TemporaryDirectory(prefix="vibekidbright-macos-") as temporary:
-        scratch = Path(temporary)
+        # macOS /var aliases /private/var. Tauri rejects an executable launched
+        # through any symlink component; launch the copied bundle canonically.
+        scratch = Path(temporary).resolve()
         mount = scratch / "mounted image"
         mount.mkdir()
         mounted = False
@@ -105,9 +107,12 @@ def probe(image, report_path, expected_version, expected_arch, sdk_idf=None, sdk
         working.mkdir()
         data.mkdir()
         env = clean_environment(data)
+        # The explicit scratch argument isolates app data. Keychain belongs to
+        # the real macOS login session and must not be resolved under a fake HOME.
+        native_env = dict(env, HOME=str(Path.home()))
         native_report = scratch / "native-self-check.json"
         result = subprocess.run([str(binary), "--self-check", str(native_report), str(data)],
-                                cwd=working, env=env, capture_output=True, text=True, timeout=180)
+                                cwd=working, env=native_env, capture_output=True, text=True, timeout=180)
         if not native_report.is_file():
             raise ValueError(f"App self-check produced no report (exit {result.returncode}): {result.stderr[-4000:]}")
         record = json.loads(native_report.read_text(encoding="utf-8"))
@@ -135,7 +140,7 @@ def probe(image, report_path, expected_version, expected_arch, sdk_idf=None, sdk
         # separate manual check and is not certified by a live process alone.
         gui_log = report_path.with_suffix(".gui.log")
         with gui_log.open("w", encoding="utf-8") as log:
-            child = subprocess.Popen([str(binary)], cwd=working, env=env, stdout=log, stderr=log)
+            child = subprocess.Popen([str(binary)], cwd=working, env=native_env, stdout=log, stderr=log)
             try:
                 try:
                     child.wait(timeout=12)
@@ -154,6 +159,7 @@ def probe(image, report_path, expected_version, expected_arch, sdk_idf=None, sdk
         record.update({"universal_architectures": architectures, "code_signature_verified": True,
                        "dmg_verified_and_unmounted": True, "gui_survived_startup_seconds": 12,
                        "interactive_gui_tested": False, "probe_environment": {
+                           "native_login_home_for_gui_and_keychain": True,
                            "copied_installation": True, "install_path_contains_spaces": True,
                            "separate_working_directory": True, "fresh_appdata": True,
                            "developer_paths_removed_from_environment": True, "http_proxy_closed": True,
