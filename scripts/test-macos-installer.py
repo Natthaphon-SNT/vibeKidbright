@@ -105,9 +105,12 @@ def probe(image, report_path, expected_version, expected_arch, sdk_idf=None, sdk
         working.mkdir()
         data.mkdir()
         env = clean_environment(data)
+        # The explicit scratch argument isolates app data. Keychain belongs to
+        # the real macOS login session and must not be resolved under a fake HOME.
+        native_env = dict(env, HOME=str(Path.home()))
         native_report = scratch / "native-self-check.json"
         result = subprocess.run([str(binary), "--self-check", str(native_report), str(data)],
-                                cwd=working, env=env, capture_output=True, text=True, timeout=180)
+                                cwd=working, env=native_env, capture_output=True, text=True, timeout=180)
         if not native_report.is_file():
             raise ValueError(f"App self-check produced no report (exit {result.returncode}): {result.stderr[-4000:]}")
         record = json.loads(native_report.read_text(encoding="utf-8"))

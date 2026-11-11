@@ -10,13 +10,18 @@ on:
         type: choice
         default: ''
         options: ['', v3.7.1]
+      installer_run:
+        description: 'Existing 3.7.4 artifact run ID, only for repeating installation checks'
+        type: string
+        default: ''
 
 permissions:
   contents: write
+  actions: read
 
 jobs:
   build:
-    if: ${{ inputs.source_ref != 'v3.7.1' }}
+    if: ${{ inputs.source_ref != 'v3.7.1' && inputs.installer_run == '' }}
     runs-on: macos-15
     timeout-minutes: 90
     outputs:
@@ -223,10 +228,12 @@ jobs:
           rm -f "$RUNNER_TEMP/cert.p12"
 
   verify-installation:
+    if: ${{ always() && inputs.source_ref != 'v3.7.1' && (needs.build.result == 'success' || inputs.installer_run != '') }}
     name: Install and launch (${{ matrix.arch }})
     needs: build
     permissions:
       contents: read
+      actions: read
     strategy:
       fail-fast: false
       matrix:
@@ -244,8 +251,10 @@ jobs:
       - name: Download the universal installer
         uses: actions/download-artifact@v4
         with:
-          name: vibeKidbright-macOS-${{ needs.build.outputs.version }}-universal
+          name: vibeKidbright-macOS-${{ needs.build.outputs.version || '3.7.4' }}-universal
           path: installer
+          run-id: ${{ inputs.installer_run || github.run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install native ESP-IDF using the in-app macOS setup instructions
         run: |
@@ -259,14 +268,41 @@ jobs:
           /bin/bash macos-sdk-setup.sh
 
       - name: Verify copied installation without developer tools
+        env:
+          CI_KEYCHAIN: ${{ runner.temp }}/vibekidbright-probe.keychain-db
+        run: |
+          python3 - <<'PY'
+          import os, secrets, subprocess
+          password = secrets.token_urlsafe(32)
+          path = os.environ['CI_KEYCHAIN']
+          for arguments in [
+              ['create-keychain', '-p', password, path],
+              ['set-keychain-settings', '-lut', '3600', path],
+              ['unlock-keychain', '-p', password, path],
+              ['default-keychain', '-d', 'user', '-s', path],
+              ['list-keychains', '-d', 'user', '-s', path],
+          ]:
+              subprocess.run(['/usr/bin/security', *arguments], check=True, capture_output=True)
+          PY
+          python3 scripts/test-macos-installer.py \
+            --installer-directory installer \
+            --report verification/macos-installation-check-${{ matrix.arch }}.json \
+            --expected-version '${{ needs.build.outputs.version || '3.7.4' }}' \
+            --expected-arch '${{ matrix.arch }}' \
+            --sdk-idf "$HOME/esp/esp-idf-v5.5.1" \
+            --sdk-tools "$HOME/.vibekidbright/.espressif"
+
+      - name: Remove temporary installation probe keychain
+        if: ${{ always() }}
+        run: |
+          if [ -f "$RUNNER_TEMP/vibekidbright-probe.keychain-db" ]; then
+            security delete-keychain "$RUNNER_TEMP/vibekidbright-probe.keychain-db"
+          fi
+
+      # Native probe details remain in the uploaded report and SDK/startup logs.
+      - name: Record installation verification completed
         run: >-
-          python3 scripts/test-macos-installer.py
-          --installer-directory installer
-          --report verification/macos-installation-check-${{ matrix.arch }}.json
-          --expected-version '${{ needs.build.outputs.version }}'
-          --expected-arch '${{ matrix.arch }}'
-          --sdk-idf "$HOME/esp/esp-idf-v5.5.1"
-          --sdk-tools "$HOME/.vibekidbright/.espressif"
+          test -s verification/macos-installation-check-${{ matrix.arch }}.json
 
       - name: Upload installation verification and startup logs
         if: ${{ always() }}
@@ -278,6 +314,7 @@ jobs:
           retention-days: 30
 
   release:
+    if: ${{ always() && needs.verify-installation.result == 'success' }}
     needs: [build, verify-installation]
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -285,8 +322,10 @@ jobs:
       - name: Download verified installer
         uses: actions/download-artifact@v4
         with:
-          name: vibeKidbright-macOS-${{ needs.build.outputs.version }}-universal
+          name: vibeKidbright-macOS-${{ needs.build.outputs.version || '3.7.4' }}-universal
           path: installer
+          run-id: ${{ inputs.installer_run || github.run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Download installation reports
         uses: actions/download-artifact@v4
@@ -298,9 +337,9 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ needs.build.outputs.tag }}
+          tag_name: ${{ needs.build.outputs.tag || 'v3.7.4' }}
           target_commitish: ${{ github.sha }}
-          name: 'vibeKidbright ${{ needs.build.outputs.tag }}'
+          name: "vibeKidbright ${{ needs.build.outputs.tag || 'v3.7.4' }}"
           body: |
             macOS: ดาวน์โหลด Universal .dmg แล้วลาก VibeKidbright IDE ไปไว้ใน Applications (Apple Silicon และ Intel)
             ตรวจ SHA-256 ด้วย SHA256SUMS-macos.txt; แนบผล self-check และ startup ของทั้งสองสถาปัตยกรรม
